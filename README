@@ -1,0 +1,50 @@
+Tango - Easy Twitter utilities for Django-based applications
+-----------------------------------------------------------------------------------------------------
+As a Django user, I've often wanted a way to easily implement Twitter scraping calls in my applications.
+I could write them from scratch using the already existing (and quite excellent) library called
+"Python-Twitter" (http://code.google.com/p/python-twitter/)...
+
+However, Python-Twitter doesn't (currently) handle some things well, such as using Twitter's
+Search API. I've found myself wanting a largely drop-in solution for this (and other)
+problems...
+
+Thus, we now have Tango.
+
+
+Installation
+-----------------------------------------------------------------------------------------------------
+You can install this like any other Django-app; just throw it in as a new app, register it in your
+settings as an "Installed App", and sync the models.
+
+Tango requires (much like Python-Twitter, because they had the right idea :D) a library called
+"simplejson" - Django should include this by default, but if you need the library for any reason,
+you can grab it at the following link:
+
+http://pypi.python.org/pypi/simplejson
+
+Tango also works well as a standalone Python library, so feel free to use it however you like.
+
+
+Example Use
+-----------------------------------------------------------------------------------------------------
+An extremely generic, and somewhat useless, demo is below. Instantiate your class by passing in a 
+Twitter username, then all functions will come off of that. Results are returned as a list.
+
+testList = tango("ryanmcgrath")
+newTestList = testList.getSearchTimeline("b", "20")
+for testTweet in newTestList:
+    print testTweet
+
+
+Questions, Comments, etc?
+-----------------------------------------------------------------------------------------------------
+I want to note that Tango is *not* like other Twitter libraries - we don't handle authentication or
+anything of the sort (yet); there are already battle-tested solutions out there for both Basic Auth and 
+OAuth. This isn't production ready quite yet.
+
+Tango will (hopefully) be compatible with Python 3; as it stands, I think it might be now, I've just
+not had the time to check over it.
+
+My hope is that Tango is so plug-and-play that you'd never *have* to ask any questions, but if
+you feel the need to contact me for this (or other) reasons, you can hit me up 
+at ryan@venodesigns.net.
