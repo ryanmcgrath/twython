@@ -26,8 +26,10 @@ class tango:
         return formattedTimeline
 
     def getTrendingTopics(self):
+        # Returns an array of dictionary items containing the current trends
         trendingTopicsURL = "http://search.twitter.com/trends.json"
         trendingTopics = simplejson.load(urllib.urlopen(trendingTopicsURL))
-        pass # for now, coming soon
-
-
+        trendingTopicsArray = []
+        for topic in trendingTopics['trends']:
+            trendingTopicsArray.append({"name" : topic['name'], "url" : topic['url']})
+        return trendingTopicsArray
