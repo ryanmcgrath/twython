@@ -9,8 +9,11 @@ class tango:
         # Authenticate here?
         self.twitter_user = twitter_user
     
-    def getUserTimeline(self, count, page, since_id):
-        userTimelineURL = "http://twitter.com/statuses/user_timeline/" + self.twitter_user + ".json" + ("" if optional_count is None else "?count=" + optional_count)
+    def getUserTimeline(self, **kwargs):
+        # Needs full API support, when I'm not so damn tired.
+        userTimelineURL = "http://twitter.com/statuses/user_timeline/" + self.twitter_user + ".json"
+        if kwargs["count"] is not None:
+            userTimelineURL += "?count=" + kwargs["count"]
         userTimeline = simplejson.load(urllib2.urlopen(userTimelineURL))
         formattedTimeline = []
         for tweet in userTimeline:
