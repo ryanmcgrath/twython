@@ -1,25 +1,37 @@
+#!/usr/bin/python
+
 """
     Django-Twitter (Tango) utility functions. Huzzah.
 """
 
-import simplejson, urllib, urllib2
+import simplejson, urllib, urllib2, base64
+
+# Need to support URL shortening
 
 class tango:
-    def __init__(self, twitter_user):
-        # Authenticate here?
-        self.twitter_user = twitter_user
+    def __init__(self, authtype = None, username = None, password = None):
+        self.authtype = authtype
+        self.username = username
+        self.password = password
+        # Forthcoming auth work below, now requires base64 shiz        
+        if self.authtype == "OAuth":
+            pass            
+        elif self.authtype == "Basic":
+            print "Basic Auth"
+        else:
+            pass
     
-    def getUserTimeline(self, **kwargs):
-        # Needs full API support, when I'm not so damn tired.
-        userTimelineURL = "http://twitter.com/statuses/user_timeline/" + self.twitter_user + ".json"
-        if kwargs["count"] is not None:
-            userTimelineURL += "?count=" + kwargs["count"]
-        if kwargs["since_id"] is not None:
-            userTimelineURL += "?since_id=" + kwargs["since_id"]
-        if kwargs["max_id"] is not None:
-            userTimelineURL += "?max_id=" + kwargs["max_id"]
-        if kwargs["page"] is not None:
-            userTimelineURL += "?page=" + kwargs["page"]
+    def getUserTimeline(self, count = None, since_id = None, max_id = None, page = None):
+        # Fairly close to full API support, need a few other methods.
+        userTimelineURL = "http://twitter.com/statuses/user_timeline/" + self.username + ".json"
+        if count is not None:
+            userTimelineURL += "?count=" + count
+        if since_id is not None:
+            userTimelineURL += "?since_id=" + since_id
+        if max_id is not None:
+            userTimelineURL += "?max_id=" + max_id
+        if page is not None:
+            userTimelineURL += "?page=" + page
         userTimeline = simplejson.load(urllib2.urlopen(userTimelineURL))
         formattedTimeline = []
         for tweet in userTimeline:
