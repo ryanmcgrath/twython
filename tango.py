@@ -14,6 +14,12 @@ class tango:
         userTimelineURL = "http://twitter.com/statuses/user_timeline/" + self.twitter_user + ".json"
         if kwargs["count"] is not None:
             userTimelineURL += "?count=" + kwargs["count"]
+        if kwargs["since_id"] is not None:
+            userTimelineURL += "?since_id=" + kwargs["since_id"]
+        if kwargs["max_id"] is not None:
+            userTimelineURL += "?max_id=" + kwargs["max_id"]
+        if kwargs["page"] is not None:
+            userTimelineURL += "?page=" + kwargs["page"]
         userTimeline = simplejson.load(urllib2.urlopen(userTimelineURL))
         formattedTimeline = []
         for tweet in userTimeline:
