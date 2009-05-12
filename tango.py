@@ -8,7 +8,7 @@ import simplejson, urllib, urllib2, base64
 
 # Need to support URL shortening
 
-class tango:
+class setup:
     def __init__(self, authtype = None, username = None, password = None):
         self.authtype = authtype
         self.username = username
@@ -21,17 +21,20 @@ class tango:
         else:
             pass
     
-    def getUserTimeline(self, count = None, since_id = None, max_id = None, page = None):
-        # Fairly close to full API support, need a few other methods.
-        userTimelineURL = "http://twitter.com/statuses/user_timeline/" + self.username + ".json"
-        if count is not None:
-            userTimelineURL += "?count=" + count
-        if since_id is not None:
-            userTimelineURL += "?since_id=" + since_id
-        if max_id is not None:
-            userTimelineURL += "?max_id=" + max_id
-        if page is not None:
-            userTimelineURL += "?page=" + page
+    def constructApiURL(self, base_url, params):
+        queryURL = base_url
+        questionMarkUsed = False
+        for param in params:
+            if params[param] is not None:
+                queryURL += (("&" if questionMarkUsed is True else "?") + param + "=" + params[param])
+                questionMarkUsed = True
+        return queryURL
+    
+    def getUserTimeline(self, **kwargs): 
+        # 99% API compliant, I think - need to figure out Gzip compression and auto-getting based on authentication
+        # By doing this with kwargs and constructing a url outside, we can stay somewhat agnostic of API changes - it's all
+        # based on what the user decides to pass. We just handle the heavy lifting! :D
+        userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline/" + self.username + ".json", kwargs)
         userTimeline = simplejson.load(urllib2.urlopen(userTimelineURL))
         formattedTimeline = []
         for tweet in userTimeline:
