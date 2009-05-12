@@ -30,7 +30,7 @@ Example Use
 An extremely generic, and somewhat useless, demo is below. Instantiate your class by passing in a 
 Twitter username, then all functions will come off of that. Results are returned as a list.
 
-testList = tango("ryanmcgrath")
+testList = tango.setup(username="ryanmcgrath")
 newTestList = testList.getSearchTimeline("b", "20")
 for testTweet in newTestList:
     print testTweet
