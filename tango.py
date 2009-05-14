@@ -31,11 +31,17 @@ class setup:
         return queryURL
     
     def getPublicTimeline(self):
-        publicTimeline = simplejson.load(urllib2.urlopen("http://twitter.com/statuses/public_timeline.json"))
-        formattedTimeline = []
-        for tweet in publicTimeline:
-            formattedTimeline.append(tweet['text'])
-        return formattedTimeline
+        try:
+            publicTimeline = simplejson.load(urllib2.urlopen("http://twitter.com/statuses/public_timeline.json"))
+            formattedTimeline = []
+            for tweet in publicTimeline:
+                formattedTimeline.append(tweet['text'])
+            return formattedTimeline
+        except IOError, e:
+            if hasattr(e, 'code'):
+                return "Loading API failed with HTTP Status Code " + e.code
+            else:
+                return "God help us all, Scotty, she's dead and we're not sure why."
     
     def getUserTimeline(self, **kwargs): 
         # 99% API compliant, I think - need to figure out Gzip compression and auto-getting based on authentication
