@@ -4,18 +4,17 @@
     Django-Twitter (Tango) utility functions. Huzzah.
 """
 
-import simplejson, httplib2, urllib, urllib2, base64
+import simplejson, httplib2, urllib, urllib2
 
 # Need to support URL shortening
 
 class setup:
-    def __init__(self, authtype = None, username = None, password = None):
+    def __init__(self, authtype = "OAuth", username = None, password = None):
         self.authtype = authtype
         self.authenticated = False
         self.username = username
         self.password = password
         self.http = httplib2.Http() # For Basic Auth...
-        # Forthcoming auth work below, now requires base64 shiz 
         if self.username is not None and self.password is not None:
             if self.authtype == "OAuth":
                 pass            
@@ -35,17 +34,11 @@ class setup:
         return queryURL
     
     def getPublicTimeline(self):
-        try:
-            publicTimeline = simplejson.load(urllib2.urlopen("http://twitter.com/statuses/public_timeline.json"))
-            formattedTimeline = []
-            for tweet in publicTimeline:
-                formattedTimeline.append(tweet['text'])
-            return formattedTimeline
-        except IOError, e:
-            if hasattr(e, 'code'):
-                return "Loading API failed with HTTP Status Code " + e.code
-            else:
-                return "God help us all, Scotty, she's dead and we're not sure why."
+        publicTimeline = simplejson.load(urllib2.urlopen("http://twitter.com/statuses/public_timeline.json"))
+        formattedTimeline = []
+        for tweet in publicTimeline:
+            formattedTimeline.append(tweet['text'])
+        return formattedTimeline
     
     def getUserTimeline(self, **kwargs): 
         # 99% API compliant, I think - need to figure out Gzip compression and auto-getting based on authentication
@@ -60,7 +53,10 @@ class setup:
     
     def getUserMentions(self, **kwargs):
         if self.authenticated is True:
-            pass
+            if self.authtype is "Basic":
+                pass
+            else:
+                pass
         else:
             print "getUserMentions() requires you to be authenticated."
             pass
