@@ -4,20 +4,24 @@
     Django-Twitter (Tango) utility functions. Huzzah.
 """
 
-import simplejson, urllib, urllib2, base64
+import simplejson, httplib2, urllib, urllib2, base64
 
 # Need to support URL shortening
 
 class setup:
     def __init__(self, authtype = None, username = None, password = None):
         self.authtype = authtype
+        self.authenticated = False
         self.username = username
         self.password = password
-        # Forthcoming auth work below, now requires base64 shiz        
-        if self.authtype == "OAuth":
-            pass            
-        elif self.authtype == "Basic":
-            print "Basic Auth"
+        self.http = httplib2.Http() # For Basic Auth...
+        # Forthcoming auth work below, now requires base64 shiz 
+        if self.username is not None and self.password is not None:
+            if self.authtype == "OAuth":
+                pass            
+            elif self.authtype == "Basic":
+                self.http.add_credentials(self.username, self.password)
+                self.authenticated = True
         else:
             pass
     
@@ -55,13 +59,29 @@ class setup:
         return formattedTimeline
     
     def getUserMentions(self, **kwargs):
-        pass
+        if self.authenticated is True:
+            pass
+        else:
+            print "getUserMentions() requires you to be authenticated."
+            pass
 
-    def updateStatus(self, **kwargs):
-        pass
+    def updateStatus(self, status = None, in_reply_to_status_id = None):
+        if self.authenticated is True:
+            if self.authtype == "Basic":
+                self.http.request("http://twitter.com/statuses/update.json", "POST", urllib.urlencode({"status": status}, {"in_reply_to_status_id": in_reply_to_status_id}))
+            else:
+                print "Sorry, OAuth support is still forthcoming. Feel free to help out on this front!"
+                pass
+        else:
+            print "updateStatus() requires you to be authenticated."
+            pass
     
     def destroyStatus(self, **kwargs):
-        pass
+        if self.authenticated is True:
+            pass
+        else:
+            print "destroyStatus() requires you to be authenticated."
+            pass
     
     def getSearchTimeline(self, search_query, optional_page):
         params = urllib.urlencode({'q': search_query, 'rpp': optional_page}) # Doesn't hurt to do pages this way. *shrug*
