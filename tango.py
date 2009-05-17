@@ -4,16 +4,33 @@
     Django-Twitter (Tango) utility functions. Huzzah.
 """
 
-import simplejson, httplib2, urllib, urllib2
+import urllib, urllib2
+
+try:
+    import simplejson
+except:
+    print "Tango requires the simplejson library to work. http://www.undefined.org/python/"
+
+try:
+    import httplib2
+except:
+    print "Tango requires httplib2 for authentication purposes. http://code.google.com/p/httplib2/"
+
+try:
+    import oauth
+except:
+    print "Tango requires oauth for authentication purposes. http://oauth.googlecode.com/svn/code/python/oauth/oauth.py"
+
 
 # Need to support URL shortening
 
 class setup:
-    def __init__(self, authtype = "OAuth", username = None, password = None):
+    def __init__(self, authtype = "OAuth", username = None, password = None, oauth_keys = None):
         self.authtype = authtype
         self.authenticated = False
         self.username = username
         self.password = password
+        self.oauth_keys = oauth_keys
         self.http = httplib2.Http() # For Basic Auth...
         if self.username is not None and self.password is not None:
             if self.authtype == "OAuth":
@@ -53,7 +70,7 @@ class setup:
     
     def getUserMentions(self, **kwargs):
         if self.authenticated is True:
-            if self.authtype is "Basic":
+            if self.authtype == "Basic":
                 pass
             else:
                 pass
@@ -72,9 +89,9 @@ class setup:
             print "updateStatus() requires you to be authenticated."
             pass
     
-    def destroyStatus(self, **kwargs):
+    def destroyStatus(self, id):
         if self.authenticated is True:
-            pass
+            self.http.request("http://twitter.com/status/destroy/" + id + ".json", "POST")
         else:
             print "destroyStatus() requires you to be authenticated."
             pass
