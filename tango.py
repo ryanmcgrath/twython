@@ -11,6 +11,7 @@ try:
 except:
     print "Tango requires the simplejson library to work. http://www.undefined.org/python/"
 
+# Should really deprecate httplib2 at some point...
 try:
     import httplib2
 except:
@@ -41,6 +42,11 @@ class setup:
         else:
             pass
     
+    def shortenURL(self, url_to_shorten):
+        # Perhaps we should have fallbacks here in case the is.gd API limit gets hit? Maybe allow them to set the host?
+        shortURL = urllib2.urlopen("http://is.gd/api.php?" + urllib.urlencode({"longurl": url_to_shorten})).read()
+        return shortURL
+
     def constructApiURL(self, base_url, params):
         queryURL = base_url
         questionMarkUsed = False
