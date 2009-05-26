@@ -6,6 +6,8 @@
 
 import urllib, urllib2
 
+from urllib2 import HTTPError
+
 try:
 	import simplejson
 except:
@@ -23,13 +25,12 @@ class setup:
 		self.username = username
 		self.password = password
 		self.oauth_keys = oauth_keys
-		self.opener = None
 		if self.username is not None and self.password is not None:
 			if self.authtype == "OAuth":
 				pass
 			elif self.authtype == "Basic":
 				self.auth_manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
-				self.auth_manager.add_password(None, "http://twitter.com/account/verify_credentials.json", self.username, self.password)
+				self.auth_manager.add_password(None, "http://twitter.com", self.username, self.password)
 				self.handler = urllib2.HTTPBasicAuthHandler(self.auth_manager)
 				self.opener = urllib2.build_opener(self.handler)
 				self.authenticated = True
@@ -78,11 +79,14 @@ class setup:
 			print "getUserMentions() requires you to be authenticated."
 			pass
 	
-	def updateStatus(self, status, in_reply_to_status_id = ""):
+	def updateStatus(self, status, in_reply_to_status_id = None):
 		if self.authenticated is True:
 			if self.authtype == "Basic":
-				self.opener.open("http://twitter.com/statuses/update.json" + urllib.urlencode({"status": status}, {"in_reply_to_status_id": in_reply_to_status_id}))
-				print self.opener.open("http://twitter.com/statuses/update.json" + urllib.urlencode({"status": status}, {"in_reply_to_status_id": in_reply_to_status_id})).read()
+				try:
+					self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status}, {"in_reply_to_status_id": in_reply_to_status_id}))
+				except HTTPError, e:
+					print e.code
+					print e.headers
 			else:
 				print "Sorry, OAuth support is still forthcoming. Feel free to help out on this front!"
 				pass
