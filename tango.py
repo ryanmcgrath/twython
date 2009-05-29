@@ -86,7 +86,22 @@ class setup:
 				"text": tweet["text"]
 			})
 		return genericTimeline
-		
+	
+	def getRateLimitStatus(self, rate_for = "requestingIP"):
+		try:
+			if rate_for == "requestingIP":
+				rate_limit = simplejson.load(urllib2.urlopen("http://twitter.com/account/rate_limit_status.json"))
+			else:
+				rate_limit = simplejson.load(self.opener.open("http://twitter.com/account/rate_limit_status.json"))
+		except HTTPError, e:
+			if self.debug is True:
+				print e.headers
+			print "It seems that there's something wrong. Twitter gave you a " + e.code + " error code; are you doing something you shouldn't be?"
+		return {"remaining-hits": rate_limit["remaining-hits"], 
+				"hourly-limit": rate_limit["hourly-limit"], 
+				"reset-time": rate_limit["reset-time"],
+				"reset-time-in-seconds": rate_limit["reset-time-in-seconds"]}
+
 	def getPublicTimeline(self):
 		return self.createGenericTimeline(simplejson.load(urllib2.urlopen("http://twitter.com/statuses/public_timeline.json")))
 	
@@ -102,8 +117,10 @@ class setup:
 		userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline/" + self.username + ".json", kwargs)
 		try:
 			return self.createGenericTimeline(simplejson.load(urllib2.urlopen(userTimelineURL)))
-		except:
-			print "Hmmm, that failed. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
+		except HTTPError, e:
+			if self.debug is True:
+				print e.headers
+			print "Hmmm, failed with a " + e.code + " error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
 			pass
 	
 	def getUserMentions(self, **kwargs):
@@ -118,6 +135,21 @@ class setup:
 			print "getUserMentions() requires you to be authenticated."
 			pass
 	
+	def showStatus(self, id):
+		try:
+			tweet = simplejson.load(self.opener.open("http://twitter.com/statuses/show/" + id + ".json"))
+			return {"created_at": tweet["created_at"], 
+					"id": tweet["id"], 
+					"text": tweet["text"], 
+					"in_reply_to_status_id": tweet["in_reply_to_status_id"],
+					"in_reply_to_user_id": tweet["in_reply_to_user_id"],
+					"in_reply_to_screen_name": tweet["in_reply_to_screen_name"]}
+		except HTTPError, e:
+			if self.debug is True:
+				print e.headers
+			print "Hmmm, failed with a " + e.code + " error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
+			pass
+
 	def updateStatus(self, status, in_reply_to_status_id = None):
 		if self.authenticated is True:
 			if self.authtype == "Basic":
