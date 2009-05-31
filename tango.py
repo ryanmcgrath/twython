@@ -174,6 +174,20 @@ class setup:
 			print "destroyStatus() requires you to be authenticated."
 			pass
 	
+	def endSession(self):
+		if self.authenticated is True:
+			try:
+				self.opener.open("http://twitter.com/account/end_session.json", "")
+				self.authenticated = False
+			except:
+				if self.debug is True:
+					print e.headers
+				print "endSession failed with a " + e.code + " error code."
+				pass
+		else:
+			print "You can't end a session when you're not authenticated to begin with."
+			pass
+	
 	def getSearchTimeline(self, search_query, optional_page):
 		params = urllib.urlencode({'q': search_query, 'rpp': optional_page}) # Doesn't hurt to do pages this way. *shrug*
 		try:
