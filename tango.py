@@ -8,7 +8,7 @@
 	Questions, comments? ryan@venodesigns.net
 """
 
-import urllib, urllib2
+import httplib, urllib, urllib2, mimetypes
 
 from urllib2 import HTTPError
 
@@ -179,7 +179,7 @@ class setup:
 			try:
 				self.opener.open("http://twitter.com/account/end_session.json", "")
 				self.authenticated = False
-			except:
+			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
 				print "endSession failed with a " + e.code + " error code."
@@ -187,6 +187,85 @@ class setup:
 		else:
 			print "You can't end a session when you're not authenticated to begin with."
 			pass
+	
+	def updateDeliveryDevice(self, device_name = "none"):
+		if self.authenticated is True:
+			try:
+				self.opener.open("http://twitter.com/account/update_delivery_device.json?", urllib.urlencode({"device": device_name}))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "updateDeliveryDevice() failed with a " + e.code + " error code."
+		else:
+			print "updateDeliveryDevice() requires you to be authenticated."
+	
+	def updateProfileColors(self, **kwargs):
+		if self.authenticated is True:
+			try:
+				self.opener.open(self.constructApiURL("http://twitter.com/account/update_profile_colors.json?", kwargs))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "updateProfileColors() failed with a " + e.code + " error code."
+		else:
+			print "updateProfileColors() requires you to be authenticated."
+	
+	def updateProfile(self, name = None, email = None, url = None, location = None, description = None):
+		if self.authenticated is True:
+			useAmpersands = False
+			updateProfileQueryString = ""
+			if name is not None:
+				if len(list(name)) < 20:
+					updateProfileQueryString += "name=" + name
+					useAmpersands = True
+				else:
+					print "Twitter has a character limit of 20 for all usernames. Try again."
+			if email is not None and "@" in email:
+				if len(list(email)) < 40:
+					if useAmpersands is True:
+						updateProfileQueryString += "&email=" + email
+					else:
+						updateProfileQueryString += "email=" + email
+						useAmpersands = True
+				else:
+					print "Twitter has a character limit of 40 for all email addresses, and the email address must be valid. Try again."
+			if url is not None:
+				if len(list(url)) < 100:
+					if useAmpersands is True:
+						updateProfileQueryString += "&" + urllib.urlencode({"url": url})
+					else:
+						updateProfileQueryString += urllib.urlencode({"url": url})
+						useAmpersands = True
+				else:
+					print "Twitter has a character limit of 100 for all urls. Try again."
+			if location is not None:
+				if len(list(location)) < 30:
+					if useAmpersands is True:
+						updateProfileQueryString += "&" + urllib.urlencode({"location": location})
+					else:
+						updateProfileQueryString += urllib.urlencode({"location": location})
+						useAmpersands = True
+				else:
+					print "Twitter has a character limit of 30 for all locations. Try again."
+			if description is not None:
+				if len(list(description)) < 160:
+					if useAmpersands is True:
+						updateProfileQueryString += "&" + urllib.urlencode({"description": description})
+					else:
+						updateProfileQueryString += urllib.urlencode({"description": description})
+				else:
+					print "Twitter has a character limit of 160 for all descriptions. Try again."
+			
+			if updateProfileQueryString != "":
+				try:
+					self.opener.open("http://twitter.com/account/update_profile.json?", updateProfileQueryString)
+				except HTTPError, e:
+					if self.debug is True:
+						print e.headers
+					print "updateProfile() failed with a " + e.code + " error code."
+		else:
+			# If they're not authenticated
+			print "updateProfile() requires you to be authenticated."
 	
 	def getSearchTimeline(self, search_query, optional_page):
 		params = urllib.urlencode({'q': search_query, 'rpp': optional_page}) # Doesn't hurt to do pages this way. *shrug*
