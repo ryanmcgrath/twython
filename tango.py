@@ -8,18 +8,18 @@
 	Questions, comments? ryan@venodesigns.net
 """
 
-import httplib, urllib, urllib2, mimetypes
+import httplib, urllib, urllib2, mimetypes, mimetools
 
 from urllib2 import HTTPError
 
 try:
 	import simplejson
-except:
+except ImportError:
 	print "Tango requires the simplejson library to work. http://www.undefined.org/python/"
 
 try:
 	import oauth
-except:
+except ImportError:
 	print "Tango requires oauth for authentication purposes. http://oauth.googlecode.com/svn/code/python/oauth/oauth.py"
 
 class setup:
@@ -70,7 +70,7 @@ class setup:
 		return queryURL
 	
 	def createGenericTimeline(self, existingTimeline):
-		# Many of Twitter's API functions return the same style of data. This function just wraps it if we need it.
+		# Many of Twitters API functions return the same style of data. This function just wraps it if we need it.
 		genericTimeline = []
 		for tweet in existingTimeline:
 			genericTimeline.append({
@@ -379,3 +379,56 @@ class setup:
 			if self.debug is True:
 				print e.headers
 			print "getCurrentTrends() failed with a " + str(e.code) + " error code."
+	
+	# The following methods are apart from the other Account methods, because they rely on a whole multipart-data posting function set.
+	def updateProfileBackgroundImage(self, filename, tile="true"):
+		if self.authenticated is True:
+			#try:
+			files = [("image", filename, open(filename).read())]
+			fields = []
+			content_type, body = self.encode_multipart_formdata(fields, files)
+			headers = {'Content-Type': content_type, 'Content-Length': str(len(body))}
+			r = urllib2.Request("http://twitter.com/account/update_profile_background_image.json?tile=" + tile, body, headers)
+			return self.opener.open(r).read()
+			#except:
+			#print "Oh god, this failed so horribly."
+		else:
+			print "You realize you need to be authenticated to change a background image, right?"
+	
+	def updateProfileImage(self, filename):
+		if self.authenticated is True:
+			try:
+				files = [("image", filename, open(filename).read())]
+				fields = []
+				content_type, body = self.encode_multipart_formdata(fields, files)
+				headers = {'Content-Type': content_type, 'Content-Length': str(len(body))}
+				r = urllib2.Request("http://twitter.com/account/update_profile_image.json", body, headers)
+				return self.opener.open(r).read()
+			except:
+				print "Oh god, this failed so horribly."
+		else:
+			print "You realize you need to be authenticated to change a profile image, right?"
+	
+	def encode_multipart_formdata(self, fields, files):
+		BOUNDARY = mimetools.choose_boundary()
+		CRLF = '\r\n'
+		L = []
+		for (key, value) in fields:
+			L.append('--' + BOUNDARY)
+			L.append('Content-Disposition: form-data; name="%s"' % key)
+			L.append('')
+			L.append(value)
+		for (key, filename, value) in files:
+			L.append('--' + BOUNDARY)
+			L.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename))
+			L.append('Content-Type: %s' % self.get_content_type(filename))
+			L.append('')
+			L.append(value)
+		L.append('--' + BOUNDARY + '--')
+		L.append('')
+		body = CRLF.join(L)
+		content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
+		return content_type, body
+	
+	def get_content_type(self, filename):
+		return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
