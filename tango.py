@@ -267,6 +267,40 @@ class setup:
 			# If they're not authenticated
 			print "updateProfile() requires you to be authenticated."
 	
+	def getFavorites(self, page = "1"):
+		if self.authenticated is True:
+			try:
+				favoritesTimeline = simplejson.load(self.opener.open("http://twitter.com/favorites.json?page=" + page))
+				return self.createGenericTimeline(favoritesTimeline)
+			except HTTPError, e:
+				if self.debug:
+					print e.headers
+				print "getFavorites() failed with a " + e.code + " error code."
+		else:
+			print "getFavorites() requires you to be authenticated."
+	
+	def createFavorite(self, id):
+		if self.authenticated is True:
+			try:
+				self.opener.open("http://twitter.com/favorites/create/" + id + ".json", "")
+			except HTTPError, e:
+				if self.debug:
+					print e.headers
+				print "createFavorite() failed with a " + e.code + " error code."
+		else:
+			print "createFavorite() requires you to be authenticated."
+	
+	def destroyFavorite(self, id):
+		if self.authenticated is True:
+			try:
+				self.opener.open("http://twitter.com/favorites/destroy/" + id + ".json", "")
+			except HTTPError, e:
+				if self.debug:
+					print e.headers
+				print "destroyFavorite() failed with a " + e.code + " error code."
+		else:
+			print "destroyFavorite() requires you to be authenticated."
+	
 	def getSearchTimeline(self, search_query, optional_page):
 		params = urllib.urlencode({'q': search_query, 'rpp': optional_page}) # Doesn't hurt to do pages this way. *shrug*
 		try:
