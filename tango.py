@@ -42,10 +42,6 @@ class setup:
 		else:
 			pass
 	
-	def explainOAuthSupport(self):
-		print "Sorry, OAuth support is still forthcoming. Default back to Basic Authentication for now, or help out on this front!"
-		pass
-
 	# OAuth functions; shortcuts for verifying the credentials.
 	def fetch_response_oauth(self, oauth_request):
 		pass
@@ -96,19 +92,29 @@ class setup:
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
-			print "It seems that there's something wrong. Twitter gave you a " + e.code + " error code; are you doing something you shouldn't be?"
+			print "It seems that there's something wrong. Twitter gave you a " + str(e.code) + " error code; are you doing something you shouldn't be?"
 		return {"remaining-hits": rate_limit["remaining-hits"], 
 				"hourly-limit": rate_limit["hourly-limit"], 
 				"reset-time": rate_limit["reset-time"],
 				"reset-time-in-seconds": rate_limit["reset-time-in-seconds"]}
 
 	def getPublicTimeline(self):
-		return self.createGenericTimeline(simplejson.load(urllib2.urlopen("http://twitter.com/statuses/public_timeline.json")))
+		try:
+			return self.createGenericTimeline(simplejson.load(urllib2.urlopen("http://twitter.com/statuses/public_timeline.json")))
+		except HTTPError, e:
+			if self.debug is True:
+				print e.headers
+			print "getPublicTimeline() failed with a " + str(e.code) + " error code."
 	
 	def getFriendsTimeline(self, **kwargs):
 		if self.authenticated is True:
-			friendsTimelineURL = self.constructApiURL("http://twitter.com/statuses/friends_timeline.json", kwargs)
-			return self.createGenericTimeline(simplejson.load(self.opener.open(friendsTimelineURL)))
+			try:
+				friendsTimelineURL = self.constructApiURL("http://twitter.com/statuses/friends_timeline.json", kwargs)
+				return self.createGenericTimeline(simplejson.load(self.opener.open(friendsTimelineURL)))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "getFriendsTimeline() failed with a " + str(e.code) + " error code."
 		else:
 			print "getFriendsTimeline() requires you to be authenticated."
 			pass
@@ -120,17 +126,19 @@ class setup:
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
-			print "Hmmm, failed with a " + e.code + " error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
+			print "Failed with a " + str(e.code) + " error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
 			pass
 	
 	def getUserMentions(self, **kwargs):
 		if self.authenticated is True:
-			if self.authtype == "Basic":
+			try:
 				mentionsFeedURL = self.constructApiURL("http://twitter.com/statuses/mentions.json", kwargs)
 				mentionsFeed = simplejson.load(self.opener.open(mentionsFeedURL))
 				return self.createGenericTimeline(mentionsFeed)
-			else:
-				pass
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "getUserMentions() failed with a " + str(e.code) + " error code."
 		else:
 			print "getUserMentions() requires you to be authenticated."
 			pass
@@ -147,29 +155,29 @@ class setup:
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
-			print "Hmmm, failed with a " + e.code + " error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
+			print "Failed with a " + str(e.code) + " error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
 			pass
 
 	def updateStatus(self, status, in_reply_to_status_id = None):
 		if self.authenticated is True:
-			if self.authtype == "Basic":
-				try:
-					self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status}, {"in_reply_to_status_id": in_reply_to_status_id}))
-				except HTTPError, e:
-					print e.code
+			try:
+				self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status}, {"in_reply_to_status_id": in_reply_to_status_id}))
+			except HTTPError, e:
+				if self.debug is True:
 					print e.headers
-			else:
-				self.explainOAuthSupport()
+				print "updateStatus() failed with a " + str(e.code) + " error code."
 		else:
 			print "updateStatus() requires you to be authenticated."
 			pass
 	
 	def destroyStatus(self, id):
 		if self.authenticated is True:
-			if self.authtype == "Basic":
+			try:
 				self.opener.open("http://twitter.com/status/destroy/" + id + ".json", "POST")
-			else:
-				self.explainOAuthSupport()
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "destroyStatus() failed with a " + str(e.code) + " error code."
 		else:
 			print "destroyStatus() requires you to be authenticated."
 			pass
@@ -182,8 +190,7 @@ class setup:
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
-				print "endSession failed with a " + e.code + " error code."
-				pass
+				print "endSession failed with a " + str(e.code) + " error code."
 		else:
 			print "You can't end a session when you're not authenticated to begin with."
 			pass
@@ -195,7 +202,7 @@ class setup:
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
-				print "updateDeliveryDevice() failed with a " + e.code + " error code."
+				print "updateDeliveryDevice() failed with a " + str(e.code) + " error code."
 		else:
 			print "updateDeliveryDevice() requires you to be authenticated."
 	
@@ -206,7 +213,7 @@ class setup:
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
-				print "updateProfileColors() failed with a " + e.code + " error code."
+				print "updateProfileColors() failed with a " + str(e.code) + " error code."
 		else:
 			print "updateProfileColors() requires you to be authenticated."
 	
@@ -275,7 +282,7 @@ class setup:
 			except HTTPError, e:
 				if self.debug:
 					print e.headers
-				print "getFavorites() failed with a " + e.code + " error code."
+				print "getFavorites() failed with a " + str(e.code) + " error code."
 		else:
 			print "getFavorites() requires you to be authenticated."
 	
@@ -286,7 +293,7 @@ class setup:
 			except HTTPError, e:
 				if self.debug:
 					print e.headers
-				print "createFavorite() failed with a " + e.code + " error code."
+				print "createFavorite() failed with a " + str(e.code) + " error code."
 		else:
 			print "createFavorite() requires you to be authenticated."
 	
@@ -297,9 +304,45 @@ class setup:
 			except HTTPError, e:
 				if self.debug:
 					print e.headers
-				print "destroyFavorite() failed with a " + e.code + " error code."
+				print "destroyFavorite() failed with a " + str(e.code) + " error code."
 		else:
 			print "destroyFavorite() requires you to be authenticated."
+	
+	def notificationFollow(self, id = None, user_id = None, screen_name = None):
+		if self.authenticated is True:
+			apiURL = ""
+			if id is not None:
+				apiURL = "http://twitter.com/notifications/follow/" + id + ".json"
+			if user_id is not None:
+				apiURL = "http://twitter.com/notifications/follow/follow.json?user_id" + user_id
+			if screen_name is not None:
+				apiURL = "http://twitter.com/notifications/follow/follow.json?screen_name" + screen_name
+			try:
+				self.opener.open(apiURL, "")
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "notificationFollow() failed with a " + str(e.code) + " error code."
+		else:
+			print "notificationFollow() requires you to be authenticated."
+	
+	def notificationLeave(self, id = None, user_id = None, screen_name = None):
+		if self.authenticated is True:
+			apiURL = ""
+			if id is not None:
+				apiURL = "http://twitter.com/notifications/leave/" + id + ".json"
+			if user_id is not None:
+				apiURL = "http://twitter.com/notifications/leave/leave.json?user_id" + user_id
+			if screen_name is not None:
+				apiURL = "http://twitter.com/notifications/leave/leave.json?screen_name" + screen_name
+			try:
+				self.opener.open(apiURL, "")
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "notificationLeave() failed with a " + str(e.code) + " error code."
+		else:
+			print "notificationLeave() requires you to be authenticated."
 	
 	def getSearchTimeline(self, search_query, optional_page):
 		params = urllib.urlencode({'q': search_query, 'rpp': optional_page}) # Doesn't hurt to do pages this way. *shrug*
@@ -319,14 +362,20 @@ class setup:
 				})
 			return genericTimeline
 		except HTTPError, e:
-			print e.code
-			print e.headers
+			if self.debug is True:
+				print e.headers
+			print "getSearchTimeline() failed with a " + str(e.code) + " error code."
 	
 	def getCurrentTrends(self):
-		# Returns an array of dictionary items containing the current trends
-		trendingTopicsURL = "http://search.twitter.com/trends.json"
-		trendingTopics = simplejson.load(urllib.urlopen(trendingTopicsURL))
-		trendingTopicsArray = []
-		for topic in trendingTopics['trends']:
-			trendingTopicsArray.append({"name" : topic['name'], "url" : topic['url']})
-		return trendingTopicsArray
+		try:
+			# Returns an array of dictionary items containing the current trends
+			trendingTopicsURL = "http://search.twitter.com/trends.json"
+			trendingTopics = simplejson.load(urllib.urlopen(trendingTopicsURL))
+			trendingTopicsArray = []
+			for topic in trendingTopics['trends']:
+				trendingTopicsArray.append({"name" : topic['name'], "url" : topic['url']})
+			return trendingTopicsArray
+		except HTTPError, e:
+			if self.debug is True:
+				print e.headers
+			print "getCurrentTrends() failed with a " + str(e.code) + " error code."
