@@ -314,9 +314,9 @@ class setup:
 			if id is not None:
 				apiURL = "http://twitter.com/notifications/follow/" + id + ".json"
 			if user_id is not None:
-				apiURL = "http://twitter.com/notifications/follow/follow.json?user_id" + user_id
+				apiURL = "http://twitter.com/notifications/follow/follow.json?user_id=" + user_id
 			if screen_name is not None:
-				apiURL = "http://twitter.com/notifications/follow/follow.json?screen_name" + screen_name
+				apiURL = "http://twitter.com/notifications/follow/follow.json?screen_name=" + screen_name
 			try:
 				self.opener.open(apiURL, "")
 			except HTTPError, e:
@@ -332,9 +332,9 @@ class setup:
 			if id is not None:
 				apiURL = "http://twitter.com/notifications/leave/" + id + ".json"
 			if user_id is not None:
-				apiURL = "http://twitter.com/notifications/leave/leave.json?user_id" + user_id
+				apiURL = "http://twitter.com/notifications/leave/leave.json?user_id=" + user_id
 			if screen_name is not None:
-				apiURL = "http://twitter.com/notifications/leave/leave.json?screen_name" + screen_name
+				apiURL = "http://twitter.com/notifications/leave/leave.json?screen_name=" + screen_name
 			try:
 				self.opener.open(apiURL, "")
 			except HTTPError, e:
@@ -343,6 +343,36 @@ class setup:
 				print "notificationLeave() failed with a " + str(e.code) + " error code."
 		else:
 			print "notificationLeave() requires you to be authenticated."
+	
+	def getFriendsIDs(self, id = None, user_id = None, screen_name = None, page = "1"):
+		apiURL = ""
+		if id is not None:
+			apiURL = "http://twitter.com/friends/ids/" + id + ".json" + "?page=" + page
+		if user_id is not None:
+			apiURL = "http://twitter.com/friends/ids.json?user_id=" + user_id + "&page=" + page
+		if screen_name is not None:
+			apiURL = "http://twitter.com/friends/ids.json?screen_name=" + screen_name + "&page=" + page
+		try:
+			return simplejson.load(urllib2.urlopen(apiURL))
+		except HTTPError, e:
+			if self.debug is True:
+				print e.headers
+			print "getFriendsIDs() failed with a " + str(e.code) + " error code."
+		
+	def getFollowersIDs(self, id = None, user_id = None, screen_name = None, page = "1"):
+		apiURL = ""
+		if id is not None:
+			apiURL = "http://twitter.com/followers/ids/" + id + ".json" + "?page=" + page
+		if user_id is not None:
+			apiURL = "http://twitter.com/followers/ids.json?user_id=" + user_id + "&page=" + page
+		if screen_name is not None:
+			apiURL = "http://twitter.com/followers/ids.json?screen_name=" + screen_name + "&page=" + page
+		try:
+			return simplejson.load(urllib2.urlopen(apiURL))
+		except HTTPError, e:
+			if self.debug is True:
+				print e.headers
+			print "getFollowersIDs() failed with a " + str(e.code) + " error code."
 	
 	def getSearchTimeline(self, search_query, optional_page):
 		params = urllib.urlencode({'q': search_query, 'rpp': optional_page}) # Doesn't hurt to do pages this way. *shrug*
