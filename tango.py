@@ -5,6 +5,8 @@
 	Other Python Twitter libraries seem to have fallen a bit behind, and
 	Twitter's API has evolved a bit. Here's hoping this helps.
 
+	TODO: Blocks API Wrapper, Direct Messages API Wrapper, Friendship API Wrapper, OAuth, Streaming API
+
 	Questions, comments? ryan@venodesigns.net
 """
 
