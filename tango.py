@@ -197,6 +197,55 @@ class setup:
 			print "You can't end a session when you're not authenticated to begin with."
 			pass
 	
+	def createFriendship(self, id = None, user_id = None, screen_name = None, follow = "false"):
+		if self.authenticated is True:
+			apiURL = ""
+			if id is not None:
+				apiURL = "http://twitter.com/friendships/create/" + id + ".json" + "?follow=" + follow
+			if user_id is not None:
+				apiURL = "http://twitter.com/friendships/create.json?user_id=" + user_id + "&follow=" + follow
+			if screen_name is not None:
+				apiURL = "http://twitter.com/friendships/create.json?screen_name=" + screen_name + "&follow=" + follow
+			try:
+				return simplejson.load(urllib2.urlopen(apiURL))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "createFriendship() failed with a " + str(e.code) + " error code. "
+				if e.code == 403:
+					print "It seems you've hit the update limit for this method. Try again in 24 hours."
+		else:
+			print "createFriendship() requires you to be authenticated."
+		
+	def destroyFriendship(self, id = None, user_id = None, screen_name = None):
+		if self.authenticated is True:
+			apiURL = ""
+			if id is not None:
+				apiURL = "http://twitter.com/friendships/destroy/" + id + ".json"
+			if user_id is not None:
+				apiURL = "http://twitter.com/friendships/destroy.json?user_id=" + user_id
+			if screen_name is not None:
+				apiURL = "http://twitter.com/friendships/destroy.json?screen_name=" + screen_name
+			try:
+				return simplejson.load(urllib2.urlopen(apiURL))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "destroyFriendship() failed with a " + str(e.code) + " error code."
+		else:
+			print "destroyFriendship() requires you to be authenticated."
+	
+	def checkIfFriendshipExists(self, user_a, user_b):
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://twitter.com/friendships/exists.json", urllib.urlencode({"user_a": user_a, "user_b": user_b})))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "checkIfFriendshipExists() failed with a " + str(e.code) + " error code."
+		else:
+			print "checkIfFriendshipExists(), oddly, requires that you be authenticated."
+	
 	def updateDeliveryDevice(self, device_name = "none"):
 		if self.authenticated is True:
 			try:
