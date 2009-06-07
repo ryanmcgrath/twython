@@ -207,7 +207,7 @@ class setup:
 			if screen_name is not None:
 				apiURL = "http://twitter.com/friendships/create.json?screen_name=" + screen_name + "&follow=" + follow
 			try:
-				return simplejson.load(urllib2.urlopen(apiURL))
+				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
@@ -227,7 +227,7 @@ class setup:
 			if screen_name is not None:
 				apiURL = "http://twitter.com/friendships/destroy.json?screen_name=" + screen_name
 			try:
-				return simplejson.load(urllib2.urlopen(apiURL))
+				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
@@ -424,6 +424,65 @@ class setup:
 			if self.debug is True:
 				print e.headers
 			print "getFollowersIDs() failed with a " + str(e.code) + " error code."
+	
+	def createBlock(self, id):
+		if self.authenticated is True:
+			try:
+				self.opener.open("http://twitter.com/blocks/create/" + id + ".json", "")
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "createBlock() failed with a " + str(e.code) + " error code."
+		else:
+			print "createBlock() requires you to be authenticated."
+	
+	def destroyBlock(self, id):
+		if self.authenticated is True:
+			try:
+				self.opener.open("http://twitter.com/blocks/destroy/" + id + ".json", "")
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "destroyBlock() failed with a " + str(e.code) + " error code."
+		else:
+			print "destroyBlock() requires you to be authenticated."
+	
+	def checkIfBlockExists(self, id = None, user_id = None, screen_name = None):
+		apiURL = ""
+		if id is not None:
+			apiURL = "http://twitter.com/blocks/exists/" + id + ".json"
+		if user_id is not None:
+			apiURL = "http://twitter.com/blocks/exists.json?user_id=" + user_id
+		if screen_name is not None:
+			apiURL = "http://twitter.com/blocks/exists.json?screen_name=" + screen_name
+		try:
+			return simplejson.load(urllib2.urlopen(apiURL))
+		except HTTPError, e:
+			if self.debug is True:
+				print e.headers
+			print "checkIfBlockExists() failed with a " + str(e.code) + " error code."
+	
+	def getBlocking(self, page = "1"):
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://twitter.com/blocks/blocking.json?page=" + page))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "getBlocking() failed with a " + str(e.code) + " error code."
+		else:
+			print "getBlocking() requires you to be authenticated"
+	
+	def getBlockedIDs(self):
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://twitter.com/blocks/blocking/ids.json"))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "getBlockedIDs() failed with a " + str(e.code) + " error code."
+		else:
+			print "getBlockedIDs() requires you to be authenticated."
 	
 	def getSearchTimeline(self, search_query, optional_page):
 		params = urllib.urlencode({'q': search_query, 'rpp': optional_page}) # Doesn't hurt to do pages this way. *shrug*
