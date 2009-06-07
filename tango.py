@@ -197,6 +197,69 @@ class setup:
 			print "You can't end a session when you're not authenticated to begin with."
 			pass
 	
+	def getDirectMessages(self, since_id = None, max_id = None, count = None, page = "1"):
+		if self.authenticated is True:
+			apiURL = "http://twitter.com/direct_messages.json?page=" + page
+			if since_id is not None:
+				apiURL += "&since_id=" + since_id
+			if max_id is not None:
+				apiURL += "&max_id=" + max_id
+			if count is not None:
+				apiURL += "&count=" + count
+			
+			try:
+				return simplejson.load(self.opener.open(apiURL))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "getDirectMessages() failed with a " + str(e.code) + " error code."
+		else:
+			print "getDirectMessages() requires you to be authenticated."
+	
+	def getSentMessages(self, since_id = None, max_id = None, count = None, page = "1"):
+		if self.authenticated is True:
+			apiURL = "http://twitter.com/direct_messages/sent.json?page=" + page
+			if since_id is not None:
+				apiURL += "&since_id=" + since_id
+			if max_id is not None:
+				apiURL += "&max_id=" + max_id
+			if count is not None:
+				apiURL += "&count=" + count
+			
+			try:
+				return simplejson.load(self.opener.open(apiURL))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "getSentMessages() failed with a " + str(e.code) + " error code."
+		else:
+			print "getSentMessages() requires you to be authenticated."
+	
+	def sendDirectMessage(self, user, text):
+		if self.authenticated is True:
+			if len(list(text)) < 140:
+				try:
+					return self.opener.open("http://twitter.com/direct_messages/new.json", urllib.urlencode({"user": user, "text" text}))
+				except HTTPError, e:
+					if self.debug is True:
+						print e.headers
+					print "sendDirectMessage() failed with a " + str(e.code) + " error code."
+			else:
+				print "Your message must be longer than 140 characters"
+		else:
+			print "You must be authenticated to send a new direct message."
+	
+	def destroyDirectMessage(self, id):
+		if self.authenticated is True:
+			try:
+				return self.opener.open("http://twitter.com/direct_messages/destroy/" + id + ".json", "")
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "destroyDirectMessage() failed with a " + str(e.code) + " error code."
+		else:
+			print "You must be authenticated to destroy a direct message."
+	
 	def createFriendship(self, id = None, user_id = None, screen_name = None, follow = "false"):
 		if self.authenticated is True:
 			apiURL = ""
