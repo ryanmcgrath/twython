@@ -5,12 +5,12 @@
 	Other Python Twitter libraries seem to have fallen a bit behind, and
 	Twitter's API has evolved a bit. Here's hoping this helps.
 
-	TODO: Blocks API Wrapper, Direct Messages API Wrapper, Friendship API Wrapper, OAuth, Streaming API
+	TODO: Streaming API?
 
 	Questions, comments? ryan@venodesigns.net
 """
 
-import httplib, urllib, urllib2, mimetypes, mimetools, pprint
+import httplib, urllib, urllib2, mimetypes, mimetools
 
 from urllib2 import HTTPError
 
@@ -523,7 +523,7 @@ class setup:
 		else:
 			print "getBlockedIDs() requires you to be authenticated."
 	
-	def getSearchTimeline(self, search_query, optional_page):
+	def searchTwitter(self, search_query, optional_page):
 		params = urllib.urlencode({'q': search_query, 'rpp': optional_page}) # Doesn't hurt to do pages this way. *shrug*
 		try:
 			return simplejson.load(urllib2.urlopen("http://search.twitter.com/search.json", params))
@@ -532,13 +532,52 @@ class setup:
 				print e.headers
 			print "getSearchTimeline() failed with a " + str(e.code) + " error code."
 	
-	def getCurrentTrends(self):
+	def getCurrentTrends(self, excludeHashTags = False):
+		apiURL = "http://search.twitter.com/trends/current.json"
+		if excludeHashTags is True:
+			apiURL += "?exclude=hashtags"
 		try:
-			return simplejson.load(urllib.urlopen("http://search.twitter.com/trends.json"))
+			return simplejson.load(urllib.urlopen(apiURL))
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
 			print "getCurrentTrends() failed with a " + str(e.code) + " error code."
+	
+	def getDailyTrends(self, date = None, exclude = False):
+		apiURL = "http://search.twitter.com/trends/daily.json"
+		questionMarkUsed = False
+		if date is not None:
+			apiURL += "?date=" + date
+			questionMarkUsed = True
+		if exclude is True:
+			if questionMarkUsed is True:
+				apiURL += "&exclude=hashtags"
+			else:
+				apiURL += "?exclude=hashtags"
+		try:
+			return simplejson.load(urllib.urlopen(apiURL))
+		except HTTPError, e:
+			if self.debug is True:
+				print e.headers
+			print "getDailyTrends() failed with a " + str(e.code) + " error code."
+	
+	def getWeeklyTrends(self, date = None, exclude = False):
+		apiURL = "http://search.twitter.com/trends/daily.json"
+		questionMarkUsed = False
+		if date is not None:
+			apiURL += "?date=" + date
+			questionMarkUsed = True
+		if exclude is True:
+			if questionMarkUsed is True:
+				apiURL += "&exclude=hashtags"
+			else:
+				apiURL += "?exclude=hashtags"
+		try:
+			return simplejson.load(urllib.urlopen(apiURL))
+		except HTTPError, e:
+			if self.debug is True:
+				print e.headers
+			print "getWeeklyTrends() failed with a " + str(e.code) + " error code."
 	
 	# The following methods are apart from the other Account methods, because they rely on a whole multipart-data posting function set.
 	def updateProfileBackgroundImage(self, filename, tile="true"):
