@@ -216,7 +216,7 @@ class setup:
 		if self.authenticated is True:
 			if len(list(text)) < 140:
 				try:
-					return self.opener.open("http://twitter.com/direct_messages/new.json", urllib.urlencode({"user": user, "text" text}))
+					return self.opener.open("http://twitter.com/direct_messages/new.json", urllib.urlencode({"user": user, "text": text}))
 				except HTTPError, e:
 					if self.debug is True:
 						print e.headers
@@ -578,6 +578,50 @@ class setup:
 			if self.debug is True:
 				print e.headers
 			print "getWeeklyTrends() failed with a " + str(e.code) + " error code."
+	
+	def getSavedSearches(self):
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://twitter.com/saved_searches.json"))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "getSavedSearches() failed with a " + str(e.code) + " error code."
+		else:
+			print "getSavedSearches() requires you to be authenticated."
+	
+	def showSavedSearch(self, id):
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/show/" + id + ".json"))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "showSavedSearch() failed with a " + str(e.code) + " error code."
+		else:
+			print "showSavedSearch() requires you to be authenticated."
+	
+	def createSavedSearch(self, query):
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/create.json?query=" + query, ""))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "createSavedSearch() failed with a " + str(e.code) + " error code."
+		else:
+			print "createSavedSearch() requires you to be authenticated."
+	
+	def destroySavedSearch(self, id):
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/destroy/" + id + ".json", ""))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "destroySavedSearch() failed with a " + str(e.code) + " error code."
+		else:
+			print "destroySavedSearch() requires you to be authenticated."
 	
 	# The following methods are apart from the other Account methods, because they rely on a whole multipart-data posting function set.
 	def updateProfileBackgroundImage(self, filename, tile="true"):
