@@ -10,7 +10,7 @@
 	Questions, comments? ryan@venodesigns.net
 """
 
-import httplib, urllib, urllib2, mimetypes, mimetools
+import httplib, urllib, urllib2, mimetypes, mimetools, pprint
 
 from urllib2 import HTTPError
 
@@ -41,8 +41,6 @@ class setup:
 				self.handler = urllib2.HTTPBasicAuthHandler(self.auth_manager)
 				self.opener = urllib2.build_opener(self.handler)
 				self.authenticated = True
-		else:
-			pass
 	
 	# OAuth functions; shortcuts for verifying the credentials.
 	def fetch_response_oauth(self, oauth_request):
@@ -59,8 +57,12 @@ class setup:
 	
 	# URL Shortening function huzzah
 	def shortenURL(self, url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
-		shortURL = urllib2.urlopen(shortener + "?" + urllib.urlencode({query: url_to_shorten})).read()
-		return shortURL
+		try:
+			return urllib2.urlopen(shortener + "?" + urllib.urlencode({query: url_to_shorten})).read()
+		except HTTPError, e:
+			if self.debug is True:
+				print e.headers
+			print "shortenURL() failed with a " + str(e.code) + " error code."
 	
 	def constructApiURL(self, base_url, params):
 		queryURL = base_url
@@ -71,38 +73,20 @@ class setup:
 				questionMarkUsed = True
 		return queryURL
 	
-	def createGenericTimeline(self, existingTimeline):
-		# Many of Twitters API functions return the same style of data. This function just wraps it if we need it.
-		genericTimeline = []
-		for tweet in existingTimeline:
-			genericTimeline.append({
-				"created_at": tweet["created_at"],
-				"in_reply_to_screen_name": tweet["in_reply_to_screen_name"],
-				"in_reply_to_status_id": tweet["in_reply_to_status_id"],
-				"in_reply_to_user_id": tweet["in_reply_to_user_id"],
-				"id": tweet["id"], 
-				"text": tweet["text"]
-			})
-		return genericTimeline
-	
 	def getRateLimitStatus(self, rate_for = "requestingIP"):
 		try:
 			if rate_for == "requestingIP":
-				rate_limit = simplejson.load(urllib2.urlopen("http://twitter.com/account/rate_limit_status.json"))
+				return simplejson.load(urllib2.urlopen("http://twitter.com/account/rate_limit_status.json"))
 			else:
-				rate_limit = simplejson.load(self.opener.open("http://twitter.com/account/rate_limit_status.json"))
+				return simplejson.load(self.opener.open("http://twitter.com/account/rate_limit_status.json"))
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
 			print "It seems that there's something wrong. Twitter gave you a " + str(e.code) + " error code; are you doing something you shouldn't be?"
-		return {"remaining-hits": rate_limit["remaining-hits"], 
-				"hourly-limit": rate_limit["hourly-limit"], 
-				"reset-time": rate_limit["reset-time"],
-				"reset-time-in-seconds": rate_limit["reset-time-in-seconds"]}
-
+	
 	def getPublicTimeline(self):
 		try:
-			return self.createGenericTimeline(simplejson.load(urllib2.urlopen("http://twitter.com/statuses/public_timeline.json")))
+			return simplejson.load(urllib2.urlopen("http://twitter.com/statuses/public_timeline.json"))
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
@@ -112,7 +96,7 @@ class setup:
 		if self.authenticated is True:
 			try:
 				friendsTimelineURL = self.constructApiURL("http://twitter.com/statuses/friends_timeline.json", kwargs)
-				return self.createGenericTimeline(simplejson.load(self.opener.open(friendsTimelineURL)))
+				return simplejson.load(self.opener.open(friendsTimelineURL))
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
@@ -124,7 +108,7 @@ class setup:
 	def getUserTimeline(self, **kwargs): 
 		userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline/" + self.username + ".json", kwargs)
 		try:
-			return self.createGenericTimeline(simplejson.load(urllib2.urlopen(userTimelineURL)))
+			return simplejson.load(urllib2.urlopen(userTimelineURL))
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
@@ -135,8 +119,7 @@ class setup:
 		if self.authenticated is True:
 			try:
 				mentionsFeedURL = self.constructApiURL("http://twitter.com/statuses/mentions.json", kwargs)
-				mentionsFeed = simplejson.load(self.opener.open(mentionsFeedURL))
-				return self.createGenericTimeline(mentionsFeed)
+				return simplejson.load(self.opener.open(mentionsFeedURL))
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
@@ -147,13 +130,7 @@ class setup:
 	
 	def showStatus(self, id):
 		try:
-			tweet = simplejson.load(self.opener.open("http://twitter.com/statuses/show/" + id + ".json"))
-			return {"created_at": tweet["created_at"], 
-					"id": tweet["id"], 
-					"text": tweet["text"], 
-					"in_reply_to_status_id": tweet["in_reply_to_status_id"],
-					"in_reply_to_user_id": tweet["in_reply_to_user_id"],
-					"in_reply_to_screen_name": tweet["in_reply_to_screen_name"]}
+			return simplejson.load(self.opener.open("http://twitter.com/statuses/show/" + id + ".json"))
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
@@ -163,7 +140,7 @@ class setup:
 	def updateStatus(self, status, in_reply_to_status_id = None):
 		if self.authenticated is True:
 			try:
-				self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status}, {"in_reply_to_status_id": in_reply_to_status_id}))
+				return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status}, {"in_reply_to_status_id": in_reply_to_status_id})))
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
@@ -175,7 +152,7 @@ class setup:
 	def destroyStatus(self, id):
 		if self.authenticated is True:
 			try:
-				self.opener.open("http://twitter.com/status/destroy/" + id + ".json", "POST")
+				return simplejson.load(self.opener.open("http://twitter.com/status/destroy/" + id + ".json", "POST"))
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
@@ -312,7 +289,7 @@ class setup:
 	def updateDeliveryDevice(self, device_name = "none"):
 		if self.authenticated is True:
 			try:
-				self.opener.open("http://twitter.com/account/update_delivery_device.json?", urllib.urlencode({"device": device_name}))
+				return self.opener.open("http://twitter.com/account/update_delivery_device.json?", urllib.urlencode({"device": device_name}))
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
@@ -323,7 +300,7 @@ class setup:
 	def updateProfileColors(self, **kwargs):
 		if self.authenticated is True:
 			try:
-				self.opener.open(self.constructApiURL("http://twitter.com/account/update_profile_colors.json?", kwargs))
+				return self.opener.open(self.constructApiURL("http://twitter.com/account/update_profile_colors.json?", kwargs))
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
@@ -379,7 +356,7 @@ class setup:
 			
 			if updateProfileQueryString != "":
 				try:
-					self.opener.open("http://twitter.com/account/update_profile.json?", updateProfileQueryString)
+					return self.opener.open("http://twitter.com/account/update_profile.json?", updateProfileQueryString)
 				except HTTPError, e:
 					if self.debug is True:
 						print e.headers
@@ -391,8 +368,7 @@ class setup:
 	def getFavorites(self, page = "1"):
 		if self.authenticated is True:
 			try:
-				favoritesTimeline = simplejson.load(self.opener.open("http://twitter.com/favorites.json?page=" + page))
-				return self.createGenericTimeline(favoritesTimeline)
+				return simplejson.load(self.opener.open("http://twitter.com/favorites.json?page=" + page))
 			except HTTPError, e:
 				if self.debug:
 					print e.headers
@@ -403,7 +379,7 @@ class setup:
 	def createFavorite(self, id):
 		if self.authenticated is True:
 			try:
-				self.opener.open("http://twitter.com/favorites/create/" + id + ".json", "")
+				return simplejson.load(self.opener.open("http://twitter.com/favorites/create/" + id + ".json", ""))
 			except HTTPError, e:
 				if self.debug:
 					print e.headers
@@ -414,7 +390,7 @@ class setup:
 	def destroyFavorite(self, id):
 		if self.authenticated is True:
 			try:
-				self.opener.open("http://twitter.com/favorites/destroy/" + id + ".json", "")
+				return simplejson.load(self.opener.open("http://twitter.com/favorites/destroy/" + id + ".json", ""))
 			except HTTPError, e:
 				if self.debug:
 					print e.headers
@@ -432,7 +408,7 @@ class setup:
 			if screen_name is not None:
 				apiURL = "http://twitter.com/notifications/follow/follow.json?screen_name=" + screen_name
 			try:
-				self.opener.open(apiURL, "")
+				return simplejson.load(self.opener.open(apiURL, ""))
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
@@ -450,7 +426,7 @@ class setup:
 			if screen_name is not None:
 				apiURL = "http://twitter.com/notifications/leave/leave.json?screen_name=" + screen_name
 			try:
-				self.opener.open(apiURL, "")
+				return simplejson.load(self.opener.open(apiURL, ""))
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
@@ -491,7 +467,7 @@ class setup:
 	def createBlock(self, id):
 		if self.authenticated is True:
 			try:
-				self.opener.open("http://twitter.com/blocks/create/" + id + ".json", "")
+				return simplejson.load(self.opener.open("http://twitter.com/blocks/create/" + id + ".json", ""))
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
@@ -502,7 +478,7 @@ class setup:
 	def destroyBlock(self, id):
 		if self.authenticated is True:
 			try:
-				self.opener.open("http://twitter.com/blocks/destroy/" + id + ".json", "")
+				return simplejson.load(self.opener.open("http://twitter.com/blocks/destroy/" + id + ".json", ""))
 			except HTTPError, e:
 				if self.debug is True:
 					print e.headers
@@ -550,20 +526,7 @@ class setup:
 	def getSearchTimeline(self, search_query, optional_page):
 		params = urllib.urlencode({'q': search_query, 'rpp': optional_page}) # Doesn't hurt to do pages this way. *shrug*
 		try:
-			searchTimeline = simplejson.load(urllib2.urlopen("http://search.twitter.com/search.json", params))
-			# This one is custom built because the search feed is a bit different than the other feeds.
-			genericTimeline = []
-			for tweet in searchTimeline["results"]:
-				genericTimeline.append({
-					"created_at": tweet["created_at"],
-					"from_user": tweet["from_user"],
-					"from_user_id": tweet["from_user_id"],
-					"profile_image_url": tweet["profile_image_url"],
-					"id": tweet["id"],
-					"text": tweet["text"],
-					"to_user_id": tweet["to_user_id"]
-				})
-			return genericTimeline
+			return simplejson.load(urllib2.urlopen("http://search.twitter.com/search.json", params))
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
@@ -571,13 +534,7 @@ class setup:
 	
 	def getCurrentTrends(self):
 		try:
-			# Returns an array of dictionary items containing the current trends
-			trendingTopicsURL = "http://search.twitter.com/trends.json"
-			trendingTopics = simplejson.load(urllib.urlopen(trendingTopicsURL))
-			trendingTopicsArray = []
-			for topic in trendingTopics['trends']:
-				trendingTopicsArray.append({"name" : topic['name'], "url" : topic['url']})
-			return trendingTopicsArray
+			return simplejson.load(urllib.urlopen("http://search.twitter.com/trends.json"))
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
@@ -586,15 +543,17 @@ class setup:
 	# The following methods are apart from the other Account methods, because they rely on a whole multipart-data posting function set.
 	def updateProfileBackgroundImage(self, filename, tile="true"):
 		if self.authenticated is True:
-			#try:
-			files = [("image", filename, open(filename).read())]
-			fields = []
-			content_type, body = self.encode_multipart_formdata(fields, files)
-			headers = {'Content-Type': content_type, 'Content-Length': str(len(body))}
-			r = urllib2.Request("http://twitter.com/account/update_profile_background_image.json?tile=" + tile, body, headers)
-			return self.opener.open(r).read()
-			#except:
-			#print "Oh god, this failed so horribly."
+			try:
+				files = [("image", filename, open(filename).read())]
+				fields = []
+				content_type, body = self.encode_multipart_formdata(fields, files)
+				headers = {'Content-Type': content_type, 'Content-Length': str(len(body))}
+				r = urllib2.Request("http://twitter.com/account/update_profile_background_image.json?tile=" + tile, body, headers)
+				return self.opener.open(r).read()
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "updateProfileBackgroundImage() failed with a " + str(e.code) + " error code."
 		else:
 			print "You realize you need to be authenticated to change a background image, right?"
 	
@@ -607,8 +566,10 @@ class setup:
 				headers = {'Content-Type': content_type, 'Content-Length': str(len(body))}
 				r = urllib2.Request("http://twitter.com/account/update_profile_image.json", body, headers)
 				return self.opener.open(r).read()
-			except:
-				print "Oh god, this failed so horribly."
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				print "updateProfileImage() failed with a " + str(e.code) + " error code."
 		else:
 			print "You realize you need to be authenticated to change a profile image, right?"
 	
