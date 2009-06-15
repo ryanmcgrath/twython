@@ -105,15 +105,23 @@ class setup:
 			print "getFriendsTimeline() requires you to be authenticated."
 			pass
 	
-	def getUserTimeline(self, **kwargs): 
-		userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline/" + self.username + ".json", kwargs)
+	def getUserTimeline(self, id = None, **kwargs): 
+		if id is not None and kwargs.has_key("user_id") is False and kwargs.has_key("screen_name") is False:
+			userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline/" + id + ".json", kwargs)
+		elif id is None and kwargs.has_key("user_id") is False and kwargs.has_key("screen_name") is False and self.authenticated is True:
+			userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline/" + self.username + ".json", kwargs)
+		else:
+			userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline.json", kwargs)
 		try:
-			return simplejson.load(urllib2.urlopen(userTimelineURL))
+			# We do our custom opener if we're authenticated, as it helps avoid cases where it's a protected user
+			if self.authenticated is True:
+				return simplejson.load(self.opener.open(userTimelineURL))
+			else:
+				return simplejson.load(urllib2.urlopen(userTimelineURL))
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
 			print "Failed with a " + str(e.code) + " error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
-			pass
 	
 	def getUserMentions(self, **kwargs):
 		if self.authenticated is True:
@@ -523,7 +531,7 @@ class setup:
 		else:
 			print "getBlockedIDs() requires you to be authenticated."
 	
-	def searchTwitter(self, search_query, optional_page):
+	def searchTwitter(self, search_query, optional_page = "1"):
 		params = urllib.urlencode({'q': search_query, 'rpp': optional_page}) # Doesn't hurt to do pages this way. *shrug*
 		try:
 			return simplejson.load(urllib2.urlopen("http://search.twitter.com/search.json", params))
