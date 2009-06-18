@@ -64,9 +64,11 @@ class setup:
 				print e.headers
 			print "shortenURL() failed with a " + str(e.code) + " error code."
 	
-	def constructApiURL(self, base_url, params):
+	def constructApiURL(self, base_url, params, **kwargs):
 		queryURL = base_url
 		questionMarkUsed = False
+		if kwargs.has_key("questionMarkUsed") is True:
+			questionMarkUsed = True
 		for param in params:
 			if params[param] is not None:
 				queryURL += (("&" if questionMarkUsed is True else "?") + param + "=" + params[param])
@@ -531,10 +533,12 @@ class setup:
 		else:
 			print "getBlockedIDs() requires you to be authenticated."
 	
-	def searchTwitter(self, search_query, optional_page = "1"):
-		params = urllib.urlencode({'q': search_query, 'rpp': optional_page}) # Doesn't hurt to do pages this way. *shrug*
+	def searchTwitter(self, search_query, **kwargs):
+		baseURL = "http://search.twitter.com/search.json?" + urllib.urlencode({"q": search_query})
+		searchURL = self.constructApiURL(baseURL, kwargs, questionMarkUsed=True)
+		print searchURL
 		try:
-			return simplejson.load(urllib2.urlopen("http://search.twitter.com/search.json", params))
+			return simplejson.load(urllib2.urlopen(searchURL))
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
