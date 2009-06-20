@@ -148,6 +148,8 @@ class setup:
 			pass
 
 	def updateStatus(self, status, in_reply_to_status_id = None):
+		if len(list(status)) > 140:
+			print "This status message is over 140 characters, but we're gonna try it anyway. Might wanna watch this!"
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status}, {"in_reply_to_status_id": in_reply_to_status_id})))
@@ -536,7 +538,6 @@ class setup:
 	def searchTwitter(self, search_query, **kwargs):
 		baseURL = "http://search.twitter.com/search.json?" + urllib.urlencode({"q": search_query})
 		searchURL = self.constructApiURL(baseURL, kwargs, questionMarkUsed=True)
-		print searchURL
 		try:
 			return simplejson.load(urllib2.urlopen(searchURL))
 		except HTTPError, e:
