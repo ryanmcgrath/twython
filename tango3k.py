@@ -7,6 +7,8 @@
 
 	TODO: OAuth, Streaming API?
 
+	NOTE: THIS IS EXPERIMENTAL.
+
 	Questions, comments? ryan@venodesigns.net
 """
 
