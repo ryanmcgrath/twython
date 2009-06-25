@@ -5,7 +5,7 @@
 	Other Python Twitter libraries seem to have fallen a bit behind, and
 	Twitter's API has evolved a bit. Here's hoping this helps.
 
-	TODO: Streaming API?
+	TODO: OAuth, Streaming API?
 
 	Questions, comments? ryan@venodesigns.net
 """
