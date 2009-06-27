@@ -107,7 +107,6 @@ class setup:
 				print("getFriendsTimeline() failed with a " + str(e.code) + " error code.")
 		else:
 			print("getFriendsTimeline() requires you to be authenticated.")
-			pass
 	
 	def getUserTimeline(self, id = None, **kwargs): 
 		if id is not None and ("user_id" in kwargs) is False and ("screen_name" in kwargs) is False:
@@ -138,7 +137,6 @@ class setup:
 				print("getUserMentions() failed with a " + str(e.code) + " error code.")
 		else:
 			print("getUserMentions() requires you to be authenticated.")
-			pass
 	
 	def showStatus(self, id):
 		try:
@@ -147,7 +145,6 @@ class setup:
 			if self.debug is True:
 				print(e.headers)
 			print("Failed with a " + str(e.code) + " error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline.")
-			pass
 
 	def updateStatus(self, status, in_reply_to_status_id = None):
 		if len(list(status)) > 140:
@@ -161,7 +158,6 @@ class setup:
 				print("updateStatus() failed with a " + str(e.code) + " error code.")
 		else:
 			print("updateStatus() requires you to be authenticated.")
-			pass
 	
 	def destroyStatus(self, id):
 		if self.authenticated is True:
@@ -173,7 +169,6 @@ class setup:
 				print("destroyStatus() failed with a " + str(e.code) + " error code.")
 		else:
 			print("destroyStatus() requires you to be authenticated.")
-			pass
 	
 	def endSession(self):
 		if self.authenticated is True:
@@ -186,7 +181,6 @@ class setup:
 				print("endSession failed with a " + str(e.code) + " error code.")
 		else:
 			print("You can't end a session when you're not authenticated to begin with.")
-			pass
 	
 	def getDirectMessages(self, since_id = None, max_id = None, count = None, page = "1"):
 		if self.authenticated is True:
