@@ -82,7 +82,10 @@ class setup:
 			if rate_for == "requestingIP":
 				return simplejson.load(urllib.request.urlopen("http://twitter.com/account/rate_limit_status.json"))
 			else:
-				return simplejson.load(self.opener.open("http://twitter.com/account/rate_limit_status.json"))
+				if self.authenticated is True:
+					return simplejson.load(self.opener.open("http://twitter.com/account/rate_limit_status.json"))
+				else:
+					print("You need to be authenticated to check for this.")
 		except HTTPError as e:
 			if self.debug is True:
 				print(e.headers)
