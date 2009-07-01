@@ -80,7 +80,10 @@ class setup:
 			if rate_for == "requestingIP":
 				return simplejson.load(urllib2.urlopen("http://twitter.com/account/rate_limit_status.json"))
 			else:
-				return simplejson.load(self.opener.open("http://twitter.com/account/rate_limit_status.json"))
+				if self.authenticated is True:
+					return simplejson.load(self.opener.open("http://twitter.com/account/rate_limit_status.json"))
+				else:
+					print "You need to be authenticated to check for this."
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
@@ -143,19 +146,16 @@ class setup:
 			if self.debug is True:
 				print e.headers
 			print "Failed with a " + str(e.code) + " error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
-
+	
 	def updateStatus(self, status, in_reply_to_status_id = None):
 		if len(list(status)) > 140:
 			print "This status message is over 140 characters, but we're gonna try it anyway. Might wanna watch this!"
-		if self.authenticated is True:
-			try:
-				return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status}, {"in_reply_to_status_id": in_reply_to_status_id})))
-			except HTTPError, e:
-				if self.debug is True:
-					print e.headers
-				print "updateStatus() failed with a " + str(e.code) + " error code."
-		else:
-			print "updateStatus() requires you to be authenticated."
+		try:
+			return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status}, {"in_reply_to_status_id": in_reply_to_status_id})))
+		except HTTPError, e:
+			if self.debug is True:
+				print e.headers
+			print "updateStatus() failed with a " + str(e.code) + " error code."
 	
 	def destroyStatus(self, id):
 		if self.authenticated is True:
