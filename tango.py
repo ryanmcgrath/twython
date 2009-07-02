@@ -40,7 +40,13 @@ class setup:
 				self.auth_manager.add_password(None, "http://twitter.com", self.username, self.password)
 				self.handler = urllib2.HTTPBasicAuthHandler(self.auth_manager)
 				self.opener = urllib2.build_opener(self.handler)
-				self.authenticated = True
+				try:
+					test_verify = simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
+					self.authenticated = True
+				except HTTPError, e:
+					if self.debug is True:
+						print e.headers
+					print "Huh, authentication failed with your provided credentials. Try again? (" + str(e.code) + " failure)"
 	
 	# OAuth functions; shortcuts for verifying the credentials.
 	def fetch_response_oauth(self, oauth_request):
