@@ -160,7 +160,7 @@ class setup:
 			print("This status message is over 140 characters, but we're gonna try it anyway. Might wanna watch this!")
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.parse.urlencode({"status": status}, {"in_reply_to_status_id": in_reply_to_status_id})))
+				return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.parse.urlencode({"status": status, "in_reply_to_status_id": in_reply_to_status_id})))	
 			except HTTPError as e:
 				if self.debug is True:
 					print(e.headers)

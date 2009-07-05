@@ -157,7 +157,7 @@ class setup:
 		if len(list(status)) > 140:
 			print "This status message is over 140 characters, but we're gonna try it anyway. Might wanna watch this!"
 		try:
-			return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status}, {"in_reply_to_status_id": in_reply_to_status_id})))
+			return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status, "in_reply_to_status_id": in_reply_to_status_id})))
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
