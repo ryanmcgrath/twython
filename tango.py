@@ -24,6 +24,12 @@ try:
 except ImportError:
 	print "Tango requires oauth for authentication purposes. http://oauth.googlecode.com/svn/code/python/oauth/oauth.py"
 
+class TangoError(Exception):
+	def __init__(self, msg):
+		self.msg = msg
+	def __str__(self):
+		return repr(self.msg)
+
 class setup:
 	def __init__(self, authtype = "OAuth", username = None, password = None, oauth_keys = None, debug = False):
 		self.authtype = authtype
@@ -154,14 +160,18 @@ class setup:
 			print "Failed with a " + str(e.code) + " error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
 	
 	def updateStatus(self, status, in_reply_to_status_id = None):
-		if len(list(status)) > 140:
-			print "This status message is over 140 characters, but we're gonna try it anyway. Might wanna watch this!"
-		try:
-			return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status, "in_reply_to_status_id": in_reply_to_status_id})))
-		except HTTPError, e:
-			if self.debug is True:
-				print e.headers
-			print "updateStatus() failed with a " + str(e.code) + " error code."
+		if self.authenticated is True:
+			if len(list(status)) > 140:
+				print "This status message is over 140 characters, but we're gonna try it anyway. Might wanna watch this!"
+			try:
+				return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status, "in_reply_to_status_id": in_reply_to_status_id})))
+			except HTTPError, e:
+				if self.debug is True:
+					print e.headers
+				raise TangoError("updateStatus() failed with a " + str(e.code) + "error code.")
+				#print "updateStatus() failed with a " + str(e.code) + " error code."
+		else:
+			raise TangoError("updateStatus() requires you to be authenticated.")
 	
 	def destroyStatus(self, id):
 		if self.authenticated is True:
