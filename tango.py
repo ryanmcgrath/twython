@@ -52,7 +52,7 @@ class setup:
 				except HTTPError, e:
 					if self.debug is True:
 						print e.headers
-					print "Huh, authentication failed with your provided credentials. Try again? (" + str(e.code) + " failure)"
+					raise TangoError("Authentication failed with your provided credentials. Try again? (" + str(e.code) + " failure)")
 	
 	# OAuth functions; shortcuts for verifying the credentials.
 	def fetch_response_oauth(self, oauth_request):
@@ -76,16 +76,8 @@ class setup:
 				print e.headers
 			print "shortenURL() failed with a " + str(e.code) + " error code."
 	
-	def constructApiURL(self, base_url, params, **kwargs):
-		queryURL = base_url
-		questionMarkUsed = False
-		if kwargs.has_key("questionMarkUsed") is True:
-			questionMarkUsed = True
-		for param in params:
-			if params[param] is not None:
-				queryURL += (("&" if questionMarkUsed is True else "?") + param + "=" + params[param])
-				questionMarkUsed = True
-		return queryURL
+	def constructApiURL(self, base_url, params):
+		return base_url + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in params.iteritems()])
 	
 	def getRateLimitStatus(self, rate_for = "requestingIP"):
 		try:
@@ -169,7 +161,6 @@ class setup:
 				if self.debug is True:
 					print e.headers
 				raise TangoError("updateStatus() failed with a " + str(e.code) + "error code.")
-				#print "updateStatus() failed with a " + str(e.code) + " error code."
 		else:
 			raise TangoError("updateStatus() requires you to be authenticated.")
 	
@@ -384,7 +375,6 @@ class setup:
 						print e.headers
 					print "updateProfile() failed with a " + e.code + " error code."
 		else:
-			# If they're not authenticated
 			print "updateProfile() requires you to be authenticated."
 	
 	def getFavorites(self, page = "1"):
@@ -543,17 +533,16 @@ class setup:
 					print e.headers
 				print "getBlockedIDs() failed with a " + str(e.code) + " error code."
 		else:
-			print "getBlockedIDs() requires you to be authenticated."
+			raise TangoError("getBlockedIDs() requires you to be authenticated.")
 	
 	def searchTwitter(self, search_query, **kwargs):
-		baseURL = "http://search.twitter.com/search.json?" + urllib.urlencode({"q": search_query})
-		searchURL = self.constructApiURL(baseURL, kwargs, questionMarkUsed=True)
+		searchURL = self.constructApiURL("http://search.twitter.com/search.json", kwargs) + "&" + urllib.urlencode({"q": search_query})
 		try:
 			return simplejson.load(urllib2.urlopen(searchURL))
 		except HTTPError, e:
 			if self.debug is True:
 				print e.headers
-			print "getSearchTimeline() failed with a " + str(e.code) + " error code."
+			raise TangoError("getSearchTimeline() failed with a %s error code." % `e.code`)
 	
 	def getCurrentTrends(self, excludeHashTags = False):
 		apiURL = "http://search.twitter.com/trends/current.json"
