@@ -14,6 +14,16 @@ import httplib, urllib, urllib2, mimetypes, mimetools
 
 from urllib2 import HTTPError
 
+__author__ = "Ryan McGrath <ryan@venodesigns.net>"
+__version__ = "0.5"
+
+"""
+REQUEST_TOKEN_URL = 'https://twitter.com/oauth/request_token'
+ACCESS_TOKEN_URL = 'https://twitter.com/oauth/access_token'
+AUTHORIZATION_URL = 'http://twitter.com/oauth/authorize'
+SIGNIN_URL = 'http://twitter.com/oauth/authenticate'
+"""
+
 try:
 	import simplejson
 except ImportError:
@@ -25,10 +35,17 @@ except ImportError:
 try:
 	import oauth
 except ImportError:
-	# Need to figure out a better way to signal that this is an optional thing
-	print "Tango requires oauth for authentication purposes. http://oauth.googlecode.com/svn/code/python/oauth/oauth.py"
+	pass
 
 class TangoError(Exception):
+	def __init__(self, msg, error_code=None):
+		self.msg = msg
+		if error_code == 400:
+			raise APILimit(msg)
+	def __str__(self):
+		return repr(self.msg)
+
+class APILimit(TangoError):
 	def __init__(self, msg):
 		self.msg = msg
 	def __str__(self):
@@ -53,7 +70,7 @@ class setup:
 					test_verify = simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
 					self.authenticated = True
 				except HTTPError, e:
-					raise TangoError("Authentication failed with your provided credentials. Try again? (" + str(e.code) + " failure)")
+					raise TangoError("Authentication failed with your provided credentials. Try again? (%s failure)" % `e.code`, e.code)
 	
 	# OAuth functions; shortcuts for verifying the credentials.
 	def fetch_response_oauth(self, oauth_request):
@@ -88,7 +105,7 @@ class setup:
 				else:
 					raise TangoError("You need to be authenticated to check a rate limit status on an account.")
 		except HTTPError, e:
-			raise TangoError("It seems that there's something wrong. Twitter gave you a %s error code; are you doing something you shouldn't be?" % `e.code`)
+			raise TangoError("It seems that there's something wrong. Twitter gave you a %s error code; are you doing something you shouldn't be?" % `e.code`, e.code)
 	
 	def getPublicTimeline(self):
 		try:
@@ -121,7 +138,7 @@ class setup:
 				return simplejson.load(urllib2.urlopen(userTimelineURL))
 		except HTTPError, e:
 			raise TangoError("Failed with a %s error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
-				% `e.code`)
+				% `e.code`, e.code)
 	
 	def getUserMentions(self, **kwargs):
 		if self.authenticated is True:
@@ -129,15 +146,16 @@ class setup:
 				mentionsFeedURL = self.constructApiURL("http://twitter.com/statuses/mentions.json", kwargs)
 				return simplejson.load(self.opener.open(mentionsFeedURL))
 			except HTTPError, e:
-				raise TangoError("getUserMentions() failed with a %s error code." % `e.code`)
+				raise TangoError("getUserMentions() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("getUserMentions() requires you to be authenticated.")
 	
 	def showStatus(self, id):
 		try:
-			return simplejson.load(self.opener.open("http://twitter.com/statuses/show/" + id + ".json"))
+			return simplejson.load(self.opener.open("http://twitter.com/statuses/show/%s.json" % id))
 		except HTTPError, e:
-			raise TangoError("Failed with a %s error code. Does this user hide/protect their updates? You'll need to authenticate and be friends to get their timeline." % `e.code`)
+			raise TangoError("Failed with a %s error code. Does this user hide/protect their updates? You'll need to authenticate and be friends to get their timeline." 
+				% `e.code`, e.code)
 	
 	def updateStatus(self, status, in_reply_to_status_id = None):
 		if self.authenticated is True:
@@ -146,16 +164,16 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status, "in_reply_to_status_id": in_reply_to_status_id})))
 			except HTTPError, e:
-				raise TangoError("updateStatus() failed with a " + str(e.code) + "error code.")
+				raise TangoError("updateStatus() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("updateStatus() requires you to be authenticated.")
 	
 	def destroyStatus(self, id):
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/status/destroy/" + id + ".json", "POST"))
+				return simplejson.load(self.opener.open("http://twitter.com/status/destroy/%s.json", "POST" % id))
 			except HTTPError, e:
-				raise TangoError("destroyStatus() failed with a %s error code." % `e.code`)
+				raise TangoError("destroyStatus() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("destroyStatus() requires you to be authenticated.")
 	
@@ -165,9 +183,9 @@ class setup:
 				self.opener.open("http://twitter.com/account/end_session.json", "")
 				self.authenticated = False
 			except HTTPError, e:
-				raise TangoError("endSession failed with a %s error code." % `e.code`)
+				raise TangoError("endSession failed with a %s error code." % `e.code`, e.code)
 		else:
-			print "You can't end a session when you're not authenticated to begin with."
+			raise TangoError("You can't end a session when you're not authenticated to begin with.")
 	
 	def getDirectMessages(self, since_id = None, max_id = None, count = None, page = "1"):
 		if self.authenticated is True:
@@ -182,7 +200,7 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError, e:
-				raise TangoError("getDirectMessages() failed with a %s error code." % `e.code`)
+				raise TangoError("getDirectMessages() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("getDirectMessages() requires you to be authenticated.")
 	
@@ -199,7 +217,7 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError, e:
-				raise TangoError("getSentMessages() failed with a %s error code." % `e.code`)
+				raise TangoError("getSentMessages() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("getSentMessages() requires you to be authenticated.")
 	
@@ -209,7 +227,7 @@ class setup:
 				try:
 					return self.opener.open("http://twitter.com/direct_messages/new.json", urllib.urlencode({"user": user, "text": text}))
 				except HTTPError, e:
-					raise TangoError("sendDirectMessage() failed with a %s error code." % `e.code`)
+					raise TangoError("sendDirectMessage() failed with a %s error code." % `e.code`, e.code)
 			else:
 				raise TangoError("Your message must not be longer than 140 characters")
 		else:
@@ -218,9 +236,9 @@ class setup:
 	def destroyDirectMessage(self, id):
 		if self.authenticated is True:
 			try:
-				return self.opener.open("http://twitter.com/direct_messages/destroy/" + id + ".json", "")
+				return self.opener.open("http://twitter.com/direct_messages/destroy/%s.json" % id, "")
 			except HTTPError, e:
-				raise TangoError("destroyDirectMessage() failed with a %s error code." % `e.code`)
+				raise TangoError("destroyDirectMessage() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("You must be authenticated to destroy a direct message.")
 	
@@ -236,9 +254,10 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError, e:
+				# Rate limiting is done differently here for API reasons...
 				if e.code == 403:
 					raise TangoError("You've hit the update limit for this method. Try again in 24 hours.")
-				raise TangoError("createFriendship() failed with a %s error code." % `e.code`)
+				raise TangoError("createFriendship() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("createFriendship() requires you to be authenticated.")
 		
@@ -254,7 +273,7 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError, e:
-				raise TangoError("destroyFriendship() failed with a %s error code." % `e.code`)
+				raise TangoError("destroyFriendship() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("destroyFriendship() requires you to be authenticated.")
 	
@@ -263,7 +282,7 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/friendships/exists.json", urllib.urlencode({"user_a": user_a, "user_b": user_b})))
 			except HTTPError, e:
-				raise TangoError("checkIfFriendshipExists() failed with a %s error code." % `e.code`)
+				raise TangoError("checkIfFriendshipExists() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("checkIfFriendshipExists(), oddly, requires that you be authenticated.")
 	
@@ -272,7 +291,7 @@ class setup:
 			try:
 				return self.opener.open("http://twitter.com/account/update_delivery_device.json?", urllib.urlencode({"device": device_name}))
 			except HTTPError, e:
-				raise TangoError("updateDeliveryDevice() failed with a %s error code." % `e.code`)
+				raise TangoError("updateDeliveryDevice() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("updateDeliveryDevice() requires you to be authenticated.")
 	
@@ -281,7 +300,7 @@ class setup:
 			try:
 				return self.opener.open(self.constructApiURL("http://twitter.com/account/update_profile_colors.json?", kwargs))
 			except HTTPError, e:
-				raise TangoError("updateProfileColors() failed with a %s error code." % `e.code`)
+				raise TangoError("updateProfileColors() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("updateProfileColors() requires you to be authenticated.")
 	
@@ -335,7 +354,7 @@ class setup:
 				try:
 					return self.opener.open("http://twitter.com/account/update_profile.json?", updateProfileQueryString)
 				except HTTPError, e:
-					raise TangoError("updateProfile() failed with a %s error code." % `e.code`)
+					raise TangoError("updateProfile() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("updateProfile() requires you to be authenticated.")
 	
@@ -344,7 +363,7 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/favorites.json?page=" + page))
 			except HTTPError, e:
-				raise TangoError("getFavorites() failed with a %s error code." % `e.code`)
+				raise TangoError("getFavorites() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("getFavorites() requires you to be authenticated.")
 	
@@ -353,7 +372,7 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/favorites/create/" + id + ".json", ""))
 			except HTTPError, e:
-				raise TangoError("createFavorite() failed with a %s error code." % `e.code`)
+				raise TangoError("createFavorite() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("createFavorite() requires you to be authenticated.")
 	
@@ -362,7 +381,7 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/favorites/destroy/" + id + ".json", ""))
 			except HTTPError, e:
-				raise TangoError("destroyFavorite() failed with a %s error code." %	`e.code`)
+				raise TangoError("destroyFavorite() failed with a %s error code." %	`e.code`, e.code)
 		else:
 			raise TangoError("destroyFavorite() requires you to be authenticated.")
 	
@@ -378,7 +397,7 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open(apiURL, ""))
 			except HTTPError, e:
-				raise TangoError("notificationFollow() failed with a %s error code." % `e.code`)
+				raise TangoError("notificationFollow() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("notificationFollow() requires you to be authenticated.")
 	
@@ -394,7 +413,7 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open(apiURL, ""))
 			except HTTPError, e:
-				raise TangoError("notificationLeave() failed with a %s error code." % `e.code`)
+				raise TangoError("notificationLeave() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("notificationLeave() requires you to be authenticated.")
 	
@@ -409,7 +428,7 @@ class setup:
 		try:
 			return simplejson.load(urllib2.urlopen(apiURL))
 		except HTTPError, e:
-			raise TangoError("getFriendsIDs() failed with a %s error code." % `e.code`)
+			raise TangoError("getFriendsIDs() failed with a %s error code." % `e.code`, e.code)
 		
 	def getFollowersIDs(self, id = None, user_id = None, screen_name = None, page = "1"):
 		apiURL = ""
@@ -422,14 +441,14 @@ class setup:
 		try:
 			return simplejson.load(urllib2.urlopen(apiURL))
 		except HTTPError, e:
-			raise TangoError("getFollowersIDs() failed with a %s error code." % `e.code`)
+			raise TangoError("getFollowersIDs() failed with a %s error code." % `e.code`, e.code)
 	
 	def createBlock(self, id):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/blocks/create/" + id + ".json", ""))
 			except HTTPError, e:
-				raise TangoError("createBlock() failed with a %s error code." % `e.code`)
+				raise TangoError("createBlock() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("createBlock() requires you to be authenticated.")
 	
@@ -438,7 +457,7 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/blocks/destroy/" + id + ".json", ""))
 			except HTTPError, e:
-				raise TangoError("destroyBlock() failed with a %s error code." % `e.code`)
+				raise TangoError("destroyBlock() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("destroyBlock() requires you to be authenticated.")
 	
@@ -453,14 +472,14 @@ class setup:
 		try:
 			return simplejson.load(urllib2.urlopen(apiURL))
 		except HTTPError, e:
-			raise TangoError("checkIfBlockExists() failed with a %s error code." % `e.code`)
+			raise TangoError("checkIfBlockExists() failed with a %s error code." % `e.code`, e.code)
 	
 	def getBlocking(self, page = "1"):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/blocks/blocking.json?page=" + page))
 			except HTTPError, e:
-				raise TangoError("getBlocking() failed with a %s error code." %	`e.code`)
+				raise TangoError("getBlocking() failed with a %s error code." %	`e.code`, e.code)
 		else:
 			raise TangoError("getBlocking() requires you to be authenticated")
 	
@@ -469,7 +488,7 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/blocks/blocking/ids.json"))
 			except HTTPError, e:
-				raise TangoError("getBlockedIDs() failed with a %s error code." % `e.code`)
+				raise TangoError("getBlockedIDs() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("getBlockedIDs() requires you to be authenticated.")
 	
@@ -478,7 +497,7 @@ class setup:
 		try:
 			return simplejson.load(urllib2.urlopen(searchURL))
 		except HTTPError, e:
-			raise TangoError("getSearchTimeline() failed with a %s error code." % `e.code`)
+			raise TangoError("getSearchTimeline() failed with a %s error code." % `e.code`, e.code)
 	
 	def getCurrentTrends(self, excludeHashTags = False):
 		apiURL = "http://search.twitter.com/trends/current.json"
@@ -487,7 +506,7 @@ class setup:
 		try:
 			return simplejson.load(urllib.urlopen(apiURL))
 		except HTTPError, e:
-			raise TangoError("getCurrentTrends() failed with a %s error code." % `e.code`)
+			raise TangoError("getCurrentTrends() failed with a %s error code." % `e.code`, e.code)
 	
 	def getDailyTrends(self, date = None, exclude = False):
 		apiURL = "http://search.twitter.com/trends/daily.json"
@@ -503,7 +522,7 @@ class setup:
 		try:
 			return simplejson.load(urllib.urlopen(apiURL))
 		except HTTPError, e:
-			raise TangoError("getDailyTrends() failed with a %s error code." % `e.code`)
+			raise TangoError("getDailyTrends() failed with a %s error code." % `e.code`, e.code)
 	
 	def getWeeklyTrends(self, date = None, exclude = False):
 		apiURL = "http://search.twitter.com/trends/daily.json"
@@ -519,14 +538,14 @@ class setup:
 		try:
 			return simplejson.load(urllib.urlopen(apiURL))
 		except HTTPError, e:
-			raise TangoError("getWeeklyTrends() failed with a %s error code." % `e.code`)
+			raise TangoError("getWeeklyTrends() failed with a %s error code." % `e.code`, e.code)
 	
 	def getSavedSearches(self):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/saved_searches.json"))
 			except HTTPError, e:
-				raise TangoError("getSavedSearches() failed with a %s error code." % `e.code`)
+				raise TangoError("getSavedSearches() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("getSavedSearches() requires you to be authenticated.")
 	
@@ -535,7 +554,7 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/show/" + id + ".json"))
 			except HTTPError, e:
-				raise TangoError("showSavedSearch() failed with a %s error code." % `e.code`)
+				raise TangoError("showSavedSearch() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("showSavedSearch() requires you to be authenticated.")
 	
@@ -544,7 +563,7 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/create.json?query=" + query, ""))
 			except HTTPError, e:
-				raise TangoError("createSavedSearch() failed with a %s error code." % `e.code`)
+				raise TangoError("createSavedSearch() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("createSavedSearch() requires you to be authenticated.")
 	
@@ -553,7 +572,7 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/destroy/" + id + ".json", ""))
 			except HTTPError, e:
-				raise TangoError("destroySavedSearch() failed with a %s error code." % `e.code`)
+				raise TangoError("destroySavedSearch() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("destroySavedSearch() requires you to be authenticated.")
 	
@@ -568,7 +587,7 @@ class setup:
 				r = urllib2.Request("http://twitter.com/account/update_profile_background_image.json?tile=" + tile, body, headers)
 				return self.opener.open(r).read()
 			except HTTPError, e:
-				raise TangoError("updateProfileBackgroundImage() failed with a %s error code." % `e.code`)
+				raise TangoError("updateProfileBackgroundImage() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("You realize you need to be authenticated to change a background image, right?")
 	
@@ -582,7 +601,7 @@ class setup:
 				r = urllib2.Request("http://twitter.com/account/update_profile_image.json", body, headers)
 				return self.opener.open(r).read()
 			except HTTPError, e:
-				raise TangoError("updateProfileImage() failed with a %s error code." % `e.code`)
+				raise TangoError("updateProfileImage() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise TangoError("You realize you need to be authenticated to change a profile image, right?")
 	
