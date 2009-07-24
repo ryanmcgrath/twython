@@ -9,7 +9,7 @@ make a seasoned Python vet scratch his head, or possibly call me insane. It's op
 and I'm open to anything that'll improve the library as a whole.
 
 OAuth support is in the works, but every other part of the Twitter API should be covered. Tango
-handles both Baisc (HTTP) Authentication and OAuth, and OAuth is the default method for
+handles both Basic (HTTP) Authentication and OAuth, and OAuth is the default method for
 Authentication. To override this, specify 'authtype="Basic"' in your tango.setup() call.
 
 Documentation is forthcoming, but Tango attempts to mirror the Twitter API in a large way. All
