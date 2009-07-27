@@ -17,13 +17,6 @@ from urllib2 import HTTPError
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
 __version__ = "0.5"
 
-"""
-REQUEST_TOKEN_URL = 'https://twitter.com/oauth/request_token'
-ACCESS_TOKEN_URL = 'https://twitter.com/oauth/access_token'
-AUTHORIZATION_URL = 'http://twitter.com/oauth/authorize'
-SIGNIN_URL = 'http://twitter.com/oauth/authenticate'
-"""
-
 try:
 	import simplejson
 except ImportError:
@@ -60,7 +53,11 @@ class setup:
 		self.oauth_keys = oauth_keys
 		if self.username is not None and self.password is not None:
 			if self.authtype == "OAuth":
-				pass
+				self.request_token_url = 'https://twitter.com/oauth/request_token'
+				self.access_token_url = 'https://twitter.com/oauth/access_token'
+				self.authorization_url = 'http://twitter.com/oauth/authorize'
+				self.signin_url = 'http://twitter.com/oauth/authenticate'
+				# Do OAuth type stuff here - how should this be handled? Seems like a framework question...
 			elif self.authtype == "Basic":
 				self.auth_manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
 				self.auth_manager.add_password(None, "http://twitter.com", self.username, self.password)
