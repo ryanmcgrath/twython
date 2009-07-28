@@ -1,0 +1,12 @@
+Tango is released under the "Tango License".
+
+What's the "Tango License"? It basically means you can do
+whatever you want with this; hack on it, redistribute it, contribute changes, whatever.
+
+All I ask is that, if you do make changes to Tango, decide to fork it, etc., please provide some
+note about the origin of the work. (i.e, a link back to Tango, etc)
+
+Tango is provided "as-is"; that is, I don't guarantee that it will 100% work in your
+environment without some effort. Tango is a base to build off of.
+
+~ Ryan McGrath, 07/27/2009
