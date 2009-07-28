@@ -15,7 +15,7 @@ import httplib, urllib, urllib2, mimetypes, mimetools
 from urllib2 import HTTPError
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "0.5"
+__version__ = "0.6"
 
 try:
 	import simplejson
@@ -45,7 +45,7 @@ class APILimit(TangoError):
 		return repr(self.msg)
 
 class setup:
-	def __init__(self, authtype = "OAuth", username = None, password = None, oauth_keys = None):
+	def __init__(self, authtype = "OAuth", username = None, password = None, oauth_keys = None, headers = None):
 		self.authtype = authtype
 		self.authenticated = False
 		self.username = username
@@ -63,6 +63,8 @@ class setup:
 				self.auth_manager.add_password(None, "http://twitter.com", self.username, self.password)
 				self.handler = urllib2.HTTPBasicAuthHandler(self.auth_manager)
 				self.opener = urllib2.build_opener(self.handler)
+				if self.headers is not None:
+					self.opener.addheaders = [('User-agent', self.headers)]
 				try:
 					test_verify = simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
 					self.authenticated = True

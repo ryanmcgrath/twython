@@ -15,14 +15,7 @@ import http.client, urllib, urllib.request, urllib.error, urllib.parse, mimetype
 from urllib.error import HTTPError
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "0.5"
-
-"""
-REQUEST_TOKEN_URL = 'https://twitter.com/oauth/request_token'
-ACCESS_TOKEN_URL = 'https://twitter.com/oauth/access_token'
-AUTHORIZATION_URL = 'http://twitter.com/oauth/authorize'
-SIGNIN_URL = 'http://twitter.com/oauth/authenticate'
-"""
+__version__ = "0.6"
 
 try:
 	import simplejson
@@ -52,7 +45,7 @@ class APILimit(TangoError):
 		return repr(self.msg)
 
 class setup:
-	def __init__(self, authtype = "OAuth", username = None, password = None, oauth_keys = None):
+	def __init__(self, authtype = "OAuth", username = None, password = None, oauth_keys = None, headers = None):
 		self.authtype = authtype
 		self.authenticated = False
 		self.username = username
@@ -60,12 +53,18 @@ class setup:
 		self.oauth_keys = oauth_keys
 		if self.username is not None and self.password is not None:
 			if self.authtype == "OAuth":
-				pass
+				self.request_token_url = 'https://twitter.com/oauth/request_token'
+				self.access_token_url = 'https://twitter.com/oauth/access_token'
+				self.authorization_url = 'http://twitter.com/oauth/authorize'
+				self.signin_url = 'http://twitter.com/oauth/authenticate'
+				# Do OAuth type stuff here - how should this be handled? Seems like a framework question...
 			elif self.authtype == "Basic":
 				self.auth_manager = urllib.request.HTTPPasswordMgrWithDefaultRealm()
 				self.auth_manager.add_password(None, "http://twitter.com", self.username, self.password)
 				self.handler = urllib.request.HTTPBasicAuthHandler(self.auth_manager)
 				self.opener = urllib.request.build_opener(self.handler)
+				if self.headers is not None:
+					self.opener.addheaders = [('User-agent', self.headers)]
 				try:
 					test_verify = simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
 					self.authenticated = True
