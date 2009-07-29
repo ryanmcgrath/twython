@@ -1,0 +1,17 @@
+Metadata-Version: 1.0
+Name: tango
+Version: 0.7
+Summary: A new and easy way to access Twitter data with Python.
+Home-page: http://github.com/ryanmcgrath/tango/tree/master
+Author: Ryan McGrath
+Author-email: ryan@venodesigns.net
+License: MIT License
+Description: UNKNOWN
+Keywords: twitter search api tweet tango
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Communications :: Chat
+Classifier: Topic :: Internet
