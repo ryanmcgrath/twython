@@ -25,10 +25,10 @@ SETUPTOOLS_METADATA = dict(
 	classifiers = [
 		'Development Status :: 4 - Beta',
 		'Intended Audience :: Developers',
-		'License :: Tango License',
+		'License :: OSI Approved :: MIT License',
 		'Topic :: Software Development :: Libraries :: Python Modules',
-		'Topic :: Communications :: Chat :: Twitter',
-		'Topic :: Internet :: Search',
+		'Topic :: Communications :: Chat',
+		'Topic :: Internet',
 	]
 )
 
