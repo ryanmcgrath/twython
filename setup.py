@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
+import sys, os
+
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '0.7'
+__version__ = '0.8.0.1'
 
 # For the love of god, use Pip to install this.
 
@@ -13,6 +15,7 @@ METADATA = dict(
 	author='Ryan McGrath',
 	author_email='ryan@venodesigns.net',
 	description='A new and easy way to access Twitter data with Python.',
+	long_description= open("README").read(),
 	license='MIT License',
 	url='http://github.com/ryanmcgrath/tango/tree/master',
 	keywords='twitter search api tweet tango',
