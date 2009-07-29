@@ -151,7 +151,10 @@ class setup:
 	
 	def showStatus(self, id):
 		try:
-			return simplejson.load(self.opener.open("http://twitter.com/statuses/show/%s.json" % id))
+			if self.authenticated is True:
+				return simplejson.load(self.opener.open("http://twitter.com/statuses/show/%s.json" % id))
+			else:
+				return simplejson.load(urllib.request.urlopen("http://twitter.com/statuses/show/%s.json" % id))
 		except HTTPError as e:
 			raise TangoError("Failed with a %s error code. Does this user hide/protect their updates? You'll need to authenticate and be friends to get their timeline." 
 				% repr(e.code), e.code)
