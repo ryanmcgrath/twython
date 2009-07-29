@@ -23,7 +23,7 @@ except ImportError:
 	try:
 		import json as simplejson
 	except:
-		raise Exception("Tango requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
+		raise Exception("Tango requires a json library to work. http://www.undefined.org/python/")
 
 try:
 	import oauth
@@ -63,8 +63,8 @@ class setup:
 				self.auth_manager.add_password(None, "http://twitter.com", self.username, self.password)
 				self.handler = urllib.request.HTTPBasicAuthHandler(self.auth_manager)
 				self.opener = urllib.request.build_opener(self.handler)
-				if self.headers is not None:
-					self.opener.addheaders = [('User-agent', self.headers)]
+				if headers is not None:
+					self.opener.addheaders = [('User-agent', headers)]
 				try:
 					test_verify = simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
 					self.authenticated = True

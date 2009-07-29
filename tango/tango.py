@@ -63,10 +63,10 @@ class setup:
 				self.auth_manager.add_password(None, "http://twitter.com", self.username, self.password)
 				self.handler = urllib2.HTTPBasicAuthHandler(self.auth_manager)
 				self.opener = urllib2.build_opener(self.handler)
-				if self.headers is not None:
-					self.opener.addheaders = [('User-agent', self.headers)]
+				if headers is not None:
+					self.opener.addheaders = [('User-agent', headers)]
 				try:
-					test_verify = simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
+					simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
 					self.authenticated = True
 				except HTTPError, e:
 					raise TangoError("Authentication failed with your provided credentials. Try again? (%s failure)" % `e.code`, e.code)
