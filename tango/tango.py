@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
 """
-	Tango is an up-to-date library for Python that wraps the Twitter API.
+    NOTE: Tango is being renamed to Twython; all basic strings have been changed below, but there's still work ongoing in this department.
+
+	Twython is an up-to-date library for Python that wraps the Twitter API.
 	Other Python Twitter libraries seem to have fallen a bit behind, and
 	Twitter's API has evolved a bit. Here's hoping this helps.
 
@@ -15,7 +17,9 @@ import httplib, urllib, urllib2, mimetypes, mimetools
 from urllib2 import HTTPError
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "0.6"
+__version__ = "0.8.0.1"
+
+"""Twython - Easy Twitter utilities in Python"""
 
 try:
 	import simplejson
@@ -23,7 +27,7 @@ except ImportError:
 	try:
 		import json as simplejson
 	except:
-		raise Exception("Tango requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
+		raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
 
 try:
 	import oauth
@@ -63,10 +67,10 @@ class setup:
 				self.auth_manager.add_password(None, "http://twitter.com", self.username, self.password)
 				self.handler = urllib2.HTTPBasicAuthHandler(self.auth_manager)
 				self.opener = urllib2.build_opener(self.handler)
-				if self.headers is not None:
-					self.opener.addheaders = [('User-agent', self.headers)]
+				if headers is not None:
+					self.opener.addheaders = [('User-agent', headers)]
 				try:
-					test_verify = simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
+					simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
 					self.authenticated = True
 				except HTTPError, e:
 					raise TangoError("Authentication failed with your provided credentials. Try again? (%s failure)" % `e.code`, e.code)
@@ -86,13 +90,27 @@ class setup:
 	
 	# URL Shortening function huzzah
 	def shortenURL(self, url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
-		try:
+		"""
+            function:: shortenURL(url_to_shorten, shortener, query)
+
+            Returns a shortened URL.
+
+            :param url_to_shorten: URL to shorten, as a String
+            :param shortener: URL to an API call for a different shortening service, allows overriding.
+            :param query: Name of the param that you pass the long URL as.
+
+            Example:
+            >>> twitter = tango.setup()
+            >>> twitter.shortenURL("http://webs.com/")
+
+        """
+        try:
 			return urllib2.urlopen(shortener + "?" + urllib.urlencode({query: url_to_shorten})).read()
 		except HTTPError, e:
 			raise TangoError("shortenURL() failed with a %s error code." % `e.code`)
 	
 	def constructApiURL(self, base_url, params):
-		return base_url + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in params.iteritems()])
+        return base_url + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in params.iteritems()])
 	
 	def getRateLimitStatus(self, rate_for = "requestingIP"):
 		try:
