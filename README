@@ -1,3 +1,9 @@
+NOTICE: On 08/01/2009, Tango is going to be renamed to "Twython". In renaming the GitHub repo, most watchers/followers
+will be lost, so please take note of this date if you wish to continue following development!
+
+There should (hopefully) be no further disruptions after that. Eventually, I'll get around to creating a setup.py file
+that works correctly. ;)
+
 Tango - Easy Twitter utilities in Python
 -----------------------------------------------------------------------------------------------------
 I wrote Tango because I found that other Python Twitter libraries weren't that up to date. Certain
