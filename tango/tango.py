@@ -90,20 +90,6 @@ class setup:
 	
 	# URL Shortening function huzzah
 	def shortenURL(self, url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
-		"""
-            function:: shortenURL(url_to_shorten, shortener, query)
-
-            Returns a shortened URL.
-
-            :param url_to_shorten: URL to shorten, as a String
-            :param shortener: URL to an API call for a different shortening service, allows overriding.
-            :param query: Name of the param that you pass the long URL as.
-
-            Example:
-            >>> twitter = tango.setup()
-            >>> twitter.shortenURL("http://webs.com/")
-
-        """
         try:
 			return urllib2.urlopen(shortener + "?" + urllib.urlencode({query: url_to_shorten})).read()
 		except HTTPError, e:
