@@ -1,5 +1,6 @@
 README
 setup.py
+twython/twython.py
 twython.egg-info/PKG-INFO
 twython.egg-info/SOURCES.txt
 twython.egg-info/dependency_links.txt
