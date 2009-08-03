@@ -3,22 +3,22 @@
 import sys, os
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '0.8.0.1'
+__version__ = '0.5'
 
 # For the love of god, use Pip to install this.
 
 # Distutils version
 METADATA = dict(
-	name = "tango",
+	name = "twython",
 	version = __version__,
-	py_modules = ['tango/tango'],
+	py_modules = ['twython/twython'],
 	author='Ryan McGrath',
 	author_email='ryan@venodesigns.net',
 	description='A new and easy way to access Twitter data with Python.',
 	long_description= open("README").read(),
 	license='MIT License',
-	url='http://github.com/ryanmcgrath/tango/tree/master',
-	keywords='twitter search api tweet tango',
+	url='http://github.com/ryanmcgrath/twython/tree/master',
+	keywords='twitter search api tweet twython',
 )
 
 # Setuptools version

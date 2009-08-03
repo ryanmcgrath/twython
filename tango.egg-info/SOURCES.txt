@@ -1,8 +1,0 @@
-README
-setup.py
-tango/tango.py
-tango.egg-info/PKG-INFO
-tango.egg-info/SOURCES.txt
-tango.egg-info/dependency_links.txt
-tango.egg-info/requires.txt
-tango.egg-info/top_level.txt

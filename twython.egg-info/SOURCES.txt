@@ -1,0 +1,7 @@
+README
+setup.py
+twython.egg-info/PKG-INFO
+twython.egg-info/SOURCES.txt
+twython.egg-info/dependency_links.txt
+twython.egg-info/requires.txt
+twython.egg-info/top_level.txt
