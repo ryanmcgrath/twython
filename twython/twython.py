@@ -14,10 +14,11 @@
 
 import httplib, urllib, urllib2, mimetypes, mimetools
 
+from urlparse import urlparse
 from urllib2 import HTTPError
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "0.8.0.1"
+__version__ = "0.5"
 
 """Twython - Easy Twitter utilities in Python"""
 
@@ -49,20 +50,25 @@ class APILimit(TangoError):
 		return repr(self.msg)
 
 class setup:
-	def __init__(self, authtype = "OAuth", username = None, password = None, oauth_keys = None, headers = None):
+	def __init__(self, authtype = "OAuth", username = None, password = None, consumer_secret = None, consumer_key = None, headers = None):
 		self.authtype = authtype
 		self.authenticated = False
 		self.username = username
 		self.password = password
-		self.oauth_keys = oauth_keys
+		# OAuth specific variables below
+		self.request_token_url = 'https://twitter.com/oauth/request_token'
+		self.access_token_url = 'https://twitter.com/oauth/access_token'
+		self.authorization_url = 'http://twitter.com/oauth/authorize'
+		self.signin_url = 'http://twitter.com/oauth/authenticate'
+		self.signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()
+		self.consumer_key = consumer_key
+		self.consumer_secret = consumer_secret
+		self.request_token = None
+		self.access_token = None
+		# Check and set up authentication
 		if self.username is not None and self.password is not None:
-			if self.authtype == "OAuth":
-				self.request_token_url = 'https://twitter.com/oauth/request_token'
-				self.access_token_url = 'https://twitter.com/oauth/access_token'
-				self.authorization_url = 'http://twitter.com/oauth/authorize'
-				self.signin_url = 'http://twitter.com/oauth/authenticate'
-				# Do OAuth type stuff here - how should this be handled? Seems like a framework question...
-			elif self.authtype == "Basic":
+			if self.authtype == "Basic":
+				# Basic authentication ritual
 				self.auth_manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
 				self.auth_manager.add_password(None, "http://twitter.com", self.username, self.password)
 				self.handler = urllib2.HTTPBasicAuthHandler(self.auth_manager)
@@ -74,19 +80,31 @@ class setup:
 					self.authenticated = True
 				except HTTPError, e:
 					raise TangoError("Authentication failed with your provided credentials. Try again? (%s failure)" % `e.code`, e.code)
+			else:
+				# Awesome OAuth authentication ritual
+				if consumer_secret is not None and consumer_key is not None:
+					#req = oauth.OAuthRequest.from_consumer_and_token
+					#req.sign_request(self.signature_method, self.consumer_key, self.token)
+					#self.opener = urllib2.build_opener()
+					pass
+				else:
+					raise TwythonError("Woah there, buddy. We've defaulted to OAuth authentication, but you didn't provide API keys. Try again.")
 	
-	# OAuth functions; shortcuts for verifying the credentials.
-	def fetch_response_oauth(self, oauth_request):
-		pass
+	def getRequestToken(self):
+		response = self.oauth_request(self.request_token_url)
+		token = self.parseOAuthResponse(response)
+		self.request_token = oauth.OAuthConsumer(token['oauth_token'],token['oauth_token_secret'])
+		return self.request_token
 	
-	def get_unauthorized_request_token(self):
-		pass
-	
-	def get_authorization_url(self, token):
-		pass
-	
-	def exchange_tokens(self, request_token):
-		pass
+	def parseOAuthResponse(self, response_string):
+		# Partial credit goes to Harper Reed for this gem.
+		lol = {}
+		for param in response_string.split("&"):
+			pair = param.split("=")
+			if(len(pair) != 2):
+				break
+			lol[pair[0]] = pair[1]
+		return lol
 	
 	# URL Shortening function huzzah
 	def shortenURL(self, url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
