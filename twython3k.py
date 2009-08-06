@@ -15,7 +15,7 @@ import http.client, urllib, urllib.request, urllib.error, urllib.parse, mimetype
 from urllib.error import HTTPError
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "0.6"
+__version__ = "0.5"
 
 try:
 	import simplejson
