@@ -60,7 +60,6 @@ class setup:
 		self.access_token_url = 'https://twitter.com/oauth/access_token'
 		self.authorization_url = 'http://twitter.com/oauth/authorize'
 		self.signin_url = 'http://twitter.com/oauth/authenticate'
-		self.signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()
 		self.consumer_key = consumer_key
 		self.consumer_secret = consumer_secret
 		self.request_token = None
@@ -81,6 +80,7 @@ class setup:
 				except HTTPError, e:
 					raise TangoError("Authentication failed with your provided credentials. Try again? (%s failure)" % `e.code`, e.code)
 			else:
+				self.signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()
 				# Awesome OAuth authentication ritual
 				if consumer_secret is not None and consumer_key is not None:
 					#req = oauth.OAuthRequest.from_consumer_and_token
