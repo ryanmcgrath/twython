@@ -1,1 +1,1 @@
-import twython2k as twython
+import twython as twython

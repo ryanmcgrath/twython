@@ -3,7 +3,7 @@
 import sys, os
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '0.5'
+__version__ = '0.6'
 
 # For the love of god, use Pip to install this.
 
@@ -11,7 +11,7 @@ __version__ = '0.5'
 METADATA = dict(
 	name = "twython",
 	version = __version__,
-	py_modules = ['twython2k'],
+	py_modules = ['twython'],
 	author='Ryan McGrath',
 	author_email='ryan@venodesigns.net',
 	description='A new and easy way to access Twitter data with Python.',
