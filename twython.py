@@ -134,6 +134,16 @@ class setup:
 		except HTTPError, e:
 			raise TangoError("getPublicTimeline() failed with a %s error code." % `e.code`)
 	
+	def getHomeTimeline(self, **kwargs):
+		if self.authenticated is True:
+			try:
+				friendsTimelineURL = self.constructApiURL("http://twitter.com/statuses/home_timeline.json", kwargs)
+				return simplejson.load(self.opener.open(friendsTimelineURL))
+			except HTTPError, e:
+				raise TangoError("getHomeTimeline() failed with a %s error code. (This is an upcoming feature in the Twitter API, and may not be implemented yet)" % `e.code`)
+		else:
+			raise TangoError("getHomeTimeline() requires you to be authenticated.")
+	
 	def getFriendsTimeline(self, **kwargs):
 		if self.authenticated is True:
 			try:
