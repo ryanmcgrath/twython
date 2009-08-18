@@ -35,7 +35,7 @@ try:
 except ImportError:
 	pass
 
-class TangoError(Exception):
+class TwythonError(Exception):
 	def __init__(self, msg, error_code=None):
 		self.msg = msg
 		if error_code == 400:
@@ -43,7 +43,7 @@ class TangoError(Exception):
 	def __str__(self):
 		return repr(self.msg)
 
-class APILimit(TangoError):
+class APILimit(TwythonError):
 	def __init__(self, msg):
 		self.msg = msg
 	def __str__(self):
@@ -78,7 +78,7 @@ class setup:
 					simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
 					self.authenticated = True
 				except HTTPError, e:
-					raise TangoError("Authentication failed with your provided credentials. Try again? (%s failure)" % `e.code`, e.code)
+					raise TwythonError("Authentication failed with your provided credentials. Try again? (%s failure)" % `e.code`, e.code)
 			else:
 				self.signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()
 				# Awesome OAuth authentication ritual
@@ -111,7 +111,7 @@ class setup:
 		try:
 			return urllib2.urlopen(shortener + "?" + urllib.urlencode({query: url_to_shorten})).read()
 		except HTTPError, e:
-			raise TangoError("shortenURL() failed with a %s error code." % `e.code`)
+			raise TwythonError("shortenURL() failed with a %s error code." % `e.code`)
 	
 	def constructApiURL(self, base_url, params):
 		return base_url + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in params.iteritems()])
@@ -124,15 +124,15 @@ class setup:
 				if self.authenticated is True:
 					return simplejson.load(self.opener.open("http://twitter.com/account/rate_limit_status.json"))
 				else:
-					raise TangoError("You need to be authenticated to check a rate limit status on an account.")
+					raise TwythonError("You need to be authenticated to check a rate limit status on an account.")
 		except HTTPError, e:
-			raise TangoError("It seems that there's something wrong. Twitter gave you a %s error code; are you doing something you shouldn't be?" % `e.code`, e.code)
+			raise TwythonError("It seems that there's something wrong. Twitter gave you a %s error code; are you doing something you shouldn't be?" % `e.code`, e.code)
 	
 	def getPublicTimeline(self):
 		try:
 			return simplejson.load(urllib2.urlopen("http://twitter.com/statuses/public_timeline.json"))
 		except HTTPError, e:
-			raise TangoError("getPublicTimeline() failed with a %s error code." % `e.code`)
+			raise TwythonError("getPublicTimeline() failed with a %s error code." % `e.code`)
 	
 	def getHomeTimeline(self, **kwargs):
 		if self.authenticated is True:
@@ -140,9 +140,9 @@ class setup:
 				friendsTimelineURL = self.constructApiURL("http://twitter.com/statuses/home_timeline.json", kwargs)
 				return simplejson.load(self.opener.open(friendsTimelineURL))
 			except HTTPError, e:
-				raise TangoError("getHomeTimeline() failed with a %s error code. (This is an upcoming feature in the Twitter API, and may not be implemented yet)" % `e.code`)
+				raise TwythonError("getHomeTimeline() failed with a %s error code. (This is an upcoming feature in the Twitter API, and may not be implemented yet)" % `e.code`)
 		else:
-			raise TangoError("getHomeTimeline() requires you to be authenticated.")
+			raise TwythonError("getHomeTimeline() requires you to be authenticated.")
 	
 	def getFriendsTimeline(self, **kwargs):
 		if self.authenticated is True:
@@ -150,9 +150,9 @@ class setup:
 				friendsTimelineURL = self.constructApiURL("http://twitter.com/statuses/friends_timeline.json", kwargs)
 				return simplejson.load(self.opener.open(friendsTimelineURL))
 			except HTTPError, e:
-				raise TangoError("getFriendsTimeline() failed with a %s error code." % `e.code`)
+				raise TwythonError("getFriendsTimeline() failed with a %s error code." % `e.code`)
 		else:
-			raise TangoError("getFriendsTimeline() requires you to be authenticated.")
+			raise TwythonError("getFriendsTimeline() requires you to be authenticated.")
 	
 	def getUserTimeline(self, id = None, **kwargs): 
 		if id is not None and kwargs.has_key("user_id") is False and kwargs.has_key("screen_name") is False:
@@ -168,7 +168,7 @@ class setup:
 			else:
 				return simplejson.load(urllib2.urlopen(userTimelineURL))
 		except HTTPError, e:
-			raise TangoError("Failed with a %s error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
+			raise TwythonError("Failed with a %s error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
 				% `e.code`, e.code)
 	
 	def getUserMentions(self, **kwargs):
@@ -177,9 +177,9 @@ class setup:
 				mentionsFeedURL = self.constructApiURL("http://twitter.com/statuses/mentions.json", kwargs)
 				return simplejson.load(self.opener.open(mentionsFeedURL))
 			except HTTPError, e:
-				raise TangoError("getUserMentions() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("getUserMentions() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("getUserMentions() requires you to be authenticated.")
+			raise TwythonError("getUserMentions() requires you to be authenticated.")
 	
 	def showStatus(self, id):
 		try:
@@ -188,28 +188,37 @@ class setup:
 			else:
 				return simplejson.load(urllib2.urlopen("http://twitter.com/statuses/show/%s.json" % id))
 		except HTTPError, e:
-			raise TangoError("Failed with a %s error code. Does this user hide/protect their updates? You'll need to authenticate and be friends to get their timeline." 
+			raise TwythonError("Failed with a %s error code. Does this user hide/protect their updates? You'll need to authenticate and be friends to get their timeline." 
 				% `e.code`, e.code)
 	
 	def updateStatus(self, status, in_reply_to_status_id = None):
 		if self.authenticated is True:
 			if len(list(status)) > 140:
-				raise TangoError("This status message is over 140 characters. Trim it down!")
+				raise TwythonError("This status message is over 140 characters. Trim it down!")
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status, "in_reply_to_status_id": in_reply_to_status_id})))
 			except HTTPError, e:
-				raise TangoError("updateStatus() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("updateStatus() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("updateStatus() requires you to be authenticated.")
+			raise TwythonError("updateStatus() requires you to be authenticated.")
 	
 	def destroyStatus(self, id):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/status/destroy/%s.json", "POST" % id))
 			except HTTPError, e:
-				raise TangoError("destroyStatus() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("destroyStatus() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("destroyStatus() requires you to be authenticated.")
+			raise TwythonError("destroyStatus() requires you to be authenticated.")
+	
+	def reTweet(self, id):
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://twitter.com/statuses/retweet/%s.json", "POST" % id))
+			except HTTPError, e:
+				raise TwythonError("reTweet() failed with a %s error code." % `e.code`, e.code)
+		else:
+			raise TwythonError("reTweet() requires you to be authenticated.")
 	
 	def endSession(self):
 		if self.authenticated is True:
@@ -217,9 +226,9 @@ class setup:
 				self.opener.open("http://twitter.com/account/end_session.json", "")
 				self.authenticated = False
 			except HTTPError, e:
-				raise TangoError("endSession failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("endSession failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("You can't end a session when you're not authenticated to begin with.")
+			raise TwythonError("You can't end a session when you're not authenticated to begin with.")
 	
 	def getDirectMessages(self, since_id = None, max_id = None, count = None, page = "1"):
 		if self.authenticated is True:
@@ -234,9 +243,9 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError, e:
-				raise TangoError("getDirectMessages() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("getDirectMessages() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("getDirectMessages() requires you to be authenticated.")
+			raise TwythonError("getDirectMessages() requires you to be authenticated.")
 	
 	def getSentMessages(self, since_id = None, max_id = None, count = None, page = "1"):
 		if self.authenticated is True:
@@ -251,9 +260,9 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError, e:
-				raise TangoError("getSentMessages() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("getSentMessages() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("getSentMessages() requires you to be authenticated.")
+			raise TwythonError("getSentMessages() requires you to be authenticated.")
 	
 	def sendDirectMessage(self, user, text):
 		if self.authenticated is True:
@@ -261,20 +270,20 @@ class setup:
 				try:
 					return self.opener.open("http://twitter.com/direct_messages/new.json", urllib.urlencode({"user": user, "text": text}))
 				except HTTPError, e:
-					raise TangoError("sendDirectMessage() failed with a %s error code." % `e.code`, e.code)
+					raise TwythonError("sendDirectMessage() failed with a %s error code." % `e.code`, e.code)
 			else:
-				raise TangoError("Your message must not be longer than 140 characters")
+				raise TwythonError("Your message must not be longer than 140 characters")
 		else:
-			raise TangoError("You must be authenticated to send a new direct message.")
+			raise TwythonError("You must be authenticated to send a new direct message.")
 	
 	def destroyDirectMessage(self, id):
 		if self.authenticated is True:
 			try:
 				return self.opener.open("http://twitter.com/direct_messages/destroy/%s.json" % id, "")
 			except HTTPError, e:
-				raise TangoError("destroyDirectMessage() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("destroyDirectMessage() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("You must be authenticated to destroy a direct message.")
+			raise TwythonError("You must be authenticated to destroy a direct message.")
 	
 	def createFriendship(self, id = None, user_id = None, screen_name = None, follow = "false"):
 		if self.authenticated is True:
@@ -290,10 +299,10 @@ class setup:
 			except HTTPError, e:
 				# Rate limiting is done differently here for API reasons...
 				if e.code == 403:
-					raise TangoError("You've hit the update limit for this method. Try again in 24 hours.")
-				raise TangoError("createFriendship() failed with a %s error code." % `e.code`, e.code)
+					raise TwythonError("You've hit the update limit for this method. Try again in 24 hours.")
+				raise TwythonError("createFriendship() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("createFriendship() requires you to be authenticated.")
+			raise TwythonError("createFriendship() requires you to be authenticated.")
 		
 	def destroyFriendship(self, id = None, user_id = None, screen_name = None):
 		if self.authenticated is True:
@@ -307,36 +316,36 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError, e:
-				raise TangoError("destroyFriendship() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("destroyFriendship() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("destroyFriendship() requires you to be authenticated.")
+			raise TwythonError("destroyFriendship() requires you to be authenticated.")
 	
 	def checkIfFriendshipExists(self, user_a, user_b):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/friendships/exists.json", urllib.urlencode({"user_a": user_a, "user_b": user_b})))
 			except HTTPError, e:
-				raise TangoError("checkIfFriendshipExists() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("checkIfFriendshipExists() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("checkIfFriendshipExists(), oddly, requires that you be authenticated.")
+			raise TwythonError("checkIfFriendshipExists(), oddly, requires that you be authenticated.")
 	
 	def updateDeliveryDevice(self, device_name = "none"):
 		if self.authenticated is True:
 			try:
 				return self.opener.open("http://twitter.com/account/update_delivery_device.json?", urllib.urlencode({"device": device_name}))
 			except HTTPError, e:
-				raise TangoError("updateDeliveryDevice() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("updateDeliveryDevice() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("updateDeliveryDevice() requires you to be authenticated.")
+			raise TwythonError("updateDeliveryDevice() requires you to be authenticated.")
 	
 	def updateProfileColors(self, **kwargs):
 		if self.authenticated is True:
 			try:
 				return self.opener.open(self.constructApiURL("http://twitter.com/account/update_profile_colors.json?", kwargs))
 			except HTTPError, e:
-				raise TangoError("updateProfileColors() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("updateProfileColors() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("updateProfileColors() requires you to be authenticated.")
+			raise TwythonError("updateProfileColors() requires you to be authenticated.")
 	
 	def updateProfile(self, name = None, email = None, url = None, location = None, description = None):
 		if self.authenticated is True:
@@ -347,7 +356,7 @@ class setup:
 					updateProfileQueryString += "name=" + name
 					useAmpersands = True
 				else:
-					raise TangoError("Twitter has a character limit of 20 for all usernames. Try again.")
+					raise TwythonError("Twitter has a character limit of 20 for all usernames. Try again.")
 			if email is not None and "@" in email:
 				if len(list(email)) < 40:
 					if useAmpersands is True:
@@ -356,7 +365,7 @@ class setup:
 						updateProfileQueryString += "email=" + email
 						useAmpersands = True
 				else:
-					raise TangoError("Twitter has a character limit of 40 for all email addresses, and the email address must be valid. Try again.")
+					raise TwythonError("Twitter has a character limit of 40 for all email addresses, and the email address must be valid. Try again.")
 			if url is not None:
 				if len(list(url)) < 100:
 					if useAmpersands is True:
@@ -365,7 +374,7 @@ class setup:
 						updateProfileQueryString += urllib.urlencode({"url": url})
 						useAmpersands = True
 				else:
-					raise TangoError("Twitter has a character limit of 100 for all urls. Try again.")
+					raise TwythonError("Twitter has a character limit of 100 for all urls. Try again.")
 			if location is not None:
 				if len(list(location)) < 30:
 					if useAmpersands is True:
@@ -374,7 +383,7 @@ class setup:
 						updateProfileQueryString += urllib.urlencode({"location": location})
 						useAmpersands = True
 				else:
-					raise TangoError("Twitter has a character limit of 30 for all locations. Try again.")
+					raise TwythonError("Twitter has a character limit of 30 for all locations. Try again.")
 			if description is not None:
 				if len(list(description)) < 160:
 					if useAmpersands is True:
@@ -382,42 +391,42 @@ class setup:
 					else:
 						updateProfileQueryString += urllib.urlencode({"description": description})
 				else:
-					raise TangoError("Twitter has a character limit of 160 for all descriptions. Try again.")
+					raise TwythonError("Twitter has a character limit of 160 for all descriptions. Try again.")
 			
 			if updateProfileQueryString != "":
 				try:
 					return self.opener.open("http://twitter.com/account/update_profile.json?", updateProfileQueryString)
 				except HTTPError, e:
-					raise TangoError("updateProfile() failed with a %s error code." % `e.code`, e.code)
+					raise TwythonError("updateProfile() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("updateProfile() requires you to be authenticated.")
+			raise TwythonError("updateProfile() requires you to be authenticated.")
 	
 	def getFavorites(self, page = "1"):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/favorites.json?page=" + page))
 			except HTTPError, e:
-				raise TangoError("getFavorites() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("getFavorites() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("getFavorites() requires you to be authenticated.")
+			raise TwythonError("getFavorites() requires you to be authenticated.")
 	
 	def createFavorite(self, id):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/favorites/create/" + id + ".json", ""))
 			except HTTPError, e:
-				raise TangoError("createFavorite() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("createFavorite() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("createFavorite() requires you to be authenticated.")
+			raise TwythonError("createFavorite() requires you to be authenticated.")
 	
 	def destroyFavorite(self, id):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/favorites/destroy/" + id + ".json", ""))
 			except HTTPError, e:
-				raise TangoError("destroyFavorite() failed with a %s error code." %	`e.code`, e.code)
+				raise TwythonError("destroyFavorite() failed with a %s error code." %	`e.code`, e.code)
 		else:
-			raise TangoError("destroyFavorite() requires you to be authenticated.")
+			raise TwythonError("destroyFavorite() requires you to be authenticated.")
 	
 	def notificationFollow(self, id = None, user_id = None, screen_name = None):
 		if self.authenticated is True:
@@ -431,9 +440,9 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open(apiURL, ""))
 			except HTTPError, e:
-				raise TangoError("notificationFollow() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("notificationFollow() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("notificationFollow() requires you to be authenticated.")
+			raise TwythonError("notificationFollow() requires you to be authenticated.")
 	
 	def notificationLeave(self, id = None, user_id = None, screen_name = None):
 		if self.authenticated is True:
@@ -447,9 +456,9 @@ class setup:
 			try:
 				return simplejson.load(self.opener.open(apiURL, ""))
 			except HTTPError, e:
-				raise TangoError("notificationLeave() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("notificationLeave() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("notificationLeave() requires you to be authenticated.")
+			raise TwythonError("notificationLeave() requires you to be authenticated.")
 	
 	def getFriendsIDs(self, id = None, user_id = None, screen_name = None, page = "1"):
 		apiURL = ""
@@ -462,7 +471,7 @@ class setup:
 		try:
 			return simplejson.load(urllib2.urlopen(apiURL))
 		except HTTPError, e:
-			raise TangoError("getFriendsIDs() failed with a %s error code." % `e.code`, e.code)
+			raise TwythonError("getFriendsIDs() failed with a %s error code." % `e.code`, e.code)
 		
 	def getFollowersIDs(self, id = None, user_id = None, screen_name = None, page = "1"):
 		apiURL = ""
@@ -475,25 +484,25 @@ class setup:
 		try:
 			return simplejson.load(urllib2.urlopen(apiURL))
 		except HTTPError, e:
-			raise TangoError("getFollowersIDs() failed with a %s error code." % `e.code`, e.code)
+			raise TwythonError("getFollowersIDs() failed with a %s error code." % `e.code`, e.code)
 	
 	def createBlock(self, id):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/blocks/create/" + id + ".json", ""))
 			except HTTPError, e:
-				raise TangoError("createBlock() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("createBlock() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("createBlock() requires you to be authenticated.")
+			raise TwythonError("createBlock() requires you to be authenticated.")
 	
 	def destroyBlock(self, id):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/blocks/destroy/" + id + ".json", ""))
 			except HTTPError, e:
-				raise TangoError("destroyBlock() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("destroyBlock() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("destroyBlock() requires you to be authenticated.")
+			raise TwythonError("destroyBlock() requires you to be authenticated.")
 	
 	def checkIfBlockExists(self, id = None, user_id = None, screen_name = None):
 		apiURL = ""
@@ -506,32 +515,32 @@ class setup:
 		try:
 			return simplejson.load(urllib2.urlopen(apiURL))
 		except HTTPError, e:
-			raise TangoError("checkIfBlockExists() failed with a %s error code." % `e.code`, e.code)
+			raise TwythonError("checkIfBlockExists() failed with a %s error code." % `e.code`, e.code)
 	
 	def getBlocking(self, page = "1"):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/blocks/blocking.json?page=" + page))
 			except HTTPError, e:
-				raise TangoError("getBlocking() failed with a %s error code." %	`e.code`, e.code)
+				raise TwythonError("getBlocking() failed with a %s error code." %	`e.code`, e.code)
 		else:
-			raise TangoError("getBlocking() requires you to be authenticated")
+			raise TwythonError("getBlocking() requires you to be authenticated")
 	
 	def getBlockedIDs(self):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/blocks/blocking/ids.json"))
 			except HTTPError, e:
-				raise TangoError("getBlockedIDs() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("getBlockedIDs() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("getBlockedIDs() requires you to be authenticated.")
+			raise TwythonError("getBlockedIDs() requires you to be authenticated.")
 	
 	def searchTwitter(self, search_query, **kwargs):
 		searchURL = self.constructApiURL("http://search.twitter.com/search.json", kwargs) + "&" + urllib.urlencode({"q": search_query})
 		try:
 			return simplejson.load(urllib2.urlopen(searchURL))
 		except HTTPError, e:
-			raise TangoError("getSearchTimeline() failed with a %s error code." % `e.code`, e.code)
+			raise TwythonError("getSearchTimeline() failed with a %s error code." % `e.code`, e.code)
 	
 	def getCurrentTrends(self, excludeHashTags = False):
 		apiURL = "http://search.twitter.com/trends/current.json"
@@ -540,7 +549,7 @@ class setup:
 		try:
 			return simplejson.load(urllib.urlopen(apiURL))
 		except HTTPError, e:
-			raise TangoError("getCurrentTrends() failed with a %s error code." % `e.code`, e.code)
+			raise TwythonError("getCurrentTrends() failed with a %s error code." % `e.code`, e.code)
 	
 	def getDailyTrends(self, date = None, exclude = False):
 		apiURL = "http://search.twitter.com/trends/daily.json"
@@ -556,7 +565,7 @@ class setup:
 		try:
 			return simplejson.load(urllib.urlopen(apiURL))
 		except HTTPError, e:
-			raise TangoError("getDailyTrends() failed with a %s error code." % `e.code`, e.code)
+			raise TwythonError("getDailyTrends() failed with a %s error code." % `e.code`, e.code)
 	
 	def getWeeklyTrends(self, date = None, exclude = False):
 		apiURL = "http://search.twitter.com/trends/daily.json"
@@ -572,43 +581,43 @@ class setup:
 		try:
 			return simplejson.load(urllib.urlopen(apiURL))
 		except HTTPError, e:
-			raise TangoError("getWeeklyTrends() failed with a %s error code." % `e.code`, e.code)
+			raise TwythonError("getWeeklyTrends() failed with a %s error code." % `e.code`, e.code)
 	
 	def getSavedSearches(self):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/saved_searches.json"))
 			except HTTPError, e:
-				raise TangoError("getSavedSearches() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("getSavedSearches() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("getSavedSearches() requires you to be authenticated.")
+			raise TwythonError("getSavedSearches() requires you to be authenticated.")
 	
 	def showSavedSearch(self, id):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/show/" + id + ".json"))
 			except HTTPError, e:
-				raise TangoError("showSavedSearch() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("showSavedSearch() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("showSavedSearch() requires you to be authenticated.")
+			raise TwythonError("showSavedSearch() requires you to be authenticated.")
 	
 	def createSavedSearch(self, query):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/create.json?query=" + query, ""))
 			except HTTPError, e:
-				raise TangoError("createSavedSearch() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("createSavedSearch() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("createSavedSearch() requires you to be authenticated.")
+			raise TwythonError("createSavedSearch() requires you to be authenticated.")
 	
 	def destroySavedSearch(self, id):
 		if self.authenticated is True:
 			try:
 				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/destroy/" + id + ".json", ""))
 			except HTTPError, e:
-				raise TangoError("destroySavedSearch() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("destroySavedSearch() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("destroySavedSearch() requires you to be authenticated.")
+			raise TwythonError("destroySavedSearch() requires you to be authenticated.")
 	
 	# The following methods are apart from the other Account methods, because they rely on a whole multipart-data posting function set.
 	def updateProfileBackgroundImage(self, filename, tile="true"):
@@ -621,9 +630,9 @@ class setup:
 				r = urllib2.Request("http://twitter.com/account/update_profile_background_image.json?tile=" + tile, body, headers)
 				return self.opener.open(r).read()
 			except HTTPError, e:
-				raise TangoError("updateProfileBackgroundImage() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("updateProfileBackgroundImage() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("You realize you need to be authenticated to change a background image, right?")
+			raise TwythonError("You realize you need to be authenticated to change a background image, right?")
 	
 	def updateProfileImage(self, filename):
 		if self.authenticated is True:
@@ -635,9 +644,9 @@ class setup:
 				r = urllib2.Request("http://twitter.com/account/update_profile_image.json", body, headers)
 				return self.opener.open(r).read()
 			except HTTPError, e:
-				raise TangoError("updateProfileImage() failed with a %s error code." % `e.code`, e.code)
+				raise TwythonError("updateProfileImage() failed with a %s error code." % `e.code`, e.code)
 		else:
-			raise TangoError("You realize you need to be authenticated to change a profile image, right?")
+			raise TwythonError("You realize you need to be authenticated to change a profile image, right?")
 	
 	def encode_multipart_formdata(self, fields, files):
 		BOUNDARY = mimetools.choose_boundary()
