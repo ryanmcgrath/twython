@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 """
+    NOTE: Tango is being renamed to Twython; all basic strings have been changed below, but there's still work ongoing in this department.
+
 	Twython is an up-to-date library for Python that wraps the Twitter API.
 	Other Python Twitter libraries seem to have fallen a bit behind, and
 	Twitter's API has evolved a bit. Here's hoping this helps.
@@ -12,10 +14,13 @@
 
 import http.client, urllib, urllib.request, urllib.error, urllib.parse, mimetypes, mimetools
 
+from urllib.parse import urlparse
 from urllib.error import HTTPError
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
 __version__ = "0.6"
+
+"""Twython - Easy Twitter utilities in Python"""
 
 try:
 	import simplejson
@@ -23,7 +28,7 @@ except ImportError:
 	try:
 		import json as simplejson
 	except:
-		raise Exception("Twython requires a json library to work. http://www.undefined.org/python/")
+		raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
 
 try:
 	import oauth
@@ -45,46 +50,61 @@ class APILimit(TwythonError):
 		return repr(self.msg)
 
 class setup:
-	def __init__(self, authtype = "OAuth", username = None, password = None, oauth_keys = None, headers = None):
+	def __init__(self, authtype = "OAuth", username = None, password = None, consumer_secret = None, consumer_key = None, headers = None):
 		self.authtype = authtype
 		self.authenticated = False
 		self.username = username
 		self.password = password
-		self.oauth_keys = oauth_keys
+		# OAuth specific variables below
+		self.request_token_url = 'https://twitter.com/oauth/request_token'
+		self.access_token_url = 'https://twitter.com/oauth/access_token'
+		self.authorization_url = 'http://twitter.com/oauth/authorize'
+		self.signin_url = 'http://twitter.com/oauth/authenticate'
+		self.consumer_key = consumer_key
+		self.consumer_secret = consumer_secret
+		self.request_token = None
+		self.access_token = None
+		# Check and set up authentication
 		if self.username is not None and self.password is not None:
-			if self.authtype == "OAuth":
-				self.request_token_url = 'https://twitter.com/oauth/request_token'
-				self.access_token_url = 'https://twitter.com/oauth/access_token'
-				self.authorization_url = 'http://twitter.com/oauth/authorize'
-				self.signin_url = 'http://twitter.com/oauth/authenticate'
-				# Do OAuth type stuff here - how should this be handled? Seems like a framework question...
-			elif self.authtype == "Basic":
+			if self.authtype == "Basic":
+				# Basic authentication ritual
 				self.auth_manager = urllib.request.HTTPPasswordMgrWithDefaultRealm()
 				self.auth_manager.add_password(None, "http://twitter.com", self.username, self.password)
 				self.handler = urllib.request.HTTPBasicAuthHandler(self.auth_manager)
 				self.opener = urllib.request.build_opener(self.handler)
 				if headers is not None:
 					self.opener.addheaders = [('User-agent', headers)]
-				"""
 				try:
-					test_verify = simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
+					simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
 					self.authenticated = True
 				except HTTPError as e:
 					raise TwythonError("Authentication failed with your provided credentials. Try again? (%s failure)" % repr(e.code), e.code)
-				"""
+			else:
+				self.signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()
+				# Awesome OAuth authentication ritual
+				if consumer_secret is not None and consumer_key is not None:
+					#req = oauth.OAuthRequest.from_consumer_and_token
+					#req.sign_request(self.signature_method, self.consumer_key, self.token)
+					#self.opener = urllib2.build_opener()
+					pass
+				else:
+					raise TwythonError("Woah there, buddy. We've defaulted to OAuth authentication, but you didn't provide API keys. Try again.")
 	
-	# OAuth functions; shortcuts for verifying the credentials.
-	def fetch_response_oauth(self, oauth_request):
-		pass
+	def getRequestToken(self):
+		response = self.oauth_request(self.request_token_url)
+		token = self.parseOAuthResponse(response)
+		self.request_token = oauth.OAuthConsumer(token['oauth_token'],token['oauth_token_secret'])
+		return self.request_token
 	
-	def get_unauthorized_request_token(self):
-		pass
-	
-	def get_authorization_url(self, token):
-		pass
-	
-	def exchange_tokens(self, request_token):
-		pass
+	def parseOAuthResponse(self, response_string):
+		# Partial credit goes to Harper Reed for this gem.
+		lol = {}
+		for param in response_string.split("&"):
+			pair = param.split("=")
+			if(len(pair) != 2):
+				break
+			lol[pair[0]] = pair[1]
+		return lol
 	
 	# URL Shortening function huzzah
 	def shortenURL(self, url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
@@ -113,6 +133,16 @@ class setup:
 			return simplejson.load(urllib.request.urlopen("http://twitter.com/statuses/public_timeline.json"))
 		except HTTPError as e:
 			raise TwythonError("getPublicTimeline() failed with a %s error code." % repr(e.code))
+	
+	def getHomeTimeline(self, **kwargs):
+		if self.authenticated is True:
+			try:
+				friendsTimelineURL = self.constructApiURL("http://twitter.com/statuses/home_timeline.json", kwargs)
+				return simplejson.load(self.opener.open(friendsTimelineURL))
+			except HTTPError as e:
+				raise TwythonError("getHomeTimeline() failed with a %s error code. (This is an upcoming feature in the Twitter API, and may not be implemented yet)" % repr(e.code))
+		else:
+			raise TwythonError("getHomeTimeline() requires you to be authenticated.")
 	
 	def getFriendsTimeline(self, **kwargs):
 		if self.authenticated is True:
@@ -151,6 +181,36 @@ class setup:
 		else:
 			raise TwythonError("getUserMentions() requires you to be authenticated.")
 	
+	def retweetedOfMe(self, **kwargs):
+		if self.authenticated is True:
+			try:
+				retweetURL = self.constructApiURL("http://twitter.com/statuses/retweets_of_me.json", kwargs)
+				return simplejson.load(self.opener.open(retweetURL))
+			except HTTPError as e:
+				raise TwythonError("retweetedOfMe() failed with a %s error code." % repr(e.code), e.code)
+		else:
+			raise TwythonError("retweetedOfMe() requires you to be authenticated.")
+	
+	def retweetedByMe(self, **kwargs):
+		if self.authenticated is True:
+			try:
+				retweetURL = self.constructApiURL("http://twitter.com/statuses/retweeted_by_me.json", kwargs)
+				return simplejson.load(self.opener.open(retweetURL))
+			except HTTPError as e:
+				raise TwythonError("retweetedByMe() failed with a %s error code." % repr(e.code), e.code)
+		else:
+			raise TwythonError("retweetedByMe() requires you to be authenticated.")
+	
+	def retweetedToMe(self, **kwargs):
+		if self.authenticated is True:
+			try:
+				retweetURL = self.constructApiURL("http://twitter.com/statuses/retweeted_to_me.json", kwargs)
+				return simplejson.load(self.opener.open(retweetURL))
+			except HTTPError as e:
+				raise TwythonError("retweetedToMe() failed with a %s error code." % repr(e.code), e.code)
+		else:
+			raise TwythonError("retweetedToMe() requires you to be authenticated.")
+	
 	def showStatus(self, id):
 		try:
 			if self.authenticated is True:
@@ -180,6 +240,15 @@ class setup:
 				raise TwythonError("destroyStatus() failed with a %s error code." % repr(e.code), e.code)
 		else:
 			raise TwythonError("destroyStatus() requires you to be authenticated.")
+	
+	def reTweet(self, id):
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://twitter.com/statuses/retweet/%s.json", "POST" % id))
+			except HTTPError as e:
+				raise TwythonError("reTweet() failed with a %s error code." % repr(e.code), e.code)
+		else:
+			raise TwythonError("reTweet() requires you to be authenticated.")
 	
 	def endSession(self):
 		if self.authenticated is True:

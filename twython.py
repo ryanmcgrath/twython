@@ -181,6 +181,36 @@ class setup:
 		else:
 			raise TwythonError("getUserMentions() requires you to be authenticated.")
 	
+	def retweetedOfMe(self, **kwargs):
+		if self.authenticated is True:
+			try:
+				retweetURL = self.constructApiURL("http://twitter.com/statuses/retweets_of_me.json", kwargs)
+				return simplejson.load(self.opener.open(retweetURL))
+			except HTTPError, e:
+				raise TwythonError("retweetedOfMe() failed with a %s error code." % `e.code`, e.code)
+		else:
+			raise TwythonError("retweetedOfMe() requires you to be authenticated.")
+	
+	def retweetedByMe(self, **kwargs):
+		if self.authenticated is True:
+			try:
+				retweetURL = self.constructApiURL("http://twitter.com/statuses/retweeted_by_me.json", kwargs)
+				return simplejson.load(self.opener.open(retweetURL))
+			except HTTPError, e:
+				raise TwythonError("retweetedByMe() failed with a %s error code." % `e.code`, e.code)
+		else:
+			raise TwythonError("retweetedByMe() requires you to be authenticated.")
+	
+	def retweetedToMe(self, **kwargs):
+		if self.authenticated is True:
+			try:
+				retweetURL = self.constructApiURL("http://twitter.com/statuses/retweeted_to_me.json", kwargs)
+				return simplejson.load(self.opener.open(retweetURL))
+			except HTTPError, e:
+				raise TwythonError("retweetedToMe() failed with a %s error code." % `e.code`, e.code)
+		else:
+			raise TwythonError("retweetedToMe() requires you to be authenticated.")
+	
 	def showStatus(self, id):
 		try:
 			if self.authenticated is True:
