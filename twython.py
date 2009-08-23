@@ -49,6 +49,18 @@ class APILimit(TwythonError):
 	def __str__(self):
 		return repr(self.msg)
 
+class AuthError(TwythonError):
+	def __init__(self, msg):
+		self.msg = msg
+	def __str__(self):
+		return repr(self.msg)
+
+# A simple decorator to clean up some authentication checks that exist all over.
+# Not implemented yet - 
+def requires_authentication(func):
+	print func
+	# raise AuthError("This function requires you to be authenticated. Double check that and try again!")	
+
 class setup:
 	def __init__(self, authtype = "OAuth", username = None, password = None, consumer_secret = None, consumer_key = None, headers = None):
 		self.authtype = authtype
@@ -222,15 +234,12 @@ class setup:
 				% `e.code`, e.code)
 	
 	def updateStatus(self, status, in_reply_to_status_id = None):
-		if self.authenticated is True:
-			if len(list(status)) > 140:
-				raise TwythonError("This status message is over 140 characters. Trim it down!")
-			try:
-				return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status, "in_reply_to_status_id": in_reply_to_status_id})))
-			except HTTPError, e:
-				raise TwythonError("updateStatus() failed with a %s error code." % `e.code`, e.code)
-		else:
-			raise TwythonError("updateStatus() requires you to be authenticated.")
+		if len(list(status)) > 140:
+			raise TwythonError("This status message is over 140 characters. Trim it down!")
+		try:
+			return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": status, "in_reply_to_status_id": in_reply_to_status_id})))
+		except HTTPError, e:
+			raise TwythonError("updateStatus() failed with a %s error code." % `e.code`, e.code)
 	
 	def destroyStatus(self, id):
 		if self.authenticated is True:
