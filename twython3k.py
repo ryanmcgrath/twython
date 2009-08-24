@@ -1,8 +1,6 @@
 #!/usr/bin/python
 
 """
-    NOTE: Tango is being renamed to Twython; all basic strings have been changed below, but there's still work ongoing in this department.
-
 	Twython is an up-to-date library for Python that wraps the Twitter API.
 	Other Python Twitter libraries seem to have fallen a bit behind, and
 	Twitter's API has evolved a bit. Here's hoping this helps.
@@ -18,7 +16,7 @@ from urllib.parse import urlparse
 from urllib.error import HTTPError
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "0.6"
+__version__ = "0.7a"
 
 """Twython - Easy Twitter utilities in Python"""
 
@@ -49,12 +47,17 @@ class APILimit(TwythonError):
 	def __str__(self):
 		return repr(self.msg)
 
+class AuthError(TwythonError):
+	def __init__(self, msg):
+		self.msg = msg
+	def __str__(self):
+		return repr(self.msg)
+
 class setup:
 	def __init__(self, authtype = "OAuth", username = None, password = None, consumer_secret = None, consumer_key = None, headers = None):
 		self.authtype = authtype
 		self.authenticated = False
 		self.username = username
-		self.password = password
 		# OAuth specific variables below
 		self.request_token_url = 'https://twitter.com/oauth/request_token'
 		self.access_token_url = 'https://twitter.com/oauth/access_token'
@@ -65,11 +68,11 @@ class setup:
 		self.request_token = None
 		self.access_token = None
 		# Check and set up authentication
-		if self.username is not None and self.password is not None:
+		if self.username is not None and password is not None:
 			if self.authtype == "Basic":
 				# Basic authentication ritual
 				self.auth_manager = urllib.request.HTTPPasswordMgrWithDefaultRealm()
-				self.auth_manager.add_password(None, "http://twitter.com", self.username, self.password)
+				self.auth_manager.add_password(None, "http://twitter.com", self.username, password)
 				self.handler = urllib.request.HTTPBasicAuthHandler(self.auth_manager)
 				self.opener = urllib.request.build_opener(self.handler)
 				if headers is not None:
@@ -109,7 +112,7 @@ class setup:
 	# URL Shortening function huzzah
 	def shortenURL(self, url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
 		try:
-			return urllib.request.urlopen(shortener + "?" + urllib.urlencode({query: url_to_shorten})).read()
+			return urllib.request.urlopen(shortener + "?" + urllib.urlencode({query: self.unicode2utf8(url_to_shorten)})).read()
 		except HTTPError as e:
 			raise TwythonError("shortenURL() failed with a %s error code." % repr(e.code))
 	
@@ -142,7 +145,7 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("getHomeTimeline() failed with a %s error code. (This is an upcoming feature in the Twitter API, and may not be implemented yet)" % repr(e.code))
 		else:
-			raise TwythonError("getHomeTimeline() requires you to be authenticated.")
+			raise AuthError("getHomeTimeline() requires you to be authenticated.")
 	
 	def getFriendsTimeline(self, **kwargs):
 		if self.authenticated is True:
@@ -152,13 +155,13 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("getFriendsTimeline() failed with a %s error code." % repr(e.code))
 		else:
-			raise TwythonError("getFriendsTimeline() requires you to be authenticated.")
+			raise AuthError("getFriendsTimeline() requires you to be authenticated.")
 	
 	def getUserTimeline(self, id = None, **kwargs): 
 		if id is not None and ("user_id" in kwargs) is False and ("screen_name" in kwargs) is False:
-			userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline/" + id + ".json", kwargs)
+			userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline/%s.json" % repr(id), kwargs)
 		elif id is None and ("user_id" in kwargs) is False and ("screen_name" in kwargs) is False and self.authenticated is True:
-			userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline/" + self.username + ".json", kwargs)
+			userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline/%s.json" % self.username, kwargs)
 		else:
 			userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline.json", kwargs)
 		try:
@@ -179,7 +182,7 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("getUserMentions() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("getUserMentions() requires you to be authenticated.")
+			raise AuthError("getUserMentions() requires you to be authenticated.")
 	
 	def retweetedOfMe(self, **kwargs):
 		if self.authenticated is True:
@@ -189,7 +192,7 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("retweetedOfMe() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("retweetedOfMe() requires you to be authenticated.")
+			raise AuthError("retweetedOfMe() requires you to be authenticated.")
 	
 	def retweetedByMe(self, **kwargs):
 		if self.authenticated is True:
@@ -199,7 +202,7 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("retweetedByMe() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("retweetedByMe() requires you to be authenticated.")
+			raise AuthError("retweetedByMe() requires you to be authenticated.")
 	
 	def retweetedToMe(self, **kwargs):
 		if self.authenticated is True:
@@ -209,7 +212,7 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("retweetedToMe() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("retweetedToMe() requires you to be authenticated.")
+			raise AuthError("retweetedToMe() requires you to be authenticated.")
 	
 	def showStatus(self, id):
 		try:
@@ -222,15 +225,12 @@ class setup:
 				% repr(e.code), e.code)
 	
 	def updateStatus(self, status, in_reply_to_status_id = None):
-		if self.authenticated is True:
-			if len(list(status)) > 140:
-				raise TwythonError("This status message is over 140 characters. Trim it down!")
-			try:
-				return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.parse.urlencode({"status": status, "in_reply_to_status_id": in_reply_to_status_id})))
-			except HTTPError as e:
-				raise TwythonError("updateStatus() failed with a %s error code." % repr(e.code), e.code)
-		else:
-			raise TwythonError("updateStatus() requires you to be authenticated.")
+		if len(list(status)) > 140:
+			raise TwythonError("This status message is over 140 characters. Trim it down!")
+		try:
+			return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.parse.urlencode({"status": self.unicode2utf8(status), "in_reply_to_status_id": in_reply_to_status_id})))
+		except HTTPError as e:
+			raise TwythonError("updateStatus() failed with a %s error code." % repr(e.code), e.code)
 	
 	def destroyStatus(self, id):
 		if self.authenticated is True:
@@ -239,7 +239,7 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("destroyStatus() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("destroyStatus() requires you to be authenticated.")
+			raise AuthError("destroyStatus() requires you to be authenticated.")
 	
 	def reTweet(self, id):
 		if self.authenticated is True:
@@ -248,7 +248,7 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("reTweet() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("reTweet() requires you to be authenticated.")
+			raise AuthError("reTweet() requires you to be authenticated.")
 	
 	def endSession(self):
 		if self.authenticated is True:
@@ -258,41 +258,41 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("endSession failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("You can't end a session when you're not authenticated to begin with.")
+			raise AuthError("You can't end a session when you're not authenticated to begin with.")
 	
 	def getDirectMessages(self, since_id = None, max_id = None, count = None, page = "1"):
 		if self.authenticated is True:
-			apiURL = "http://twitter.com/direct_messages.json?page=" + page
+			apiURL = "http://twitter.com/direct_messages.json?page=%s" % repr(page)
 			if since_id is not None:
-				apiURL += "&since_id=" + since_id
+				apiURL += "&since_id=%s" % repr(since_id)
 			if max_id is not None:
-				apiURL += "&max_id=" + max_id
+				apiURL += "&max_id=%s" % repr(max_id)
 			if count is not None:
-				apiURL += "&count=" + count
+				apiURL += "&count=%s" % repr(count)
 			
 			try:
 				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError as e:
 				raise TwythonError("getDirectMessages() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("getDirectMessages() requires you to be authenticated.")
+			raise AuthError("getDirectMessages() requires you to be authenticated.")
 	
 	def getSentMessages(self, since_id = None, max_id = None, count = None, page = "1"):
 		if self.authenticated is True:
-			apiURL = "http://twitter.com/direct_messages/sent.json?page=" + page
+			apiURL = "http://twitter.com/direct_messages/sent.json?page=%s" % repr(page)
 			if since_id is not None:
-				apiURL += "&since_id=" + since_id
+				apiURL += "&since_id=%s" % repr(since_id)
 			if max_id is not None:
-				apiURL += "&max_id=" + max_id
+				apiURL += "&max_id=%s" % repr(max_id)
 			if count is not None:
-				apiURL += "&count=" + count
+				apiURL += "&count=%s" % repr(count)
 			
 			try:
 				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError as e:
 				raise TwythonError("getSentMessages() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("getSentMessages() requires you to be authenticated.")
+			raise AuthError("getSentMessages() requires you to be authenticated.")
 	
 	def sendDirectMessage(self, user, text):
 		if self.authenticated is True:
@@ -304,7 +304,7 @@ class setup:
 			else:
 				raise TwythonError("Your message must not be longer than 140 characters")
 		else:
-			raise TwythonError("You must be authenticated to send a new direct message.")
+			raise AuthError("You must be authenticated to send a new direct message.")
 	
 	def destroyDirectMessage(self, id):
 		if self.authenticated is True:
@@ -313,17 +313,17 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("destroyDirectMessage() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("You must be authenticated to destroy a direct message.")
+			raise AuthError("You must be authenticated to destroy a direct message.")
 	
 	def createFriendship(self, id = None, user_id = None, screen_name = None, follow = "false"):
 		if self.authenticated is True:
 			apiURL = ""
 			if id is not None:
-				apiURL = "http://twitter.com/friendships/create/" + id + ".json" + "?follow=" + follow
+				apiURL = "http://twitter.com/friendships/create/%s.json?follow=%s" %(id, follow)
 			if user_id is not None:
-				apiURL = "http://twitter.com/friendships/create.json?user_id=" + user_id + "&follow=" + follow
+				apiURL = "http://twitter.com/friendships/create.json?user_id=%s&follow=%s" %(repr(user_id), follow)
 			if screen_name is not None:
-				apiURL = "http://twitter.com/friendships/create.json?screen_name=" + screen_name + "&follow=" + follow
+				apiURL = "http://twitter.com/friendships/create.json?screen_name=%s&follow=%s" %(screen_name, follow)
 			try:
 				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError as e:
@@ -332,23 +332,23 @@ class setup:
 					raise TwythonError("You've hit the update limit for this method. Try again in 24 hours.")
 				raise TwythonError("createFriendship() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("createFriendship() requires you to be authenticated.")
+			raise AuthError("createFriendship() requires you to be authenticated.")
 		
 	def destroyFriendship(self, id = None, user_id = None, screen_name = None):
 		if self.authenticated is True:
 			apiURL = ""
 			if id is not None:
-				apiURL = "http://twitter.com/friendships/destroy/" + id + ".json"
+				apiURL = "http://twitter.com/friendships/destroy/%s.json" % id
 			if user_id is not None:
-				apiURL = "http://twitter.com/friendships/destroy.json?user_id=" + user_id
+				apiURL = "http://twitter.com/friendships/destroy.json?user_id=%s" %	repr(user_id)
 			if screen_name is not None:
-				apiURL = "http://twitter.com/friendships/destroy.json?screen_name=" + screen_name
+				apiURL = "http://twitter.com/friendships/destroy.json?screen_name=%s" % screen_name
 			try:
 				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError as e:
 				raise TwythonError("destroyFriendship() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("destroyFriendship() requires you to be authenticated.")
+			raise AuthError("destroyFriendship() requires you to be authenticated.")
 	
 	def checkIfFriendshipExists(self, user_a, user_b):
 		if self.authenticated is True:
@@ -357,16 +357,16 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("checkIfFriendshipExists() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("checkIfFriendshipExists(), oddly, requires that you be authenticated.")
+			raise AuthError("checkIfFriendshipExists(), oddly, requires that you be authenticated.")
 	
 	def updateDeliveryDevice(self, device_name = "none"):
 		if self.authenticated is True:
 			try:
-				return self.opener.open("http://twitter.com/account/update_delivery_device.json?", urllib.parse.urlencode({"device": device_name}))
+				return self.opener.open("http://twitter.com/account/update_delivery_device.json?", urllib.parse.urlencode({"device": self.unicode2utf8(device_name)}))
 			except HTTPError as e:
 				raise TwythonError("updateDeliveryDevice() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("updateDeliveryDevice() requires you to be authenticated.")
+			raise AuthError("updateDeliveryDevice() requires you to be authenticated.")
 	
 	def updateProfileColors(self, **kwargs):
 		if self.authenticated is True:
@@ -375,7 +375,7 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("updateProfileColors() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("updateProfileColors() requires you to be authenticated.")
+			raise AuthError("updateProfileColors() requires you to be authenticated.")
 	
 	def updateProfile(self, name = None, email = None, url = None, location = None, description = None):
 		if self.authenticated is True:
@@ -399,27 +399,27 @@ class setup:
 			if url is not None:
 				if len(list(url)) < 100:
 					if useAmpersands is True:
-						updateProfileQueryString += "&" + urllib.parse.urlencode({"url": url})
+						updateProfileQueryString += "&" + urllib.parse.urlencode({"url": self.unicode2utf8(url)})
 					else:
-						updateProfileQueryString += urllib.parse.urlencode({"url": url})
+						updateProfileQueryString += urllib.parse.urlencode({"url": self.unicode2utf8(url)})
 						useAmpersands = True
 				else:
 					raise TwythonError("Twitter has a character limit of 100 for all urls. Try again.")
 			if location is not None:
 				if len(list(location)) < 30:
 					if useAmpersands is True:
-						updateProfileQueryString += "&" + urllib.parse.urlencode({"location": location})
+						updateProfileQueryString += "&" + urllib.parse.urlencode({"location": self.unicode2utf8(location)})
 					else:
-						updateProfileQueryString += urllib.parse.urlencode({"location": location})
+						updateProfileQueryString += urllib.parse.urlencode({"location": self.unicode2utf8(location)})
 						useAmpersands = True
 				else:
 					raise TwythonError("Twitter has a character limit of 30 for all locations. Try again.")
 			if description is not None:
 				if len(list(description)) < 160:
 					if useAmpersands is True:
-						updateProfileQueryString += "&" + urllib.parse.urlencode({"description": description})
+						updateProfileQueryString += "&" + urllib.parse.urlencode({"description": self.unicode2utf8(description)})
 					else:
-						updateProfileQueryString += urllib.parse.urlencode({"description": description})
+						updateProfileQueryString += urllib.parse.urlencode({"description": self.unicode2utf8(description)})
 				else:
 					raise TwythonError("Twitter has a character limit of 160 for all descriptions. Try again.")
 			
@@ -429,75 +429,75 @@ class setup:
 				except HTTPError as e:
 					raise TwythonError("updateProfile() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("updateProfile() requires you to be authenticated.")
+			raise AuthError("updateProfile() requires you to be authenticated.")
 	
 	def getFavorites(self, page = "1"):
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/favorites.json?page=" + page))
+				return simplejson.load(self.opener.open("http://twitter.com/favorites.json?page=%s" % repr(page)))
 			except HTTPError as e:
 				raise TwythonError("getFavorites() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("getFavorites() requires you to be authenticated.")
+			raise AuthError("getFavorites() requires you to be authenticated.")
 	
 	def createFavorite(self, id):
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/favorites/create/" + id + ".json", ""))
+				return simplejson.load(self.opener.open("http://twitter.com/favorites/create/%s.json" % repr(id), ""))
 			except HTTPError as e:
 				raise TwythonError("createFavorite() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("createFavorite() requires you to be authenticated.")
+			raise AuthError("createFavorite() requires you to be authenticated.")
 	
 	def destroyFavorite(self, id):
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/favorites/destroy/" + id + ".json", ""))
+				return simplejson.load(self.opener.open("http://twitter.com/favorites/destroy/%s.json" % repr(id), ""))
 			except HTTPError as e:
-				raise TwythonError("destroyFavorite() failed with a %s error code." %	repr(e.code), e.code)
+				raise TwythonError("destroyFavorite() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("destroyFavorite() requires you to be authenticated.")
+			raise AuthError("destroyFavorite() requires you to be authenticated.")
 	
 	def notificationFollow(self, id = None, user_id = None, screen_name = None):
 		if self.authenticated is True:
 			apiURL = ""
 			if id is not None:
-				apiURL = "http://twitter.com/notifications/follow/" + id + ".json"
+				apiURL = "http://twitter.com/notifications/follow/%s.json" % id
 			if user_id is not None:
-				apiURL = "http://twitter.com/notifications/follow/follow.json?user_id=" + user_id
+				apiURL = "http://twitter.com/notifications/follow/follow.json?user_id=%s" % repr(user_id)
 			if screen_name is not None:
-				apiURL = "http://twitter.com/notifications/follow/follow.json?screen_name=" + screen_name
+				apiURL = "http://twitter.com/notifications/follow/follow.json?screen_name=%s" % screen_name
 			try:
 				return simplejson.load(self.opener.open(apiURL, ""))
 			except HTTPError as e:
 				raise TwythonError("notificationFollow() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("notificationFollow() requires you to be authenticated.")
+			raise AuthError("notificationFollow() requires you to be authenticated.")
 	
 	def notificationLeave(self, id = None, user_id = None, screen_name = None):
 		if self.authenticated is True:
 			apiURL = ""
 			if id is not None:
-				apiURL = "http://twitter.com/notifications/leave/" + id + ".json"
+				apiURL = "http://twitter.com/notifications/leave/%s.json" % id
 			if user_id is not None:
-				apiURL = "http://twitter.com/notifications/leave/leave.json?user_id=" + user_id
+				apiURL = "http://twitter.com/notifications/leave/leave.json?user_id=%s" % repr(user_id)
 			if screen_name is not None:
-				apiURL = "http://twitter.com/notifications/leave/leave.json?screen_name=" + screen_name
+				apiURL = "http://twitter.com/notifications/leave/leave.json?screen_name=%s" % screen_name
 			try:
 				return simplejson.load(self.opener.open(apiURL, ""))
 			except HTTPError as e:
 				raise TwythonError("notificationLeave() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("notificationLeave() requires you to be authenticated.")
+			raise AuthError("notificationLeave() requires you to be authenticated.")
 	
 	def getFriendsIDs(self, id = None, user_id = None, screen_name = None, page = "1"):
 		apiURL = ""
 		if id is not None:
-			apiURL = "http://twitter.com/friends/ids/" + id + ".json" + "?page=" + page
+			apiURL = "http://twitter.com/friends/ids/%s.json?page=%s" %(id, repr(page))
 		if user_id is not None:
-			apiURL = "http://twitter.com/friends/ids.json?user_id=" + user_id + "&page=" + page
+			apiURL = "http://twitter.com/friends/ids.json?user_id=%s&page=%s" %(repr(user_id), repr(page))
 		if screen_name is not None:
-			apiURL = "http://twitter.com/friends/ids.json?screen_name=" + screen_name + "&page=" + page
+			apiURL = "http://twitter.com/friends/ids.json?screen_name=%s&page=%s" %(screen_name, repr(page))
 		try:
 			return simplejson.load(urllib.request.urlopen(apiURL))
 		except HTTPError as e:
@@ -506,11 +506,11 @@ class setup:
 	def getFollowersIDs(self, id = None, user_id = None, screen_name = None, page = "1"):
 		apiURL = ""
 		if id is not None:
-			apiURL = "http://twitter.com/followers/ids/" + id + ".json" + "?page=" + page
+			apiURL = "http://twitter.com/followers/ids/%s.json?page=%s" %(repr(id), repr(page))
 		if user_id is not None:
-			apiURL = "http://twitter.com/followers/ids.json?user_id=" + user_id + "&page=" + page
+			apiURL = "http://twitter.com/followers/ids.json?user_id=%s&page=%s" %(repr(user_id), repr(page))
 		if screen_name is not None:
-			apiURL = "http://twitter.com/followers/ids.json?screen_name=" + screen_name + "&page=" + page
+			apiURL = "http://twitter.com/followers/ids.json?screen_name=%s&page=%s" %(screen_name, repr(page))
 		try:
 			return simplejson.load(urllib.request.urlopen(apiURL))
 		except HTTPError as e:
@@ -519,29 +519,29 @@ class setup:
 	def createBlock(self, id):
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/blocks/create/" + id + ".json", ""))
+				return simplejson.load(self.opener.open("http://twitter.com/blocks/create/%s.json" % repr(id), ""))
 			except HTTPError as e:
 				raise TwythonError("createBlock() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("createBlock() requires you to be authenticated.")
+			raise AuthError("createBlock() requires you to be authenticated.")
 	
 	def destroyBlock(self, id):
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/blocks/destroy/" + id + ".json", ""))
+				return simplejson.load(self.opener.open("http://twitter.com/blocks/destroy/%s.json" % repr(id), ""))
 			except HTTPError as e:
 				raise TwythonError("destroyBlock() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("destroyBlock() requires you to be authenticated.")
+			raise AuthError("destroyBlock() requires you to be authenticated.")
 	
 	def checkIfBlockExists(self, id = None, user_id = None, screen_name = None):
 		apiURL = ""
 		if id is not None:
-			apiURL = "http://twitter.com/blocks/exists/" + id + ".json"
+			apiURL = "http://twitter.com/blocks/exists/%s.json" % repr(id)
 		if user_id is not None:
-			apiURL = "http://twitter.com/blocks/exists.json?user_id=" + user_id
+			apiURL = "http://twitter.com/blocks/exists.json?user_id=%s" % repr(user_id)
 		if screen_name is not None:
-			apiURL = "http://twitter.com/blocks/exists.json?screen_name=" + screen_name
+			apiURL = "http://twitter.com/blocks/exists.json?screen_name=%s" % screen_name
 		try:
 			return simplejson.load(urllib.request.urlopen(apiURL))
 		except HTTPError as e:
@@ -550,11 +550,11 @@ class setup:
 	def getBlocking(self, page = "1"):
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/blocks/blocking.json?page=" + page))
+				return simplejson.load(self.opener.open("http://twitter.com/blocks/blocking.json?page=%s" % repr(page)))
 			except HTTPError as e:
 				raise TwythonError("getBlocking() failed with a %s error code." %	repr(e.code), e.code)
 		else:
-			raise TwythonError("getBlocking() requires you to be authenticated")
+			raise AuthError("getBlocking() requires you to be authenticated")
 	
 	def getBlockedIDs(self):
 		if self.authenticated is True:
@@ -563,10 +563,10 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("getBlockedIDs() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("getBlockedIDs() requires you to be authenticated.")
+			raise AuthError("getBlockedIDs() requires you to be authenticated.")
 	
 	def searchTwitter(self, search_query, **kwargs):
-		searchURL = self.constructApiURL("http://search.twitter.com/search.json", kwargs) + "&" + urllib.parse.urlencode({"q": search_query})
+		searchURL = self.constructApiURL("http://search.twitter.com/search.json", kwargs) + "&" + urllib.parse.urlencode({"q": self.unicode2utf8(search_query)})
 		try:
 			return simplejson.load(urllib.request.urlopen(searchURL))
 		except HTTPError as e:
@@ -585,7 +585,7 @@ class setup:
 		apiURL = "http://search.twitter.com/trends/daily.json"
 		questionMarkUsed = False
 		if date is not None:
-			apiURL += "?date=" + date
+			apiURL += "?date=%s" % date
 			questionMarkUsed = True
 		if exclude is True:
 			if questionMarkUsed is True:
@@ -601,7 +601,7 @@ class setup:
 		apiURL = "http://search.twitter.com/trends/daily.json"
 		questionMarkUsed = False
 		if date is not None:
-			apiURL += "?date=" + date
+			apiURL += "?date=%s" % date
 			questionMarkUsed = True
 		if exclude is True:
 			if questionMarkUsed is True:
@@ -620,34 +620,34 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("getSavedSearches() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("getSavedSearches() requires you to be authenticated.")
+			raise AuthError("getSavedSearches() requires you to be authenticated.")
 	
 	def showSavedSearch(self, id):
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/show/" + id + ".json"))
+				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/show/%s.json" % repr(id)))
 			except HTTPError as e:
 				raise TwythonError("showSavedSearch() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("showSavedSearch() requires you to be authenticated.")
+			raise AuthError("showSavedSearch() requires you to be authenticated.")
 	
 	def createSavedSearch(self, query):
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/create.json?query=" + query, ""))
+				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/create.json?query=%s" % query, ""))
 			except HTTPError as e:
 				raise TwythonError("createSavedSearch() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("createSavedSearch() requires you to be authenticated.")
+			raise AuthError("createSavedSearch() requires you to be authenticated.")
 	
 	def destroySavedSearch(self, id):
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/destroy/" + id + ".json", ""))
+				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/destroy/%s.json" % repr(id), ""))
 			except HTTPError as e:
 				raise TwythonError("destroySavedSearch() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("destroySavedSearch() requires you to be authenticated.")
+			raise AuthError("destroySavedSearch() requires you to be authenticated.")
 	
 	# The following methods are apart from the other Account methods, because they rely on a whole multipart-data posting function set.
 	def updateProfileBackgroundImage(self, filename, tile="true"):
@@ -662,7 +662,7 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("updateProfileBackgroundImage() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("You realize you need to be authenticated to change a background image, right?")
+			raise AuthError("You realize you need to be authenticated to change a background image, right?")
 	
 	def updateProfileImage(self, filename):
 		if self.authenticated is True:
@@ -676,7 +676,7 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("updateProfileImage() failed with a %s error code." % repr(e.code), e.code)
 		else:
-			raise TwythonError("You realize you need to be authenticated to change a profile image, right?")
+			raise AuthError("You realize you need to be authenticated to change a profile image, right?")
 	
 	def encode_multipart_formdata(self, fields, files):
 		BOUNDARY = mimetools.choose_boundary()
@@ -701,3 +701,11 @@ class setup:
 	
 	def get_content_type(self, filename):
 		return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+	
+	def unicode2utf8(self, text):
+		try:
+			if isinstance(text, str):
+				text = text.encode('utf-8')
+		except:
+			pass
+		return text
