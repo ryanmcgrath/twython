@@ -140,8 +140,8 @@ class setup:
 	def getHomeTimeline(self, **kwargs):
 		if self.authenticated is True:
 			try:
-				friendsTimelineURL = self.constructApiURL("http://twitter.com/statuses/home_timeline.json", kwargs)
-				return simplejson.load(self.opener.open(friendsTimelineURL))
+				homeTimelineURL = self.constructApiURL("http://twitter.com/statuses/home_timeline.json", kwargs)
+				return simplejson.load(self.opener.open(homeTimelineURL))
 			except HTTPError as e:
 				raise TwythonError("getHomeTimeline() failed with a %s error code. (This is an upcoming feature in the Twitter API, and may not be implemented yet)" % repr(e.code))
 		else:
@@ -184,6 +184,15 @@ class setup:
 		else:
 			raise AuthError("getUserMentions() requires you to be authenticated.")
 	
+	def reTweet(self, id):
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://twitter.com/statuses/retweet/%s.json", "POST" % id))
+			except HTTPError as e:
+				raise TwythonError("reTweet() failed with a %s error code." % repr(e.code), e.code)
+		else:
+			raise AuthError("reTweet() requires you to be authenticated.")
+	
 	def retweetedOfMe(self, **kwargs):
 		if self.authenticated is True:
 			try:
@@ -214,6 +223,55 @@ class setup:
 		else:
 			raise AuthError("retweetedToMe() requires you to be authenticated.")
 	
+	def showUser(self, id = None, user_id = None, screen_name = None):
+		if self.authenticated is True:
+			apiURL = ""
+			if id is not None:
+				apiURL = "http://twitter.com/users/show/%s.json" % id
+			if user_id is not None:
+				apiURL = "http://twitter.com/users/show.json?user_id=%s" % repr(user_id)
+			if screen_name is not None:
+				apiURL = "http://twitter.com/users/show.json?screen_name=%s" % screen_name
+			try:
+				return simplejson.load(self.opener.open(apiURL))
+			except HTTPError as e:
+				raise TwythonError("showUser() failed with a %s error code." % repr(e.code), e.code)
+		else:
+			raise AuthError("showUser() requires you to be authenticated.")
+	
+	def getFriendsStatus(self, id = None, user_id = None, screen_name = None, page = "1"):
+		if self.authenticated is True:
+			apiURL = ""
+			if id is not None:
+				apiURL = "http://twitter.com/statuses/friends/%s.json" % id
+			if user_id is not None:
+				apiURL = "http://twitter.com/statuses/friends.json?user_id=%s" % repr(user_id)
+			if screen_name is not None:
+				apiURL = "http://twitter.com/statuses/friends.json?screen_name=%s" % screen_name
+			try:
+				return simplejson.load(self.opener.open(apiURL + "&page=%s" % repr(page)))
+			except HTTPError as e:
+				raise TwythonError("getFriendsStatus() failed with a %s error code." % repr(e.code), e.code)
+		else:
+			raise AuthError("getFriendsStatus() requires you to be authenticated.")
+	
+	def getFollowersStatus(self, id = None, user_id = None, screen_name = None, page = "1"):
+		if self.authenticated is True:
+			apiURL = ""
+			if id is not None:
+				apiURL = "http://twitter.com/statuses/followers/%s.json" % id
+			if user_id is not None:
+				apiURL = "http://twitter.com/statuses/followers.json?user_id=%s" % repr(user_id)
+			if screen_name is not None:
+				apiURL = "http://twitter.com/statuses/followers.json?screen_name=%s" % screen_name
+			try:
+				return simplejson.load(self.opener.open(apiURL + "&page=%s" % repr(page)))
+			except HTTPError as e:
+				raise TwythonError("getFollowersStatus() failed with a %s error code." % repr(e.code), e.code)
+		else:
+			raise AuthError("getFollowersStatus() requires you to be authenticated.")
+	
+
 	def showStatus(self, id):
 		try:
 			if self.authenticated is True:
@@ -240,15 +298,6 @@ class setup:
 				raise TwythonError("destroyStatus() failed with a %s error code." % repr(e.code), e.code)
 		else:
 			raise AuthError("destroyStatus() requires you to be authenticated.")
-	
-	def reTweet(self, id):
-		if self.authenticated is True:
-			try:
-				return simplejson.load(self.opener.open("http://twitter.com/statuses/retweet/%s.json", "POST" % id))
-			except HTTPError as e:
-				raise TwythonError("reTweet() failed with a %s error code." % repr(e.code), e.code)
-		else:
-			raise AuthError("reTweet() requires you to be authenticated.")
 	
 	def endSession(self):
 		if self.authenticated is True:
