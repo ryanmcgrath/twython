@@ -3,7 +3,7 @@
 import sys, os
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '0.6'
+__version__ = '0.8'
 
 # For the love of god, use Pip to install this.
 
