@@ -60,14 +60,12 @@ class setup:
 			Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
 			Parameters:
-				authtype - "OAuth"/"Basic"
-				username - Your twitter username
-				password - Password for your twitter account.
-				consumer_secret - Consumer secret in case you specified for OAuth as authtype.
-				consumer_key - Consumer key in case you specified for OAuth as authtype.
+				username - Your Twitter username, if you want Basic (HTTP) Authentication.
+				password - Password for your twitter account, if you want Basic (HTTP) Authentication.
+				consumer_secret - Consumer secret, if you want OAuth.
+				consumer_key - Consumer key, if you want OAuth.
 				headers - User agent header.
 		"""
-		self.authtype = authtype
 		self.authenticated = False
 		self.username = username
 		# OAuth specific variables below
@@ -81,30 +79,28 @@ class setup:
 		self.access_token = None
 		# Check and set up authentication
 		if self.username is not None and password is not None:
-			if self.authtype == "Basic":
-				# Basic authentication ritual
-				self.auth_manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
-				self.auth_manager.add_password(None, "http://twitter.com", self.username, password)
-				self.handler = urllib2.HTTPBasicAuthHandler(self.auth_manager)
-				self.opener = urllib2.build_opener(self.handler)
-				if headers is not None:
-					self.opener.addheaders = [('User-agent', headers)]
-				try:
-					simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
-					self.authenticated = True
-				except HTTPError, e:
-					raise TwythonError("Authentication failed with your provided credentials. Try again? (%s failure)" % `e.code`, e.code)
-			else:
-				self.signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()
-				# Awesome OAuth authentication ritual
-				if consumer_secret is not None and consumer_key is not None:
-					#req = oauth.OAuthRequest.from_consumer_and_token
-					#req.sign_request(self.signature_method, self.consumer_key, self.token)
-					#self.opener = urllib2.build_opener()
-					pass
-				else:
-					raise TwythonError("Woah there, buddy. We've defaulted to OAuth authentication, but you didn't provide API keys. Try again.")
-
+			# Assume Basic authentication ritual
+			self.auth_manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
+			self.auth_manager.add_password(None, "http://twitter.com", self.username, password)
+			self.handler = urllib2.HTTPBasicAuthHandler(self.auth_manager)
+			self.opener = urllib2.build_opener(self.handler)
+			if headers is not None:
+				self.opener.addheaders = [('User-agent', headers)]
+			try:
+				simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
+				self.authenticated = True
+			except HTTPError, e:
+				raise TwythonError("Authentication failed with your provided credentials. Try again? (%s failure)" % `e.code`, e.code)
+		elif consumer_secret is not None and consumer_key is not None:
+			self.signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()
+			# Awesome OAuth authentication ritual
+			# req = oauth.OAuthRequest.from_consumer_and_token
+			# req.sign_request(self.signature_method, self.consumer_key, self.token)
+			# self.opener = urllib2.build_opener()
+			pass
+		else:
+			pass
+	
 	def getRequestToken(self):
 		response = self.oauth_request(self.request_token_url)
 		token = self.parseOAuthResponse(response)
