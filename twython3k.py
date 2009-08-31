@@ -487,7 +487,7 @@ class setup:
 		"""
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/status/destroy/%s.json", "POST" % id))
+				return simplejson.load(self.opener.open("http://twitter.com/status/destroy/%s.json" % `id`, "POST"))
 			except HTTPError as e:
 				raise TwythonError("destroyStatus() failed with a %s error code." % repr(e.code), e.code)
 		else:
