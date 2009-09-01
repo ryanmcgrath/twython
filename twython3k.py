@@ -54,14 +54,14 @@ class AuthError(TwythonError):
 		return repr(self.msg)
 
 class setup:
-	def __init__(self, username = None, password = None, consumer_secret = None, consumer_key = None, headers = None):
+	def __init__(self, authtype = "OAuth", username = None, password = None, consumer_secret = None, consumer_key = None, headers = None):
 		"""setup(authtype = "OAuth", username = None, password = None, consumer_secret = None, consumer_key = None, headers = None)
 
 			Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
 			Parameters:
-				username - Your twitter username, if you want Basic (HTTP) Authentication
-				password - Password for your twitter account, if you want Basic (HTTP) Authentication
+				username - Your Twitter username, if you want Basic (HTTP) Authentication.
+				password - Password for your twitter account, if you want Basic (HTTP) Authentication.
 				consumer_secret - Consumer secret, if you want OAuth.
 				consumer_key - Consumer key, if you want OAuth.
 				headers - User agent header.
@@ -79,7 +79,7 @@ class setup:
 		self.access_token = None
 		# Check and set up authentication
 		if self.username is not None and password is not None:
-			# Basic authentication ritual
+			# Assume Basic authentication ritual
 			self.auth_manager = urllib.request.HTTPPasswordMgrWithDefaultRealm()
 			self.auth_manager.add_password(None, "http://twitter.com", self.username, password)
 			self.handler = urllib.request.HTTPBasicAuthHandler(self.auth_manager)
@@ -275,7 +275,7 @@ class setup:
 		"""
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/statuses/retweet/%s.json", "POST" % id))
+				return simplejson.load(self.opener.open("http://twitter.com/statuses/retweet/%s.json" % repr(id), "POST"))
 			except HTTPError as e:
 				raise TwythonError("reTweet() failed with a %s error code." % repr(e.code), e.code)
 		else:
@@ -487,7 +487,7 @@ class setup:
 		"""
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/status/destroy/%s.json" % `id`, "POST"))
+				return simplejson.load(self.opener.open("http://twitter.com/status/destroy/%s.json" % repr(id), "DELETE"))
 			except HTTPError as e:
 				raise TwythonError("destroyStatus() failed with a %s error code." % repr(e.code), e.code)
 		else:
@@ -672,7 +672,8 @@ class setup:
 		"""
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/friendships/exists.json", urllib.parse.urlencode({"user_a": user_a, "user_b": user_b})))
+				friendshipURL = "http://twitter.com/friendships/exists.json?%s" % urllib.parse.urlencode({"user_a": user_a, "user_b": user_b})
+				return simplejson.load(self.opener.open(friendshipURL))
 			except HTTPError as e:
 				raise TwythonError("checkIfFriendshipExists() failed with a %s error code." % repr(e.code), e.code)
 		else:

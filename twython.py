@@ -275,7 +275,7 @@ class setup:
 		"""
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/statuses/retweet/%s.json", "POST" % id))
+				return simplejson.load(self.opener.open("http://twitter.com/statuses/retweet/%s.json" % `id`, "POST"))
 			except HTTPError, e:
 				raise TwythonError("reTweet() failed with a %s error code." % `e.code`, e.code)
 		else:
@@ -672,7 +672,8 @@ class setup:
 		"""
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/friendships/exists.json", urllib.urlencode({"user_a": user_a, "user_b": user_b})))
+				friendshipURL = "http://twitter.com/friendships/exists.json?%s" % urllib.urlencode({"user_a": user_a, "user_b": user_b})
+				return simplejson.load(self.opener.open(friendshipURL))
 			except HTTPError, e:
 				raise TwythonError("checkIfFriendshipExists() failed with a %s error code." % `e.code`, e.code)
 		else:
