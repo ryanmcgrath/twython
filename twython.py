@@ -617,18 +617,19 @@ class setup:
 		"""
 		if self.authenticated is True:
 			apiURL = ""
-			if id is not None:
-				apiURL = "http://twitter.com/friendships/create/%s.json?follow=%s" %(id, follow)
 			if user_id is not None:
-				apiURL = "http://twitter.com/friendships/create.json?user_id=%s&follow=%s" %(`user_id`, follow)
+				apiURL = "?user_id=%s&follow=%s" %(`user_id`, follow)
 			if screen_name is not None:
-				apiURL = "http://twitter.com/friendships/create.json?screen_name=%s&follow=%s" %(screen_name, follow)
+				apiURL = "?screen_name=%s&follow=%s" %(screen_name, follow)
 			try:
-				return simplejson.load(self.opener.open(apiURL))
+				if id is not None:
+					return simplejson.load(self.opener.open("http://twitter.com/friendships/create/%s.json" % `id`, "?folow=%s" % follow))
+				else:
+					return simplejson.load(self.opener.open("http://twitter.com/friendships/create.json", apiURL))
 			except HTTPError, e:
 				# Rate limiting is done differently here for API reasons...
 				if e.code == 403:
-					raise TwythonError("You've hit the update limit for this method. Try again in 24 hours.")
+					raise APILimit("You've hit the update limit for this method. Try again in 24 hours.")
 				raise TwythonError("createFriendship() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("createFriendship() requires you to be authenticated.")
@@ -647,14 +648,15 @@ class setup:
 		"""
 		if self.authenticated is True:
 			apiURL = ""
-			if id is not None:
-				apiURL = "http://twitter.com/friendships/destroy/%s.json" % id
 			if user_id is not None:
-				apiURL = "http://twitter.com/friendships/destroy.json?user_id=%s" %	`user_id`
+				apiURL = "?user_id=%s" % `user_id`
 			if screen_name is not None:
-				apiURL = "http://twitter.com/friendships/destroy.json?screen_name=%s" % screen_name
+				apiURL = "?screen_name=%s" % screen_name
 			try:
-				return simplejson.load(self.opener.open(apiURL))
+				if id is not None:
+					return simplejson.load(self.opener.open("http://twitter.com/friendships/destroy/%s.json" % `id`, "lol=1")) # Random string appended for POST reasons, quick hack ;P
+				else:
+					return simplejson.load(self.opener.open("http://twitter.com/friendships/destroy.json", apiURL))
 			except HTTPError, e:
 				raise TwythonError("destroyFriendship() failed with a %s error code." % `e.code`, e.code)
 		else:
@@ -678,7 +680,41 @@ class setup:
 				raise TwythonError("checkIfFriendshipExists() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("checkIfFriendshipExists(), oddly, requires that you be authenticated.")
+	
+	def showFriendship(self, source_id = None, source_screen_name = None, target_id = None, target_screen_name = None):
+		"""showFriendship(source_id, source_screen_name, target_id, target_screen_name)
 
+			Returns detailed information about the relationship between two users. 
+
+			Parameters:
+				** Note: One of the following is required if the request is unauthenticated
+				source_id - The user_id of the subject user.
+				source_screen_name - The screen_name of the subject user.
+
+				** Note: One of the following is required at all times
+				target_id - The user_id of the target user.
+				target_screen_name - The screen_name of the target user.
+		"""
+		apiURL = "http://twitter.com/friendships/show.json?lol=1" # Another quick hack, look away if you want. :D
+		if source_id is not None:
+			apiURL += "&source_id=%s" % `source_id`
+		if source_screen_name is not None:
+			apiURL += "&source_screen_name=%s" % source_screen_name
+		if target_id is not None:
+			apiURL += "&target_id=%s" % `target_id`
+		if target_screen_name is not None:
+			apiURL += "&target_screen_name=%s" % target_screen_name
+		try:
+			if self.authenticated is True:
+				return simplejson.load(self.opener.open(apiURL))
+			else:
+				return simplejson.load(urllib2.urlopen(apiURL))
+		except HTTPError, e:
+			# Catch this for now
+			if e.code == 403:
+				raise AuthError("You're unauthenticated, and forgot to pass a source for this method. Try again!")
+			raise TwythonError("showFriendship() failed with a %s error code." % `e.code`, e.code)
+	
 	def updateDeliveryDevice(self, device_name = "none"):
 		"""updateDeliveryDevice(device_name = "none")
 
