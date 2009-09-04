@@ -98,7 +98,6 @@ class setup:
 		elif consumer_secret is not None and consumer_key is not None:
 			self.consumer = oauth.OAuthConsumer(self.consumer_key, self.consumer_secret)
 			self.connection = httplib.HTTPSConnection(SERVER)
-			self.signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()
 			pass
 		else:
 			pass
@@ -122,19 +121,21 @@ class setup:
 		response = connection.getresponse()
 		return simplejson.load(response.read())
 	
-	def getUnauthorisedRequestToken(self, consumer, connection, signature_method=self.signature_method):
+	def getUnauthorisedRequestToken(self, consumer, connection, signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()):
 		oauth_request = oauth.OAuthRequest.from_consumer_and_token(consumer, consumer, http_url=self.request_token_url)
 		oauth_request.sign_request(signature_method, consumer, None)
 		resp = fetch_response(oauth_request, connection)
 		return oauth.OAuthToken.from_string(resp)
 	
-	def getAuthorizationURL(self, consumer, token, signature_method=self.signature_method):
+	def getAuthorizationURL(self, consumer, token, signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()):
 		oauth_request = oauth.OAuthRequest.from_consumer_and_token(consumer, token=token, http_url=self.authorization_url)
 		oauth_request.sign_request(signature_method, consumer, token)
 		return oauth_request.to_url()
 	
-	def exchangeRequestTokenForAccessToken(self, consumer, connection, request_token=self.request_token, signature_method=self.signature_method):
-		oauth_request = oauth.OAuthRequest.from_consumer_and_token(consumer, token=request_token, http_url=self.access_token_url)
+	def exchangeRequestTokenForAccessToken(self, consumer, connection, request_token, signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()):
+		# May not be needed...
+		self.request_token = request_token
+		oauth_request = oauth.OAuthRequest.from_consumer_and_token(consumer, token = request_token, http_url=self.access_token_url)
 		oauth_request.sign_request(signature_method, consumer, request_token)
 		resp = fetch_response(oauth_request, connection)
 		return oauth.OAuthToken.from_string(resp)
@@ -302,7 +303,7 @@ class setup:
 				raise TwythonError("reTweet() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("reTweet() requires you to be authenticated.")
-
+	
 	def retweetedOfMe(self, **kwargs):
 		"""retweetedOfMe(**kwargs)
 
@@ -322,7 +323,7 @@ class setup:
 				raise TwythonError("retweetedOfMe() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("retweetedOfMe() requires you to be authenticated.")
-
+	
 	def retweetedByMe(self, **kwargs):
 		"""retweetedByMe(**kwargs)
 
@@ -342,7 +343,7 @@ class setup:
 				raise TwythonError("retweetedByMe() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("retweetedByMe() requires you to be authenticated.")
-
+	
 	def retweetedToMe(self, **kwargs):
 		"""retweetedToMe(**kwargs)
 
@@ -362,7 +363,7 @@ class setup:
 				raise TwythonError("retweetedToMe() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("retweetedToMe() requires you to be authenticated.")
-
+	
 	def showUser(self, id = None, user_id = None, screen_name = None):
 		"""showUser(id = None, user_id = None, screen_name = None)
 
@@ -381,21 +382,22 @@ class setup:
 
 			...will result in only publicly available data being returned.
 		"""
-		if self.authenticated is True:
-			apiURL = ""
-			if id is not None:
-				apiURL = "http://twitter.com/users/show/%s.json" % id
-			if user_id is not None:
-				apiURL = "http://twitter.com/users/show.json?user_id=%s" % `user_id`
-			if screen_name is not None:
-				apiURL = "http://twitter.com/users/show.json?screen_name=%s" % screen_name
+		apiURL = ""
+		if id is not None:
+			apiURL = "http://twitter.com/users/show/%s.json" % id
+		if user_id is not None:
+			apiURL = "http://twitter.com/users/show.json?user_id=%s" % `user_id`
+		if screen_name is not None:
+			apiURL = "http://twitter.com/users/show.json?screen_name=%s" % screen_name
+		if apiURL != "":
 			try:
-				return simplejson.load(self.opener.open(apiURL))
+				if self.authenticated is True:
+					return simplejson.load(self.opener.open(apiURL))
+				else:
+					return simplejson.load(urllib2.urlopen(apiURL))
 			except HTTPError, e:
 				raise TwythonError("showUser() failed with a %s error code." % `e.code`, e.code)
-		else:
-			raise AuthError("showUser() requires you to be authenticated.")
-
+	
 	def getFriendsStatus(self, id = None, user_id = None, screen_name = None, page = "1"):
 		"""getFriendsStatus(id = None, user_id = None, screen_name = None, page = "1")
 
