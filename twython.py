@@ -25,8 +25,11 @@ try:
 except ImportError:
 	try:
 		import json as simplejson
-	except:
-		raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
+	except ImportError:
+		try:
+			from django.utils import simplejson
+		except:
+			raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
 
 try:
 	import oauth
