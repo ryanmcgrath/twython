@@ -25,11 +25,14 @@ try:
 except ImportError:
 	try:
 		import json as simplejson
-	except:
-		raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
+	except ImportError:
+		try:
+			from django.utils import simplejson
+		except:
+			raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
 
 try:
-	import oauth
+	from . import oauth
 except ImportError:
 	pass
 
@@ -54,7 +57,7 @@ class AuthError(TwythonError):
 		return repr(self.msg)
 
 class setup:
-	def __init__(self, authtype = "OAuth", username = None, password = None, consumer_secret = None, consumer_key = None, headers = None):
+	def __init__(self, username = None, password = None, consumer_key = None, consumer_secret = None, signature_method = None, headers = None):
 		"""setup(authtype = "OAuth", username = None, password = None, consumer_secret = None, consumer_key = None, headers = None)
 
 			Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
@@ -64,6 +67,7 @@ class setup:
 				password - Password for your twitter account, if you want Basic (HTTP) Authentication.
 				consumer_secret - Consumer secret, if you want OAuth.
 				consumer_key - Consumer key, if you want OAuth.
+				signature_method - Method for signing OAuth requests; defaults to oauth.OAuthSignatureMethod_HMAC_SHA1()
 				headers - User agent header.
 		"""
 		self.authenticated = False
@@ -77,6 +81,9 @@ class setup:
 		self.consumer_secret = consumer_secret
 		self.request_token = None
 		self.access_token = None
+		self.consumer = None
+		self.connection = None
+		self.signature_method = None
 		# Check and set up authentication
 		if self.username is not None and password is not None:
 			# Assume Basic authentication ritual
@@ -92,31 +99,50 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("Authentication failed with your provided credentials. Try again? (%s failure)" % repr(e.code), e.code)
 		elif consumer_secret is not None and consumer_key is not None:
-			self.signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()
-			# Awesome OAuth authentication ritual
-			# req = oauth.OAuthRequest.from_consumer_and_token
-			# req.sign_request(self.signature_method, self.consumer_key, self.token)
-			# self.opener = urllib2.build_opener()
+			self.consumer = oauth.OAuthConsumer(self.consumer_key, self.consumer_secret)
+			self.connection = http.client.HTTPSConnection(SERVER)
 			pass
 		else:
 			pass
 	
-	def getRequestToken(self):
-		response = self.oauth_request(self.request_token_url)
-		token = self.parseOAuthResponse(response)
-		self.request_token = oauth.OAuthConsumer(token['oauth_token'],token['oauth_token_secret'])
-		return self.request_token
+	def getOAuthResource(self, url, access_token, params, http_method="GET"):
+		"""getOAuthResource(self, url, access_token, params, http_method="GET")
 
-	def parseOAuthResponse(self, response_string):
-		# Partial credit goes to Harper Reed for this gem.
-		lol = {}
-		for param in response_string.split("&"):
-			pair = param.split("=")
-			if(len(pair) != 2):
-				break
-			lol[pair[0]] = pair[1]
-		return lol
+			Returns a signed OAuth object for use in requests.
+		"""
+		newRequest = oauth.OAuthRequest.from_consumer_and_token(consumer, token=self.access_token, http_method=http_method, http_url=url, parameters=parameters)
+		oauth_request.sign_request(self.signature_method, consumer, access_token)
+		return oauth_request
+	
+	def getResponse(self, oauth_request, connection):
+		"""getResponse(self, oauth_request, connection)
 
+			Returns a JSON-ified list of results.
+		"""
+		url = oauth_request.to_url()
+		connection.request(oauth_request.http_method, url)
+		response = connection.getresponse()
+		return simplejson.load(response.read())
+	
+	def getUnauthorisedRequestToken(self, consumer, connection, signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()):
+		oauth_request = oauth.OAuthRequest.from_consumer_and_token(consumer, consumer, http_url=self.request_token_url)
+		oauth_request.sign_request(signature_method, consumer, None)
+		resp = fetch_response(oauth_request, connection)
+		return oauth.OAuthToken.from_string(resp)
+	
+	def getAuthorizationURL(self, consumer, token, signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()):
+		oauth_request = oauth.OAuthRequest.from_consumer_and_token(consumer, token=token, http_url=self.authorization_url)
+		oauth_request.sign_request(signature_method, consumer, token)
+		return oauth_request.to_url()
+	
+	def exchangeRequestTokenForAccessToken(self, consumer, connection, request_token, signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()):
+		# May not be needed...
+		self.request_token = request_token
+		oauth_request = oauth.OAuthRequest.from_consumer_and_token(consumer, token = request_token, http_url=self.access_token_url)
+		oauth_request.sign_request(signature_method, consumer, request_token)
+		resp = fetch_response(oauth_request, connection)
+		return oauth.OAuthToken.from_string(resp)
+	
 	# URL Shortening function huzzah
 	def shortenURL(self, url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
 		"""shortenURL(url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl")
@@ -280,7 +306,7 @@ class setup:
 				raise TwythonError("reTweet() failed with a %s error code." % repr(e.code), e.code)
 		else:
 			raise AuthError("reTweet() requires you to be authenticated.")
-
+	
 	def retweetedOfMe(self, **kwargs):
 		"""retweetedOfMe(**kwargs)
 
@@ -300,7 +326,7 @@ class setup:
 				raise TwythonError("retweetedOfMe() failed with a %s error code." % repr(e.code), e.code)
 		else:
 			raise AuthError("retweetedOfMe() requires you to be authenticated.")
-
+	
 	def retweetedByMe(self, **kwargs):
 		"""retweetedByMe(**kwargs)
 
@@ -320,7 +346,7 @@ class setup:
 				raise TwythonError("retweetedByMe() failed with a %s error code." % repr(e.code), e.code)
 		else:
 			raise AuthError("retweetedByMe() requires you to be authenticated.")
-
+	
 	def retweetedToMe(self, **kwargs):
 		"""retweetedToMe(**kwargs)
 
@@ -340,7 +366,7 @@ class setup:
 				raise TwythonError("retweetedToMe() failed with a %s error code." % repr(e.code), e.code)
 		else:
 			raise AuthError("retweetedToMe() requires you to be authenticated.")
-
+	
 	def showUser(self, id = None, user_id = None, screen_name = None):
 		"""showUser(id = None, user_id = None, screen_name = None)
 
@@ -359,21 +385,22 @@ class setup:
 
 			...will result in only publicly available data being returned.
 		"""
-		if self.authenticated is True:
-			apiURL = ""
-			if id is not None:
-				apiURL = "http://twitter.com/users/show/%s.json" % id
-			if user_id is not None:
-				apiURL = "http://twitter.com/users/show.json?user_id=%s" % repr(user_id)
-			if screen_name is not None:
-				apiURL = "http://twitter.com/users/show.json?screen_name=%s" % screen_name
+		apiURL = ""
+		if id is not None:
+			apiURL = "http://twitter.com/users/show/%s.json" % id
+		if user_id is not None:
+			apiURL = "http://twitter.com/users/show.json?user_id=%s" % repr(user_id)
+		if screen_name is not None:
+			apiURL = "http://twitter.com/users/show.json?screen_name=%s" % screen_name
+		if apiURL != "":
 			try:
-				return simplejson.load(self.opener.open(apiURL))
+				if self.authenticated is True:
+					return simplejson.load(self.opener.open(apiURL))
+				else:
+					return simplejson.load(urllib.request.urlopen(apiURL))
 			except HTTPError as e:
 				raise TwythonError("showUser() failed with a %s error code." % repr(e.code), e.code)
-		else:
-			raise AuthError("showUser() requires you to be authenticated.")
-
+	
 	def getFriendsStatus(self, id = None, user_id = None, screen_name = None, page = "1"):
 		"""getFriendsStatus(id = None, user_id = None, screen_name = None, page = "1")
 
