@@ -1257,7 +1257,7 @@ class setup:
 		"""
 		if self.authenticated is True:
 			try:
-				files = [("image", filename, open(filename).read())]
+				files = [("image", filename, open(filename, 'rb').read())]
 				fields = []
 				content_type, body = self.encode_multipart_formdata(fields, files)
 				headers = {'Content-Type': content_type, 'Content-Length': str(len(body))}
@@ -1278,7 +1278,7 @@ class setup:
 		"""
 		if self.authenticated is True:
 			try:
-				files = [("image", filename, open(filename).read())]
+				files = [("image", filename, open(filename, 'rb').read())]
 				fields = []
 				content_type, body = self.encode_multipart_formdata(fields, files)
 				headers = {'Content-Type': content_type, 'Content-Length': str(len(body))}
