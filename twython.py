@@ -650,7 +650,7 @@ class setup:
 				apiURL = "?screen_name=%s&follow=%s" %(screen_name, follow)
 			try:
 				if id is not None:
-					return simplejson.load(self.opener.open("http://twitter.com/friendships/create/%s.json" % `id`, "?folow=%s" % follow))
+					return simplejson.load(self.opener.open("http://twitter.com/friendships/create/%s.json" % id, "?folow=%s" % follow))
 				else:
 					return simplejson.load(self.opener.open("http://twitter.com/friendships/create.json", apiURL))
 			except HTTPError, e:
