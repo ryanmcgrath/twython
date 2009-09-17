@@ -9,12 +9,11 @@ make a seasoned Python vet scratch his head, or possibly call me insane. It's op
 and I'm open to anything that'll improve the library as a whole.
 
 OAuth support is in the works, but every other part of the Twitter API should be covered. Twython
-handles both Basic (HTTP) Authentication and OAuth, and OAuth is the default method for
-Authentication. To override this, specify 'authtype="Basic"' in your twython.setup() call.
+handles both Basic (HTTP) Authentication and OAuth. Older versions of Twython need Basic Auth specified -
+to override this, specify 'authtype="Basic"' in your twython.setup() call.
 
-Documentation is forthcoming, but Twython attempts to mirror the Twitter API in a large way. All
-parameters for API calls should translate over as function arguments.
-
+Twython has Docstrings if you want function-by-function plays; otherwise, check the Twython Wiki or 
+Twitter's API Wiki (Twython calls mirror most of the methods listed there).
 
 Requirements
 -----------------------------------------------------------------------------------------------------
