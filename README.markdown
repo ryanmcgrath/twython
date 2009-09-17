@@ -1,5 +1,5 @@
 Twython - Easy Twitter utilities in Python
------------------------------------------------------------------------------------------------------
+=========================================================================================
 I wrote Twython because I found that other Python Twitter libraries weren't that up to date. Certain
 things like the Search API, OAuth, etc, don't seem to be fully covered. This is my attempt at
 a library that offers more coverage.
@@ -21,15 +21,15 @@ Requirements
 Twython requires (much like Python-Twitter, because they had the right idea :D) a library called
 "simplejson". You can grab it at the following link:
 
-http://pypi.python.org/pypi/simplejson
+> http://pypi.python.org/pypi/simplejson
 
 
 Example Use
 -----------------------------------------------------------------------------------------------------
-import twython
-
-twitter = twython.setup(authtype="Basic", username="example", password="example")
-twitter.updateStatus("See how easy this was?")
+> import twython
+>
+> twitter = twython.setup(authtype="Basic", username="example", password="example")
+> twitter.updateStatus("See how easy this was?")
 
 
 Twython 3k
