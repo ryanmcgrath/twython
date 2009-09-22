@@ -97,7 +97,7 @@ class setup:
 				simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
 				self.authenticated = True
 			except HTTPError, e:
-				raise AuthError("Authentication failed with your provided credentials. Try again? (%s failure)" % `e.code`, e.code)
+				raise AuthError("Authentication failed with your provided credentials. Try again? (%s failure)" % `e.code`)
 		elif consumer_secret is not None and consumer_key is not None:
 			self.consumer = oauth.OAuthConsumer(self.consumer_key, self.consumer_secret)
 			self.connection = httplib.HTTPSConnection(SERVER)
