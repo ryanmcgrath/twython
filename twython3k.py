@@ -307,6 +307,26 @@ class setup:
 		else:
 			raise AuthError("reTweet() requires you to be authenticated.")
 	
+	def getRetweets(self, id, count = None):
+		"""	getAllRetweets(self, id, count):
+			
+			Returns up to 100 of the first retweets of a given tweet.
+		
+			Parameters:
+				id - Required.  The numerical ID of the tweet you want the retweets of.
+				Optional.  Specifies the number of retweets to retrieve. May not be greater than 100.
+		"""
+		if self.authenticated is True:
+			apiURL = "http://twitter.com/statuses/retweets/%s.json" % repr(id)
+			if count is not None:
+				apiURL += "?count=%s" % repr(count)
+			try:
+				return simplejson.load(self.opener.open(apiURL))
+			except HTTPError as e:
+				raise TwythonError("getRetweets failed with a %s eroror code." % repr(e.code), e.code)
+		else:
+			raise AuthError("getRetweets() requires you to be authenticated.")
+	
 	def retweetedOfMe(self, **kwargs):
 		"""retweetedOfMe(**kwargs)
 
@@ -401,8 +421,8 @@ class setup:
 			except HTTPError as e:
 				raise TwythonError("showUser() failed with a %s error code." % repr(e.code), e.code)
 	
-	def getFriendsStatus(self, id = None, user_id = None, screen_name = None, page = "1"):
-		"""getFriendsStatus(id = None, user_id = None, screen_name = None, page = "1")
+	def getFriendsStatus(self, id = None, user_id = None, screen_name = None, page = None, cursor="-1"):
+		"""getFriendsStatus(id = None, user_id = None, screen_name = None, page = None, cursor="-1")
 
 			Returns a user's friends, each with current status inline. They are ordered by the order in which they were added as friends, 100 at a time. 
 			(Please note that the result set isn't guaranteed to be 100 every time, as suspended users will be filtered out.) Use the page option to access 
@@ -410,12 +430,15 @@ class setup:
 			
 			It's also possible to request another user's friends list via the id, screen_name or user_id parameter.
 
+			Note: The previously documented page-based pagination mechanism is still in production, but please migrate to cursor-based pagination for increase reliability and performance.
+			
 			Parameters:
 				** Note: One of the following is required. (id, user_id, or screen_name)
 				id - Optional. The ID or screen name of the user for whom to request a list of friends. 
 				user_id - Optional. Specfies the ID of the user for whom to return the list of friends. Helpful for disambiguating when a valid user ID is also a valid screen name.
 				screen_name - Optional. Specfies the screen name of the user for whom to return the list of friends. Helpful for disambiguating when a valid screen name is also a user ID.
-				page - Optional. Specifies the page of friends to receive.
+				page - (BEING DEPRECATED) Optional. Specifies the page of friends to receive.
+				cursor - Optional. Breaks the results into pages. A single page contains 100 users. This is recommended for users who are following many users. Provide a value of  -1 to begin paging. Provide values as returned to in the response body's next_cursor and previous_cursor attributes to page back and forth in the list.
 		"""
 		if self.authenticated is True:
 			apiURL = ""
@@ -426,14 +449,17 @@ class setup:
 			if screen_name is not None:
 				apiURL = "http://twitter.com/statuses/friends.json?screen_name=%s" % screen_name
 			try:
-				return simplejson.load(self.opener.open(apiURL + "&page=%s" % repr(page)))
+				if page is not None:
+					return simplejson.load(self.opener.open(apiURL + "&page=%s" % repr(page)))
+				else:
+					return simplejson.load(self.opener.open(apiURL + "&cursor=%s" % cursor))
 			except HTTPError as e:
 				raise TwythonError("getFriendsStatus() failed with a %s error code." % repr(e.code), e.code)
 		else:
 			raise AuthError("getFriendsStatus() requires you to be authenticated.")
 
-	def getFollowersStatus(self, id = None, user_id = None, screen_name = None, page = "1"):
-		"""getFollowersStatus(id = None, user_id = None, screen_name = None, page = "1")
+	def getFollowersStatus(self, id = None, user_id = None, screen_name = None, page = None, cursor = "-1"):
+		"""getFollowersStatus(id = None, user_id = None, screen_name = None, page = None, cursor = "-1")
 
 			Returns the authenticating user's followers, each with current status inline.
 			They are ordered by the order in which they joined Twitter, 100 at a time.
@@ -441,12 +467,15 @@ class setup:
 			
 			Use the page option to access earlier followers.
 
+			Note: The previously documented page-based pagination mechanism is still in production, but please migrate to cursor-based pagination for increase reliability and performance.
+			
 			Parameters:
 				** Note: One of the following is required. (id, user_id, screen_name)
 				id - Optional. The ID or screen name of the user for whom to request a list of followers. 
 				user_id - Optional. Specfies the ID of the user for whom to return the list of followers. Helpful for disambiguating when a valid user ID is also a valid screen name.
 				screen_name - Optional. Specfies the screen name of the user for whom to return the list of followers. Helpful for disambiguating when a valid screen name is also a user ID.
-				page - Optional. Specifies the page to retrieve. 
+				page - (BEING DEPRECATED) Optional. Specifies the page to retrieve.		
+				cursor - Optional. Breaks the results into pages. A single page contains 100 users. This is recommended for users who are following many users. Provide a value of  -1 to begin paging. Provide values as returned to in the response body's next_cursor and previous_cursor attributes to page back and forth in the list.
 		"""
 		if self.authenticated is True:
 			apiURL = ""
@@ -457,13 +486,15 @@ class setup:
 			if screen_name is not None:
 				apiURL = "http://twitter.com/statuses/followers.json?screen_name=%s" % screen_name
 			try:
-				return simplejson.load(self.opener.open(apiURL + "&page=%s" % repr(page)))
+				if page is not None:
+					return simplejson.load(self.opener.open(apiURL + "&page=%s" % repr(page)))
+				else:
+					return simplejson.load(self.opener.open(apiURL + "&cursor=%s" % cursor))
 			except HTTPError as e:
 				raise TwythonError("getFollowersStatus() failed with a %s error code." % repr(e.code), e.code)
 		else:
 			raise AuthError("getFollowersStatus() requires you to be authenticated.")
-
-
+	
 	def showStatus(self, id):
 		"""showStatus(id)
 
@@ -650,7 +681,7 @@ class setup:
 				apiURL = "?screen_name=%s&follow=%s" %(screen_name, follow)
 			try:
 				if id is not None:
-					return simplejson.load(self.opener.open("http://twitter.com/friendships/create/%s.json" % repr(id), "?folow=%s" % follow))
+					return simplejson.load(self.opener.open("http://twitter.com/friendships/create/%s.json" % id, "?folow=%s" % follow))
 				else:
 					return simplejson.load(self.opener.open("http://twitter.com/friendships/create.json", apiURL))
 			except HTTPError as e:
@@ -951,49 +982,61 @@ class setup:
 		else:
 			raise AuthError("notificationLeave() requires you to be authenticated.")
 
-	def getFriendsIDs(self, id = None, user_id = None, screen_name = None, page = "1"):
-		"""getFriendsIDs(id = None, user_id = None, screen_name = None, page = "1")
+	def getFriendsIDs(self, id = None, user_id = None, screen_name = None, page = None, cursor = "-1"):
+		"""getFriendsIDs(id = None, user_id = None, screen_name = None, page = None, cursor = "-1")
 
 			Returns an array of numeric IDs for every user the specified user is following.
+
+			Note: The previously documented page-based pagination mechanism is still in production, but please migrate to cursor-based pagination for increase reliability and performance.
 
 			Parameters:
 				** Note: One of the following is required. (id, user_id, screen_name)
 				id - Required. The ID or screen name of the user to follow with device updates.
 				user_id - Required. Specfies the ID of the user to follow with device updates. Helpful for disambiguating when a valid user ID is also a valid screen name. 
 				screen_name - Required. Specfies the screen name of the user to follow with device updates. Helpful for disambiguating when a valid screen name is also a user ID. 
-				page - Optional. Specifies the page number of the results beginning at 1. A single page contains up to 5000 ids. This is recommended for users with large ID lists. If not provided all ids are returned. (Please note that the result set isn't guaranteed to be 5000 every time as suspended users will be filtered out.)
+				page - (BEING DEPRECATED) Optional. Specifies the page number of the results beginning at 1. A single page contains up to 5000 ids. This is recommended for users with large ID lists. If not provided all ids are returned. (Please note that the result set isn't guaranteed to be 5000 every time as suspended users will be filtered out.)
+				cursor - Optional. Breaks the results into pages. A single page contains 5000 ids. This is recommended for users with large ID lists. Provide a value of -1 to begin paging. Provide values as returned to in the response body's "next_cursor" and "previous_cursor" attributes to page back and forth in the list.
 		"""
 		apiURL = ""
+		breakResults = "cursor=%s" % cursor
+		if page is not None:
+			breakResults = "page=%s" % page
 		if id is not None:
-			apiURL = "http://twitter.com/friends/ids/%s.json?page=%s" %(id, repr(page))
+			apiURL = "http://twitter.com/friends/ids/%s.json?%s" %(id, breakResults)
 		if user_id is not None:
-			apiURL = "http://twitter.com/friends/ids.json?user_id=%s&page=%s" %(repr(user_id), repr(page))
+			apiURL = "http://twitter.com/friends/ids.json?user_id=%s&%s" %(repr(user_id), breakResults)
 		if screen_name is not None:
-			apiURL = "http://twitter.com/friends/ids.json?screen_name=%s&page=%s" %(screen_name, repr(page))
+			apiURL = "http://twitter.com/friends/ids.json?screen_name=%s&%s" %(screen_name, breakResults)
 		try:
 			return simplejson.load(urllib.request.urlopen(apiURL))
 		except HTTPError as e:
 			raise TwythonError("getFriendsIDs() failed with a %s error code." % repr(e.code), e.code)
 
-	def getFollowersIDs(self, id = None, user_id = None, screen_name = None, page = "1"):
-		"""getFollowersIDs(id = None, user_id = None, screen_name = None, page = "1")
+	def getFollowersIDs(self, id = None, user_id = None, screen_name = None, page = None, cursor = "-1"):
+		"""getFollowersIDs(id = None, user_id = None, screen_name = None, page = None, cursor = "-1")
 
 			Returns an array of numeric IDs for every user following the specified user.
 
+			Note: The previously documented page-based pagination mechanism is still in production, but please migrate to cursor-based pagination for increase reliability and performance.
+			
 			Parameters:
 				** Note: One of the following is required. (id, user_id, screen_name)
 				id - Required. The ID or screen name of the user to follow with device updates.
 				user_id - Required. Specfies the ID of the user to follow with device updates. Helpful for disambiguating when a valid user ID is also a valid screen name. 
 				screen_name - Required. Specfies the screen name of the user to follow with device updates. Helpful for disambiguating when a valid screen name is also a user ID. 
-				page - Optional. Specifies the page number of the results beginning at 1. A single page contains 5000 ids. This is recommended for users with large ID lists. If not provided all ids are returned. (Please note that the result set isn't guaranteed to be 5000 every time as suspended users will be filtered out.)
+				page - (BEING DEPRECATED) Optional. Specifies the page number of the results beginning at 1. A single page contains 5000 ids. This is recommended for users with large ID lists. If not provided all ids are returned. (Please note that the result set isn't guaranteed to be 5000 every time as suspended users will be filtered out.)
+				cursor - Optional. Breaks the results into pages. A single page contains 5000 ids. This is recommended for users with large ID lists. Provide a value of -1 to begin paging. Provide values as returned to in the response body's "next_cursor" and "previous_cursor" attributes to page back and forth in the list.
 		"""
 		apiURL = ""
+		breakResults = "cursor=%s" % cursor
+		if page is not None:
+			breakResults = "page=%s" % page
 		if id is not None:
-			apiURL = "http://twitter.com/followers/ids/%s.json?page=%s" %(repr(id), repr(page))
+			apiURL = "http://twitter.com/followers/ids/%s.json?%s" %(repr(id), breakResults)
 		if user_id is not None:
-			apiURL = "http://twitter.com/followers/ids.json?user_id=%s&page=%s" %(repr(user_id), repr(page))
+			apiURL = "http://twitter.com/followers/ids.json?user_id=%s&%s" %(repr(user_id), breakResults)
 		if screen_name is not None:
-			apiURL = "http://twitter.com/followers/ids.json?screen_name=%s&page=%s" %(screen_name, repr(page))
+			apiURL = "http://twitter.com/followers/ids.json?screen_name=%s&%s" %(screen_name, breakResults)
 		try:
 			return simplejson.load(urllib.request.urlopen(apiURL))
 		except HTTPError as e:
