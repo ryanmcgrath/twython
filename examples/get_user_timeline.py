@@ -1,7 +1,7 @@
-import tango
+import twython
 
 # We won't authenticate for this, but sometimes it's necessary
-twitter = tango.setup()
+twitter = twython.setup()
 user_timeline = twitter.getUserTimeline(screen_name="ryanmcgrath")
 
 print user_timeline

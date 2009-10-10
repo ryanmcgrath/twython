@@ -1,6 +1,6 @@
-import tango
+import twitter
 
-twitter = tango.setup(authtype="Basic", username="example", password="example")
+twitter = twitter.setup(authtype="Basic", username="example", password="example")
 mentions = twitter.getUserMentions(count="150")
 
 print mentions

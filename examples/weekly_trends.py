@@ -1,7 +1,7 @@
-import tango
+import twython
 
-""" Instantiate Tango with no Authentication """
-twitter = tango.setup()
+""" Instantiate Twython with no Authentication """
+twitter = twython.setup()
 trends = twitter.getWeeklyTrends()
 
 print trends

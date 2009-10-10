@@ -1,5 +1,5 @@
-import tango
+import twython
 
-# Instantiate Tango with Basic (HTTP) Authentication
-twitter = tango.setup(authtype="Basic", username="example", password="example")
+# Instantiate Twython with Basic (HTTP) Authentication
+twitter = twython.setup(authtype="Basic", username="example", password="example")
 twitter.updateProfileImage("myImage.png")

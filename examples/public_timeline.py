@@ -1,7 +1,7 @@
-import tango
+import twython
 
 # Getting the public timeline requires no authentication, huzzah
-twitter = tango.setup()
+twitter = twython.setup()
 public_timeline = twitter.getPublicTimeline()
 
 for tweet in public_timeline:

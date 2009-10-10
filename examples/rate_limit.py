@@ -1,7 +1,7 @@
-import tango
+import twython
 
 # Instantiate with Basic (HTTP) Authentication
-twitter = tango.setup(authtype="Basic", username="example", password="example")
+twitter = twython.setup(authtype="Basic", username="example", password="example")
 
 # This returns the rate limit for the requesting IP
 rateLimit = twitter.getRateLimitStatus()
