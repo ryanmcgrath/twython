@@ -1,7 +1,7 @@
-import tango
+import twython
 
 # Shortening URLs requires no authentication, huzzah
-twitter = tango.setup()
+twitter = twython.setup()
 shortURL = twitter.shortenURL("http://www.webs.com/")
 
 print shortURL

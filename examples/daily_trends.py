@@ -1,7 +1,7 @@
 import twitter
 
 """ Instantiate Twython with no Authentication """
-twitter = twitter.setup()
+twitter = twython.setup()
 trends = twitter.getDailyTrends()
 
 print trends
