@@ -290,7 +290,37 @@ class setup:
 				raise TwythonError("getUserMentions() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("getUserMentions() requires you to be authenticated.")
+	
+	def reportSpam(self, id = None, user_id = None, screen_name = None):
+		"""reportSpam(self, id), user_id, screen_name):
 
+			Report a user account to Twitter as a spam account. *One* of the following parameters is required, and
+			this requires that you be authenticated with a user account.
+
+			Parameters:
+				id - Optional. The ID or screen_name of the user you want to report as a spammer.
+				user_id - Optional.  The ID of the user you want to report as a spammer. Helpful for disambiguating when a valid user ID is also a valid screen name.
+				screen_name - Optional.  The ID or screen_name of the user you want to report as a spammer. Helpful for disambiguating when a valid screen name is also a user ID.
+		"""
+		if self.authenticated is True:
+			# This entire block of code is stupid, but I'm far too tired to think through it at the moment. Refactor it if you care.
+			if id is not None or user_id is not None or screen_name is not None:
+				try:
+					apiExtension = ""
+					if id is not None:
+						apiExtension = "?id=%s" % id
+					if user_id is not None:
+						apiExtension = "?user_id=%s" % `user_id`
+					if screen_name is not None:
+						apiExtension = "?screen_name=%s" % screen_name
+					return simplejson.load(self.opener.open("http://twitter.com/report_spam.json" + apiExtension))
+				except HTTPError, e:
+					raise TwythonError("reportSpam() failed with a %s error code." % `e.code`, e.code)
+			else:
+				raise TwythonError("reportSpam requires you to specify an id, user_id, or screen_name. Try again!")
+		else:
+			raise AuthError("reportSpam() requires you to be authenticated.")
+	
 	def reTweet(self, id):
 		"""reTweet(id)
 
