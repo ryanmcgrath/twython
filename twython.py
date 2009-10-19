@@ -57,7 +57,7 @@ class AuthError(TwythonError):
 		return repr(self.msg)
 
 class setup:
-	def __init__(self, username = None, password = None, consumer_key = None, consumer_secret = None, signature_method = None, headers = None):
+	def __init__(self, username = None, password = None, consumer_key = None, consumer_secret = None, signature_method = None, headers = None, version = 1):
 		"""setup(authtype = "OAuth", username = None, password = None, consumer_secret = None, consumer_key = None, headers = None)
 
 			Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
@@ -69,14 +69,17 @@ class setup:
 				consumer_key - Consumer key, if you want OAuth.
 				signature_method - Method for signing OAuth requests; defaults to oauth.OAuthSignatureMethod_HMAC_SHA1()
 				headers - User agent header.
+				version - Twitter supports a "versioned" API as of Oct. 16th, 2009 - this defaults to 1, but can be overridden on a class and function-based basis.
+
+				** Note: versioning is not currently used by search.twitter functions; when Twitter moves their junk, it'll be supported.
 		"""
 		self.authenticated = False
 		self.username = username
 		# OAuth specific variables below
-		self.request_token_url = 'https://twitter.com/oauth/request_token'
-		self.access_token_url = 'https://twitter.com/oauth/access_token'
-		self.authorization_url = 'http://twitter.com/oauth/authorize'
-		self.signin_url = 'http://twitter.com/oauth/authenticate'
+		self.request_token_url = 'https://api.twitter.com/%s/oauth/request_token' % version
+		self.access_token_url = 'https://api.twitter.com/%s/oauth/access_token' % version
+		self.authorization_url = 'http://api.twitter.com/%s/oauth/authorize' % version
+		self.signin_url = 'http://api.twitter.com/%s/oauth/authenticate' % version
 		self.consumer_key = consumer_key
 		self.consumer_secret = consumer_secret
 		self.request_token = None
@@ -84,23 +87,24 @@ class setup:
 		self.consumer = None
 		self.connection = None
 		self.signature_method = None
+		self.apiVersion = version
 		# Check and set up authentication
 		if self.username is not None and password is not None:
 			# Assume Basic authentication ritual
 			self.auth_manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
-			self.auth_manager.add_password(None, "http://twitter.com", self.username, password)
+			self.auth_manager.add_password(None, "http://api.twitter.com", self.username, password)
 			self.handler = urllib2.HTTPBasicAuthHandler(self.auth_manager)
 			self.opener = urllib2.build_opener(self.handler)
 			if headers is not None:
 				self.opener.addheaders = [('User-agent', headers)]
 			try:
-				simplejson.load(self.opener.open("http://twitter.com/account/verify_credentials.json"))
+				simplejson.load(self.opener.open("http://api.twitter.com/%d/account/verify_credentials.json" % self.apiVersion))
 				self.authenticated = True
 			except HTTPError, e:
 				raise AuthError("Authentication failed with your provided credentials. Try again? (%s failure)" % `e.code`)
 		elif consumer_secret is not None and consumer_key is not None:
 			self.consumer = oauth.OAuthConsumer(self.consumer_key, self.consumer_secret)
-			self.connection = httplib.HTTPSConnection(SERVER)
+			self.connection = httplib.HTTPSConnection("http://api.twitter.com")
 			pass
 		else:
 			pass
@@ -161,7 +165,7 @@ class setup:
 	def constructApiURL(self, base_url, params):
 		return base_url + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in params.iteritems()])
 
-	def getRateLimitStatus(self, rate_for = "requestingIP"):
+	def getRateLimitStatus(self, rate_for = "requestingIP", version = None):
 		"""getRateLimitStatus()
 
 			Returns the remaining number of API requests available to the requesting user before the
@@ -169,30 +173,39 @@ class setup:
 			the rate limit.  If authentication credentials are provided, the rate limit status for the
 			authenticating user is returned.  Otherwise, the rate limit status for the requesting
 			IP address is returned.
+
+			Params:
+				rate_for - Defaults to "requestingIP", but can be changed to check on whatever account is currently authenticated. (Pass a blank string or something)
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		try:
 			if rate_for == "requestingIP":
-				return simplejson.load(urllib2.urlopen("http://twitter.com/account/rate_limit_status.json"))
+				return simplejson.load(urllib2.urlopen("http://api.twitter.com/%d/account/rate_limit_status.json" % version))
 			else:
 				if self.authenticated is True:
-					return simplejson.load(self.opener.open("http://twitter.com/account/rate_limit_status.json"))
+					return simplejson.load(self.opener.open("http://api.twitter.com/%d/account/rate_limit_status.json" % version))
 				else:
 					raise TwythonError("You need to be authenticated to check a rate limit status on an account.")
 		except HTTPError, e:
 			raise TwythonError("It seems that there's something wrong. Twitter gave you a %s error code; are you doing something you shouldn't be?" % `e.code`, e.code)
 
-	def getPublicTimeline(self):
+	def getPublicTimeline(self, version = None):
 		"""getPublicTimeline()
 
 			Returns the 20 most recent statuses from non-protected users who have set a custom user icon.
 			The public timeline is cached for 60 seconds, so requesting it more often than that is a waste of resources.
+
+			Params:
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		try:
-			return simplejson.load(urllib2.urlopen("http://twitter.com/statuses/public_timeline.json"))
+			return simplejson.load(urllib2.urlopen("http://api.twitter.com/%d/statuses/public_timeline.json" % version))
 		except HTTPError, e:
 			raise TwythonError("getPublicTimeline() failed with a %s error code." % `e.code`)
 
-	def getHomeTimeline(self, **kwargs):
+	def getHomeTimeline(self, version = None, **kwargs):
 		"""getHomeTimeline(**kwargs)
 
 			Returns the 20 most recent statuses, including retweets, posted by the authenticating user
@@ -208,17 +221,19 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				homeTimelineURL = self.constructApiURL("http://twitter.com/statuses/home_timeline.json", kwargs)
+				homeTimelineURL = self.constructApiURL("http://api.twitter.com/%d/statuses/home_timeline.json" % version, kwargs)
 				return simplejson.load(self.opener.open(homeTimelineURL))
 			except HTTPError, e:
 				raise TwythonError("getHomeTimeline() failed with a %s error code. (This is an upcoming feature in the Twitter API, and may not be implemented yet)" % `e.code`)
 		else:
 			raise AuthError("getHomeTimeline() requires you to be authenticated.")
 
-	def getFriendsTimeline(self, **kwargs):
+	def getFriendsTimeline(self, version = None, **kwargs):
 		"""getFriendsTimeline(**kwargs)
 
 			Returns the 20 most recent statuses posted by the authenticating user, as well as that users friends. 
@@ -229,17 +244,19 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				friendsTimelineURL = self.constructApiURL("http://twitter.com/statuses/friends_timeline.json", kwargs)
+				friendsTimelineURL = self.constructApiURL("http://api.twitter.com/%d/statuses/friends_timeline.json" % version, kwargs)
 				return simplejson.load(self.opener.open(friendsTimelineURL))
 			except HTTPError, e:
 				raise TwythonError("getFriendsTimeline() failed with a %s error code." % `e.code`)
 		else:
 			raise AuthError("getFriendsTimeline() requires you to be authenticated.")
 
-	def getUserTimeline(self, id = None, **kwargs): 
+	def getUserTimeline(self, id = None, version = None, **kwargs): 
 		"""getUserTimeline(id = None, **kwargs)
 
 			Returns the 20 most recent statuses posted from the authenticating user. It's also
@@ -254,13 +271,15 @@ class setup:
 				max_id - Returns only statuses with an ID less than (that is, older than) or equal to the specified ID.
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits. 
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if id is not None and kwargs.has_key("user_id") is False and kwargs.has_key("screen_name") is False:
-			userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline/%s.json" % `id`, kwargs)
+			userTimelineURL = self.constructApiURL("http://api.twitter.com/%d/statuses/user_timeline/%s.json" % (version, `id`), kwargs)
 		elif id is None and kwargs.has_key("user_id") is False and kwargs.has_key("screen_name") is False and self.authenticated is True:
-			userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline/%s.json" % self.username, kwargs)
+			userTimelineURL = self.constructApiURL("http://api.twitter.com/%d/statuses/user_timeline/%s.json" % (version, self.username), kwargs)
 		else:
-			userTimelineURL = self.constructApiURL("http://twitter.com/statuses/user_timeline.json", kwargs)
+			userTimelineURL = self.constructApiURL("http://api.twitter.com/%d/statuses/user_timeline.json" % version, kwargs)
 		try:
 			# We do our custom opener if we're authenticated, as it helps avoid cases where it's a protected user
 			if self.authenticated is True:
@@ -271,7 +290,7 @@ class setup:
 			raise TwythonError("Failed with a %s error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
 				% `e.code`, e.code)
 
-	def getUserMentions(self, **kwargs):
+	def getUserMentions(self, version = None, **kwargs):
 		"""getUserMentions(**kwargs)
 
 			Returns the 20 most recent mentions (status containing @username) for the authenticating user.
@@ -281,17 +300,19 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				mentionsFeedURL = self.constructApiURL("http://twitter.com/statuses/mentions.json", kwargs)
+				mentionsFeedURL = self.constructApiURL("http://api.twitter.com/%d/statuses/mentions.json" % version, kwargs)
 				return simplejson.load(self.opener.open(mentionsFeedURL))
 			except HTTPError, e:
 				raise TwythonError("getUserMentions() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("getUserMentions() requires you to be authenticated.")
 	
-	def reportSpam(self, id = None, user_id = None, screen_name = None):
+	def reportSpam(self, id = None, user_id = None, screen_name = None, version = None):
 		"""reportSpam(self, id), user_id, screen_name):
 
 			Report a user account to Twitter as a spam account. *One* of the following parameters is required, and
@@ -301,19 +322,21 @@ class setup:
 				id - Optional. The ID or screen_name of the user you want to report as a spammer.
 				user_id - Optional.  The ID of the user you want to report as a spammer. Helpful for disambiguating when a valid user ID is also a valid screen name.
 				screen_name - Optional.  The ID or screen_name of the user you want to report as a spammer. Helpful for disambiguating when a valid screen name is also a user ID.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			# This entire block of code is stupid, but I'm far too tired to think through it at the moment. Refactor it if you care.
 			if id is not None or user_id is not None or screen_name is not None:
 				try:
 					apiExtension = ""
 					if id is not None:
-						apiExtension = "?id=%s" % id
+						apiExtension = "id=%s" % id
 					if user_id is not None:
-						apiExtension = "?user_id=%s" % `user_id`
+						apiExtension = "user_id=%s" % `user_id`
 					if screen_name is not None:
-						apiExtension = "?screen_name=%s" % screen_name
-					return simplejson.load(self.opener.open("http://twitter.com/report_spam.json" + apiExtension))
+						apiExtension = "screen_name=%s" % screen_name
+					return simplejson.load(self.opener.open("http://api.twitter.com/%d/report_spam.json" % version, apiExtension))
 				except HTTPError, e:
 					raise TwythonError("reportSpam() failed with a %s error code." % `e.code`, e.code)
 			else:
@@ -321,33 +344,37 @@ class setup:
 		else:
 			raise AuthError("reportSpam() requires you to be authenticated.")
 	
-	def reTweet(self, id):
+	def reTweet(self, id, version = None):
 		"""reTweet(id)
 
 			Retweets a tweet. Requires the id parameter of the tweet you are retweeting.
 
 			Parameters:
 				id - Required. The numerical ID of the tweet you are retweeting.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/statuses/retweet/%s.json" % `id`, "POST"))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/retweet/%s.json" % (version, `id`), "POST"))
 			except HTTPError, e:
 				raise TwythonError("reTweet() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("reTweet() requires you to be authenticated.")
 	
-	def getRetweets(self, id, count = None):
+	def getRetweets(self, id, count = None, version = None):
 		"""	getRetweets(self, id, count):
 			
 			Returns up to 100 of the first retweets of a given tweet.
 		
 			Parameters:
 				id - Required.  The numerical ID of the tweet you want the retweets of.
-				Optional.  Specifies the number of retweets to retrieve. May not be greater than 100.
+				count - Optional.  Specifies the number of retweets to retrieve. May not be greater than 100.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
-			apiURL = "http://twitter.com/statuses/retweets/%s.json" % `id`
+			apiURL = "http://api.twitter.com/%d/statuses/retweets/%s.json" % (version, `id`)
 			if count is not None:
 				apiURL += "?count=%s" % `count`
 			try:
@@ -357,7 +384,7 @@ class setup:
 		else:
 			raise AuthError("getRetweets() requires you to be authenticated.")
 	
-	def retweetedOfMe(self, **kwargs):
+	def retweetedOfMe(self, version = None, **kwargs):
 		"""retweetedOfMe(**kwargs)
 
 			Returns the 20 most recent tweets of the authenticated user that have been retweeted by others.
@@ -367,17 +394,19 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				retweetURL = self.constructApiURL("http://twitter.com/statuses/retweets_of_me.json", kwargs)
+				retweetURL = self.constructApiURL("http://api.twitter.com/%d/statuses/retweets_of_me.json" % version, kwargs)
 				return simplejson.load(self.opener.open(retweetURL))
 			except HTTPError, e:
 				raise TwythonError("retweetedOfMe() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("retweetedOfMe() requires you to be authenticated.")
 	
-	def retweetedByMe(self, **kwargs):
+	def retweetedByMe(self, version = None, **kwargs):
 		"""retweetedByMe(**kwargs)
 
 			Returns the 20 most recent retweets posted by the authenticating user.
@@ -387,17 +416,19 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				retweetURL = self.constructApiURL("http://twitter.com/statuses/retweeted_by_me.json", kwargs)
+				retweetURL = self.constructApiURL("http://api.twitter.com/%d/statuses/retweeted_by_me.json" % version, kwargs)
 				return simplejson.load(self.opener.open(retweetURL))
 			except HTTPError, e:
 				raise TwythonError("retweetedByMe() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("retweetedByMe() requires you to be authenticated.")
 	
-	def retweetedToMe(self, **kwargs):
+	def retweetedToMe(self, version = None, **kwargs):
 		"""retweetedToMe(**kwargs)
 
 			Returns the 20 most recent retweets posted by the authenticating user's friends.
@@ -407,17 +438,19 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				retweetURL = self.constructApiURL("http://twitter.com/statuses/retweeted_to_me.json", kwargs)
+				retweetURL = self.constructApiURL("http://api.twitter.com/%d/statuses/retweeted_to_me.json" % version, kwargs)
 				return simplejson.load(self.opener.open(retweetURL))
 			except HTTPError, e:
 				raise TwythonError("retweetedToMe() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("retweetedToMe() requires you to be authenticated.")
 	
-	def showUser(self, id = None, user_id = None, screen_name = None):
+	def showUser(self, id = None, user_id = None, screen_name = None, version = None):
 		"""showUser(id = None, user_id = None, screen_name = None)
 
 			Returns extended information of a given user.  The author's most recent status will be returned inline.
@@ -427,6 +460,7 @@ class setup:
 				id - The ID or screen name of a user.
 				user_id - Specfies the ID of the user to return. Helpful for disambiguating when a valid user ID is also a valid screen name.
 				screen_name - Specfies the screen name of the user to return. Helpful for disambiguating when a valid screen name is also a user ID.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 
 			Usage Notes:
 			Requests for protected users without credentials from 
@@ -435,13 +469,14 @@ class setup:
 
 			...will result in only publicly available data being returned.
 		"""
+		version = version or self.apiVersion
 		apiURL = ""
 		if id is not None:
-			apiURL = "http://twitter.com/users/show/%s.json" % id
+			apiURL = "http://api.twitter.com/%d/users/show/%s.json" % (version, id)
 		if user_id is not None:
-			apiURL = "http://twitter.com/users/show.json?user_id=%s" % `user_id`
+			apiURL = "http://api.twitter.com/%d/users/show.json?user_id=%s" % (version, `user_id`)
 		if screen_name is not None:
-			apiURL = "http://twitter.com/users/show.json?screen_name=%s" % screen_name
+			apiURL = "http://api.twitter.com/%d/users/show.json?screen_name=%s" % (version, screen_name)
 		if apiURL != "":
 			try:
 				if self.authenticated is True:
@@ -451,7 +486,7 @@ class setup:
 			except HTTPError, e:
 				raise TwythonError("showUser() failed with a %s error code." % `e.code`, e.code)
 	
-	def getFriendsStatus(self, id = None, user_id = None, screen_name = None, page = None, cursor="-1"):
+	def getFriendsStatus(self, id = None, user_id = None, screen_name = None, page = None, cursor="-1", version = None):
 		"""getFriendsStatus(id = None, user_id = None, screen_name = None, page = None, cursor="-1")
 
 			Returns a user's friends, each with current status inline. They are ordered by the order in which they were added as friends, 100 at a time. 
@@ -469,15 +504,17 @@ class setup:
 				screen_name - Optional. Specfies the screen name of the user for whom to return the list of friends. Helpful for disambiguating when a valid screen name is also a user ID.
 				page - (BEING DEPRECATED) Optional. Specifies the page of friends to receive.
 				cursor - Optional. Breaks the results into pages. A single page contains 100 users. This is recommended for users who are following many users. Provide a value of  -1 to begin paging. Provide values as returned to in the response body's next_cursor and previous_cursor attributes to page back and forth in the list.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			apiURL = ""
 			if id is not None:
-				apiURL = "http://twitter.com/statuses/friends/%s.json" % id
+				apiURL = "http://api.twitter.com/%d/statuses/friends/%s.json" % (version, id)
 			if user_id is not None:
-				apiURL = "http://twitter.com/statuses/friends.json?user_id=%s" % `user_id`
+				apiURL = "http://api.twitter.com/%d/statuses/friends.json?user_id=%s" % (version, `user_id`)
 			if screen_name is not None:
-				apiURL = "http://twitter.com/statuses/friends.json?screen_name=%s" % screen_name
+				apiURL = "http://api.twitter.com/%d/statuses/friends.json?screen_name=%s" % (version, screen_name)
 			try:
 				if page is not None:
 					return simplejson.load(self.opener.open(apiURL + "&page=%s" % `page`))
@@ -488,7 +525,7 @@ class setup:
 		else:
 			raise AuthError("getFriendsStatus() requires you to be authenticated.")
 
-	def getFollowersStatus(self, id = None, user_id = None, screen_name = None, page = None, cursor = "-1"):
+	def getFollowersStatus(self, id = None, user_id = None, screen_name = None, page = None, cursor = "-1", version = None):
 		"""getFollowersStatus(id = None, user_id = None, screen_name = None, page = None, cursor = "-1")
 
 			Returns the authenticating user's followers, each with current status inline.
@@ -506,18 +543,20 @@ class setup:
 				screen_name - Optional. Specfies the screen name of the user for whom to return the list of followers. Helpful for disambiguating when a valid screen name is also a user ID.
 				page - (BEING DEPRECATED) Optional. Specifies the page to retrieve.		
 				cursor - Optional. Breaks the results into pages. A single page contains 100 users. This is recommended for users who are following many users. Provide a value of  -1 to begin paging. Provide values as returned to in the response body's next_cursor and previous_cursor attributes to page back and forth in the list.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			apiURL = ""
 			if id is not None:
-				apiURL = "http://twitter.com/statuses/followers/%s.json" % id
+				apiURL = "http://api.twitter.com/%d/statuses/followers/%s.json" % (version, id)
 			if user_id is not None:
-				apiURL = "http://twitter.com/statuses/followers.json?user_id=%s" % `user_id`
+				apiURL = "http://api.twitter.com/%d/statuses/followers.json?user_id=%s" % (version, `user_id`)
 			if screen_name is not None:
-				apiURL = "http://twitter.com/statuses/followers.json?screen_name=%s" % screen_name
+				apiURL = "http://api.twitter.com/%d/statuses/followers.json?screen_name=%s" % (version, screen_name)
 			try:
 				if page is not None:
-					return simplejson.load(self.opener.open(apiURL + "&page=%s" % `page`))
+					return simplejson.load(self.opener.open(apiURL + "&page=%s" % page))
 				else:
 					return simplejson.load(self.opener.open(apiURL + "&cursor=%s" % cursor))
 			except HTTPError, e:
@@ -525,7 +564,7 @@ class setup:
 		else:
 			raise AuthError("getFollowersStatus() requires you to be authenticated.")
 	
-	def showStatus(self, id):
+	def showStatus(self, id, version = None):
 		"""showStatus(id)
 
 			Returns a single status, specified by the id parameter below.
@@ -533,17 +572,19 @@ class setup:
 
 			Parameters:
 				id - Required. The numerical ID of the status to retrieve.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		try:
 			if self.authenticated is True:
-				return simplejson.load(self.opener.open("http://twitter.com/statuses/show/%s.json" % id))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/show/%s.json" % (version, id)))
 			else:
-				return simplejson.load(urllib2.urlopen("http://twitter.com/statuses/show/%s.json" % id))
+				return simplejson.load(urllib2.urlopen("http://api.twitter.com/%d/statuses/show/%s.json" % (version, id)))
 		except HTTPError, e:
 			raise TwythonError("Failed with a %s error code. Does this user hide/protect their updates? You'll need to authenticate and be friends to get their timeline." 
 				% `e.code`, e.code)
 
-	def updateStatus(self, status, in_reply_to_status_id = None):
+	def updateStatus(self, status, in_reply_to_status_id = None, version = None):
 		"""updateStatus(status, in_reply_to_status_id = None)
 
 			Updates the authenticating user's status.  Requires the status parameter specified below.
@@ -552,19 +593,21 @@ class setup:
 			Parameters:
 				status - Required. The text of your status update. URL encode as necessary. Statuses over 140 characters will be forceably truncated.
 				in_reply_to_status_id - Optional. The ID of an existing status that the update is in reply to.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 
 				** Note: in_reply_to_status_id will be ignored unless the author of the tweet this parameter references
 				is mentioned within the status text. Therefore, you must include @username, where username is 
 				the author of the referenced tweet, within the update.
 		"""
+		version = version or self.apiVersion
 		if len(list(status)) > 140:
 			raise TwythonError("This status message is over 140 characters. Trim it down!")
 		try:
-			return simplejson.load(self.opener.open("http://twitter.com/statuses/update.json?", urllib.urlencode({"status": self.unicode2utf8(status), "in_reply_to_status_id": in_reply_to_status_id})))
+			return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/update.json?" % version, urllib.urlencode({"status": self.unicode2utf8(status), "in_reply_to_status_id": in_reply_to_status_id})))
 		except HTTPError, e:
 			raise TwythonError("updateStatus() failed with a %s error code." % `e.code`, e.code)
 
-	def destroyStatus(self, id):
+	def destroyStatus(self, id, version = None):
 		"""destroyStatus(id)
 
 			Destroys the status specified by the required ID parameter. 
@@ -572,31 +615,37 @@ class setup:
 
 			Parameters:
 				id - Required. The ID of the status to destroy.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/status/destroy/%s.json" % `id`, "DELETE"))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/status/destroy/%s.json" % (version, `id`), "DELETE"))
 			except HTTPError, e:
 				raise TwythonError("destroyStatus() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("destroyStatus() requires you to be authenticated.")
 
-	def endSession(self):
+	def endSession(self, version = None):
 		"""endSession()
 
 			Ends the session of the authenticating user, returning a null cookie. 
 			Use this method to sign users out of client-facing applications (widgets, etc).
+
+			Parameters:
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				self.opener.open("http://twitter.com/account/end_session.json", "")
+				self.opener.open("http://api.twitter.com/%d/account/end_session.json" % version, "")
 				self.authenticated = False
 			except HTTPError, e:
 				raise TwythonError("endSession failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("You can't end a session when you're not authenticated to begin with.")
 
-	def getDirectMessages(self, since_id = None, max_id = None, count = None, page = "1"):
+	def getDirectMessages(self, since_id = None, max_id = None, count = None, page = "1", version = None):
 		"""getDirectMessages(since_id = None, max_id = None, count = None, page = "1")
 
 			Returns a list of the 20 most recent direct messages sent to the authenticating user. 
@@ -606,9 +655,11 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
-			apiURL = "http://twitter.com/direct_messages.json?page=%s" % `page`
+			apiURL = "http://api.twitter.com/%d/direct_messages.json?page=%s" % (version, `page`)
 			if since_id is not None:
 				apiURL += "&since_id=%s" % `since_id`
 			if max_id is not None:
@@ -623,7 +674,7 @@ class setup:
 		else:
 			raise AuthError("getDirectMessages() requires you to be authenticated.")
 
-	def getSentMessages(self, since_id = None, max_id = None, count = None, page = "1"):
+	def getSentMessages(self, since_id = None, max_id = None, count = None, page = "1", version = None):
 		"""getSentMessages(since_id = None, max_id = None, count = None, page = "1")
 
 			Returns a list of the 20 most recent direct messages sent by the authenticating user.
@@ -633,9 +684,11 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
-			apiURL = "http://twitter.com/direct_messages/sent.json?page=%s" % `page`
+			apiURL = "http://api.twitter.com/%d/direct_messages/sent.json?page=%s" % (version, `page`)
 			if since_id is not None:
 				apiURL += "&since_id=%s" % `since_id`
 			if max_id is not None:
@@ -650,7 +703,7 @@ class setup:
 		else:
 			raise AuthError("getSentMessages() requires you to be authenticated.")
 
-	def sendDirectMessage(self, user, text):
+	def sendDirectMessage(self, user, text, version = None):
 		"""sendDirectMessage(user, text)
 
 			Sends a new direct message to the specified user from the authenticating user. Requires both the user and text parameters. 
@@ -659,11 +712,13 @@ class setup:
 			Parameters:
 				user - Required. The ID or screen name of the recipient user.
 				text - Required. The text of your direct message. Be sure to keep it under 140 characters.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			if len(list(text)) < 140:
 				try:
-					return self.opener.open("http://twitter.com/direct_messages/new.json", urllib.urlencode({"user": user, "text": text}))
+					return self.opener.open("http://api.twitter.com/%d/direct_messages/new.json" % version, urllib.urlencode({"user": user, "text": text}))
 				except HTTPError, e:
 					raise TwythonError("sendDirectMessage() failed with a %s error code." % `e.code`, e.code)
 			else:
@@ -671,7 +726,7 @@ class setup:
 		else:
 			raise AuthError("You must be authenticated to send a new direct message.")
 
-	def destroyDirectMessage(self, id):
+	def destroyDirectMessage(self, id, version = None):
 		"""destroyDirectMessage(id)
 
 			Destroys the direct message specified in the required ID parameter.
@@ -679,16 +734,18 @@ class setup:
 
 			Parameters:
 				id - Required. The ID of the direct message to destroy.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return self.opener.open("http://twitter.com/direct_messages/destroy/%s.json" % id, "")
+				return self.opener.open("http://api.twitter.com/%d/direct_messages/destroy/%s.json" % (version, id), "")
 			except HTTPError, e:
 				raise TwythonError("destroyDirectMessage() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("You must be authenticated to destroy a direct message.")
 
-	def createFriendship(self, id = None, user_id = None, screen_name = None, follow = "false"):
+	def createFriendship(self, id = None, user_id = None, screen_name = None, follow = "false", version = None):
 		"""createFriendship(id = None, user_id = None, screen_name = None, follow = "false")
 
 			Allows the authenticating users to follow the user specified in the ID parameter.
@@ -702,7 +759,9 @@ class setup:
 				user_id - Required. Specfies the ID of the user to befriend. Helpful for disambiguating when a valid user ID is also a valid screen name. 
 				screen_name - Required. Specfies the screen name of the user to befriend. Helpful for disambiguating when a valid screen name is also a user ID. 
 				follow - Optional. Enable notifications for the target user in addition to becoming friends. 
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			apiURL = ""
 			if user_id is not None:
@@ -711,9 +770,9 @@ class setup:
 				apiURL = "?screen_name=%s&follow=%s" %(screen_name, follow)
 			try:
 				if id is not None:
-					return simplejson.load(self.opener.open("http://twitter.com/friendships/create/%s.json" % id, "?folow=%s" % follow))
+					return simplejson.load(self.opener.open("http://api.twitter.com/%d/friendships/create/%s.json" % (version, id), "?folow=%s" % follow))
 				else:
-					return simplejson.load(self.opener.open("http://twitter.com/friendships/create.json", apiURL))
+					return simplejson.load(self.opener.open("http://api.twitter.com/%d/friendships/create.json" % version, apiURL))
 			except HTTPError, e:
 				# Rate limiting is done differently here for API reasons...
 				if e.code == 403:
@@ -722,7 +781,7 @@ class setup:
 		else:
 			raise AuthError("createFriendship() requires you to be authenticated.")
 
-	def destroyFriendship(self, id = None, user_id = None, screen_name = None):
+	def destroyFriendship(self, id = None, user_id = None, screen_name = None, version = None):
 		"""destroyFriendship(id = None, user_id = None, screen_name = None)
 
 			Allows the authenticating users to unfollow the user specified in the ID parameter.  
@@ -733,7 +792,9 @@ class setup:
 				id - Required. The ID or screen name of the user to unfollow. 
 				user_id - Required. Specfies the ID of the user to unfollow. Helpful for disambiguating when a valid user ID is also a valid screen name. 
 				screen_name - Required. Specfies the screen name of the user to unfollow. Helpful for disambiguating when a valid screen name is also a user ID.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			apiURL = ""
 			if user_id is not None:
@@ -742,15 +803,15 @@ class setup:
 				apiURL = "?screen_name=%s" % screen_name
 			try:
 				if id is not None:
-					return simplejson.load(self.opener.open("http://twitter.com/friendships/destroy/%s.json" % `id`, "lol=1")) # Random string appended for POST reasons, quick hack ;P
+					return simplejson.load(self.opener.open("http://api.twitter.com/%d/friendships/destroy/%s.json" % (version, `id`), "lol=1")) # Random string hack for POST reasons ;P
 				else:
-					return simplejson.load(self.opener.open("http://twitter.com/friendships/destroy.json", apiURL))
+					return simplejson.load(self.opener.open("http://api.twitter.com/%d/friendships/destroy.json" % version, apiURL))
 			except HTTPError, e:
 				raise TwythonError("destroyFriendship() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("destroyFriendship() requires you to be authenticated.")
 
-	def checkIfFriendshipExists(self, user_a, user_b):
+	def checkIfFriendshipExists(self, user_a, user_b, version = None):
 		"""checkIfFriendshipExists(user_a, user_b)
 
 			Tests for the existence of friendship between two users.
@@ -759,17 +820,19 @@ class setup:
 			Parameters:
 				user_a - Required. The ID or screen_name of the subject user.
 				user_b - Required. The ID or screen_name of the user to test for following.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				friendshipURL = "http://twitter.com/friendships/exists.json?%s" % urllib.urlencode({"user_a": user_a, "user_b": user_b})
+				friendshipURL = "http://api.twitter.com/%d/friendships/exists.json?%s" % (version, urllib.urlencode({"user_a": user_a, "user_b": user_b}))
 				return simplejson.load(self.opener.open(friendshipURL))
 			except HTTPError, e:
 				raise TwythonError("checkIfFriendshipExists() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("checkIfFriendshipExists(), oddly, requires that you be authenticated.")
 	
-	def showFriendship(self, source_id = None, source_screen_name = None, target_id = None, target_screen_name = None):
+	def showFriendship(self, source_id = None, source_screen_name = None, target_id = None, target_screen_name = None, version = None):
 		"""showFriendship(source_id, source_screen_name, target_id, target_screen_name)
 
 			Returns detailed information about the relationship between two users. 
@@ -782,8 +845,11 @@ class setup:
 				** Note: One of the following is required at all times
 				target_id - The user_id of the target user.
 				target_screen_name - The screen_name of the target user.
+
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
-		apiURL = "http://twitter.com/friendships/show.json?lol=1" # Another quick hack, look away if you want. :D
+		version = version or self.apiVersion
+		apiURL = "http://api.twitter.com/%d/friendships/show.json?lol=1" % version # Another quick hack, look away if you want. :D
 		if source_id is not None:
 			apiURL += "&source_id=%s" % `source_id`
 		if source_screen_name is not None:
@@ -803,7 +869,7 @@ class setup:
 				raise AuthError("You're unauthenticated, and forgot to pass a source for this method. Try again!")
 			raise TwythonError("showFriendship() failed with a %s error code." % `e.code`, e.code)
 	
-	def updateDeliveryDevice(self, device_name = "none"):
+	def updateDeliveryDevice(self, device_name = "none", version = None):
 		"""updateDeliveryDevice(device_name = "none")
 
 			Sets which device Twitter delivers updates to for the authenticating user.
@@ -811,19 +877,21 @@ class setup:
 
 			Parameters:
 				device - Required. Must be one of: sms, im, none.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return self.opener.open("http://twitter.com/account/update_delivery_device.json?", urllib.urlencode({"device": self.unicode2utf8(device_name)}))
+				return self.opener.open("http://api.twitter.com/%d/account/update_delivery_device.json?" % version, urllib.urlencode({"device": self.unicode2utf8(device_name)}))
 			except HTTPError, e:
 				raise TwythonError("updateDeliveryDevice() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("updateDeliveryDevice() requires you to be authenticated.")
 
-	def updateProfileColors(self, **kwargs):
+	def updateProfileColors(self, version = None, **kwargs):
 		"""updateProfileColors(**kwargs)
 
-			Sets one or more hex values that control the color scheme of the authenticating user's profile page on twitter.com.
+			Sets one or more hex values that control the color scheme of the authenticating user's profile page on api.twitter.com.
 
 			Parameters:
 				** Note: One or more of the following parameters must be present. Each parameter's value must
@@ -834,16 +902,19 @@ class setup:
 				profile_link_color - Optional.
 				profile_sidebar_fill_color - Optional.
 				profile_sidebar_border_color - Optional.
+
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return self.opener.open(self.constructApiURL("http://twitter.com/account/update_profile_colors.json?", kwargs))
+				return self.opener.open(self.constructApiURL("http://api.twitter.com/%d/account/update_profile_colors.json?" % version, kwargs))
 			except HTTPError, e:
 				raise TwythonError("updateProfileColors() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("updateProfileColors() requires you to be authenticated.")
 
-	def updateProfile(self, name = None, email = None, url = None, location = None, description = None):
+	def updateProfile(self, name = None, email = None, url = None, location = None, description = None, version = None):
 		"""updateProfile(name = None, email = None, url = None, location = None, description = None)
 
 			Sets values that users are able to set under the "Account" tab of their settings page. 
@@ -858,7 +929,10 @@ class setup:
 				url - Optional. Maximum of 100 characters. Will be prepended with "http://" if not present.
 				location - Optional. Maximum of 30 characters. The contents are not normalized or geocoded in any way.
 				description - Optional. Maximum of 160 characters.
+
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			useAmpersands = False
 			updateProfileQueryString = ""
@@ -906,61 +980,67 @@ class setup:
 
 			if updateProfileQueryString != "":
 				try:
-					return self.opener.open("http://twitter.com/account/update_profile.json?", updateProfileQueryString)
+					return self.opener.open("http://api.twitter.com/%d/account/update_profile.json?" % version, updateProfileQueryString)
 				except HTTPError, e:
 					raise TwythonError("updateProfile() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("updateProfile() requires you to be authenticated.")
 
-	def getFavorites(self, page = "1"):
+	def getFavorites(self, page = "1", version = None):
 		"""getFavorites(page = "1")
 
 			Returns the 20 most recent favorite statuses for the authenticating user or user specified by the ID parameter in the requested format.
 
 			Parameters:
 				page - Optional. Specifies the page of favorites to retrieve.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/favorites.json?page=%s" % `page`))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/favorites.json?page=%s" % (version, `page`)))
 			except HTTPError, e:
 				raise TwythonError("getFavorites() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("getFavorites() requires you to be authenticated.")
 
-	def createFavorite(self, id):
+	def createFavorite(self, id, version = None):
 		"""createFavorite(id)
 
 			Favorites the status specified in the ID parameter as the authenticating user. Returns the favorite status when successful.
 
 			Parameters:
 				id - Required. The ID of the status to favorite.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/favorites/create/%s.json" % `id`, ""))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/favorites/create/%s.json" % (version, `id`), ""))
 			except HTTPError, e:
 				raise TwythonError("createFavorite() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("createFavorite() requires you to be authenticated.")
 
-	def destroyFavorite(self, id):
+	def destroyFavorite(self, id, version = None):
 		"""destroyFavorite(id)
 
 			Un-favorites the status specified in the ID parameter as the authenticating user. Returns the un-favorited status in the requested format when successful.
 
 			Parameters:
 				id - Required. The ID of the status to un-favorite.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/favorites/destroy/%s.json" % `id`, ""))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/favorites/destroy/%s.json" % (version, `id`), ""))
 			except HTTPError, e:
 				raise TwythonError("destroyFavorite() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("destroyFavorite() requires you to be authenticated.")
 
-	def notificationFollow(self, id = None, user_id = None, screen_name = None):
+	def notificationFollow(self, id = None, user_id = None, screen_name = None, version = None):
 		"""notificationFollow(id = None, user_id = None, screen_name = None)
 
 			Enables device notifications for updates from the specified user. Returns the specified user when successful.
@@ -970,15 +1050,17 @@ class setup:
 				id - Required. The ID or screen name of the user to follow with device updates.
 				user_id - Required. Specfies the ID of the user to follow with device updates. Helpful for disambiguating when a valid user ID is also a valid screen name. 
 				screen_name - Required. Specfies the screen name of the user to follow with device updates. Helpful for disambiguating when a valid screen name is also a user ID. 
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			apiURL = ""
 			if id is not None:
-				apiURL = "http://twitter.com/notifications/follow/%s.json" % id
+				apiURL = "http://api.twitter.com/%d/notifications/follow/%s.json" % (version, id)
 			if user_id is not None:
-				apiURL = "http://twitter.com/notifications/follow/follow.json?user_id=%s" % `user_id`
+				apiURL = "http://api.twitter.com/%d/notifications/follow/follow.json?user_id=%s" % (version, `user_id`)
 			if screen_name is not None:
-				apiURL = "http://twitter.com/notifications/follow/follow.json?screen_name=%s" % screen_name
+				apiURL = "http://api.twitter.com/%d/notifications/follow/follow.json?screen_name=%s" % (version, screen_name)
 			try:
 				return simplejson.load(self.opener.open(apiURL, ""))
 			except HTTPError, e:
@@ -986,7 +1068,7 @@ class setup:
 		else:
 			raise AuthError("notificationFollow() requires you to be authenticated.")
 
-	def notificationLeave(self, id = None, user_id = None, screen_name = None):
+	def notificationLeave(self, id = None, user_id = None, screen_name = None, version = None):
 		"""notificationLeave(id = None, user_id = None, screen_name = None)
 
 			Disables notifications for updates from the specified user to the authenticating user.  Returns the specified user when successful.
@@ -996,15 +1078,17 @@ class setup:
 				id - Required. The ID or screen name of the user to follow with device updates.
 				user_id - Required. Specfies the ID of the user to follow with device updates. Helpful for disambiguating when a valid user ID is also a valid screen name. 
 				screen_name - Required. Specfies the screen name of the user to follow with device updates. Helpful for disambiguating when a valid screen name is also a user ID. 
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			apiURL = ""
 			if id is not None:
-				apiURL = "http://twitter.com/notifications/leave/%s.json" % id
+				apiURL = "http://api.twitter.com/%d/notifications/leave/%s.json" % (version, id)
 			if user_id is not None:
-				apiURL = "http://twitter.com/notifications/leave/leave.json?user_id=%s" % `user_id`
+				apiURL = "http://api.twitter.com/%d/notifications/leave/leave.json?user_id=%s" % (version, `user_id`)
 			if screen_name is not None:
-				apiURL = "http://twitter.com/notifications/leave/leave.json?screen_name=%s" % screen_name
+				apiURL = "http://api.twitter.com/%d/notifications/leave/leave.json?screen_name=%s" % (version, screen_name)
 			try:
 				return simplejson.load(self.opener.open(apiURL, ""))
 			except HTTPError, e:
@@ -1012,7 +1096,7 @@ class setup:
 		else:
 			raise AuthError("notificationLeave() requires you to be authenticated.")
 
-	def getFriendsIDs(self, id = None, user_id = None, screen_name = None, page = None, cursor = "-1"):
+	def getFriendsIDs(self, id = None, user_id = None, screen_name = None, page = None, cursor = "-1", version = None):
 		"""getFriendsIDs(id = None, user_id = None, screen_name = None, page = None, cursor = "-1")
 
 			Returns an array of numeric IDs for every user the specified user is following.
@@ -1026,23 +1110,25 @@ class setup:
 				screen_name - Required. Specfies the screen name of the user to follow with device updates. Helpful for disambiguating when a valid screen name is also a user ID. 
 				page - (BEING DEPRECATED) Optional. Specifies the page number of the results beginning at 1. A single page contains up to 5000 ids. This is recommended for users with large ID lists. If not provided all ids are returned. (Please note that the result set isn't guaranteed to be 5000 every time as suspended users will be filtered out.)
 				cursor - Optional. Breaks the results into pages. A single page contains 5000 ids. This is recommended for users with large ID lists. Provide a value of -1 to begin paging. Provide values as returned to in the response body's "next_cursor" and "previous_cursor" attributes to page back and forth in the list.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		apiURL = ""
 		breakResults = "cursor=%s" % cursor
 		if page is not None:
 			breakResults = "page=%s" % page
 		if id is not None:
-			apiURL = "http://twitter.com/friends/ids/%s.json?%s" %(id, breakResults)
+			apiURL = "http://api.twitter.com/%d/friends/ids/%s.json?%s" %(version, id, breakResults)
 		if user_id is not None:
-			apiURL = "http://twitter.com/friends/ids.json?user_id=%s&%s" %(`user_id`, breakResults)
+			apiURL = "http://api.twitter.com/%d/friends/ids.json?user_id=%s&%s" %(version, `user_id`, breakResults)
 		if screen_name is not None:
-			apiURL = "http://twitter.com/friends/ids.json?screen_name=%s&%s" %(screen_name, breakResults)
+			apiURL = "http://api.twitter.com/%d/friends/ids.json?screen_name=%s&%s" %(version, screen_name, breakResults)
 		try:
 			return simplejson.load(urllib2.urlopen(apiURL))
 		except HTTPError, e:
 			raise TwythonError("getFriendsIDs() failed with a %s error code." % `e.code`, e.code)
 
-	def getFollowersIDs(self, id = None, user_id = None, screen_name = None, page = None, cursor = "-1"):
+	def getFollowersIDs(self, id = None, user_id = None, screen_name = None, page = None, cursor = "-1", version = None):
 		"""getFollowersIDs(id = None, user_id = None, screen_name = None, page = None, cursor = "-1")
 
 			Returns an array of numeric IDs for every user following the specified user.
@@ -1056,23 +1142,25 @@ class setup:
 				screen_name - Required. Specfies the screen name of the user to follow with device updates. Helpful for disambiguating when a valid screen name is also a user ID. 
 				page - (BEING DEPRECATED) Optional. Specifies the page number of the results beginning at 1. A single page contains 5000 ids. This is recommended for users with large ID lists. If not provided all ids are returned. (Please note that the result set isn't guaranteed to be 5000 every time as suspended users will be filtered out.)
 				cursor - Optional. Breaks the results into pages. A single page contains 5000 ids. This is recommended for users with large ID lists. Provide a value of -1 to begin paging. Provide values as returned to in the response body's "next_cursor" and "previous_cursor" attributes to page back and forth in the list.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		apiURL = ""
 		breakResults = "cursor=%s" % cursor
 		if page is not None:
 			breakResults = "page=%s" % page
 		if id is not None:
-			apiURL = "http://twitter.com/followers/ids/%s.json?%s" %(`id`, breakResults)
+			apiURL = "http://api.twitter.com/%d/followers/ids/%s.json?%s" % (version, `id`, breakResults)
 		if user_id is not None:
-			apiURL = "http://twitter.com/followers/ids.json?user_id=%s&%s" %(`user_id`, breakResults)
+			apiURL = "http://api.twitter.com/%d/followers/ids.json?user_id=%s&%s" %(version, `user_id`, breakResults)
 		if screen_name is not None:
-			apiURL = "http://twitter.com/followers/ids.json?screen_name=%s&%s" %(screen_name, breakResults)
+			apiURL = "http://api.twitter.com/%d/followers/ids.json?screen_name=%s&%s" %(version, screen_name, breakResults)
 		try:
 			return simplejson.load(urllib2.urlopen(apiURL))
 		except HTTPError, e:
 			raise TwythonError("getFollowersIDs() failed with a %s error code." % `e.code`, e.code)
 
-	def createBlock(self, id):
+	def createBlock(self, id, version = None):
 		"""createBlock(id)
 
 			Blocks the user specified in the ID parameter as the authenticating user. Destroys a friendship to the blocked user if it exists. 
@@ -1080,16 +1168,18 @@ class setup:
 
 			Parameters:
 				id - The ID or screen name of a user to block.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/blocks/create/%s.json" % `id`, ""))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/blocks/create/%s.json" % (version, `id`), ""))
 			except HTTPError, e:
 				raise TwythonError("createBlock() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("createBlock() requires you to be authenticated.")
 
-	def destroyBlock(self, id):
+	def destroyBlock(self, id, version = None):
 		"""destroyBlock(id)
 
 			Un-blocks the user specified in the ID parameter for the authenticating user.
@@ -1097,16 +1187,18 @@ class setup:
 
 			Parameters:
 				id - Required. The ID or screen_name of the user to un-block
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/blocks/destroy/%s.json" % `id`, ""))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/blocks/destroy/%s.json" % (version, `id`), ""))
 			except HTTPError, e:
 				raise TwythonError("destroyBlock() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("destroyBlock() requires you to be authenticated.")
 
-	def checkIfBlockExists(self, id = None, user_id = None, screen_name = None):
+	def checkIfBlockExists(self, id = None, user_id = None, screen_name = None, version = None):
 		"""checkIfBlockExists(id = None, user_id = None, screen_name = None)
 
 			Returns if the authenticating user is blocking a target user. Will return the blocked user's object if a block exists, and 
@@ -1117,43 +1209,51 @@ class setup:
 				id - Optional. The ID or screen_name of the potentially blocked user.
 				user_id - Optional. Specfies the ID of the potentially blocked user. Helpful for disambiguating when a valid user ID is also a valid screen name.
 				screen_name - Optional. Specfies the screen name of the potentially blocked user. Helpful for disambiguating when a valid screen name is also a user ID.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		apiURL = ""
 		if id is not None:
-			apiURL = "http://twitter.com/blocks/exists/%s.json" % `id`
+			apiURL = "http://api.twitter.com/%d/blocks/exists/%s.json" % (version, `id`)
 		if user_id is not None:
-			apiURL = "http://twitter.com/blocks/exists.json?user_id=%s" % `user_id`
+			apiURL = "http://api.twitter.com/%d/blocks/exists.json?user_id=%s" % (version, `user_id`)
 		if screen_name is not None:
-			apiURL = "http://twitter.com/blocks/exists.json?screen_name=%s" % screen_name
+			apiURL = "http://api.twitter.com/%d/blocks/exists.json?screen_name=%s" % (version, screen_name)
 		try:
 			return simplejson.load(urllib2.urlopen(apiURL))
 		except HTTPError, e:
 			raise TwythonError("checkIfBlockExists() failed with a %s error code." % `e.code`, e.code)
 
-	def getBlocking(self, page = "1"):
+	def getBlocking(self, page = "1", version = None):
 		"""getBlocking(page = "1")
 
 			Returns an array of user objects that the authenticating user is blocking.
 
 			Parameters:
 				page - Optional. Specifies the page number of the results beginning at 1. A single page contains 20 ids.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/blocks/blocking.json?page=%s" % `page`))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/blocks/blocking.json?page=%s" % (version, `page`)))
 			except HTTPError, e:
 				raise TwythonError("getBlocking() failed with a %s error code." %	`e.code`, e.code)
 		else:
 			raise AuthError("getBlocking() requires you to be authenticated")
 
-	def getBlockedIDs(self):
+	def getBlockedIDs(self, version = None):
 		"""getBlockedIDs()
 
 			Returns an array of numeric user ids the authenticating user is blocking.
+
+			Parameters:
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/blocks/blocking/ids.json"))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/blocks/blocking/ids.json" % version))
 			except HTTPError, e:
 				raise TwythonError("getBlockedIDs() failed with a %s error code." % `e.code`, e.code)
 		else:
@@ -1255,52 +1355,60 @@ class setup:
 		except HTTPError, e:
 			raise TwythonError("getWeeklyTrends() failed with a %s error code." % `e.code`, e.code)
 
-	def getSavedSearches(self):
+	def getSavedSearches(self, version = None):
 		"""getSavedSearches()
 
 			Returns the authenticated user's saved search queries.
+
+			Parameters:
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/saved_searches.json"))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/saved_searches.json" % version))
 			except HTTPError, e:
 				raise TwythonError("getSavedSearches() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("getSavedSearches() requires you to be authenticated.")
 
-	def showSavedSearch(self, id):
+	def showSavedSearch(self, id, version = None):
 		"""showSavedSearch(id)
 
 			Retrieve the data for a saved search owned by the authenticating user specified by the given id.
 
 			Parameters:
 				id - Required. The id of the saved search to be retrieved.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/show/%s.json" % `id`))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/saved_searches/show/%s.json" % (version, `id`)))
 			except HTTPError, e:
 				raise TwythonError("showSavedSearch() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("showSavedSearch() requires you to be authenticated.")
 
-	def createSavedSearch(self, query):
+	def createSavedSearch(self, query, version = None):
 		"""createSavedSearch(query)
 
 			Creates a saved search for the authenticated user.
 
 			Parameters:
 				query - Required. The query of the search the user would like to save.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/create.json?query=%s" % query, ""))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/saved_searches/create.json?query=%s" % (version, query), ""))
 			except HTTPError, e:
 				raise TwythonError("createSavedSearch() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("createSavedSearch() requires you to be authenticated.")
 
-	def destroySavedSearch(self, id):
+	def destroySavedSearch(self, id, version = None):
 		"""destroySavedSearch(id)
 
 			Destroys a saved search for the authenticated user.
@@ -1308,17 +1416,19 @@ class setup:
 
 			Parameters:
 				id - Required. The id of the saved search to be deleted.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://twitter.com/saved_searches/destroy/%s.json" % `id`, ""))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/saved_searches/destroy/%s.json" % (version, `id`), ""))
 			except HTTPError, e:
 				raise TwythonError("destroySavedSearch() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("destroySavedSearch() requires you to be authenticated.")
 
 	# The following methods are apart from the other Account methods, because they rely on a whole multipart-data posting function set.
-	def updateProfileBackgroundImage(self, filename, tile="true"):
+	def updateProfileBackgroundImage(self, filename, tile="true", version = None):
 		"""updateProfileBackgroundImage(filename, tile="true")
 
 			Updates the authenticating user's profile background image.
@@ -1327,35 +1437,39 @@ class setup:
 				image - Required. Must be a valid GIF, JPG, or PNG image of less than 800 kilobytes in size. Images with width larger than 2048 pixels will be forceably scaled down.
 				tile - Optional (defaults to true). If set to true the background image will be displayed tiled. The image will not be tiled otherwise. 
 				** Note: It's sad, but when using this method, pass the tile value as a string, e.g tile="false"
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
 				files = [("image", filename, open(filename, 'rb').read())]
 				fields = []
 				content_type, body = self.encode_multipart_formdata(fields, files)
 				headers = {'Content-Type': content_type, 'Content-Length': str(len(body))}
-				r = urllib2.Request("http://twitter.com/account/update_profile_background_image.json?tile=" + tile, body, headers)
+				r = urllib2.Request("http://api.twitter.com/%d/account/update_profile_background_image.json?tile=%s" % (version, tile), body, headers)
 				return self.opener.open(r).read()
 			except HTTPError, e:
 				raise TwythonError("updateProfileBackgroundImage() failed with a %s error code." % `e.code`, e.code)
 		else:
 			raise AuthError("You realize you need to be authenticated to change a background image, right?")
 
-	def updateProfileImage(self, filename):
+	def updateProfileImage(self, filename, version = None):
 		"""updateProfileImage(filename)
 
 			Updates the authenticating user's profile image (avatar).
 
 			Parameters:
 				image - Required. Must be a valid GIF, JPG, or PNG image of less than 700 kilobytes in size. Images with width larger than 500 pixels will be scaled down.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
+		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
 				files = [("image", filename, open(filename, 'rb').read())]
 				fields = []
 				content_type, body = self.encode_multipart_formdata(fields, files)
 				headers = {'Content-Type': content_type, 'Content-Length': str(len(body))}
-				r = urllib2.Request("http://twitter.com/account/update_profile_image.json", body, headers)
+				r = urllib2.Request("http://api.twitter.com/%d/account/update_profile_image.json" % version, body, headers)
 				return self.opener.open(r).read()
 			except HTTPError, e:
 				raise TwythonError("updateProfileImage() failed with a %s error code." % `e.code`, e.code)
