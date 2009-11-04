@@ -56,6 +56,14 @@ class AuthError(TwythonError):
 	def __str__(self):
 		return repr(self.msg)
 
+class RequestWithMethod(urllib.request.Request):
+	def __init__(self, method, *args, **kwargs):
+		self._method = method
+		urllib.request.Request.__init__(*args, **kwargs)
+	
+	def get_method(self):
+		return self._method
+
 class setup:
 	def __init__(self, username = None, password = None, consumer_key = None, consumer_secret = None, signature_method = None, headers = None, version = 1):
 		"""setup(authtype = "OAuth", username = None, password = None, consumer_secret = None, consumer_key = None, headers = None)
@@ -1409,7 +1417,7 @@ class setup:
 			raise AuthError("createSavedSearch() requires you to be authenticated.")
 
 	def destroySavedSearch(self, id, version = None):
-		"""destroySavedSearch(id)
+		""" destroySavedSearch(id)
 
 			Destroys a saved search for the authenticated user.
 			The search specified by id must be owned by the authenticating user.
@@ -1426,10 +1434,285 @@ class setup:
 				raise TwythonError("destroySavedSearch() failed with a %s error code." % repr(e.code), e.code)
 		else:
 			raise AuthError("destroySavedSearch() requires you to be authenticated.")
+	
+	def createList(self, name, mode = "public", description = "", version = None):
+		""" createList(self, name, mode, description, version)
+			
+			Creates a new list for the currently authenticated user. (Note: This may encounter issues if you authenticate with an email; try username (screen name) instead).
 
+			Parameters:
+				name - Required. The name for the new list.
+				description - Optional, in the sense that you can leave it blank if you don't want one. ;)
+				mode - Optional. This is a string indicating "public" or "private", defaults to "public".
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/lists.json" % (version, self.username), 
+					urllib.parse.urlencode({"name": name, "mode": mode, "description": description})))
+			except HTTPError as e:
+				raise TwythonError("createList() failed with a %d error code." % e.code, e.code)
+		else:
+			raise AuthError("createList() requires you to be authenticated.")
+	
+	def updateList(self, list_id, name, mode = "public", description = "", version = None):
+		""" updateList(self, list_id, name, mode, description, version)
+			
+			Updates an existing list for the authenticating user. (Note: This may encounter issues if you authenticate with an email; try username (screen name) instead).
+			This method is a bit cumbersome for the time being; I'd personally avoid using it unless you're positive you know what you're doing. Twitter should really look
+			at this...
+
+			Parameters:
+				list_id - Required. The name of the list (this gets turned into a slug - e.g, "Huck Hound" becomes "huck-hound").
+				name - Required. The name of the list, possibly for renaming or such.
+				description - Optional, in the sense that you can leave it blank if you don't want one. ;)
+				mode - Optional. This is a string indicating "public" or "private", defaults to "public".
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/lists/%s.json" % (version, self.username, list_id), 
+					urllib.parse.urlencode({"name": name, "mode": mode, "description": description})))
+			except HTTPError as e:
+				raise TwythonError("updateList() failed with a %d error code." % e.code, e.code)
+		else:
+			raise AuthError("updateList() requires you to be authenticated.")
+	
+	def showLists(self, version = None):
+		""" showLists(self, version)
+
+			Show all the lists for the currently authenticated user (i.e, they own these lists).
+			(Note: This may encounter issues if you authenticate with an email; try username (screen name) instead).
+
+			Parameters:
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/lists.json" % (version, self.username)))
+			except HTTPError as e:
+				raise TwythonError("showLists() failed with a %d error code." % e.code, e.code)
+		else:
+			raise AuthError("showLists() requires you to be authenticated.")
+	
+	def getListMemberships(self, version = None):
+		""" getListMemberships(self, version)
+
+			Get all the lists for the currently authenticated user (i.e, they're on all the lists that are returned, the lists belong to other people)
+			(Note: This may encounter issues if you authenticate with an email; try username (screen name) instead).
+
+			Parameters:
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/lists/followers.json" % (version, self.username)))
+			except HTTPError as e:
+				raise TwythonError("getLists() failed with a %d error code." % e.code, e.code)
+		else:
+			raise AuthError("getLists() requires you to be authenticated.")
+	
+	def deleteList(self, list_id, version = None):
+		""" deleteList(self, list_id, version)
+
+			Deletes a list for the authenticating user. 
+
+			Parameters:
+				list_id - Required. The name of the list to delete - this gets turned into a slug, so you can pass it as that, or hope the transformation works out alright.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		if self.authenticated is True:
+			try:
+				#deleteURL = RequestWithMethod("DELETE", "http://api.twitter.com/%d/%s/lists/%s.json?_method=DELETE" % (version, self.username, list_id))
+				print("http://api.twitter.com/%d/%s/lists/%s.json?_method=DELETE" % (version, self.username, list_id))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/lists/%s.json" % (version, self.username, list_id), "_method=DELETE"))
+			except HTTPError as e:
+				raise TwythonError("deleteList() failed with a %d error code." % e.code, e.code)
+		else:
+			raise AuthError("deleteList() requires you to be authenticated.")
+	
+	def getListTimeline(self, list_id, cursor = "-1", version = None, **kwargs):
+		""" getListTimeline(self, list_id, cursor, version, **kwargs)
+
+			Retrieves a timeline representing everyone in the list specified.
+
+			Parameters:
+				list_id - Required. The name of the list to get a timeline for - this gets turned into a slug, so you can pass it as that, or hope the transformation works out alright.
+				since_id - Optional.  Returns only statuses with an ID greater than (that is, more recent than) the specified ID.
+				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
+				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.
+				cursor - Optional. Breaks the results into pages. Provide a value of -1 to begin paging. 
+					Provide values returned in the response's "next_cursor" and "previous_cursor" attributes to page back and forth in the list.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		try:
+			baseURL = self.constructApiURL("http://api.twitter.com/%d/%s/lists/%s/statuses.json" % (version, self.username, list_id), kwargs)
+			return simplejson.load(self.opener.open(baseURL + "&cursor=%s" % cursor))
+		except HTTPError as e:
+			if e.code == 404:
+				raise AuthError("It seems the list you're trying to access is private/protected, and you don't have access. Are you authenticated and allowed?")
+			raise TwythonError("getListTimeline() failed with a %d error code." % e.code, e.code)
+	
+	def getSpecificList(self, list_id, version = None):
+		""" getSpecificList(self, list_id, version)
+
+			Retrieve a specific list - this only requires authentication if the list you're requesting is protected/private (if it is, you need to have access as well).
+
+			Parameters:
+				list_id - Required. The name of the list to get - this gets turned into a slug, so you can pass it as that, or hope the transformation works out alright.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		try:
+			return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/lists/%s/statuses.json" % (version, self.username, list_id)))
+		except HTTPError as e:
+			if e.code == 404:
+				raise AuthError("It seems the list you're trying to access is private/protected, and you don't have access. Are you authenticated and allowed?")
+			raise TwythonError("getSpecificList() failed with a %d error code." % e.code, e.code)
+	
+	def addListMember(self, list_id, version = None):
+		""" addListMember(self, list_id, id, version)
+
+			Adds a new Member (the passed in id) to the specified list.
+
+			Parameters:
+				list_id - Required. The slug of the list to add the new member to.
+				id - Required. The ID of the user that's being added to the list.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id), "id=%s" % repr(id)))
+			except HTTPError as e:
+				raise TwythonError("addListMember() failed with a %d error code." % e.code, e.code)
+		else:
+			raise AuthError("addListMember requires you to be authenticated.")
+	
+	def getListMembers(self, list_id, version = None):
+		""" getListMembers(self, list_id, version = None)
+	
+			Show all members of a specified list. This method requires authentication if the list is private/protected.
+	
+			Parameters:
+				list_id - Required. The slug of the list to retrieve members for.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		try:
+			if self.authenticated is True:
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id)))
+			else:
+				return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id)))
+		except HTTPError as e:
+			raise TwythonError("getListMembers() failed with a %d error code." % e.code, e.code)
+	
+	def removeListMember(self, list_id, id, version = None):
+		""" removeListMember(self, list_id, id, version)
+
+			Remove the specified user (id) from the specified list (list_id). Requires you to be authenticated and in control of the list in question.
+
+			Parameters:
+				list_id - Required. The slug of the list to remove the specified user from.
+				id - Required. The ID of the user that's being added to the list.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		if self.authenticated is True:
+			try:
+				deleteURL = RequestWithMethod("DELETE", "http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id))
+				return simplejson.load(self.opener.open(deleteURL))
+			except HTTPError as e:
+				raise TwythonError("getListMembers() failed with a %d error code." % e.code, e.code)
+		else:
+			raise AuthError("removeListMember() requires you to be authenticated.")
+	
+	def isListMember(self, list_id, id, version = None):
+		""" isListMember(self, list_id, id, version)
+
+			Check if a specified user (id) is a member of the list in question (list_id).
+
+			**Note: This method may not work for private/protected lists, unless you're authenticated and have access to those lists.
+
+			Parameters:
+				list_id - Required. The slug of the list to check against.
+				id - Required. The ID of the user being checked in the list.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		try:
+			if self.authenticated is True:
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, self.username, list_id, repr(id))))
+			else:
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, self.username, list_id, repr(id))))
+		except HTTPError as e:
+			raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
+	
+	def subscribeToList(self, list_id, version):
+		""" subscribeToList(self, list_id, version)
+
+			Subscribe the authenticated user to the list provided (must be public).
+
+			Parameters:
+				list_id - Required. The list to subscribe to.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/following.json" % (version, self.username, list_id), ""))
+			except HTTPError as e:
+				raise TwythonError("subscribeToList() failed with a %d error code." % e.code, e.code)
+		else:
+			raise AuthError("subscribeToList() requires you to be authenticated.")
+	
+	def unsubscribeFromList(self, list_id, version):
+		""" unsubscribeFromList(self, list_id, version)
+
+			Unsubscribe the authenticated user from the list in question (must be public).
+
+			Parameters:
+				list_id - Required. The list to unsubscribe from.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		if self.authenticated is True:
+			try:
+				deleteURL = RequestWithMethod("DELETE", "http://api.twitter.com/%d/%s/%s/following.json" % (version, self.username, list_id))
+				return simplejson.load(self.opener.open(deleteURL))
+			except HTTPError as e:
+				raise TwythonError("unsubscribeFromList() failed with a %d error code." % e.code, e.code)
+		else:
+			raise AuthError("unsubscribeFromList() requires you to be authenticated.")
+	
+	def isListSubscriber(self, list_id, id, version = None):
+		""" isListSubscriber(self, list_id, id, version)
+
+			Check if a specified user (id) is a subscriber of the list in question (list_id).
+
+			**Note: This method may not work for private/protected lists, unless you're authenticated and have access to those lists.
+
+			Parameters:
+				list_id - Required. The slug of the list to check against.
+				id - Required. The ID of the user being checked in the list.
+				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		try:
+			if self.authenticated is True:
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, self.username, list_id, repr(id))))
+			else:
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, self.username, list_id, repr(id))))
+		except HTTPError as e:
+			raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
+	
 	# The following methods are apart from the other Account methods, because they rely on a whole multipart-data posting function set.
 	def updateProfileBackgroundImage(self, filename, tile="true", version = None):
-		"""updateProfileBackgroundImage(filename, tile="true")
+		""" updateProfileBackgroundImage(filename, tile="true")
 
 			Updates the authenticating user's profile background image.
 
@@ -1449,12 +1732,12 @@ class setup:
 				r = urllib.request.Request("http://api.twitter.com/%d/account/update_profile_background_image.json?tile=%s" % (version, tile), body, headers)
 				return self.opener.open(r).read()
 			except HTTPError as e:
-				raise TwythonError("updateProfileBackgroundImage() failed with a %s error code." % repr(e.code), e.code)
+				raise TwythonError("updateProfileBackgroundImage() failed with a %d error code." % e.code, e.code)
 		else:
 			raise AuthError("You realize you need to be authenticated to change a background image, right?")
 
 	def updateProfileImage(self, filename, version = None):
-		"""updateProfileImage(filename)
+		""" updateProfileImage(filename)
 
 			Updates the authenticating user's profile image (avatar).
 
@@ -1472,7 +1755,7 @@ class setup:
 				r = urllib.request.Request("http://api.twitter.com/%d/account/update_profile_image.json" % version, body, headers)
 				return self.opener.open(r).read()
 			except HTTPError as e:
-				raise TwythonError("updateProfileImage() failed with a %s error code." % repr(e.code), e.code)
+				raise TwythonError("updateProfileImage() failed with a %d error code." % e.code, e.code)
 		else:
 			raise AuthError("You realize you need to be authenticated to change a profile image, right?")
 
@@ -1498,6 +1781,10 @@ class setup:
 		return content_type, body
 
 	def get_content_type(self, filename):
+		""" get_content_type(self, filename)
+
+			Exactly what you think it does. :D
+		"""
 		return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
 	def unicode2utf8(self, text):
