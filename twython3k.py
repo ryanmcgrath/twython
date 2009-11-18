@@ -77,7 +77,7 @@ class setup:
 				consumer_key - Consumer key, if you want OAuth.
 				signature_method - Method for signing OAuth requests; defaults to oauth.OAuthSignatureMethod_HMAC_SHA1()
 				headers - User agent header.
-				version - Twitter supports a "versioned" API as of Oct. 16th, 2009 - this defaults to 1, but can be overridden on a class and function-based basis.
+				version (number) - Twitter supports a "versioned" API as of Oct. 16th, 2009 - this defaults to 1, but can be overridden on a class and function-based basis.
 
 				** Note: versioning is not currently used by search.twitter functions; when Twitter moves their junk, it'll be supported.
 		"""
@@ -184,7 +184,7 @@ class setup:
 
 			Params:
 				rate_for - Defaults to "requestingIP", but can be changed to check on whatever account is currently authenticated. (Pass a blank string or something)
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		try:
@@ -205,7 +205,7 @@ class setup:
 			The public timeline is cached for 60 seconds, so requesting it more often than that is a waste of resources.
 
 			Params:
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		try:
@@ -229,7 +229,7 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -252,7 +252,7 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -279,7 +279,7 @@ class setup:
 				max_id - Returns only statuses with an ID less than (that is, older than) or equal to the specified ID.
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits. 
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if id is not None and ("user_id" in kwargs) is False and ("screen_name" in kwargs) is False:
@@ -308,7 +308,7 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -330,7 +330,7 @@ class setup:
 				id - Optional. The ID or screen_name of the user you want to report as a spammer.
 				user_id - Optional.  The ID of the user you want to report as a spammer. Helpful for disambiguating when a valid user ID is also a valid screen name.
 				screen_name - Optional.  The ID or screen_name of the user you want to report as a spammer. Helpful for disambiguating when a valid screen name is also a user ID.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -359,7 +359,7 @@ class setup:
 
 			Parameters:
 				id - Required. The numerical ID of the tweet you are retweeting.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -378,7 +378,7 @@ class setup:
 			Parameters:
 				id - Required.  The numerical ID of the tweet you want the retweets of.
 				count - Optional.  Specifies the number of retweets to retrieve. May not be greater than 100.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -402,7 +402,7 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -424,7 +424,7 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -446,7 +446,7 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -458,6 +458,26 @@ class setup:
 		else:
 			raise AuthError("retweetedToMe() requires you to be authenticated.")
 	
+	def searchUsers(self, q, per_page = 20, page = 1, version = None):
+		""" searchUsers(q, per_page = None, page = None):
+
+			Query Twitter to find a set of users who match the criteria we have. (Note: This, oddly, requires authentication - go figure)
+
+			Parameters:
+				q (string) - Required. The query you wanna search against; self explanatory. ;)
+				per_page (number) - Optional, defaults to 20. Specify the number of users Twitter should return per page (no more than 20, just fyi)
+				page (number) - Optional, defaults to 1. The page of users you want to pull down.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		if self.authenticated is True:
+			try:
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/users/search.json?q=%s&per_page=%d&page=%d" % (version, q, per_page, page)))
+			except HTTPError as e:
+				raise TwythonError("searchUsers() failed with a %d error code." % e.code, e.code)
+		else:
+			raise AuthError("searchUsers(), oddly, requires you to be authenticated.")
+	
 	def showUser(self, id = None, user_id = None, screen_name = None, version = None):
 		"""showUser(id = None, user_id = None, screen_name = None)
 
@@ -468,7 +488,7 @@ class setup:
 				id - The ID or screen name of a user.
 				user_id - Specfies the ID of the user to return. Helpful for disambiguating when a valid user ID is also a valid screen name.
 				screen_name - Specfies the screen name of the user to return. Helpful for disambiguating when a valid screen name is also a user ID.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 
 			Usage Notes:
 			Requests for protected users without credentials from 
@@ -512,7 +532,7 @@ class setup:
 				screen_name - Optional. Specfies the screen name of the user for whom to return the list of friends. Helpful for disambiguating when a valid screen name is also a user ID.
 				page - (BEING DEPRECATED) Optional. Specifies the page of friends to receive.
 				cursor - Optional. Breaks the results into pages. A single page contains 100 users. This is recommended for users who are following many users. Provide a value of  -1 to begin paging. Provide values as returned to in the response body's next_cursor and previous_cursor attributes to page back and forth in the list.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -551,7 +571,7 @@ class setup:
 				screen_name - Optional. Specfies the screen name of the user for whom to return the list of followers. Helpful for disambiguating when a valid screen name is also a user ID.
 				page - (BEING DEPRECATED) Optional. Specifies the page to retrieve.		
 				cursor - Optional. Breaks the results into pages. A single page contains 100 users. This is recommended for users who are following many users. Provide a value of  -1 to begin paging. Provide values as returned to in the response body's next_cursor and previous_cursor attributes to page back and forth in the list.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -580,7 +600,7 @@ class setup:
 
 			Parameters:
 				id - Required. The numerical ID of the status to retrieve.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		try:
@@ -601,7 +621,7 @@ class setup:
 			Parameters:
 				status - Required. The text of your status update. URL encode as necessary. Statuses over 140 characters will be forceably truncated.
 				in_reply_to_status_id - Optional. The ID of an existing status that the update is in reply to.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 
 				** Note: in_reply_to_status_id will be ignored unless the author of the tweet this parameter references
 				is mentioned within the status text. Therefore, you must include @username, where username is 
@@ -623,7 +643,7 @@ class setup:
 
 			Parameters:
 				id - Required. The ID of the status to destroy.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -641,7 +661,7 @@ class setup:
 			Use this method to sign users out of client-facing applications (widgets, etc).
 
 			Parameters:
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -663,7 +683,7 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -692,7 +712,7 @@ class setup:
 				max_id - Optional.  Returns only statuses with an ID less than (that is, older than) or equal to the specified ID. 
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.  
 				page - Optional. Specifies the page of results to retrieve. Note: there are pagination limits.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -720,7 +740,7 @@ class setup:
 			Parameters:
 				user - Required. The ID or screen name of the recipient user.
 				text - Required. The text of your direct message. Be sure to keep it under 140 characters.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -742,7 +762,7 @@ class setup:
 
 			Parameters:
 				id - Required. The ID of the direct message to destroy.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -767,7 +787,7 @@ class setup:
 				user_id - Required. Specfies the ID of the user to befriend. Helpful for disambiguating when a valid user ID is also a valid screen name. 
 				screen_name - Required. Specfies the screen name of the user to befriend. Helpful for disambiguating when a valid screen name is also a user ID. 
 				follow - Optional. Enable notifications for the target user in addition to becoming friends. 
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -800,7 +820,7 @@ class setup:
 				id - Required. The ID or screen name of the user to unfollow. 
 				user_id - Required. Specfies the ID of the user to unfollow. Helpful for disambiguating when a valid user ID is also a valid screen name. 
 				screen_name - Required. Specfies the screen name of the user to unfollow. Helpful for disambiguating when a valid screen name is also a user ID.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -828,7 +848,7 @@ class setup:
 			Parameters:
 				user_a - Required. The ID or screen_name of the subject user.
 				user_b - Required. The ID or screen_name of the user to test for following.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -854,7 +874,7 @@ class setup:
 				target_id - The user_id of the target user.
 				target_screen_name - The screen_name of the target user.
 
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		apiURL = "http://api.twitter.com/%d/friendships/show.json?lol=1" % version # Another quick hack, look away if you want. :D
@@ -885,7 +905,7 @@ class setup:
 
 			Parameters:
 				device - Required. Must be one of: sms, im, none.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -911,7 +931,7 @@ class setup:
 				profile_sidebar_fill_color - Optional.
 				profile_sidebar_border_color - Optional.
 
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -938,7 +958,7 @@ class setup:
 				location - Optional. Maximum of 30 characters. The contents are not normalized or geocoded in any way.
 				description - Optional. Maximum of 160 characters.
 
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1001,7 +1021,7 @@ class setup:
 
 			Parameters:
 				page - Optional. Specifies the page of favorites to retrieve.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1019,7 +1039,7 @@ class setup:
 
 			Parameters:
 				id - Required. The ID of the status to favorite.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1037,7 +1057,7 @@ class setup:
 
 			Parameters:
 				id - Required. The ID of the status to un-favorite.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1058,7 +1078,7 @@ class setup:
 				id - Required. The ID or screen name of the user to follow with device updates.
 				user_id - Required. Specfies the ID of the user to follow with device updates. Helpful for disambiguating when a valid user ID is also a valid screen name. 
 				screen_name - Required. Specfies the screen name of the user to follow with device updates. Helpful for disambiguating when a valid screen name is also a user ID. 
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1086,7 +1106,7 @@ class setup:
 				id - Required. The ID or screen name of the user to follow with device updates.
 				user_id - Required. Specfies the ID of the user to follow with device updates. Helpful for disambiguating when a valid user ID is also a valid screen name. 
 				screen_name - Required. Specfies the screen name of the user to follow with device updates. Helpful for disambiguating when a valid screen name is also a user ID. 
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1118,7 +1138,7 @@ class setup:
 				screen_name - Required. Specfies the screen name of the user to follow with device updates. Helpful for disambiguating when a valid screen name is also a user ID. 
 				page - (BEING DEPRECATED) Optional. Specifies the page number of the results beginning at 1. A single page contains up to 5000 ids. This is recommended for users with large ID lists. If not provided all ids are returned. (Please note that the result set isn't guaranteed to be 5000 every time as suspended users will be filtered out.)
 				cursor - Optional. Breaks the results into pages. A single page contains 5000 ids. This is recommended for users with large ID lists. Provide a value of -1 to begin paging. Provide values as returned to in the response body's "next_cursor" and "previous_cursor" attributes to page back and forth in the list.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		apiURL = ""
@@ -1150,7 +1170,7 @@ class setup:
 				screen_name - Required. Specfies the screen name of the user to follow with device updates. Helpful for disambiguating when a valid screen name is also a user ID. 
 				page - (BEING DEPRECATED) Optional. Specifies the page number of the results beginning at 1. A single page contains 5000 ids. This is recommended for users with large ID lists. If not provided all ids are returned. (Please note that the result set isn't guaranteed to be 5000 every time as suspended users will be filtered out.)
 				cursor - Optional. Breaks the results into pages. A single page contains 5000 ids. This is recommended for users with large ID lists. Provide a value of -1 to begin paging. Provide values as returned to in the response body's "next_cursor" and "previous_cursor" attributes to page back and forth in the list.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		apiURL = ""
@@ -1176,7 +1196,7 @@ class setup:
 
 			Parameters:
 				id - The ID or screen name of a user to block.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1195,7 +1215,7 @@ class setup:
 
 			Parameters:
 				id - Required. The ID or screen_name of the user to un-block
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1217,7 +1237,7 @@ class setup:
 				id - Optional. The ID or screen_name of the potentially blocked user.
 				user_id - Optional. Specfies the ID of the potentially blocked user. Helpful for disambiguating when a valid user ID is also a valid screen name.
 				screen_name - Optional. Specfies the screen name of the potentially blocked user. Helpful for disambiguating when a valid screen name is also a user ID.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		apiURL = ""
@@ -1239,7 +1259,7 @@ class setup:
 
 			Parameters:
 				page - Optional. Specifies the page number of the results beginning at 1. A single page contains 20 ids.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1256,7 +1276,7 @@ class setup:
 			Returns an array of numeric user ids the authenticating user is blocking.
 
 			Parameters:
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1369,7 +1389,7 @@ class setup:
 			Returns the authenticated user's saved search queries.
 
 			Parameters:
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1387,7 +1407,7 @@ class setup:
 
 			Parameters:
 				id - Required. The id of the saved search to be retrieved.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1405,7 +1425,7 @@ class setup:
 
 			Parameters:
 				query - Required. The query of the search the user would like to save.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1424,7 +1444,7 @@ class setup:
 
 			Parameters:
 				id - Required. The id of the saved search to be deleted.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1444,7 +1464,7 @@ class setup:
 				name - Required. The name for the new list.
 				description - Optional, in the sense that you can leave it blank if you don't want one. ;)
 				mode - Optional. This is a string indicating "public" or "private", defaults to "public".
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1468,7 +1488,7 @@ class setup:
 				name - Required. The name of the list, possibly for renaming or such.
 				description - Optional, in the sense that you can leave it blank if you don't want one. ;)
 				mode - Optional. This is a string indicating "public" or "private", defaults to "public".
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1487,7 +1507,7 @@ class setup:
 			(Note: This may encounter issues if you authenticate with an email; try username (screen name) instead).
 
 			Parameters:
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1505,7 +1525,7 @@ class setup:
 			(Note: This may encounter issues if you authenticate with an email; try username (screen name) instead).
 
 			Parameters:
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1523,13 +1543,11 @@ class setup:
 
 			Parameters:
 				list_id - Required. The name of the list to delete - this gets turned into a slug, so you can pass it as that, or hope the transformation works out alright.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				#deleteURL = RequestWithMethod("DELETE", "http://api.twitter.com/%d/%s/lists/%s.json?_method=DELETE" % (version, self.username, list_id))
-				print("http://api.twitter.com/%d/%s/lists/%s.json?_method=DELETE" % (version, self.username, list_id))
 				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/lists/%s.json" % (version, self.username, list_id), "_method=DELETE"))
 			except HTTPError as e:
 				raise TwythonError("deleteList() failed with a %d error code." % e.code, e.code)
@@ -1548,7 +1566,7 @@ class setup:
 				count - Optional.  Specifies the number of statuses to retrieve. May not be greater than 200.
 				cursor - Optional. Breaks the results into pages. Provide a value of -1 to begin paging. 
 					Provide values returned in the response's "next_cursor" and "previous_cursor" attributes to page back and forth in the list.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		try:
@@ -1566,11 +1584,14 @@ class setup:
 
 			Parameters:
 				list_id - Required. The name of the list to get - this gets turned into a slug, so you can pass it as that, or hope the transformation works out alright.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		try:
-			return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/lists/%s/statuses.json" % (version, self.username, list_id)))
+			if self.authenticated is True:
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/lists/%s/statuses.json" % (version, self.username, list_id)))
+			else:
+				return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/%s/lists/%s/statuses.json" % (version, self.username, list_id)))
 		except HTTPError as e:
 			if e.code == 404:
 				raise AuthError("It seems the list you're trying to access is private/protected, and you don't have access. Are you authenticated and allowed?")
@@ -1584,7 +1605,7 @@ class setup:
 			Parameters:
 				list_id - Required. The slug of the list to add the new member to.
 				id - Required. The ID of the user that's being added to the list.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1602,7 +1623,7 @@ class setup:
 	
 			Parameters:
 				list_id - Required. The slug of the list to retrieve members for.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		try:
@@ -1621,13 +1642,12 @@ class setup:
 			Parameters:
 				list_id - Required. The slug of the list to remove the specified user from.
 				id - Required. The ID of the user that's being added to the list.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				deleteURL = RequestWithMethod("DELETE", "http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id))
-				return simplejson.load(self.opener.open(deleteURL))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id), "_method=DELETE"))
 			except HTTPError as e:
 				raise TwythonError("getListMembers() failed with a %d error code." % e.code, e.code)
 		else:
@@ -1643,14 +1663,14 @@ class setup:
 			Parameters:
 				list_id - Required. The slug of the list to check against.
 				id - Required. The ID of the user being checked in the list.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		try:
 			if self.authenticated is True:
 				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, self.username, list_id, repr(id))))
 			else:
-				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, self.username, list_id, repr(id))))
+				return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, self.username, list_id, repr(id))))
 		except HTTPError as e:
 			raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
 	
@@ -1661,7 +1681,7 @@ class setup:
 
 			Parameters:
 				list_id - Required. The list to subscribe to.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		if self.authenticated is True:
 			try:
@@ -1678,12 +1698,11 @@ class setup:
 
 			Parameters:
 				list_id - Required. The list to unsubscribe from.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		if self.authenticated is True:
 			try:
-				deleteURL = RequestWithMethod("DELETE", "http://api.twitter.com/%d/%s/%s/following.json" % (version, self.username, list_id))
-				return simplejson.load(self.opener.open(deleteURL))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/following.json" % (version, self.username, list_id), "_method=DELETE"))
 			except HTTPError as e:
 				raise TwythonError("unsubscribeFromList() failed with a %d error code." % e.code, e.code)
 		else:
@@ -1699,16 +1718,53 @@ class setup:
 			Parameters:
 				list_id - Required. The slug of the list to check against.
 				id - Required. The ID of the user being checked in the list.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		try:
 			if self.authenticated is True:
 				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, self.username, list_id, repr(id))))
 			else:
-				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, self.username, list_id, repr(id))))
+				return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, self.username, list_id, repr(id))))
 		except HTTPError as e:
 			raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
+	
+	def availableTrends(self, latitude = None, longitude = None, version = None):
+		""" availableTrends(latitude, longitude, version):
+
+			Gets all available trends, optionally filtering by geolocation based stuff.
+
+			Note: If you choose to pass a latitude/longitude, keep in mind that you have to pass both - one won't work by itself. ;P
+
+			Parameters:
+				latitude (string) - Optional. A latitude to sort by.
+				longitude (string) - Optional. A longitude to sort by.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		try:
+			if latitude is not None and longitude is not None:
+				return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/trends/available.json?latitude=%s&longitude=%s" % (version, latitude, longitude)))
+			return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/trends/available.json" % version))
+		except HTTPError as e:
+			raise TwythonError("availableTrends() failed with a %d error code." % e.code, e.code)
+	
+	def trendsByLocation(self, woeid, version = None):
+		""" trendsByLocation(woeid, version):
+
+			Gets all available trends, filtering by geolocation (woeid - see http://developer.yahoo.com/geo/geoplanet/guide/concepts.html).
+
+			Note: If you choose to pass a latitude/longitude, keep in mind that you have to pass both - one won't work by itself. ;P
+
+			Parameters:
+				woeid (string) - Required. WoeID of the area you're searching in.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
+		version = version or self.apiVersion
+		try:
+			return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/trends/%s.json" % (version, woeid)))
+		except HTTPError as e:
+			raise TwythonError("trendsByLocation() failed with a %d error code." % e.code, e.code)
 	
 	# The following methods are apart from the other Account methods, because they rely on a whole multipart-data posting function set.
 	def updateProfileBackgroundImage(self, filename, tile="true", version = None):
@@ -1720,7 +1776,7 @@ class setup:
 				image - Required. Must be a valid GIF, JPG, or PNG image of less than 800 kilobytes in size. Images with width larger than 2048 pixels will be forceably scaled down.
 				tile - Optional (defaults to true). If set to true the background image will be displayed tiled. The image will not be tiled otherwise. 
 				** Note: It's sad, but when using this method, pass the tile value as a string, e.g tile="false"
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
@@ -1743,7 +1799,7 @@ class setup:
 
 			Parameters:
 				image - Required. Must be a valid GIF, JPG, or PNG image of less than 700 kilobytes in size. Images with width larger than 500 pixels will be scaled down.
-				version - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
