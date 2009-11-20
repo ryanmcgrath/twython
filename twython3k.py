@@ -10,11 +10,6 @@
 	Questions, comments? ryan@venodesigns.net
 """
 
-import http.client, urllib, urllib.request, urllib.error, urllib.parse, mimetypes, mimetools
-
-from urllib.parse import urlparse
-from urllib.error import HTTPError
-
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
 __version__ = "0.8"
 
@@ -30,11 +25,6 @@ except ImportError:
 			from django.utils import simplejson
 		except:
 			raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
-
-try:
-	from . import oauth
-except ImportError:
-	pass
 
 class TwythonError(Exception):
 	def __init__(self, msg, error_code=None):
@@ -56,16 +46,8 @@ class AuthError(TwythonError):
 	def __str__(self):
 		return repr(self.msg)
 
-class RequestWithMethod(urllib.request.Request):
-	def __init__(self, method, *args, **kwargs):
-		self._method = method
-		urllib.request.Request.__init__(*args, **kwargs)
-	
-	def get_method(self):
-		return self._method
-
 class setup:
-	def __init__(self, username = None, password = None, consumer_key = None, consumer_secret = None, signature_method = None, headers = None, version = 1):
+	def __init__(self, username = None, password = None, headers = None, version = 1):
 		"""setup(authtype = "OAuth", username = None, password = None, consumer_secret = None, consumer_key = None, headers = None)
 
 			Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
@@ -73,9 +55,6 @@ class setup:
 			Parameters:
 				username - Your Twitter username, if you want Basic (HTTP) Authentication.
 				password - Password for your twitter account, if you want Basic (HTTP) Authentication.
-				consumer_secret - Consumer secret, if you want OAuth.
-				consumer_key - Consumer key, if you want OAuth.
-				signature_method - Method for signing OAuth requests; defaults to oauth.OAuthSignatureMethod_HMAC_SHA1()
 				headers - User agent header.
 				version (number) - Twitter supports a "versioned" API as of Oct. 16th, 2009 - this defaults to 1, but can be overridden on a class and function-based basis.
 
@@ -83,18 +62,6 @@ class setup:
 		"""
 		self.authenticated = False
 		self.username = username
-		# OAuth specific variables below
-		self.request_token_url = 'https://api.twitter.com/%s/oauth/request_token' % version
-		self.access_token_url = 'https://api.twitter.com/%s/oauth/access_token' % version
-		self.authorization_url = 'http://api.twitter.com/%s/oauth/authorize' % version
-		self.signin_url = 'http://api.twitter.com/%s/oauth/authenticate' % version
-		self.consumer_key = consumer_key
-		self.consumer_secret = consumer_secret
-		self.request_token = None
-		self.access_token = None
-		self.consumer = None
-		self.connection = None
-		self.signature_method = None
 		self.apiVersion = version
 		# Check and set up authentication
 		if self.username is not None and password is not None:
@@ -110,50 +77,8 @@ class setup:
 				self.authenticated = True
 			except HTTPError as e:
 				raise AuthError("Authentication failed with your provided credentials. Try again? (%s failure)" % repr(e.code))
-		elif consumer_secret is not None and consumer_key is not None:
-			self.consumer = oauth.OAuthConsumer(self.consumer_key, self.consumer_secret)
-			self.connection = http.client.HTTPSConnection("http://api.twitter.com")
-			pass
 		else:
 			pass
-	
-	def getOAuthResource(self, url, access_token, params, http_method="GET"):
-		"""getOAuthResource(self, url, access_token, params, http_method="GET")
-
-			Returns a signed OAuth object for use in requests.
-		"""
-		newRequest = oauth.OAuthRequest.from_consumer_and_token(consumer, token=self.access_token, http_method=http_method, http_url=url, parameters=parameters)
-		oauth_request.sign_request(self.signature_method, consumer, access_token)
-		return oauth_request
-	
-	def getResponse(self, oauth_request, connection):
-		"""getResponse(self, oauth_request, connection)
-
-			Returns a JSON-ified list of results.
-		"""
-		url = oauth_request.to_url()
-		connection.request(oauth_request.http_method, url)
-		response = connection.getresponse()
-		return simplejson.load(response.read())
-	
-	def getUnauthorisedRequestToken(self, consumer, connection, signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()):
-		oauth_request = oauth.OAuthRequest.from_consumer_and_token(consumer, consumer, http_url=self.request_token_url)
-		oauth_request.sign_request(signature_method, consumer, None)
-		resp = fetch_response(oauth_request, connection)
-		return oauth.OAuthToken.from_string(resp)
-	
-	def getAuthorizationURL(self, consumer, token, signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()):
-		oauth_request = oauth.OAuthRequest.from_consumer_and_token(consumer, token=token, http_url=self.authorization_url)
-		oauth_request.sign_request(signature_method, consumer, token)
-		return oauth_request.to_url()
-	
-	def exchangeRequestTokenForAccessToken(self, consumer, connection, request_token, signature_method = oauth.OAuthSignatureMethod_HMAC_SHA1()):
-		# May not be needed...
-		self.request_token = request_token
-		oauth_request = oauth.OAuthRequest.from_consumer_and_token(consumer, token = request_token, http_url=self.access_token_url)
-		oauth_request.sign_request(signature_method, consumer, request_token)
-		resp = fetch_response(oauth_request, connection)
-		return oauth.OAuthToken.from_string(resp)
 	
 	# URL Shortening function huzzah
 	def shortenURL(self, url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
@@ -612,7 +537,7 @@ class setup:
 			raise TwythonError("Failed with a %s error code. Does this user hide/protect their updates? You'll need to authenticate and be friends to get their timeline." 
 				% repr(e.code), e.code)
 
-	def updateStatus(self, status, in_reply_to_status_id = None, version = None):
+	def updateStatus(self, status, in_reply_to_status_id = None, latitude = None, longitude = None, version = None):
 		"""updateStatus(status, in_reply_to_status_id = None)
 
 			Updates the authenticating user's status.  Requires the status parameter specified below.
@@ -621,17 +546,27 @@ class setup:
 			Parameters:
 				status - Required. The text of your status update. URL encode as necessary. Statuses over 140 characters will be forceably truncated.
 				in_reply_to_status_id - Optional. The ID of an existing status that the update is in reply to.
+				latitude (string) - Optional. The location's latitude that this tweet refers to.
+				longitude (string) - Optional. The location's longitude that this tweet refers to.
 				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 
 				** Note: in_reply_to_status_id will be ignored unless the author of the tweet this parameter references
 				is mentioned within the status text. Therefore, you must include @username, where username is 
 				the author of the referenced tweet, within the update.
+ 
+				** Note: valid ranges for latitude/longitude are, for example, -180.0 to +180.0 (East is positive) inclusive.  
+				This parameter will be ignored if outside that range, not a number, if geo_enabled is disabled, or if there not a corresponding latitude parameter with this tweet.
 		"""
 		version = version or self.apiVersion
 		if len(list(status)) > 140:
 			raise TwythonError("This status message is over 140 characters. Trim it down!")
 		try:
-			return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/update.json?" % version, urllib.parse.urlencode({"status": self.unicode2utf8(status), "in_reply_to_status_id": in_reply_to_status_id})))
+			return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/update.json?" % version, urllib.parse.urlencode({
+				"status": self.unicode2utf8(status), 
+				"in_reply_to_status_id": in_reply_to_status_id,
+				"lat": latitude,
+				"long": longitude
+			})))
 		except HTTPError as e:
 			raise TwythonError("updateStatus() failed with a %s error code." % repr(e.code), e.code)
 
