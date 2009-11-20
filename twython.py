@@ -10,6 +10,11 @@
 	Questions, comments? ryan@venodesigns.net
 """
 
+import httplib, urllib, urllib2, mimetypes, mimetools
+
+from urlparse import urlparse
+from urllib2 import HTTPError
+
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
 __version__ = "0.8"
 
