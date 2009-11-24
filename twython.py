@@ -16,7 +16,7 @@ from urlparse import urlparse
 from urllib2 import HTTPError
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "0.8"
+__version__ = "0.9"
 
 """Twython - Easy Twitter utilities in Python"""
 

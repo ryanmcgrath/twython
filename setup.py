@@ -3,7 +3,7 @@
 import sys, os
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '0.8'
+__version__ = '0.9'
 
 # For the love of god, use Pip to install this.
 
@@ -12,13 +12,13 @@ METADATA = dict(
 	name = "twython",
 	version = __version__,
 	py_modules = ['twython'],
-	author='Ryan McGrath',
-	author_email='ryan@venodesigns.net',
-	description='A new and easy way to access Twitter data with Python.',
-	long_description= open("README.markdown").read(),
-	license='MIT License',
-	url='http://github.com/ryanmcgrath/twython/tree/master',
-	keywords='twitter search api tweet twython',
+	author = 'Ryan McGrath',
+	author_email = 'ryan@venodesigns.net',
+	description = 'An easy (and up to date) way to access Twitter data with Python.',
+	long_description = open("README.markdown").read(),
+	license = 'MIT License',
+	url = 'http://github.com/ryanmcgrath/twython/tree/master',
+	keywords = 'twitter search api tweet twython',
 )
 
 # Setuptools version

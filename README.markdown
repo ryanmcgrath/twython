@@ -8,9 +8,9 @@ This is my first library I've ever written in Python, so there could be some stu
 make a seasoned Python vet scratch his head, or possibly call me insane. It's open source, though,
 and I'm open to anything that'll improve the library as a whole.
 
-OAuth support is in the works, but every other part of the Twitter API should be covered. Twython
-handles both Basic (HTTP) Authentication and OAuth. Older versions of Twython need Basic Auth specified -
-to override this, specify 'authtype="Basic"' in your twython.setup() call.
+OAuth and Streaming API support is in the works, but every other part of the Twitter API should be covered. Twython
+handles both Basic (HTTP) Authentication and OAuth (Older versions (pre 0.9) of Twython need Basic Auth specified -
+to override this, specify 'authtype="Basic"' in your twython.setup() call).
 
 Twython has Docstrings if you want function-by-function plays; otherwise, check the Twython Wiki or 
 Twitter's API Wiki (Twython calls mirror most of the methods listed there).
@@ -27,7 +27,7 @@ Example Use
 -----------------------------------------------------------------------------------------------------
 > import twython
 >
-> twitter = twython.setup(authtype="Basic", username="example", password="example")
+> twitter = twython.setup(username="example", password="example")
 > twitter.updateStatus("See how easy this was?")
 
 
