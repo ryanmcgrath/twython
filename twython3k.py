@@ -52,8 +52,8 @@ class AuthError(TwythonError):
 		return repr(self.msg)
 
 class setup:
-	def __init__(self, username = None, password = None, headers = None, version = 1):
-		"""setup(authtype = "OAuth", username = None, password = None, consumer_secret = None, consumer_key = None, headers = None)
+	def __init__(self, username = None, password = None, headers = None, proxy = None, version = 1):
+		"""setup(authtype = "OAuth", username = None, password = None, proxy = None, headers = None)
 
 			Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
@@ -68,22 +68,35 @@ class setup:
 		self.authenticated = False
 		self.username = username
 		self.apiVersion = version
+		self.proxy = proxy
+		self.headers = headers
+		if self.proxy is not None:
+			self.proxyobj = urllib.request.ProxyHandler({'http': 'http://%s:%s@%s:%d' % (self.proxy["username"], self.proxy["password"], self.proxy["host"], self.proxy["port"])})
 		# Check and set up authentication
 		if self.username is not None and password is not None:
 			# Assume Basic authentication ritual
 			self.auth_manager = urllib.request.HTTPPasswordMgrWithDefaultRealm()
 			self.auth_manager.add_password(None, "http://api.twitter.com", self.username, password)
 			self.handler = urllib.request.HTTPBasicAuthHandler(self.auth_manager)
-			self.opener = urllib.request.build_opener(self.handler)
-			if headers is not None:
-				self.opener.addheaders = [('User-agent', headers)]
+			if self.proxy is not None:
+				self.opener = urllib.request.build_opener(self.proxyobj, self.handler)
+			else:
+				self.opener = urllib.request.build_opener(self.handler)
+			if self.headers is not None:
+				self.opener.addheaders = [('User-agent', self.headers)]
 			try:
 				simplejson.load(self.opener.open("http://api.twitter.com/%d/account/verify_credentials.json" % self.apiVersion))
 				self.authenticated = True
 			except HTTPError as e:
 				raise AuthError("Authentication failed with your provided credentials. Try again? (%s failure)" % repr(e.code))
 		else:
-			pass
+			# Build a non-auth opener so we can allow proxy-auth and/or header swapping
+			if self.proxy is not None:
+				self.opener = urllib.request.build_opener(self.proxyobj)
+			else:
+				self.opener = urllib.request.build_opener()
+			if self.headers is not None:
+				self.opener.addheaders = [('User-agent', self.headers)]
 	
 	# URL Shortening function huzzah
 	def shortenURL(self, url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
@@ -119,7 +132,7 @@ class setup:
 		version = version or self.apiVersion
 		try:
 			if rate_for == "requestingIP":
-				return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/account/rate_limit_status.json" % version))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/account/rate_limit_status.json" % version))
 			else:
 				if self.authenticated is True:
 					return simplejson.load(self.opener.open("http://api.twitter.com/%d/account/rate_limit_status.json" % version))
@@ -139,7 +152,7 @@ class setup:
 		"""
 		version = version or self.apiVersion
 		try:
-			return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/statuses/public_timeline.json" % version))
+			return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/public_timeline.json" % version))
 		except HTTPError as e:
 			raise TwythonError("getPublicTimeline() failed with a %s error code." % repr(e.code))
 
@@ -223,7 +236,7 @@ class setup:
 			if self.authenticated is True:
 				return simplejson.load(self.opener.open(userTimelineURL))
 			else:
-				return simplejson.load(urllib.request.urlopen(userTimelineURL))
+				return simplejson.load(self.opener.open(userTimelineURL))
 		except HTTPError as e:
 			raise TwythonError("Failed with a %s error code. Does this user hide/protect their updates? If so, you'll need to authenticate and be their friend to get their timeline."
 				% repr(e.code), e.code)
@@ -440,7 +453,7 @@ class setup:
 				if self.authenticated is True:
 					return simplejson.load(self.opener.open(apiURL))
 				else:
-					return simplejson.load(urllib.request.urlopen(apiURL))
+					return simplejson.load(self.opener.open(apiURL))
 			except HTTPError as e:
 				raise TwythonError("showUser() failed with a %s error code." % repr(e.code), e.code)
 	
@@ -537,7 +550,7 @@ class setup:
 			if self.authenticated is True:
 				return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/show/%s.json" % (version, id)))
 			else:
-				return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/statuses/show/%s.json" % (version, id)))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/show/%s.json" % (version, id)))
 		except HTTPError as e:
 			raise TwythonError("Failed with a %s error code. Does this user hide/protect their updates? You'll need to authenticate and be friends to get their timeline." 
 				% repr(e.code), e.code)
@@ -830,7 +843,7 @@ class setup:
 			if self.authenticated is True:
 				return simplejson.load(self.opener.open(apiURL))
 			else:
-				return simplejson.load(urllib.request.urlopen(apiURL))
+				return simplejson.load(self.opener.open(apiURL))
 		except HTTPError as e:
 			# Catch this for now
 			if e.code == 403:
@@ -1092,7 +1105,7 @@ class setup:
 		if screen_name is not None:
 			apiURL = "http://api.twitter.com/%d/friends/ids.json?screen_name=%s&%s" %(version, screen_name, breakResults)
 		try:
-			return simplejson.load(urllib.request.urlopen(apiURL))
+			return simplejson.load(self.opener.open(apiURL))
 		except HTTPError as e:
 			raise TwythonError("getFriendsIDs() failed with a %s error code." % repr(e.code), e.code)
 
@@ -1124,7 +1137,7 @@ class setup:
 		if screen_name is not None:
 			apiURL = "http://api.twitter.com/%d/followers/ids.json?screen_name=%s&%s" %(version, screen_name, breakResults)
 		try:
-			return simplejson.load(urllib.request.urlopen(apiURL))
+			return simplejson.load(self.opener.open(apiURL))
 		except HTTPError as e:
 			raise TwythonError("getFollowersIDs() failed with a %s error code." % repr(e.code), e.code)
 
@@ -1188,7 +1201,7 @@ class setup:
 		if screen_name is not None:
 			apiURL = "http://api.twitter.com/%d/blocks/exists.json?screen_name=%s" % (version, screen_name)
 		try:
-			return simplejson.load(urllib.request.urlopen(apiURL))
+			return simplejson.load(self.opener.open(apiURL))
 		except HTTPError as e:
 			raise TwythonError("checkIfBlockExists() failed with a %s error code." % repr(e.code), e.code)
 
@@ -1254,7 +1267,7 @@ class setup:
 		"""
 		searchURL = self.constructApiURL("http://search.twitter.com/search.json", kwargs) + "&" + urllib.parse.urlencode({"q": self.unicode2utf8(search_query)})
 		try:
-			return simplejson.load(urllib.request.urlopen(searchURL))
+			return simplejson.load(self.opener.open(searchURL))
 		except HTTPError as e:
 			raise TwythonError("getSearchTimeline() failed with a %s error code." % repr(e.code), e.code)
 
@@ -1271,7 +1284,7 @@ class setup:
 		if excludeHashTags is True:
 			apiURL += "?exclude=hashtags"
 		try:
-			return simplejson.load(urllib.urlopen(apiURL))
+			return simplejson.load(self.opener.open(apiURL))
 		except HTTPError as e:
 			raise TwythonError("getCurrentTrends() failed with a %s error code." % repr(e.code), e.code)
 
@@ -1295,7 +1308,7 @@ class setup:
 			else:
 				apiURL += "?exclude=hashtags"
 		try:
-			return simplejson.load(urllib.urlopen(apiURL))
+			return simplejson.load(self.opener.open(apiURL))
 		except HTTPError as e:
 			raise TwythonError("getDailyTrends() failed with a %s error code." % repr(e.code), e.code)
 
@@ -1319,7 +1332,7 @@ class setup:
 			else:
 				apiURL += "?exclude=hashtags"
 		try:
-			return simplejson.load(urllib.urlopen(apiURL))
+			return simplejson.load(self.opener.open(apiURL))
 		except HTTPError as e:
 			raise TwythonError("getWeeklyTrends() failed with a %s error code." % repr(e.code), e.code)
 
@@ -1531,7 +1544,7 @@ class setup:
 			if self.authenticated is True:
 				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/lists/%s/statuses.json" % (version, self.username, list_id)))
 			else:
-				return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/%s/lists/%s/statuses.json" % (version, self.username, list_id)))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/lists/%s/statuses.json" % (version, self.username, list_id)))
 		except HTTPError as e:
 			if e.code == 404:
 				raise AuthError("It seems the list you're trying to access is private/protected, and you don't have access. Are you authenticated and allowed?")
@@ -1570,7 +1583,7 @@ class setup:
 			if self.authenticated is True:
 				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id)))
 			else:
-				return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id)))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id)))
 		except HTTPError as e:
 			raise TwythonError("getListMembers() failed with a %d error code." % e.code, e.code)
 	
@@ -1610,7 +1623,7 @@ class setup:
 			if self.authenticated is True:
 				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, self.username, list_id, repr(id))))
 			else:
-				return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, self.username, list_id, repr(id))))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, self.username, list_id, repr(id))))
 		except HTTPError as e:
 			raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
 	
@@ -1665,7 +1678,7 @@ class setup:
 			if self.authenticated is True:
 				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, self.username, list_id, repr(id))))
 			else:
-				return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, self.username, list_id, repr(id))))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, self.username, list_id, repr(id))))
 		except HTTPError as e:
 			raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
 	
@@ -1684,8 +1697,8 @@ class setup:
 		version = version or self.apiVersion
 		try:
 			if latitude is not None and longitude is not None:
-				return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/trends/available.json?latitude=%s&longitude=%s" % (version, latitude, longitude)))
-			return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/trends/available.json" % version))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/trends/available.json?latitude=%s&longitude=%s" % (version, latitude, longitude)))
+			return simplejson.load(self.opener.open("http://api.twitter.com/%d/trends/available.json" % version))
 		except HTTPError as e:
 			raise TwythonError("availableTrends() failed with a %d error code." % e.code, e.code)
 	
@@ -1702,7 +1715,7 @@ class setup:
 		"""
 		version = version or self.apiVersion
 		try:
-			return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/trends/%s.json" % (version, woeid)))
+			return simplejson.load(self.opener.open("http://api.twitter.com/%d/trends/%s.json" % (version, woeid)))
 		except HTTPError as e:
 			raise TwythonError("trendsByLocation() failed with a %d error code." % e.code, e.code)
 	

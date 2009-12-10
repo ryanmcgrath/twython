@@ -69,6 +69,7 @@ class setup:
 		self.username = username
 		self.apiVersion = version
 		self.proxy = proxy
+		self.headers = headers
 		if self.proxy is not None:
 			self.proxyobj = urllib2.ProxyHandler({'http': 'http://%s:%s@%s:%d' % (self.proxy["username"], self.proxy["password"], self.proxy["host"], self.proxy["port"])})
 		# Check and set up authentication
@@ -81,8 +82,8 @@ class setup:
 				self.opener = urllib2.build_opener(self.proxyobj, self.handler)
 			else:
 				self.opener = urllib2.build_opener(self.handler)
-			if headers is not None:
-				self.opener.addheaders = [('User-agent', headers)]
+			if self.headers is not None:
+				self.opener.addheaders = [('User-agent', self.headers)]
 			try:
 				simplejson.load(self.opener.open("http://api.twitter.com/%d/account/verify_credentials.json" % self.apiVersion))
 				self.authenticated = True
@@ -95,7 +96,7 @@ class setup:
 			else:
 				self.opener = urllib2.build_opener()
 			if self.headers is not None:
-				self.opener.addheaders = [('User-agent', headers)]
+				self.opener.addheaders = [('User-agent', self.headers)]
 	
 	# URL Shortening function huzzah
 	def shortenURL(self, url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
