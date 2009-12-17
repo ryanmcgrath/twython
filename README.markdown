@@ -22,6 +22,17 @@ Twython requires (much like Python-Twitter, because they had the right idea :D) 
 
 > http://pypi.python.org/pypi/simplejson
 
+Installation
+-----------------------------------------------------------------------------------------------------
+Installing Twython is fairly easy. You can...
+
+> easy_install twython
+
+...or, you can clone the repo and install it the old fashioned way.
+
+> git clone git://github.com/ryanmcgrath/twython.git
+> cd twython
+> sudo python setup.py install
 
 Example Use
 -----------------------------------------------------------------------------------------------------
