@@ -1,0 +1,4 @@
+*.pyc
+build
+dist
+twython.egg-info

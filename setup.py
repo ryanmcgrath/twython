@@ -3,9 +3,7 @@
 import sys, os
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '0.9'
-
-# For the love of god, use Pip to install this.
+__version__ = '1.0'
 
 # Distutils version
 METADATA = dict(

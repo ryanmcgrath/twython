@@ -1,7 +1,7 @@
-import twython
+import twython.core as twython
 
 # Instantiate with Basic (HTTP) Authentication
-twitter = twython.setup(authtype="Basic", username="example", password="example")
+twitter = twython.setup(username="example", password="example")
 
 # This returns the rate limit for the requesting IP
 rateLimit = twitter.getRateLimitStatus()

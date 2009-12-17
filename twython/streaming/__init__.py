@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 """
+	Yes, this is just in __init__ for now, hush.
+
 	The beginnings of Twitter Streaming API support in Twython. Don't expect this to work at all,
 	consider it a stub for now. -- Ryan
 	

@@ -1,4 +1,4 @@
-import twython
+import twython.core as twython
 
 # We won't authenticate for this, but sometimes it's necessary
 twitter = twython.setup()

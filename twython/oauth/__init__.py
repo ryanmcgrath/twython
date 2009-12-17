@@ -7,17 +7,17 @@
 	Questions, comments? ryan@venodesigns.net
 """
 
-import twython, httplib, urllib, urllib2, mimetypes, mimetools
+import httplib, urllib, urllib2, mimetypes, mimetools
 
 from urlparse import urlparse
 from urllib2 import HTTPError
 
 try:
-	import oauth
+	import oauth as oauthlib
 except ImportError:
 	pass
 
-class twyauth:
+class oauth:
 	def __init__(self, username, consumer_key, consumer_secret, signature_method = None, headers = None, version = 1):
 		"""oauth(username = None, consumer_secret = None, consumer_key = None, headers = None)
 

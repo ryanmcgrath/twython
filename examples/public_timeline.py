@@ -1,4 +1,4 @@
-import twython
+import twython.core as twython
 
 # Getting the public timeline requires no authentication, huzzah
 twitter = twython.setup()

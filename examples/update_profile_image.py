@@ -1,5 +1,5 @@
-import twython
+import twython.core as twython
 
 # Instantiate Twython with Basic (HTTP) Authentication
-twitter = twython.setup(authtype="Basic", username="example", password="example")
+twitter = twython.setup(username="example", password="example")
 twitter.updateProfileImage("myImage.png")

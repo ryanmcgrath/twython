@@ -1,4 +1,4 @@
-import twython
+import twython.core as twython
 
 """ Instantiate Tango with no Authentication """
 twitter = twython.setup()

@@ -1,6 +1,6 @@
-import twitter
+import twython.core as twython
 
-twitter = twython.setup(authtype="Basic", username="example", password="example")
+twitter = twython.setup(username="example", password="example")
 mentions = twitter.getUserMentions(count="150")
 
 print mentions
