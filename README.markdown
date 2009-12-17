@@ -38,7 +38,7 @@ Example Use
 -----------------------------------------------------------------------------------------------------
 > import twython
 >
-> twitter = twython.setup(username="example", password="example")
+> twitter = twython.setup(username="example", password="example")  
 > twitter.updateStatus("See how easy this was?")
 
 
