@@ -13,7 +13,7 @@ from urlparse import urlparse
 from urllib2 import HTTPError
 
 try:
-	import oauth as oauthlib
+	import oauth
 except ImportError:
 	pass
 
