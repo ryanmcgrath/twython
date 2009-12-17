@@ -17,7 +17,7 @@ Twitter's API Wiki (Twython calls mirror most of the methods listed there).
 
 Requirements
 -----------------------------------------------------------------------------------------------------
-Twython requires (much like Python-Twitter, because they had the right idea :D) a library called
+Twython (for versions of Python before 2.6) requires a library called
 "simplejson". You can grab it at the following link:
 
 > http://pypi.python.org/pypi/simplejson
