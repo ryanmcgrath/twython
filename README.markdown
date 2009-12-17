@@ -30,9 +30,9 @@ Installing Twython is fairly easy. You can...
 
 ...or, you can clone the repo and install it the old fashioned way.
 
-> git clone git://github.com/ryanmcgrath/twython.git
-> cd twython
-> sudo python setup.py install
+> git clone git://github.com/ryanmcgrath/twython.git  
+> cd twython  
+> sudo python setup.py install  
 
 Example Use
 -----------------------------------------------------------------------------------------------------
