@@ -61,6 +61,15 @@ class setup:
 				username - Your Twitter username, if you want Basic (HTTP) Authentication.
 				password - Password for your twitter account, if you want Basic (HTTP) Authentication.
 				headers - User agent header.
+				proxy - An object detailing information, in case proxy use/authentication is required. Object passed should be something like...
+
+					proxyobj = { 
+						"username": "fjnfsjdnfjd",
+						"password": "fjnfjsjdfnjd",
+						"host": "http://fjanfjasnfjjfnajsdfasd.com", 
+						"port": 87 
+					} 
+
 				version (number) - Twitter supports a "versioned" API as of Oct. 16th, 2009 - this defaults to 1, but can be overridden on a class and function-based basis.
 
 				** Note: versioning is not currently used by search.twitter functions; when Twitter moves their junk, it'll be supported.
