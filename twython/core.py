@@ -1609,7 +1609,7 @@ class setup:
 		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id), "_method=DELETE"))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id), "_method=DELETE&id=%s" % `id`))
 			except HTTPError, e:
 				raise TwythonError("getListMembers() failed with a %d error code." % e.code, e.code)
 		else:
