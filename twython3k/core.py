@@ -585,8 +585,6 @@ class setup:
 				This parameter will be ignored if outside that range, not a number, if geo_enabled is disabled, or if there not a corresponding latitude parameter with this tweet.
 		"""
 		version = version or self.apiVersion
-		if len(list(status)) > 140:
-			raise TwythonError("This status message is over 140 characters. Trim it down!")
 		try:
 			return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/update.json?" % version, urllib.parse.urlencode({
 				"status": self.unicode2utf8(status), 
