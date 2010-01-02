@@ -586,12 +586,12 @@ class setup:
 		"""
 		version = version or self.apiVersion
 		try:
-			return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/update.json?" % version, urllib.urlencode({
-				"status": self.unicode2utf8(status), 
-				"in_reply_to_status_id": in_reply_to_status_id,
-				"lat": latitude,
-				"long": longitude
-			})))
+			postExt = urllib.urlencode({"status": self.unicode2utf8(status)})
+			if latitude is not None and longitude is not None:
+				postExt += "&lat=%s&long=%s" % (latitude, longitude)
+			if in_reply_to_status_id is not None:
+				postExt += "&in_reply_to_status_id=%s" % `in_reply_to_status_id`
+			return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/update.json?" % version, postExt))
 		except HTTPError, e:
 			raise TwythonError("updateStatus() failed with a %s error code." % `e.code`, e.code)
 
