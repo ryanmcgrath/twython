@@ -608,7 +608,7 @@ class setup:
 		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://api.twitter.com/%d/status/destroy/%s.json" % (version, `id`), "DELETE"))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/destroy/%s.json?" % (version, id), "_method=DELETE"))
 			except HTTPError, e:
 				raise TwythonError("destroyStatus() failed with a %s error code." % `e.code`, e.code)
 		else:
