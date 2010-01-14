@@ -16,20 +16,14 @@ from urllib.parse import urlparse
 from urllib.error import HTTPError
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "0.9"
+__version__ = "1.0"
 
 """Twython - Easy Twitter utilities in Python"""
 
 try:
-	import simplejson
+	import json as simplejson
 except ImportError:
-	try:
-		import json as simplejson
-	except ImportError:
-		try:
-			from django.utils import simplejson
-		except:
-			raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
+	raise Exception("Twython requires a json library to work. (Try http://www.undefined.org/python/ ?")
 
 class TwythonError(Exception):
 	def __init__(self, msg, error_code=None):
@@ -60,6 +54,7 @@ class setup:
 			Parameters:
 				username - Your Twitter username, if you want Basic (HTTP) Authentication.
 				password - Password for your twitter account, if you want Basic (HTTP) Authentication.
+				headers - User agent header.
 				proxy - An object detailing information, in case proxy use/authentication is required. Object passed should be something like...
 
 					proxyobj = { 
@@ -69,7 +64,6 @@ class setup:
 						"port": 87 
 					} 
 
-				headers - User agent header.
 				version (number) - Twitter supports a "versioned" API as of Oct. 16th, 2009 - this defaults to 1, but can be overridden on a class and function-based basis.
 
 				** Note: versioning is not currently used by search.twitter functions; when Twitter moves their junk, it'll be supported.
@@ -586,12 +580,12 @@ class setup:
 		"""
 		version = version or self.apiVersion
 		try:
-			return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/update.json?" % version, urllib.parse.urlencode({
-				"status": self.unicode2utf8(status), 
-				"in_reply_to_status_id": in_reply_to_status_id,
-				"lat": latitude,
-				"long": longitude
-			})))
+			postExt = urllib.parse.urlencode({"status": self.unicode2utf8(status)})
+			if latitude is not None and longitude is not None:
+				postExt += "&lat=%s&long=%s" % (latitude, longitude)
+			if in_reply_to_status_id is not None:
+				postExt += "&in_reply_to_status_id=%s" % repr(in_reply_to_status_id)
+			return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/update.json?" % version, postExt))
 		except HTTPError as e:
 			raise TwythonError("updateStatus() failed with a %s error code." % repr(e.code), e.code)
 
@@ -608,7 +602,7 @@ class setup:
 		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://api.twitter.com/%d/status/destroy/%s.json" % (version, repr(id)), "DELETE"))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/statuses/destroy/%s.json?" % (version, id), "_method=DELETE"))
 			except HTTPError as e:
 				raise TwythonError("destroyStatus() failed with a %s error code." % repr(e.code), e.code)
 		else:
@@ -1607,7 +1601,7 @@ class setup:
 		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id), "_method=DELETE"))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id), "_method=DELETE&id=%s" % repr(id)))
 			except HTTPError as e:
 				raise TwythonError("getListMembers() failed with a %d error code." % e.code, e.code)
 		else:
