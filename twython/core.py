@@ -459,10 +459,7 @@ class setup:
 			apiURL = "http://api.twitter.com/%d/users/show.json?screen_name=%s" % (version, screen_name)
 		if apiURL != "":
 			try:
-				if self.authenticated is True:
-					return simplejson.load(self.opener.open(apiURL))
-				else:
-					return simplejson.load(self.opener.open(apiURL))
+				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError, e:
 				raise TwythonError("showUser() failed with a %s error code." % `e.code`, e.code)
 	
