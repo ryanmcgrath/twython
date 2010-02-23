@@ -21,9 +21,15 @@ __version__ = "1.0"
 """Twython - Easy Twitter utilities in Python"""
 
 try:
-	import json as simplejson
+	import simplejson
 except ImportError:
-	raise Exception("Twython requires a json library to work. (Try http://www.undefined.org/python/ ?")
+	try:
+		import json as simplejson
+	except ImportError:
+		try:
+			from django.utils import simplejson
+		except:
+			raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
 
 class TwythonError(Exception):
 	def __init__(self, msg, error_code=None):
@@ -133,12 +139,13 @@ class setup:
 				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
+		
 		try:
 			if rate_for == "requestingIP":
 				return simplejson.load(self.opener.open("http://api.twitter.com/%d/account/rate_limit_status.json" % version))
 			else:
 				if self.authenticated is True:
-					return simplejson.load(self.opener.open("http://api.twitter.com/%d/account/rate_limit_status.json" % version))
+					return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/account/rate_limit_status.json" % version))
 				else:
 					raise TwythonError("You need to be authenticated to check a rate limit status on an account.")
 		except HTTPError as e:
@@ -453,10 +460,7 @@ class setup:
 			apiURL = "http://api.twitter.com/%d/users/show.json?screen_name=%s" % (version, screen_name)
 		if apiURL != "":
 			try:
-				if self.authenticated is True:
-					return simplejson.load(self.opener.open(apiURL))
-				else:
-					return simplejson.load(self.opener.open(apiURL))
+				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError as e:
 				raise TwythonError("showUser() failed with a %s error code." % repr(e.code), e.code)
 	
@@ -869,9 +873,15 @@ class setup:
 				raise TwythonError("updateDeliveryDevice() failed with a %s error code." % repr(e.code), e.code)
 		else:
 			raise AuthError("updateDeliveryDevice() requires you to be authenticated.")
-
-	def updateProfileColors(self, version = None, **kwargs):
-		"""updateProfileColors(**kwargs)
+	
+	def updateProfileColors(self, 
+		profile_background_color = None, 
+		profile_text_color = None, 
+		profile_link_color = None, 
+		profile_sidebar_fill_color = None, 
+		profile_sidebar_border_color = None, 
+		version = None):
+		"""updateProfileColors()
 
 			Sets one or more hex values that control the color scheme of the authenticating user's profile page on api.twitter.com.
 
@@ -887,15 +897,56 @@ class setup:
 
 				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
-		version = version or self.apiVersion
 		if self.authenticated is True:
+			useAmpersands = False
+			updateProfileColorsQueryString = ""
+			
+			def checkValidColor(str):
+				if len(str) != 6:
+					return False
+				for c in str:
+					if c not in "1234567890abcdefABCDEF": return False
+				
+				return True
+			
+			if profile_background_color is not None:
+				if checkValidColor(profile_background_color):
+					updateProfileColorsQueryString += "profile_background_color=" + profile_background_color
+					useAmpersands = True
+				else:
+					raise TwythonError("Invalid background color. Try an hexadecimal 6 digit number.")
+			if profile_text_color is not None:
+				if checkValidColor(profile_text_color):
+					updateProfileColorsQueryString += "profile_text_color=" + profile_text_color
+					useAmpersands = True
+				else:
+					raise TwythonError("Invalid text color. Try an hexadecimal 6 digit number.")
+			if profile_link_color is not None:
+				if checkValidColor(profile_link_color):
+					updateProfileColorsQueryString += "profile_link_color=" + profile_link_color
+					useAmpersands = True
+				else:
+					raise TwythonError("Invalid profile link color. Try an hexadecimal 6 digit number.")
+			if profile_sidebar_fill_color is not None:
+				if checkValidColor(profile_sidebar_fill_color):
+					updateProfileColorsQueryString += "profile_sidebar_fill_color=" + profile_sidebar_fill_color
+					useAmpersands = True
+				else:
+					raise TwythonError("Invalid sidebar fill color. Try an hexadecimal 6 digit number.")
+			if profile_sidebar_border_color is not None:
+				if checkValidColor(profile_sidebar_border_color):
+					updateProfileColorsQueryString += "profile_sidebar_border_color=" + profile_sidebar_border_color
+					useAmpersands = True
+				else:
+					raise TwythonError("Invalid sidebar border color. Try an hexadecimal 6 digit number.")
+				
 			try:
-				return self.opener.open(self.constructApiURL("http://api.twitter.com/%d/account/update_profile_colors.json?" % version, kwargs))
+				return self.opener.open("http://api.twitter.com/%d/account/update_profile_colors.json?" % version, updateProfileColorsQueryString)
 			except HTTPError as e:
 				raise TwythonError("updateProfileColors() failed with a %s error code." % repr(e.code), e.code)
 		else:
 			raise AuthError("updateProfileColors() requires you to be authenticated.")
-
+	
 	def updateProfile(self, name = None, email = None, url = None, location = None, description = None, version = None):
 		"""updateProfile(name = None, email = None, url = None, location = None, description = None)
 
