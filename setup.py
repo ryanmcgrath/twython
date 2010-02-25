@@ -3,13 +3,13 @@
 import sys, os
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '1.0'
+__version__ = '1.2'
 
 # Distutils version
 METADATA = dict(
 	name = "twython",
 	version = __version__,
-	py_modules = ['twython/__init__', 'twython/core', 'twython/twyauth', 'twython/streaming', 'twython/oauth'],
+	py_modules = ['setup', 'twython/__init__', 'twython/core', 'twython/twyauth', 'twython/streaming', 'twython/oauth'],
 	author = 'Ryan McGrath',
 	author_email = 'ryan@venodesigns.net',
 	description = 'An easy (and up to date) way to access Twitter data with Python.',

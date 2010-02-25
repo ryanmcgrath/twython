@@ -125,7 +125,7 @@ class setup:
 	def constructApiURL(self, base_url, params):
 		return base_url + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in params.items()])
 
-	def getRateLimitStatus(self, rate_for = "requestingIP", version = None):
+	def getRateLimitStatus(self, checkRequestingIP = True, version = None):
 		"""getRateLimitStatus()
 
 			Returns the remaining number of API requests available to the requesting user before the
@@ -135,17 +135,16 @@ class setup:
 			IP address is returned.
 
 			Params:
-				rate_for - Defaults to "requestingIP", but can be changed to check on whatever account is currently authenticated. (Pass a blank string or something)
+				checkRequestIP - Boolean, defaults to True. Set to False to check against the currently requesting IP, instead of the account level.
 				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
-		version = version or self.apiVersion
-		
+		version = version or self.apiVersion	
 		try:
-			if rate_for == "requestingIP":
-				return simplejson.load(self.opener.open("http://api.twitter.com/%d/account/rate_limit_status.json" % version))
+			if checkRequestingIP is True:
+				return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/account/rate_limit_status.json" % version))
 			else:
 				if self.authenticated is True:
-					return simplejson.load(urllib.request.urlopen("http://api.twitter.com/%d/account/rate_limit_status.json" % version))
+					return simplejson.load(self.opener.open("http://api.twitter.com/%d/account/rate_limit_status.json" % version))
 				else:
 					raise TwythonError("You need to be authenticated to check a rate limit status on an account.")
 		except HTTPError as e:
@@ -898,8 +897,7 @@ class setup:
 				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		if self.authenticated is True:
-			useAmpersands = False
-			updateProfileColorsQueryString = ""
+			updateProfileColorsQueryString = "?lol=2"
 			
 			def checkValidColor(str):
 				if len(str) != 6:
@@ -912,31 +910,26 @@ class setup:
 			if profile_background_color is not None:
 				if checkValidColor(profile_background_color):
 					updateProfileColorsQueryString += "profile_background_color=" + profile_background_color
-					useAmpersands = True
 				else:
 					raise TwythonError("Invalid background color. Try an hexadecimal 6 digit number.")
 			if profile_text_color is not None:
 				if checkValidColor(profile_text_color):
 					updateProfileColorsQueryString += "profile_text_color=" + profile_text_color
-					useAmpersands = True
 				else:
 					raise TwythonError("Invalid text color. Try an hexadecimal 6 digit number.")
 			if profile_link_color is not None:
 				if checkValidColor(profile_link_color):
 					updateProfileColorsQueryString += "profile_link_color=" + profile_link_color
-					useAmpersands = True
 				else:
 					raise TwythonError("Invalid profile link color. Try an hexadecimal 6 digit number.")
 			if profile_sidebar_fill_color is not None:
 				if checkValidColor(profile_sidebar_fill_color):
 					updateProfileColorsQueryString += "profile_sidebar_fill_color=" + profile_sidebar_fill_color
-					useAmpersands = True
 				else:
 					raise TwythonError("Invalid sidebar fill color. Try an hexadecimal 6 digit number.")
 			if profile_sidebar_border_color is not None:
 				if checkValidColor(profile_sidebar_border_color):
 					updateProfileColorsQueryString += "profile_sidebar_border_color=" + profile_sidebar_border_color
-					useAmpersands = True
 				else:
 					raise TwythonError("Invalid sidebar border color. Try an hexadecimal 6 digit number.")
 				
