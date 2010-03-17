@@ -16,7 +16,7 @@ from urlparse import urlparse
 from urllib2 import HTTPError
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.0"
+__version__ = "1.1"
 
 """Twython - Easy Twitter utilities in Python"""
 
@@ -53,7 +53,7 @@ class AuthError(TwythonError):
 
 class setup:
 	def __init__(self, username = None, password = None, headers = None, proxy = None, version = 1):
-		"""setup(authtype = "OAuth", username = None, password = None, proxy = None, headers = None)
+		"""setup(username = None, password = None, proxy = None, headers = None)
 
 			Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
@@ -115,7 +115,7 @@ class setup:
 
 			Parameters:
 				url_to_shorten - URL to shorten.
-				shortener - In case you want to use url shorterning service other that is.gd.
+				shortener - In case you want to use a url shortening service other than is.gd.
 		"""
 		try:
 			return urllib2.urlopen(shortener + "?" + urllib.urlencode({query: self.unicode2utf8(url_to_shorten)})).read()
@@ -462,6 +462,32 @@ class setup:
 				return simplejson.load(self.opener.open(apiURL))
 			except HTTPError, e:
 				raise TwythonError("showUser() failed with a %s error code." % `e.code`, e.code)
+	
+	def bulkUserLookup(self, ids = None, screen_names = None, version = None):
+		""" bulkUserLookup(self, ids = None, screen_names = None, version = None)
+			
+			A method to do bulk user lookups against the Twitter API. Arguments (ids (numbers) / screen_names (strings)) should be flat Arrays that
+			contain their respective data sets.
+
+			Statuses for the users in question will be returned inline if they exist. Requires authentication!
+		"""
+		version = version or self.apiVersion
+		if self.authenticated is True:
+			apiURL = "http://api.twitter.com/%d/users/lookup.json?lol=1" % version
+			if ids is not None:
+				apiURL += "&user_id="
+				for id in ids:
+					apiURL += `id` + ","
+			if screen_names is not None:
+				apiURL += "&screen_name="
+				for name in screen_names:
+					apiURL += name + ","
+			try:
+				return simplejson.load(self.opener.open(apiURL))
+			except HTTPError, e:
+				raise TwythonError("bulkUserLookup() failed with a %s error code." % `e.code`, e.code)
+		else:
+			raise AuthError("bulkUserLookup() requires you to be authenticated.")
 	
 	def getFriendsStatus(self, id = None, user_id = None, screen_name = None, page = None, cursor="-1", version = None):
 		"""getFriendsStatus(id = None, user_id = None, screen_name = None, page = None, cursor="-1")
