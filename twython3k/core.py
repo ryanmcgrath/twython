@@ -776,9 +776,9 @@ class setup:
 		if self.authenticated is True:
 			apiURL = ""
 			if user_id is not None:
-				apiURL = "?user_id=%s&follow=%s" %(repr(user_id), follow)
+				apiURL = "user_id=%s&follow=%s" %(repr(user_id), follow)
 			if screen_name is not None:
-				apiURL = "?screen_name=%s&follow=%s" %(screen_name, follow)
+				apiURL = "screen_name=%s&follow=%s" %(screen_name, follow)
 			try:
 				if id is not None:
 					return simplejson.load(self.opener.open("http://api.twitter.com/%d/friendships/create/%s.json" % (version, id), "?follow=%s" % follow))
@@ -809,9 +809,9 @@ class setup:
 		if self.authenticated is True:
 			apiURL = ""
 			if user_id is not None:
-				apiURL = "?user_id=%s" % repr(user_id)
+				apiURL = "user_id=%s" % repr(user_id)
 			if screen_name is not None:
-				apiURL = "?screen_name=%s" % screen_name
+				apiURL = "screen_name=%s" % screen_name
 			try:
 				if id is not None:
 					return simplejson.load(self.opener.open("http://api.twitter.com/%d/friendships/destroy/%s.json" % (version, repr(id)), "lol=1")) # Random string hack for POST reasons ;P
