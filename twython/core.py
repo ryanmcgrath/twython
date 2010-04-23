@@ -1342,16 +1342,18 @@ class setup:
 		except HTTPError, e:
 			raise TwythonError("getSearchTimeline() failed with a %s error code." % `e.code`, e.code)
 
-	def getCurrentTrends(self, excludeHashTags = False):
-		"""getCurrentTrends(excludeHashTags = False)
+	def getCurrentTrends(self, excludeHashTags = False, version = None):
+		"""getCurrentTrends(excludeHashTags = False, version = None)
 
 			Returns the current top 10 trending topics on Twitter.  The response includes the time of the request, the name of each trending topic, and the query used 
 			on Twitter Search results page for that topic.
 
 			Parameters:
 				excludeHashTags - Optional. Setting this equal to hashtags will remove all hashtags from the trends list.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
-		apiURL = "http://search.twitter.com/trends/current.json"
+		version = version or self.apiVersion
+		apiURL = "http://api.twitter.com/%d/trends/current.json" % version
 		if excludeHashTags is True:
 			apiURL += "?exclude=hashtags"
 		try:
@@ -1359,16 +1361,18 @@ class setup:
 		except HTTPError, e:
 			raise TwythonError("getCurrentTrends() failed with a %s error code." % `e.code`, e.code)
 
-	def getDailyTrends(self, date = None, exclude = False):
-		"""getDailyTrends(date = None, exclude = False)
+	def getDailyTrends(self, date = None, exclude = False, version = None):
+		"""getDailyTrends(date = None, exclude = False, version = None)
 
 			Returns the top 20 trending topics for each hour in a given day.
 
 			Parameters:
 				date - Optional. Permits specifying a start date for the report. The date should be formatted YYYY-MM-DD.
 				exclude - Optional. Setting this equal to hashtags will remove all hashtags from the trends list.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
-		apiURL = "http://search.twitter.com/trends/daily.json"
+		version = version or self.apiVersion
+		apiURL = "http://api.twitter.com/%d/trends/daily.json" % version
 		questionMarkUsed = False
 		if date is not None:
 			apiURL += "?date=%s" % date
@@ -1391,8 +1395,10 @@ class setup:
 			Parameters:
 				date - Optional. Permits specifying a start date for the report. The date should be formatted YYYY-MM-DD.
 				exclude - Optional. Setting this equal to hashtags will remove all hashtags from the trends list.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
-		apiURL = "http://search.twitter.com/trends/daily.json"
+		version = version or self.apiVersion
+		apiURL = "http://api.twitter.com/%d/trends/daily.json" % version
 		questionMarkUsed = False
 		if date is not None:
 			apiURL += "?date=%s" % date
