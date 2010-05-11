@@ -93,11 +93,7 @@ class setup:
 				self.opener = urllib2.build_opener(self.handler)
 			if self.headers is not None:
 				self.opener.addheaders = [('User-agent', self.headers)]
-			try:
-				simplejson.load(self.opener.open("http://api.twitter.com/%d/account/verify_credentials.json" % self.apiVersion))
-				self.authenticated = True
-			except HTTPError, e:
-				raise AuthError("Authentication failed with your provided credentials. Try again? (%s failure)" % `e.code`)
+			self.authenticated = True # Play nice, people can force-check using verifyCredentials()
 		else:
 			# Build a non-auth opener so we can allow proxy-auth and/or header swapping
 			if self.proxy is not None:
@@ -124,7 +120,25 @@ class setup:
 
 	def constructApiURL(self, base_url, params):
 		return base_url + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in params.iteritems()])
+	
+	def verifyCredentials(self, version = None):
+		""" verifyCredentials(self, version = None):
 
+			Verifies the authenticity of the passed in credentials. Used to be a forced call, now made optional
+			(no need to waste network resources)
+
+			Parameters:
+				None
+		"""
+		version = version or self.apiVersion
+		if self.authenticated is True:
+			try:
+				simplejson.load(self.opener.open("http://api.twitter.com/%d/account/verify_credentials.json" % version))
+			except HTTPError, e:
+				raise AuthError("Authentication failed with your provided credentials. Try again? (%s failure)" % `e.code`)
+		else:
+			raise AuthError("verifyCredentials() requires you to actually, y'know, pass in credentials.")
+	
 	def getRateLimitStatus(self, checkRequestingIP = True, version = None):
 		"""getRateLimitStatus()
 
