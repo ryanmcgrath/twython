@@ -572,10 +572,14 @@ class setup:
 			if screen_name is not None:
 				apiURL = "http://api.twitter.com/%d/statuses/followers.json?screen_name=%s" % (version, screen_name)
 			try:
-				if page is not None:
-					return simplejson.load(self.opener.open(apiURL + "&page=%s" % page))
+				if apiURL.find("?") == -1:
+					apiURL += "?"
 				else:
-					return simplejson.load(self.opener.open(apiURL + "&cursor=%s" % cursor))
+					apiURL += "&"
+				if page is not None:
+					return simplejson.load(self.opener.open(apiURL + "page=%s" % page))
+				else:
+					return simplejson.load(self.opener.open(apiURL + "cursor=%s" % cursor))
 			except HTTPError, e:
 				raise TwythonError("getFollowersStatus() failed with a %s error code." % `e.code`, e.code)
 		else:
