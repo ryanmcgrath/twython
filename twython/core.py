@@ -61,7 +61,9 @@ class AuthError(TwythonError):
 
 
 class setup:
-	def __init__(self, username = None, password = None, headers = None, proxy = None, version = 1):
+
+	def __init__(self, username=None, password=None, headers=None, proxy=None,
+		version=1):
 		"""setup(username = None, password = None, proxy = None, headers = None)
 
 			Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
