@@ -10,15 +10,20 @@
 	Questions, comments? ryan@venodesigns.net
 """
 
-import httplib, urllib, urllib2, mimetypes, mimetools
+
+import httplib
+import urllib
+import urllib2
+import mimetypes
+import mimetools
 
 from urlparse import urlparse
 from urllib2 import HTTPError
 
+
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
 __version__ = "1.1"
 
-"""Twython - Easy Twitter utilities in Python"""
 
 try:
 	import simplejson
