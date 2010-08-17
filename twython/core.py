@@ -36,6 +36,7 @@ except ImportError:
 		except:
 			raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
 
+
 class TwythonError(Exception):
 	def __init__(self, msg, error_code=None):
 		self.msg = msg
@@ -44,17 +45,20 @@ class TwythonError(Exception):
 	def __str__(self):
 		return repr(self.msg)
 
+
 class APILimit(TwythonError):
 	def __init__(self, msg):
 		self.msg = msg
 	def __str__(self):
 		return repr(self.msg)
 
+
 class AuthError(TwythonError):
 	def __init__(self, msg):
 		self.msg = msg
 	def __str__(self):
 		return repr(self.msg)
+
 
 class setup:
 	def __init__(self, username = None, password = None, headers = None, proxy = None, version = 1):
