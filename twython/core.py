@@ -1371,6 +1371,51 @@ class setup:
 		except HTTPError, e:
 			raise TwythonError("getSearchTimeline() failed with a %s error code." % `e.code`, e.code)
 
+	def searchTwitterGen(self, search_query, **kwargs):
+		"""searchTwitterGen(search_query, **kwargs)
+
+			Returns a generator of tweets that match a specified query.
+
+			Parameters:
+				callback - Optional. Only available for JSON format. If supplied, the response will use the JSONP format with a callback of the given name.
+				lang - Optional. Restricts tweets to the given language, given by an ISO 639-1 code.
+				locale - Optional. Language of the query you're sending (only ja is currently effective). Intended for language-specific clients; default should work in most cases.
+				rpp - Optional. The number of tweets to return per page, up to a max of 100.
+				page - Optional. The page number (starting at 1) to return, up to a max of roughly 1500 results (based on rpp * page. Note: there are pagination limits.)
+				since_id - Optional. Returns tweets with status ids greater than the given id.
+				geocode - Optional. Returns tweets by users located within a given radius of the given latitude/longitude, where the user's location is taken from their Twitter profile. The parameter value is specified by "latitide,longitude,radius", where radius units must be specified as either "mi" (miles) or "km" (kilometers). Note that you cannot use the near operator via the API to geocode arbitrary locations; however you can use this geocode parameter to search near geocodes directly.
+				show_user - Optional. When true, prepends "<user>:" to the beginning of the tweet. This is useful for readers that do not display Atom's author field. The default is false. 
+
+			Usage Notes:
+				Queries are limited 140 URL encoded characters.
+				Some users may be absent from search results.
+				The since_id parameter will be removed from the next_page element as it is not supported for pagination. If since_id is removed a warning will be added to alert you.
+				This method will return an HTTP 404 error if since_id is used and is too old to be in the search index.
+				
+			Applications must have a meaningful and unique User Agent when using this method. 
+			An HTTP Referrer is expected but not required. Search traffic that does not include a User Agent will be rate limited to fewer API calls per hour than 
+			applications including a User Agent string. You can set your custom UA headers by passing it as a respective argument to the setup() method.
+		"""
+		searchURL = self.constructApiURL("http://search.twitter.com/search.json", kwargs) + "&" + urllib.urlencode({"q": self.unicode2utf8(search_query)})
+		try:
+			data = simplejson.load(self.opener.open(searchURL))
+		except HTTPError, e:
+			raise TwythonError("searchTwitterGen() failed with a %s error code." % `e.code`, e.code)
+		
+		if not data['results']:
+			raise StopIteration
+
+		for tweet in data['results']:
+			yield tweet
+
+		if 'page' not in kwargs:
+			kwargs['page'] = 2
+		else:
+			kwargs['page'] += 1
+	
+		for tweet in self.searchTwitterGen(search_query, **kwargs):
+			yield tweet
+
 	def getCurrentTrends(self, excludeHashTags = False, version = None):
 		"""getCurrentTrends(excludeHashTags = False, version = None)
 
