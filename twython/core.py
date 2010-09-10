@@ -1701,20 +1701,20 @@ class setup:
 				raise AuthError("It seems the list you're trying to access is private/protected, and you don't have access. Are you authenticated and allowed?")
 			raise TwythonError("getSpecificList() failed with a %d error code." % e.code, e.code)
 	
-	def addListMember(self, list_id, version = None):
+	def addListMember(self, list_id, id, version = None):
 		""" addListMember(self, list_id, id, version)
 
 			Adds a new Member (the passed in id) to the specified list.
 
 			Parameters:
 				list_id - Required. The slug of the list to add the new member to.
-				id - Required. The ID of the user that's being added to the list.
+				id - Required. The ID or slug of the user that's being added to the list.
 				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		version = version or self.apiVersion
 		if self.authenticated is True:
 			try:
-				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id), "id=%s" % `id`))
+				return simplejson.load(self.opener.open("http://api.twitter.com/%d/%s/%s/members.json" % (version, self.username, list_id), "id=%s" % (id)))
 			except HTTPError, e:
 				raise TwythonError("addListMember() failed with a %d error code." % e.code, e.code)
 		else:
