@@ -115,7 +115,7 @@ class setup:
 		"""
 		try:
 			return urllib.request.urlopen(shortener + "?" + urllib.urlencode({query: self.unicode2utf8(url_to_shorten)})).read()
-		except HTTPError as e:
+		except HTTPError, e:
 			raise TwythonError("shortenURL() failed with a %s error code." % repr(e.code))
 
 	def constructApiURL(self, base_url, params):
