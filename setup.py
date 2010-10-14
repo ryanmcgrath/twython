@@ -6,7 +6,7 @@ from setuptools import find_packages
 
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '1.2'
+__version__ = '1.2.1'
 
 
 setup(

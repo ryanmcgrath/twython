@@ -22,7 +22,7 @@ from urllib2 import HTTPError
 
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.1"
+__version__ = "1.2.1"
 
 
 try:
