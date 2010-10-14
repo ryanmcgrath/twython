@@ -2,3 +2,4 @@
 build
 dist
 twython.egg-info
+*.swp
