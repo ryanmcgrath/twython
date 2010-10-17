@@ -7,8 +7,8 @@ from django.contrib.auth.decorators import login_required
 from twython import Twython
 from twitter.models import Profile
 
-CONSUMER_KEY = "piKE9TwKoAhJoj7KEMlwGQ"
-CONSUMER_SECRET = "RA9IzvvzoLAFGOOoOndm1Cvyh94pwPWLy4Grl4dt0o"
+CONSUMER_KEY = "YOUR CONSUMER KEY HERE"
+CONSUMER_SECRET = "YOUR CONSUMER SECRET HERE"
 
 def twitter_logout(request):
 	logout(request)
