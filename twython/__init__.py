@@ -1,1 +1,1 @@
-import core, twyauth, streaming
+from twython import Twython

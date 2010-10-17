@@ -4,13 +4,10 @@ import sys, os
 from setuptools import setup
 from setuptools import find_packages
 
-
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '1.2.1'
-
+__version__ = '1.3'
 
 setup(
-
 	# Basic package information.
 	name = 'twython',
 	version = __version__,
@@ -20,7 +17,7 @@ setup(
 	include_package_data = True,
 
 	# Package dependencies.
-	install_requires = ['simplejson'],
+	install_requires = ['simplejson', 'oauth2'],
 
 	# Metadata for PyPI.
 	author = 'Ryan McGrath',
@@ -38,5 +35,4 @@ setup(
 		'Topic :: Communications :: Chat',
 		'Topic :: Internet'
 	]
-
 )

@@ -1,52 +1,76 @@
 Twython - Easy Twitter utilities in Python
 =========================================================================================
-I wrote Twython because I found that other Python Twitter libraries weren't that up to date. Certain
-things like the Search API, OAuth, etc, don't seem to be fully covered. This is my attempt at
-a library that offers more coverage.
+Ah, Twitter, your API used to be so awesome, before you went and implemented the crap known
+as OAuth 1.0. However, since you decided to force your entire development community over a barrel
+about it, I suppose Twython has to support this. So, that said...
 
-This is my first library I've ever written in Python, so there could be some stuff in here that'll
-make a seasoned Python vet scratch his head, or possibly call me insane. It's open source, though,
-and I'm open to anything that'll improve the library as a whole.
+If you used this library and it all stopped working, it's because of the Authentication method change.
+=========================================================================================================
+Twitter recently disabled the use of "Basic Authentication", which is why, if you used Twython previously,
+you probably started getting a ton of 401 errors. To fix this, we should note one thing...
+ 
+You need to change how authentication works in your program/application. If you're using a command line
+application or something, you'll probably languish in hell for a bit, because OAuth wasn't really designed
+for those types of use cases. Twython cannot help you with that or fix the annoying parts of OAuth.
 
-OAuth and Streaming API support is in the works, but every other part of the Twitter API should be covered. Twython
-handles both Basic (HTTP) Authentication and OAuth (Older versions (pre 0.9) of Twython need Basic Auth specified -
-to override this, specify 'authtype="Basic"' in your twython.setup() call).
-
-Twython has Docstrings if you want function-by-function plays; otherwise, check the Twython Wiki or 
-Twitter's API Wiki (Twython calls mirror most of the methods listed there).
+If you need OAuth, though, Twython now supports it, and ships with a skeleton Django application to get you started.
+Enjoy!
 
 Requirements
 -----------------------------------------------------------------------------------------------------
 Twython (for versions of Python before 2.6) requires a library called
-"simplejson". You can grab it at the following link:
+"simplejson". Depending on your flavor of package manager, you can do the following... 
 
-> http://pypi.python.org/pypi/simplejson
+    (pip install | easy_install) simplejson
+
+Twython also requires the (most excellent) OAuth2 library for handling OAuth tokens/signing/etc. Again...
+
+    (pip install | easy_install) oauth2
 
 Installation
 -----------------------------------------------------------------------------------------------------
 Installing Twython is fairly easy. You can...
 
-> easy_install twython
+    (pip install | easy_install) twython  
 
 ...or, you can clone the repo and install it the old fashioned way.
 
-> git clone git://github.com/ryanmcgrath/twython.git  
-> cd twython  
-> sudo python setup.py install  
+    git clone git://github.com/ryanmcgrath/twython.git  
+    cd twython  
+    sudo python setup.py install  
 
 Example Use
 -----------------------------------------------------------------------------------------------------
-> import twython
->
-> twitter = twython.core.setup(username="example", password="example")  
-> twitter.updateStatus("See how easy this was?")
+    from twython import Twython  
+    
+    twitter = Twython()  
+    results = twitter.searchTwitter(q="bert")  
 
+A note about the development of Twython (specifically, 1.3)
+----------------------------------------------------------------------------------------------------
+As of version 1.3, Twython has been extensively overhauled. Most API endpoint definitions are stored
+in a separate Python file, and the class itself catches calls to methods that match up in said table.
+
+Certain functions require a bit more legwork, and get to stay in the main file, but for the most part
+it's all abstracted out. 
+
+As of Twython 1.3, the syntax has changed a bit as well. Instead of Twython.core, there's a main
+Twython class to import and use. If you need to catch exceptions, import those from twython as well.
+
+Arguments to functions are now exact keyword matches for the Twitter API documentation - that means that
+whatever query parameter arguments you read on Twitter's documentation (http://dev.twitter.com/doc) gets mapped
+as a named argument to any Twitter function.
+
+For example: the search API looks for arguments under the name "q", so you pass q="query_here" to searchTwitter().
+
+Doing this allows us to be incredibly flexible in querying the Twitter API, so changes to the API aren't held up
+from you using them by this library.
 
 Twython 3k
 -----------------------------------------------------------------------------------------------------
 There's an experimental version of Twython that's made for Python 3k. This is currently not guaranteed
-to work, but it's provided so that others can grab it and hack on it. If you choose to try it out,
-be aware of this.
+to work (especially with regards to OAuth), but it's provided so that others can grab it and hack on it. 
+If you choose to try it out, be aware of this.
 
 
 Questions, Comments, etc?
