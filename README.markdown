@@ -45,7 +45,11 @@ Example Use
     
     twitter = Twython()  
     results = twitter.searchTwitter(q="bert")  
-
+    
+    # More function definitions can be found by reading over twython/twitter_endpoints.py, as well  
+    # as skimming the source file. Both are kept human-readable, and are pretty well documented or  
+    # very self documenting.  
+    
 A note about the development of Twython (specifically, 1.3)
 ----------------------------------------------------------------------------------------------------
 As of version 1.3, Twython has been extensively overhauled. Most API endpoint definitions are stored
