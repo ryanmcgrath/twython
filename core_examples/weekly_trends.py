@@ -1,7 +1,7 @@
-import twython.core as twython
+from twython import Twython
 
 """ Instantiate Twython with no Authentication """
-twitter = twython.setup()
+twitter = Twython()
 trends = twitter.getWeeklyTrends()
 
 print trends
