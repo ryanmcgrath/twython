@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.3.2"
+__version__ = "1.3.3"
 
 import urllib.request, urllib.parse, urllib.error
 import urllib.request, urllib.error, urllib.parse
@@ -209,6 +209,10 @@ class Twython(object):
 	# ------------------------------------------------------------------------------------------------------------------------
 	
 	@staticmethod
+	def constructApiURL(self, base_url, params):
+		return base_url + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in params.items()])
+	
+	@staticmethod
 	def shortenURL(url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
 		"""shortenURL(url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl")
 
@@ -260,7 +264,7 @@ class Twython(object):
 
 				e.g x.searchTwitter(q="jjndf", page="2")
 		"""
-		searchURL = self.constructApiURL("http://search.twitter.com/search.json", kwargs) + "&" + urllib.parse.urlencode({"q": self.unicode2utf8(search_query)})
+		searchURL = Twython.constructApiURL("http://search.twitter.com/search.json", kwargs) + "&" + urllib.parse.urlencode({"q": Twython.unicode2utf8(search_query)})
 		try:
 			resp, content = self.client.request(searchURL, "GET")
 			return simplejson.loads(content)
@@ -277,7 +281,7 @@ class Twython(object):
 
 				e.g x.searchTwitter(q="jjndf", page="2")
 		"""
-		searchURL = self.constructApiURL("http://search.twitter.com/search.json", kwargs) + "&" + urllib.parse.urlencode({"q": self.unicode2utf8(search_query)})
+		searchURL = Twython.constructApiURL("http://search.twitter.com/search.json", kwargs) + "&" + urllib.parse.urlencode({"q": Twython.unicode2utf8(search_query)})
 		try:
 			resp, content = self.client.request(searchURL, "GET")
 			data = simplejson.loads(content)
