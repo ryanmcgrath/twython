@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.3.3"
+__version__ = "1.3.4"
 
 import urllib.request, urllib.parse, urllib.error
 import urllib.request, urllib.error, urllib.parse
@@ -209,8 +209,8 @@ class Twython(object):
 	# ------------------------------------------------------------------------------------------------------------------------
 	
 	@staticmethod
-	def constructApiURL(self, base_url, params):
-		return base_url + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in params.items()])
+	def constructApiURL(base_url, params):
+		return base_url + "?" + "&".join(["%s=%s" %(Twython.unicode2utf8(key), Twython.unicode2utf8(value)) for (key, value) in params.items()])
 	
 	@staticmethod
 	def shortenURL(url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
@@ -264,7 +264,7 @@ class Twython(object):
 
 				e.g x.searchTwitter(q="jjndf", page="2")
 		"""
-		searchURL = Twython.constructApiURL("http://search.twitter.com/search.json", kwargs) + "&" + urllib.parse.urlencode({"q": Twython.unicode2utf8(search_query)})
+		searchURL = Twython.constructApiURL("http://search.twitter.com/search.json", kwargs)
 		try:
 			resp, content = self.client.request(searchURL, "GET")
 			return simplejson.loads(content)
@@ -281,7 +281,7 @@ class Twython(object):
 
 				e.g x.searchTwitter(q="jjndf", page="2")
 		"""
-		searchURL = Twython.constructApiURL("http://search.twitter.com/search.json", kwargs) + "&" + urllib.parse.urlencode({"q": Twython.unicode2utf8(search_query)})
+		searchURL = Twython.constructApiURL("http://search.twitter.com/search.json", kwargs)
 		try:
 			resp, content = self.client.request(searchURL, "GET")
 			data = simplejson.loads(content)
@@ -394,7 +394,7 @@ class Twython(object):
 		for (key, filename, value) in files:
 			L.append('--' + BOUNDARY)
 			L.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename))
-			L.append('Content-Type: %s' % Twython.get_content_type(filename))
+			L.append('Content-Type: %s' % mimetypes.guess_type(filename)[0] or 'application/octet-stream')
 			L.append('')
 			L.append(value)
 		L.append('--' + BOUNDARY + '--')
@@ -402,14 +402,6 @@ class Twython(object):
 		body = CRLF.join(L)
 		content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
 		return content_type, body
-	
-	@staticmethod
-	def get_content_type(filename):
-		""" get_content_type(self, filename)
-
-			Exactly what you think it does. :D
-		"""
-		return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 	
 	@staticmethod
 	def unicode2utf8(text):
