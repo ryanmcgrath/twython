@@ -21,6 +21,11 @@ api_table  = {
 		'method': 'GET',
 	},
 	
+	'verifyCredentials': {
+		'url': '/account/verify_credentials.json',
+		'method': 'GET',
+	},
+	
 	# Timeline methods
 	'getPublicTimeline': {
 		'url': '/statuses/public_timeline.json',
