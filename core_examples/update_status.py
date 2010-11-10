@@ -10,4 +10,4 @@ twitter = Twython()
 # OAuth ritual...
 
 
-twitter.updateStatus("See how easy this was?")
+twitter.updateStatus(status = "See how easy this was?")
