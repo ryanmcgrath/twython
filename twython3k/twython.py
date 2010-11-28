@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.3.4"
+__version__ = "1.3.5"
 
 import urllib.request, urllib.parse, urllib.error
 import urllib.request, urllib.error, urllib.parse
@@ -210,7 +210,7 @@ class Twython(object):
 	
 	@staticmethod
 	def constructApiURL(base_url, params):
-		return base_url + "?" + "&".join(["%s=%s" %(Twython.unicode2utf8(key), Twython.unicode2utf8(value)) for (key, value) in params.items()])
+		return base_url + "?" + "&".join(["%s=%s" %(Twython.unicode2utf8(key), urllib.parse.quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.items()])
 	
 	@staticmethod
 	def shortenURL(url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
