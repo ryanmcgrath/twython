@@ -166,7 +166,7 @@ class Twython(object):
 			
 			# Then open and load that shiiit, yo. TODO: check HTTP method and junk, handle errors/authentication
 			if fn['method'] == 'POST':
-				resp, content = self.client.request(base, fn['method'], urllib.urlencode(kwargs))
+				resp, content = self.client.request(base, fn['method'], urllib.urlencode(dict([k, v.encode('utf-8')] for k, v in kwargs.items())))
 			else:
 				url = base + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in kwargs.iteritems()])
 				resp, content = self.client.request(url, fn['method'])
