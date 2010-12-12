@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.3.5"
+__version__ = "1.3.6"
 
 import urllib
 import urllib2
@@ -60,7 +60,7 @@ class TwythonError(Exception):
 		self.msg = msg
 		if error_code == 400:
 			raise APILimit(msg)
-	
+
 	def __str__(self):
 		return repr(self.msg)
 
@@ -73,7 +73,7 @@ class APILimit(TwythonError):
 	"""
 	def __init__(self, msg):
 		self.msg = msg
-	
+
 	def __str__(self):
 		return repr(self.msg)
 
@@ -85,7 +85,7 @@ class AuthError(TwythonError):
 	"""
 	def __init__(self, msg):
 		self.msg = msg
-	
+
 	def __str__(self):
 		return repr(self.msg)
 
@@ -115,21 +115,21 @@ class Twython(object):
 		self.twitter_secret = twitter_secret
 		self.oauth_token = oauth_token
 		self.oauth_secret = oauth_token_secret
-		
+
 		# If there's headers, set them, otherwise be an embarassing parent for their own good.
 		self.headers = headers
 		if self.headers is None:
 			headers = {'User-agent': 'Twython Python Twitter Library v1.3'}
-		
+
 		consumer = None
 		token = None
-		
+
 		if self.twitter_token is not None and self.twitter_secret is not None:
 			consumer = oauth.Consumer(self.twitter_token, self.twitter_secret)
-		
+
 		if self.oauth_token is not None and self.oauth_secret is not None:
 			token = oauth.Token(oauth_token, oauth_token_secret)
-		
+
 		# Filter down through the possibilities here - if they have a token, if they're first stage, etc.
 		if consumer is not None and token is not None:
 			self.client = oauth.Client(consumer, token)
@@ -138,7 +138,7 @@ class Twython(object):
 		else:
 			# If they don't do authentication, but still want to request unprotected resources, we need an opener.
 			self.client = httplib2.Http()
-	
+
 	def __getattr__(self, api_call):
 		"""
 			The most magically awesome block of code you'll see in 2010.
@@ -152,32 +152,32 @@ class Twython(object):
 			It's called when an attribute that was called on an object doesn't seem to exist - since it doesn't exist,
 			we can take over and find the API method in our table. We then return a function that downloads and parses
 			what we're looking for, based on the keywords passed in.
-		
+
 			I'll hate myself for saying this, but this is heavily inspired by Ruby's "method_missing".
 		"""
 		def get(self, **kwargs):
 			# Go through and replace any mustaches that are in our API url.
 			fn = api_table[api_call]
 			base = re.sub(
-				'\{\{(?P<m>[a-zA-Z]+)\}\}', 
+				'\{\{(?P<m>[a-zA-Z]+)\}\}',
 				lambda m: "%s" % kwargs.get(m.group(1), '1'), # The '1' here catches the API version. Slightly hilarious.
 				base_url + fn['url']
 			)
-			
+
 			# Then open and load that shiiit, yo. TODO: check HTTP method and junk, handle errors/authentication
 			if fn['method'] == 'POST':
 				resp, content = self.client.request(base, fn['method'], urllib.urlencode(dict([k, v.encode('utf-8')] for k, v in kwargs.items())))
 			else:
 				url = base + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in kwargs.iteritems()])
 				resp, content = self.client.request(url, fn['method'])
-			
+
 			return simplejson.loads(content)
-		
+
 		if api_call in api_table:
 			return get.__get__(self)
 		else:
 			raise AttributeError, api_call
-	
+
 	def get_authentication_tokens(self):
 		"""
 			get_auth_url(self)
@@ -185,14 +185,14 @@ class Twython(object):
 			Returns an authorization URL for a user to hit.
 		"""
 		resp, content = self.client.request(self.request_token_url, "GET")
-		
+
 		if resp['status'] != '200':
 			raise AuthError("Seems something couldn't be verified with your OAuth junk. Error: %s, Message: %s" % (resp['status'], content))
-		
+
 		request_tokens = dict(urlparse.parse_qsl(content))
 		request_tokens['auth_url'] = "%s?oauth_token=%s" % (self.authenticate_url, request_tokens['oauth_token'])
 		return request_tokens
-	
+
 	def get_authorized_tokens(self):
 		"""
 			get_authorized_tokens
@@ -201,17 +201,17 @@ class Twython(object):
 		"""
 		resp, content = self.client.request(self.access_token_url, "GET")
 		return dict(urlparse.parse_qsl(content))
-	
+
 	# ------------------------------------------------------------------------------------------------------------------------
 	# The following methods are all different in some manner or require special attention with regards to the Twitter API.
 	# Because of this, we keep them separate from all the other endpoint definitions - ideally this should be change-able,
 	# but it's not high on the priority list at the moment.
 	# ------------------------------------------------------------------------------------------------------------------------
-	
+
 	@staticmethod
 	def constructApiURL(base_url, params):
 		return base_url + "?" + "&".join(["%s=%s" %(Twython.unicode2utf8(key), urllib.quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.iteritems()])
-	
+
 	@staticmethod
 	def shortenURL(url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
 		"""shortenURL(url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl")
@@ -223,17 +223,14 @@ class Twython(object):
 				shortener - In case you want to use a url shortening service other than is.gd.
 		"""
 		try:
-			resp, content = self.client.request(
-				shortener + "?" + urllib.urlencode({query: Twython.unicode2utf8(url_to_shorten)}), 
-				"GET"
-			)
+			content = urllib2.urlopen(shortener + "?" + urllib.urlencode({query: Twython.unicode2utf8(url_to_shorten)})).read()
 			return content
 		except HTTPError, e:
 			raise TwythonError("shortenURL() failed with a %s error code." % `e.code`)
-	
+
 	def bulkUserLookup(self, ids = None, screen_names = None, version = None):
 		""" bulkUserLookup(self, ids = None, screen_names = None, version = None)
-			
+
 			A method to do bulk user lookups against the Twitter API. Arguments (ids (numbers) / screen_names (strings)) should be flat Arrays that
 			contain their respective data sets.
 
@@ -270,13 +267,13 @@ class Twython(object):
 			return simplejson.loads(content)
 		except HTTPError, e:
 			raise TwythonError("getSearchTimeline() failed with a %s error code." % `e.code`, e.code)
-	
+
 	def searchTwitterGen(self, **kwargs):
 		"""searchTwitterGen(search_query, **kwargs)
 
 			Returns a generator of tweets that match a specified query.
 
-			Parameters:	
+			Parameters:
 				See the documentation at http://dev.twitter.com/doc/get/search. Pass in the API supported arguments as named parameters.
 
 				e.g x.searchTwitter(q="jjndf", page="2")
@@ -287,21 +284,21 @@ class Twython(object):
 			data = simplejson.loads(content)
 		except HTTPError, e:
 			raise TwythonError("searchTwitterGen() failed with a %s error code." % `e.code`, e.code)
-		
+
 		if not data['results']:
 			raise StopIteration
 
 		for tweet in data['results']:
 			yield tweet
-		
+
 		if 'page' not in kwargs:
 			kwargs['page'] = 2
 		else:
 			kwargs['page'] += 1
-		
+
 		for tweet in self.searchTwitterGen(search_query, **kwargs):
 			yield tweet
-	
+
 	def isListMember(self, list_id, id, username, version = 1):
 		""" isListMember(self, list_id, id, version)
 
@@ -348,7 +345,7 @@ class Twython(object):
 
 			Parameters:
 				image - Required. Must be a valid GIF, JPG, or PNG image of less than 800 kilobytes in size. Images with width larger than 2048 pixels will be forceably scaled down.
-				tile - Optional (defaults to true). If set to true the background image will be displayed tiled. The image will not be tiled otherwise. 
+				tile - Optional (defaults to true). If set to true the background image will be displayed tiled. The image will not be tiled otherwise.
 				** Note: It's sad, but when using this method, pass the tile value as a string, e.g tile="false"
 				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
@@ -380,7 +377,7 @@ class Twython(object):
 			return urllib2.urlopen(r).read()
 		except HTTPError, e:
 			raise TwythonError("updateProfileImage() failed with a %d error code." % e.code, e.code)
-	
+
 	@staticmethod
 	def encode_multipart_formdata(fields, files):
 		BOUNDARY = mimetools.choose_boundary()
@@ -402,7 +399,7 @@ class Twython(object):
 		body = CRLF.join(L)
 		content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
 		return content_type, body
-	
+
 	@staticmethod
 	def unicode2utf8(text):
 		try:
