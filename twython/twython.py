@@ -318,7 +318,7 @@ class Twython(object):
 		except HTTPError, e:
 			raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
 
-	def isListSubscriber(self, list_id, id, version = 1):
+	def isListSubscriber(self, username, list_id, id, version = 1):
 		""" isListSubscriber(self, list_id, id, version)
 
 			Check if a specified user (id) is a subscriber of the list in question (list_id).
