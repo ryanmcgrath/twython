@@ -268,7 +268,7 @@ class Twython(object):
 		except HTTPError, e:
 			raise TwythonError("getSearchTimeline() failed with a %s error code." % `e.code`, e.code)
 
-	def searchTwitterGen(self, **kwargs):
+	def searchTwitterGen(self, search_query, **kwargs):
 		"""searchTwitterGen(search_query, **kwargs)
 
 			Returns a generator of tweets that match a specified query.
@@ -278,7 +278,7 @@ class Twython(object):
 
 				e.g x.searchTwitter(q="jjndf", page="2")
 		"""
-		searchURL = Twython.constructApiURL("http://search.twitter.com/search.json", kwargs)
+		searchURL = Twython.constructApiURL("http://search.twitter.com/search.json?q=%s" % Twython.unicode2utf8(search_query), kwargs)
 		try:
 			resp, content = self.client.request(searchURL, "GET")
 			data = simplejson.loads(content)
