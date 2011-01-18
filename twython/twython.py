@@ -166,10 +166,10 @@ class Twython(object):
 
 			# Then open and load that shiiit, yo. TODO: check HTTP method and junk, handle errors/authentication
 			if fn['method'] == 'POST':
-				resp, content = self.client.request(base, fn['method'], urllib.urlencode(dict([k, v.encode('utf-8')] for k, v in kwargs.items())))
+				resp, content = self.client.request(base, fn['method'], urllib.urlencode(dict([k, v.encode('utf-8')] for k, v in kwargs.items())), headers = self.headers)
 			else:
 				url = base + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in kwargs.iteritems()])
-				resp, content = self.client.request(url, fn['method'])
+				resp, content = self.client.request(url, fn['method'], headers = self.headers)
 
 			return simplejson.loads(content)
 
@@ -263,7 +263,7 @@ class Twython(object):
 		"""
 		searchURL = Twython.constructApiURL("http://search.twitter.com/search.json", kwargs)
 		try:
-			resp, content = self.client.request(searchURL, "GET")
+			resp, content = self.client.request(searchURL, "GET", headers = self.headers)
 			return simplejson.loads(content)
 		except HTTPError, e:
 			raise TwythonError("getSearchTimeline() failed with a %s error code." % `e.code`, e.code)
@@ -280,7 +280,7 @@ class Twython(object):
 		"""
 		searchURL = Twython.constructApiURL("http://search.twitter.com/search.json?q=%s" % Twython.unicode2utf8(search_query), kwargs)
 		try:
-			resp, content = self.client.request(searchURL, "GET")
+			resp, content = self.client.request(searchURL, "GET", headers = self.headers)
 			data = simplejson.loads(content)
 		except HTTPError, e:
 			raise TwythonError("searchTwitterGen() failed with a %s error code." % `e.code`, e.code)
@@ -313,7 +313,7 @@ class Twython(object):
 				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		try:
-			resp, content = self.client.request("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, username, list_id, `id`))
+			resp, content = self.client.request("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, username, list_id, `id`), headers = self.headers)
 			return simplejson.loads(content)
 		except HTTPError, e:
 			raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
@@ -332,7 +332,7 @@ class Twython(object):
 				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
 		"""
 		try:
-			resp, content = "http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, username, list_id, `id`)
+			resp, content = self.client.request("http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, username, list_id, `id`), headers = self.headers)
 			return simplejson.loads(content)
 		except HTTPError, e:
 			raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
