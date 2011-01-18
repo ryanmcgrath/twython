@@ -159,7 +159,7 @@ class Twython(object):
 			# Go through and replace any mustaches that are in our API url.
 			fn = api_table[api_call]
 			base = re.sub(
-				'\{\{(?P<m>[a-zA-Z]+)\}\}',
+				'\{\{(?P<m>[a-zA-Z_]+)\}\}',
 				lambda m: "%s" % kwargs.get(m.group(1), '1'), # The '1' here catches the API version. Slightly hilarious.
 				base_url + fn['url']
 			)
