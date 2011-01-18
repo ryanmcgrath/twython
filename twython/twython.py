@@ -219,7 +219,6 @@ class Twython(object):
 		
 		request_tokens['auth_url'] = self.authenticate_url + '?' + urllib.urlencode(auth_url_params)
 		
-		print request_tokens
 		return request_tokens
 
 	def get_authorized_tokens(self):
