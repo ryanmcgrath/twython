@@ -46,7 +46,7 @@ except ImportError:
 			# Seriously wtf is wrong with you if you get this Exception.
 			raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
 
-class TwythonError(Exception):
+class TwythonError(AttributeError):
 	"""
 		Generic error class, catch-all for most Twython issues.
 		Special cases are handled by APILimit and AuthError.
@@ -176,7 +176,7 @@ class Twython(object):
 		if api_call in api_table:
 			return get.__get__(self)
 		else:
-			raise AttributeError, api_call
+			raise TwythonError, api_call
 
 	def get_authentication_tokens(self):
 		"""

@@ -46,7 +46,7 @@ except ImportError:
 			# Seriously wtf is wrong with you if you get this Exception.
 			raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
 
-class TwythonError(Exception):
+class TwythonError(AttributeError):
 	"""
 		Generic error class, catch-all for most Twython issues.
 		Special cases are handled by APILimit and AuthError.
@@ -119,7 +119,7 @@ class Twython(object):
 		# If there's headers, set them, otherwise be an embarassing parent for their own good.
 		self.headers = headers
 		if self.headers is None:
-			headers = {'User-agent': 'Twython Python Twitter Library v1.3'}
+			self.headers = {'User-agent': 'Twython Python Twitter Library v1.3'}
 
 		consumer = None
 		token = None
@@ -159,7 +159,7 @@ class Twython(object):
 			# Go through and replace any mustaches that are in our API url.
 			fn = api_table[api_call]
 			base = re.sub(
-				'\{\{(?P<m>[a-zA-Z]+)\}\}',
+				'\{\{(?P<m>[a-zA-Z_]+)\}\}',
 				lambda m: "%s" % kwargs.get(m.group(1), '1'), # The '1' here catches the API version. Slightly hilarious.
 				base_url + fn['url']
 			)
@@ -168,7 +168,7 @@ class Twython(object):
 			if fn['method'] == 'POST':
 				resp, content = self.client.request(base, fn['method'], urllib.parse.urlencode(dict([k, v.encode('utf-8')] for k, v in list(kwargs.items()))))
 			else:
-				url = base + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in kwargs.items()])
+				url = base + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in list(kwargs.items())])
 				resp, content = self.client.request(url, fn['method'])
 
 			return simplejson.loads(content)
@@ -176,7 +176,7 @@ class Twython(object):
 		if api_call in api_table:
 			return get.__get__(self)
 		else:
-			raise AttributeError(api_call)
+			raise TwythonError(api_call)
 
 	def get_authentication_tokens(self):
 		"""
@@ -210,7 +210,7 @@ class Twython(object):
 
 	@staticmethod
 	def constructApiURL(base_url, params):
-		return base_url + "?" + "&".join(["%s=%s" %(Twython.unicode2utf8(key), urllib.parse.quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.items()])
+		return base_url + "?" + "&".join(["%s=%s" %(Twython.unicode2utf8(key), urllib.parse.quote_plus(Twython.unicode2utf8(value))) for (key, value) in list(params.items())])
 
 	@staticmethod
 	def shortenURL(url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
@@ -268,7 +268,7 @@ class Twython(object):
 		except HTTPError as e:
 			raise TwythonError("getSearchTimeline() failed with a %s error code." % repr(e.code), e.code)
 
-	def searchTwitterGen(self, **kwargs):
+	def searchTwitterGen(self, search_query, **kwargs):
 		"""searchTwitterGen(search_query, **kwargs)
 
 			Returns a generator of tweets that match a specified query.
@@ -278,7 +278,7 @@ class Twython(object):
 
 				e.g x.searchTwitter(q="jjndf", page="2")
 		"""
-		searchURL = Twython.constructApiURL("http://search.twitter.com/search.json", kwargs)
+		searchURL = Twython.constructApiURL("http://search.twitter.com/search.json?q=%s" % Twython.unicode2utf8(search_query), kwargs)
 		try:
 			resp, content = self.client.request(searchURL, "GET")
 			data = simplejson.loads(content)
@@ -318,7 +318,7 @@ class Twython(object):
 		except HTTPError as e:
 			raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
 
-	def isListSubscriber(self, list_id, id, version = 1):
+	def isListSubscriber(self, username, list_id, id, version = 1):
 		""" isListSubscriber(self, list_id, id, version)
 
 			Check if a specified user (id) is a subscriber of the list in question (list_id).
