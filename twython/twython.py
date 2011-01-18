@@ -119,7 +119,7 @@ class Twython(object):
 		# If there's headers, set them, otherwise be an embarassing parent for their own good.
 		self.headers = headers
 		if self.headers is None:
-			headers = {'User-agent': 'Twython Python Twitter Library v1.3'}
+			self.headers = {'User-agent': 'Twython Python Twitter Library v1.3'}
 
 		consumer = None
 		token = None
