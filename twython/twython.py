@@ -256,25 +256,22 @@ class Twython(object):
 		except HTTPError, e:
 			raise TwythonError("shortenURL() failed with a %s error code." % `e.code`)
 
-	def bulkUserLookup(self, ids = None, screen_names = None, version = None):
-		""" bulkUserLookup(self, ids = None, screen_names = None, version = None)
+	def bulkUserLookup(self, ids = None, screen_names = None, version = 1, **kwargs):
+		""" bulkUserLookup(self, ids = None, screen_names = None, version = 1, **kwargs)
 
 			A method to do bulk user lookups against the Twitter API. Arguments (ids (numbers) / screen_names (strings)) should be flat Arrays that
 			contain their respective data sets.
 
 			Statuses for the users in question will be returned inline if they exist. Requires authentication!
 		"""
-		apiURL = "http://api.twitter.com/1/users/lookup.json?lol=1"
-		if ids is not None:
-			apiURL += "&user_id="
-			for id in ids:
-				apiURL += `id` + ","
-		if screen_names is not None:
-			apiURL += "&screen_name="
-			for name in screen_names:
-				apiURL += name + ","
+		if ids:
+			kwargs['user_id'] = ','.join(map(str, ids))
+		if screen_names:
+			kwargs['screen_names'] = ','.join(screen_names)
+			
+		lookupURL = Twython.constructApiURL("http://api.twitter.com/%d/users/lookup.json" % version, kwargs)
 		try:
-			resp, content = self.client.request(apiURL, "GET")
+			resp, content = self.client.request(lookupURL, "GET", headers = self.headers)
 			return simplejson.loads(content)
 		except HTTPError, e:
 			raise TwythonError("bulkUserLookup() failed with a %s error code." % `e.code`, e.code)
