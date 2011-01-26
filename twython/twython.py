@@ -402,6 +402,22 @@ class Twython(object):
 			return urllib2.urlopen(r).read()
 		except HTTPError, e:
 			raise TwythonError("updateProfileImage() failed with a %d error code." % e.code, e.code)
+		
+	def getProfileImageUrl(self, username, size=None, version=1):
+		url = "http://api.twitter.com/%s/users/profile_image/%s.json" % (version, username)
+		if size:
+			url = self.constructApiURL(url, {'size':size})
+		
+		try:
+			client = httplib2.Http()
+			client.follow_redirects = False
+			resp = client.request(url, 'HEAD')[0]
+			if resp['status'] not in ('301', '302', '303', '307'):
+				raise TwythonError("getProfileImageUrl() failed to get redirect.")
+			return resp['location']
+
+		except HTTPError, e:
+			raise TwythonError("getProfileImageUrl() failed with a %d error code." % e.code, e.code)
 
 	@staticmethod
 	def encode_multipart_formdata(fields, files):
