@@ -404,6 +404,15 @@ class Twython(object):
 			raise TwythonError("updateProfileImage() failed with a %d error code." % e.code, e.code)
 		
 	def getProfileImageUrl(self, username, size=None, version=1):
+		""" getProfileImageUrl(username)
+		
+		    Gets the URL for the user's profile image.
+		    
+		    Parameters:
+		        username - Required. User name of the user you want the image url of.
+		        size - Optional. Image size. Valid options include 'normal', 'mini' and 'bigger'. Defaults to 'normal' if not given.
+				version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+		"""
 		url = "http://api.twitter.com/%s/users/profile_image/%s.json" % (version, username)
 		if size:
 			url = self.constructApiURL(url, {'size':size})
