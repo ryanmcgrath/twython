@@ -417,16 +417,16 @@ class Twython(object):
 		if size:
 			url = self.constructApiURL(url, {'size':size})
 		
-		try:
-			client = httplib2.Http()
-			client.follow_redirects = False
-			resp = client.request(url, 'HEAD')[0]
-			if resp['status'] not in ('301', '302', '303', '307'):
-				raise TwythonError("getProfileImageUrl() failed to get redirect.")
+		client = httplib2.Http()
+		client.follow_redirects = False
+		resp, content = client.request(url, 'GET')
+		
+		if resp.status in (301,302,303,307):
 			return resp['location']
-
-		except HTTPError, e:
-			raise TwythonError("getProfileImageUrl() failed with a %d error code." % e.code, e.code)
+		elif resp.status == 200:
+			return simplejson.loads(content)
+		
+		raise TwythonError("getProfileImageUrl() failed with a %d error code." % resp.status, resp.status)
 
 	@staticmethod
 	def encode_multipart_formdata(fields, files):
