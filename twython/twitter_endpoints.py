@@ -73,6 +73,14 @@ api_table  = {
 		'url': '/followers/ids.json',
 		'method': 'GET',
 	},
+	'getIncomingFriendshipIDs': {
+		'url': '/friendships/incoming.json',
+		'method': 'GET',
+	},
+	'getOutgoingFriendshipIDs': {
+		'url': '/friendships/outgoing.json',
+		'method': 'GET',
+	},
 	
 	# Retweets
 	'reTweet': {
