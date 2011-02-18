@@ -26,6 +26,11 @@ api_table  = {
 		'method': 'GET',
 	},
 	
+	'endSession' : {
+		'url': '/account/end_session.json',
+		'method': 'POST',
+	},
+	
 	# Timeline methods
 	'getPublicTimeline': {
 		'url': '/statuses/public_timeline.json',
@@ -256,7 +261,11 @@ api_table  = {
 		'method': 'GET',
 	},
 	'getListMemberships': {
-		'url': '/{{username}}/lists/followers.json',
+		'url': '/{{username}}/lists/memberships.json',
+		'method': 'GET',
+	},
+	'getListSubscriptions': {
+		'url': '/{{username}}/lists/subscriptions.json',
 		'method': 'GET',
 	},
 	'deleteList': {
@@ -283,12 +292,16 @@ api_table  = {
 		'url': '/{{username}}/{{list_id}}/members.json',
 		'method': 'DELETE',
 	},
+	'getListSubscribers': {
+		'url': '/{{username}}/{{list_id}}/subscribers.json',
+		'method': 'GET',
+	},
 	'subscribeToList': {
-		'url': '/{{username}}/{{list_id}}/following.json',
+		'url': '/{{username}}/{{list_id}}/subscribers.json',
 		'method': 'POST',
 	},
 	'unsubscribeFromList': {
-		'url': '/{{username}}/{{list_id}}/following.json',
+		'url': '/{{username}}/{{list_id}}/subscribers.json',
 		'method': 'DELETE',
 	},
 
