@@ -1,1 +1,1 @@
-import core
+from .twython import Twython
