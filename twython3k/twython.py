@@ -17,7 +17,7 @@ import urllib.parse
 import http.client
 import httplib2
 import mimetypes
-import mimetools
+from email.generator import _make_boundary
 import re
 
 import oauth2 as oauth
@@ -380,7 +380,7 @@ class Twython(object):
 
 	@staticmethod
 	def encode_multipart_formdata(fields, files):
-		BOUNDARY = mimetools.choose_boundary()
+		BOUNDARY = _make_boundary()
 		CRLF = '\r\n'
 		L = []
 		for (key, value) in fields:
