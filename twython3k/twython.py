@@ -28,23 +28,7 @@ from .twitter_endpoints import base_url, api_table
 
 from urllib.error import HTTPError
 
-# There are some special setups (like, oh, a Django application) where
-# simplejson exists behind the scenes anyway. Past Python 2.6, this should
-# never really cause any problems to begin with.
-try:
-	# Python 2.6 and up
-	import json as simplejson
-except ImportError:
-	try:
-		# Python 2.6 and below (2.4/2.5, 2.3 is not guranteed to work with this library to begin with)
-		import simplejson
-	except ImportError:
-		try:
-			# This case gets rarer by the day, but if we need to, we can pull it from Django provided it's there.
-			from django.utils import simplejson
-		except:
-			# Seriously wtf is wrong with you if you get this Exception.
-			raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
+import json as simplejson
 
 class TwythonError(AttributeError):
 	"""
