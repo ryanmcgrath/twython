@@ -155,7 +155,7 @@ class Twython(object):
 				url = base + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in list(kwargs.items())])
 				resp, content = self.client.request(url, fn['method'])
 
-			return simplejson.loads(content)
+			return simplejson.loads(content.decode('utf-8'))
 
 		if api_call in api_table:
 			return get.__get__(self)
