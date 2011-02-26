@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.3.6"
+__version__ = "1.4"
 
 import urllib.request, urllib.parse, urllib.error
 import urllib.request, urllib.error, urllib.parse
