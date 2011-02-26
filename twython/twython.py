@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.4"
+__version__ = "1.4.1"
 
 import urllib
 import urllib2
@@ -48,7 +48,12 @@ except ImportError:
 			raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
 
 # Detect if oauth2 supports the callback_url argument to request
-OAUTH_LIB_SUPPORTS_CALLBACK = 'callback_url' in inspect.getargspec(oauth.Client.request).args
+OAUTH_CLIENT_INSPECTION = inspect.getargspec(oauth.Client.request)
+try:
+	OAUTH_LIB_SUPPORTS_CALLBACK = 'callback_url' in OAUTH_CLIENT_INSPECTION.args	
+except AttributeError:
+	# Python 2.5 doesn't return named tuples, so don't look for an args section specifically.
+	OAUTH_LIB_SUPPORTS_CALLBACK = 'callback_url' in OAUTH_CLIENT_INSPECTION
 
 class TwythonError(AttributeError):
 	"""
