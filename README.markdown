@@ -16,7 +16,7 @@ for those types of use cases. Twython cannot help you with that or fix the annoy
 If you need OAuth, though, Twython now supports it, and ships with a skeleton Django application to get you started.
 Enjoy!
 
-Requirements
+Requirements (2.7 and below; for 3k, read section further down)
 -----------------------------------------------------------------------------------------------------
 Twython (for versions of Python before 2.6) requires a library called
 "simplejson". Depending on your flavor of package manager, you can do the following... 
@@ -72,10 +72,12 @@ from you using them by this library.
 
 Twython 3k
 -----------------------------------------------------------------------------------------------------
-There's an experimental version of Twython that's made for Python 3k. This is currently not guaranteed
-to work (especially with regards to OAuth), but it's provided so that others can grab it and hack on it. 
+There's an experimental version of Twython that's made for Python 3k. This is currently not guaranteed to
+work in all situations, but it's provided so that others can grab it and hack on it. 
 If you choose to try it out, be aware of this.
 
+**OAuth is now working thanks to updates from [Hades](https://github.com/hades). You'll need to grab
+his [Python 3 branch for python-oauth2](https://github.com/hades/python-oauth2/tree/python3) to have it work, though.**
 
 Questions, Comments, etc?
 -----------------------------------------------------------------------------------------------------
