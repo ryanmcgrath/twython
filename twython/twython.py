@@ -176,7 +176,7 @@ class Twython(object):
 
 			# Then open and load that shiiit, yo. TODO: check HTTP method and junk, handle errors/authentication
 			if fn['method'] == 'POST':
-				resp, content = self.client.request(base, fn['method'], urllib.urlencode(dict([k, v.encode('utf-8')] for k, v in kwargs.items())), headers = self.headers)
+				resp, content = self.client.request(base, fn['method'], urllib.urlencode(dict([k, Twython.encode(v)] for k, v in kwargs.items())), headers = self.headers)
 			else:
 				url = base + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in kwargs.iteritems()])
 				resp, content = self.client.request(url, fn['method'], headers = self.headers)
@@ -463,3 +463,9 @@ class Twython(object):
 		except:
 			pass
 		return text
+
+	@staticmethod
+	def encode(text):
+		if isinstance(text, (str,unicode)):
+			return Twython.unicode2utf8(text)
+		return str(text)
