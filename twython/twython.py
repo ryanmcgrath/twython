@@ -101,7 +101,7 @@ class AuthError(TwythonError):
 
 
 class Twython(object):
-	def __init__(self, twitter_token = None, twitter_secret = None, oauth_token = None, oauth_token_secret = None, headers=None, callback_url=None):
+	def __init__(self, twitter_token = None, twitter_secret = None, oauth_token = None, oauth_token_secret = None, headers=None, callback_url=None, client_args={}):
 		"""setup(self, oauth_token = None, headers = None)
 
 			Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
@@ -113,6 +113,7 @@ class Twython(object):
 					pass it in and it'll be used for all requests going forward.
 				oauth_token_secret - see oauth_token; it's the other half.
 				headers - User agent header, dictionary style ala {'User-Agent': 'Bert'}
+				client_args - additional arguments for HTTP client (see httplib2.Http.__init__), e.g. {'timeout': 10.0}
 
 				** Note: versioning is not currently used by search.twitter functions; when Twitter moves their junk, it'll be supported.
 		"""
@@ -143,12 +144,12 @@ class Twython(object):
 
 		# Filter down through the possibilities here - if they have a token, if they're first stage, etc.
 		if consumer is not None and token is not None:
-			self.client = oauth.Client(consumer, token)
+			self.client = oauth.Client(consumer, token, **client_args)
 		elif consumer is not None:
-			self.client = oauth.Client(consumer)
+			self.client = oauth.Client(consumer, **client_args)
 		else:
 			# If they don't do authentication, but still want to request unprotected resources, we need an opener.
-			self.client = httplib2.Http()
+			self.client = httplib2.Http(**client_args)
 
 	def __getattr__(self, api_call):
 		"""
@@ -177,7 +178,7 @@ class Twython(object):
 
 			# Then open and load that shiiit, yo. TODO: check HTTP method and junk, handle errors/authentication
 			if fn['method'] == 'POST':
-				resp, content = self.client.request(base, fn['method'], urllib.urlencode(dict([k, v.encode('utf-8')] for k, v in kwargs.items())), headers = self.headers)
+				resp, content = self.client.request(base, fn['method'], urllib.urlencode(dict([k, Twython.encode(v)] for k, v in kwargs.items())), headers = self.headers)
 			else:
 				url = base + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in kwargs.iteritems()])
 				resp, content = self.client.request(url, fn['method'], headers = self.headers)
@@ -470,3 +471,9 @@ class Twython(object):
 		except:
 			pass
 		return text
+
+	@staticmethod
+	def encode(text):
+		if isinstance(text, (str,unicode)):
+			return Twython.unicode2utf8(text)
+		return str(text)
