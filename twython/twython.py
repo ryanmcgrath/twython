@@ -280,11 +280,11 @@ class Twython(object):
 		if ids:
 			kwargs['user_id'] = ','.join(map(str, ids))
 		if screen_names:
-			kwargs['screen_names'] = ','.join(screen_names)
+			kwargs['screen_name'] = ','.join(screen_names)
 			
 		lookupURL = Twython.constructApiURL("http://api.twitter.com/%d/users/lookup.json" % version, kwargs)
 		try:
-			resp, content = self.client.request(lookupURL, "GET", headers = self.headers)
+			resp, content = self.client.request(lookupURL, "POST", headers = self.headers)
 			return simplejson.loads(content)
 		except HTTPError, e:
 			raise TwythonError("bulkUserLookup() failed with a %s error code." % `e.code`, e.code)
