@@ -42,9 +42,9 @@ except ImportError:
 class TwythonStreamingError(Exception):
 	def __init__(self, msg):
 		self.msg = msg
-	
+
 	def __str__(self):
-		return "%s" % str(self.msg)
+		return str(self.msg)
 
 feeds = {
 	"firehose": "http://stream.twitter.com/firehose.json",
@@ -58,3 +58,4 @@ feeds = {
 
 class Stream(object):
 	def __init__(self, username = None, password = None, feed = "spritzer", user_agent = "Twython Streaming"):
+	  pass
