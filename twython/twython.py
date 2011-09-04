@@ -52,7 +52,7 @@ except ImportError:
 # url as part of the request object; older versions we need to patch for Python 2.5... ugh. ;P
 OAUTH_CALLBACK_IN_URL = False
 OAUTH_LIB_SUPPORTS_CALLBACK = False
-if float(oauth._version.manual_verstr) <= 1.4:
+if not hasattr(oauth, '_version') or float(oauth._version.manual_verstr) <= 1.4:
 	OAUTH_CLIENT_INSPECTION = inspect.getargspec(oauth.Client.request)
 	try:
 		OAUTH_LIB_SUPPORTS_CALLBACK = 'callback_url' in OAUTH_CLIENT_INSPECTION.args	
