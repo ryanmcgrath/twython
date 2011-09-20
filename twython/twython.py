@@ -447,6 +447,28 @@ class Twython(object):
 		
 		raise TwythonError("getProfileImageUrl() failed with a %d error code." % resp.status, resp.status)
 
+	def getUserProfile(self, **kwargs):
+		"""getUserProfile(**kwargs)
+
+			  Parameters:
+		          username  - Required. User name of the user you want the profile information.
+		            OR
+		          id - Required. User id of the user you want the profile information.
+
+              Returns user profile that match a specified screen_name.
+
+              Parameters:
+                  See the documentation at https://dev.twitter.com/docs/api/1/get/users/show. Pass in the API supported arguments as named parameters.
+
+                  e.g x.getUserProfile(screen_name="lacion"[, user_id=123[, include_entities=True]])
+          """
+		userShowURL = Twython.constructApiURL("http://api.twitter.com/1/users/show.json", kwargs)
+		try:
+			resp, content = self.client.request(userShowURL, "GET", headers=self.headers)
+			return simplejson.loads(content)
+		except HTTPError, e:
+			raise TwythonError("getUserProfile() failed with a %s error code." % `e.code`, e.code)
+
 	@staticmethod
 	def encode_multipart_formdata(fields, files):
 		BOUNDARY = mimetools.choose_boundary()
