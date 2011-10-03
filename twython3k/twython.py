@@ -235,15 +235,15 @@ class Twython(object):
 		except HTTPError as e:
 			raise TwythonError("bulkUserLookup() failed with a %s error code." % repr(e.code), e.code)
 
-	def searchTwitter(self, **kwargs):
-		"""searchTwitter(search_query, **kwargs)
+	def search(self, **kwargs):
+		"""search(search_query, **kwargs)
 
 			Returns tweets that match a specified query.
 
 			Parameters:
 				See the documentation at http://dev.twitter.com/doc/get/search. Pass in the API supported arguments as named parameters.
 
-				e.g x.searchTwitter(q="jjndf", page="2")
+				e.g x.search(q="jjndf")
 		"""
 		searchURL = Twython.constructApiURL("http://search.twitter.com/search.json", kwargs)
 		try:
