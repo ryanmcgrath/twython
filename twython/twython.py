@@ -349,7 +349,7 @@ class Twython(object):
                 kwargs['page'] += 1
                 kwargs['page'] = str(kwargs['page'])
             except TypeError:
-                raise TwythonError("searchGen() exited because page takes int")
+                raise TwythonError("searchGen() exited because page takes str")
             except e: 
                raise TwythonError("searchGen() failed with %s error code" %\
                                     `e.code`, e.code)
