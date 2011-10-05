@@ -303,7 +303,7 @@ class Twython(object):
             Parameters:
                 See the documentation at http://dev.twitter.com/doc/get/search. Pass in the API supported arguments as named parameters.
 
-                e.g x.search(q="jjndf")
+                e.g x.search(q = "jjndf", page = '2')
         """
         searchURL = Twython.constructApiURL("http://search.twitter.com/search.json", kwargs)
         try:
@@ -312,23 +312,28 @@ class Twython(object):
         except HTTPError, e:
             raise TwythonError("getSearchTimeline() failed with a %s error code." % `e.code`, e.code)
 
+    def searchTwitter(self, **kwargs):
+        """use search() ,this is a fall back method to support searchTwitter()
+        """
+        return self.search(**kwargs)
 
-    def searchTwitterGen(self, search_query, **kwargs):
-        """searchTwitterGen(search_query, **kwargs)
+    def searchGen(self, search_query, **kwargs):
+        """searchGen(search_query, **kwargs)
 
             Returns a generator of tweets that match a specified query.
 
             Parameters:
                 See the documentation at http://dev.twitter.com/doc/get/search. Pass in the API supported arguments as named parameters.
 
-                e.g x.searchTwitter(q="jjndf", page="2")
+                e.g x.searchGen("python", page="2") or
+                    x.searchGen(search_query = "python", page = "2")
         """
         searchURL = Twython.constructApiURL("http://search.twitter.com/search.json?q=%s" % Twython.unicode2utf8(search_query), kwargs)
         try:
             resp, content = self.client.request(searchURL, "GET", headers = self.headers)
             data = simplejson.loads(content)
         except HTTPError, e:
-            raise TwythonError("searchTwitterGen() failed with a %s error code." % `e.code`, e.code)
+            raise TwythonError("searchGen() failed with a %s error code." % `e.code`, e.code)
 
         if not data['results']:
             raise StopIteration
@@ -337,12 +342,25 @@ class Twython(object):
             yield tweet
 
         if 'page' not in kwargs:
-            kwargs['page'] = 2
+            kwargs['page'] = '2'
         else:
-            kwargs['page'] += 1
+            try:
+                kwargs['page'] = int(kwargs['page'])
+                kwargs['page'] += 1
+                kwargs['page'] = str(kwargs['page'])
+            except TypeError:
+                raise TwythonError("searchGen() exited because page takes int")
+            except e: 
+               raise TwythonError("searchGen() failed with %s error code" %\
+                                    `e.code`, e.code)
 
-        for tweet in self.searchTwitterGen(search_query, **kwargs):
+        for tweet in self.searchGen(search_query, **kwargs):
             yield tweet
+
+    def searchTwitterGen(self, search_query, **kwargs):
+        """use searchGen(), this is a fallback method to support
+           searchTwitterGen()"""
+        return self.searchGen(search_query, **kwargs)
 
     def isListMember(self, list_id, id, username, version = 1):
         """ isListMember(self, list_id, id, version)
