@@ -44,7 +44,7 @@ Example Use
     from twython import Twython  
     
     twitter = Twython()  
-    results = twitter.searchTwitter(q="bert")  
+    results = twitter.search(q = "bert")  
     
     # More function definitions can be found by reading over twython/twitter_endpoints.py, as well  
     # as skimming the source file. Both are kept human-readable, and are pretty well documented or  
@@ -65,7 +65,7 @@ Arguments to functions are now exact keyword matches for the Twitter API documen
 whatever query parameter arguments you read on Twitter's documentation (http://dev.twitter.com/doc) gets mapped
 as a named argument to any Twitter function.
 
-For example: the search API looks for arguments under the name "q", so you pass q="query_here" to searchTwitter().
+For example: the search API looks for arguments under the name "q", so you pass q="query_here" to search().
 
 Doing this allows us to be incredibly flexible in querying the Twitter API, so changes to the API aren't held up
 from you using them by this library.
