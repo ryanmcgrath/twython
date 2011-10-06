@@ -257,7 +257,7 @@ class Twython(object):
 
     @staticmethod
     def constructApiURL(base_url, params):
-        return base_url + "?" + "&"join(["%s=%s" % (key, urllib.parse.quote_plus(Twython.unicode2utf8(value))) for (key, value) in list(params.items())])
+        return base_url + "?" + "&".join(["%s=%s" % (key, urllib.parse.quote_plus(Twython.unicode2utf8(value))) for (key, value) in list(params.items())])
 	
     @staticmethod
     def shortenURL(url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl"):
