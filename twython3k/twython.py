@@ -18,7 +18,6 @@ import urllib.parse
 import http.client
 import httplib2
 import mimetypes
-import mimetools
 import re
 import inspect
 import email.generator
