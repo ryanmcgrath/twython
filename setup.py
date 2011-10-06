@@ -5,7 +5,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '1.4.3'
+__version__ = '1.4.4'
 
 setup(
 	# Basic package information.

@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.4.3"
+__version__ = "1.4.4"
 
 import cgi
 import urllib
@@ -189,7 +189,7 @@ class Twython(object):
                 url = base + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in kwargs.iteritems()])
                 resp, content = self.client.request(url, fn['method'], headers = self.headers)
 
-            return simplejson.loads(content)
+            return simplejson.loads(content.decode('utf-8'))
 
         if api_call in api_table:
             return get.__get__(self)
@@ -291,7 +291,7 @@ class Twython(object):
         lookupURL = Twython.constructApiURL("http://api.twitter.com/%d/users/lookup.json" % version, kwargs)
         try:
             resp, content = self.client.request(lookupURL, "POST", headers = self.headers)
-            return simplejson.loads(content)
+            return simplejson.loads(content.decode('utf-8'))
         except HTTPError, e:
             raise TwythonError("bulkUserLookup() failed with a %s error code." % `e.code`, e.code)
 
@@ -308,7 +308,7 @@ class Twython(object):
         searchURL = Twython.constructApiURL("http://search.twitter.com/search.json", kwargs)
         try:
             resp, content = self.client.request(searchURL, "GET", headers = self.headers)
-            return simplejson.loads(content)
+            return simplejson.loads(content.decode('utf-8'))
         except HTTPError, e:
             raise TwythonError("getSearchTimeline() failed with a %s error code." % `e.code`, e.code)
 
@@ -331,7 +331,7 @@ class Twython(object):
         searchURL = Twython.constructApiURL("http://search.twitter.com/search.json?q=%s" % Twython.unicode2utf8(search_query), kwargs)
         try:
             resp, content = self.client.request(searchURL, "GET", headers = self.headers)
-            data = simplejson.loads(content)
+            data = simplejson.loads(content.decode('utf-8'))
         except HTTPError, e:
             raise TwythonError("searchGen() failed with a %s error code." % `e.code`, e.code)
 
@@ -377,7 +377,7 @@ class Twython(object):
         """
         try:
             resp, content = self.client.request("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, username, list_id, `id`), headers = self.headers)
-            return simplejson.loads(content)
+            return simplejson.loads(content.decode('utf-8'))
         except HTTPError, e:
             raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
 
@@ -396,7 +396,7 @@ class Twython(object):
         """
         try:
             resp, content = self.client.request("http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, username, list_id, `id`), headers = self.headers)
-            return simplejson.loads(content)
+            return simplejson.loads(content.decode('utf-8'))
         except HTTPError, e:
             raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
 
@@ -462,7 +462,7 @@ class Twython(object):
         if resp.status in (301,302,303,307):
             return resp['location']
         elif resp.status == 200:
-            return simplejson.loads(content)
+            return simplejson.loads(content.decode('utf-8'))
         
         raise TwythonError("getProfileImageUrl() failed with a %d error code." % resp.status, resp.status)
 
