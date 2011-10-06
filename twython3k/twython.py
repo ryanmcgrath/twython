@@ -21,6 +21,7 @@ import mimetypes
 import mimetools
 import re
 import inspect
+import email.generator
 
 import oauth2 as oauth
 
@@ -468,7 +469,7 @@ class Twython(object):
 
     @staticmethod
     def encode_multipart_formdata(fields, files):
-        BOUNDARY = mimetools.choose_boundary()
+        BOUNDARY = email.generator._make_boundary()
         CRLF = '\r\n'
         L = []
         for (key, value) in fields:
