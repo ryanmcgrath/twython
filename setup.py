@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#! /usr/bin/python
 
 import sys, os
 from setuptools import setup
@@ -25,7 +25,8 @@ setup(
 	license = 'MIT License',
 	url = 'http://github.com/ryanmcgrath/twython/tree/master',
 	keywords = 'twitter search api tweet twython',
-	description = 'An easy (and up to date) way to access Twitter data with Python.',
+	description = 'An easy (and up to date) way to access Twitter data with\
+                   Python.',
 	long_description = open('README.markdown').read(),
 	classifiers = [
 		'Development Status :: 4 - Beta',

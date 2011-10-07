@@ -29,15 +29,18 @@ try:
 	import json as simplejson
 except ImportError:
 	try:
-		# Python 2.6 and below (2.4/2.5, 2.3 is not guranteed to work with this library to begin with)
+		# Python 2.6 and below (2.4/2.5, 2.3 is not guranteed to work with\
+        # this library to begin with)
 		import simplejson
 	except ImportError:
 		try:
-			# This case gets rarer by the day, but if we need to, we can pull it from Django provided it's there.
+			# This case gets rarer by the day, but if we need to, \
+            # we can pull it from Django provided it's there.
 			from django.utils import simplejson
 		except:
 			# Seriously wtf is wrong with you if you get this Exception.
-			raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
+			raise Exception("Twython requires the simplejson library \
+                  (or Python 2.6) to work. http://www.undefined.org/python/")
 
 class TwythonStreamingError(Exception):
 	def __init__(self, msg):
@@ -57,5 +60,6 @@ feeds = {
 }
 
 class Stream(object):
-	def __init__(self, username = None, password = None, feed = "spritzer", user_agent = "Twython Streaming"):
+	def __init__(self, username = None, password = None, feed = "spritzer", \
+                       user_agent = "Twython Streaming"):
 	  pass
