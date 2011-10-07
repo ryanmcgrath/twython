@@ -367,7 +367,6 @@ class Twython(object):
                 Pass in the API supported arguments as named parameters.
 
                 e.g x.search(q = "python", page = '2')
-                e.g x.search("python", page = '2')
         """
         searchURL = Twython.constructApiURL("\
                                  http://search.twitter.com/search.json", kwargs)

@@ -300,7 +300,7 @@ class Twython(object):
 
     def searchTwitter(self, **kwargs):
         """use search(search_query, **kwargs)
-           searchTwitter("python", page = "2")"""
+           searchTwitter(q = "python", page = "2")"""
         return search(self, **kwargs)
 
     def searchGen(self, search_query, **kwargs):
