@@ -35,21 +35,24 @@ Installing Twython is fairly easy. You can...
 
 ...or, you can clone the repo and install it the old fashioned way.
 
+
     git clone git://github.com/ryanmcgrath/twython.git  
     cd twython  
     sudo python setup.py install  
 
 Example Use
 -----------------------------------------------------------------------------------------------------
-    from twython import Twython  
+``` python
+from twython import Twython  
+   
+twitter = Twython()  
+results = twitter.search(q = "bert")  
     
-    twitter = Twython()  
-    results = twitter.search(q = "bert")  
-    
-    # More function definitions can be found by reading over twython/twitter_endpoints.py, as well  
-    # as skimming the source file. Both are kept human-readable, and are pretty well documented or  
-    # very self documenting.  
-    
+# More function definitions can be found by reading over twython/twitter_endpoints.py, as well  
+# as skimming the source file. Both are kept human-readable, and are pretty well documented or  
+# very self documenting.  
+```
+
 A note about the development of Twython (specifically, 1.3)
 ----------------------------------------------------------------------------------------------------
 As of version 1.3, Twython has been extensively overhauled. Most API endpoint definitions are stored
