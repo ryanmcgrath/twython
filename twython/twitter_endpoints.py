@@ -119,6 +119,11 @@ api_table  = {
 		'method': 'GET',
 	},
 	
+	'lookupUser': {
+		'url': '/users/lookup.json',
+		'method': 'GET',
+	},
+	
 	# Status methods - showing, updating, destroying, etc.
 	'showStatus': {
 		'url': '/statuses/show/{{id}}.json',
