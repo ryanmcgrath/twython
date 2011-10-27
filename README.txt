@@ -8,7 +8,7 @@ If you used this library and it all stopped working, it's because of the Authent
 =========================================================================================================
 Twitter recently disabled the use of "Basic Authentication", which is why, if you used Twython previously,
 you probably started getting a ton of 401 errors. To fix this, we should note one thing...
- 
+
 You need to change how authentication works in your program/application. If you're using a command line
 application or something, you'll probably languish in hell for a bit, because OAuth wasn't really designed
 for those types of use cases. Twython cannot help you with that or fix the annoying parts of OAuth.
@@ -19,7 +19,7 @@ Enjoy!
 Requirements
 -----------------------------------------------------------------------------------------------------
 Twython (for versions of Python before 2.6) requires a library called
-"simplejson". Depending on your flavor of package manager, you can do the following... 
+"simplejson". Depending on your flavor of package manager, you can do the following...
 
     (pip install | easy_install) simplejson
 
@@ -31,32 +31,32 @@ Installation
 -----------------------------------------------------------------------------------------------------
 Installing Twython is fairly easy. You can...
 
-    (pip install | easy_install) twython  
+    (pip install | easy_install) twython
 
 ...or, you can clone the repo and install it the old fashioned way.
 
-    git clone git://github.com/ryanmcgrath/twython.git  
-    cd twython  
-    sudo python setup.py install  
+    git clone git://github.com/ryanmcgrath/twython.git
+    cd twython
+    sudo python setup.py install
 
 Example Use
 -----------------------------------------------------------------------------------------------------
-    from twython import Twython  
-    
-    twitter = Twython()  
-    results = twitter.searchTwitter(q="bert")  
-    
-    # More function definitions can be found by reading over twython/twitter_endpoints.py, as well  
-    # as skimming the source file. Both are kept human-readable, and are pretty well documented or  
-    # very self documenting.  
-    
+    from twython import Twython
+
+    twitter = Twython()
+    results = twitter.searchTwitter(q="bert")
+
+    # More function definitions can be found by reading over twython/twitter_endpoints.py, as well
+    # as skimming the source file. Both are kept human-readable, and are pretty well documented or
+    # very self documenting.
+
 A note about the development of Twython (specifically, 1.3)
 ----------------------------------------------------------------------------------------------------
 As of version 1.3, Twython has been extensively overhauled. Most API endpoint definitions are stored
 in a separate Python file, and the class itself catches calls to methods that match up in said table.
 
 Certain functions require a bit more legwork, and get to stay in the main file, but for the most part
-it's all abstracted out. 
+it's all abstracted out.
 
 As of Twython 1.3, the syntax has changed a bit as well. Instead of Twython.core, there's a main
 Twython class to import and use. If you need to catch exceptions, import those from twython as well.
@@ -73,14 +73,14 @@ from you using them by this library.
 Twython 3k
 -----------------------------------------------------------------------------------------------------
 There's an experimental version of Twython that's made for Python 3k. This is currently not guaranteed
-to work (especially with regards to OAuth), but it's provided so that others can grab it and hack on it. 
+to work (especially with regards to OAuth), but it's provided so that others can grab it and hack on it.
 If you choose to try it out, be aware of this.
 
 
 Questions, Comments, etc?
 -----------------------------------------------------------------------------------------------------
 My hope is that Twython is so simple that you'd never *have* to ask any questions, but if
-you feel the need to contact me for this (or other) reasons, you can hit me up 
+you feel the need to contact me for this (or other) reasons, you can hit me up
 at ryan@venodesigns.net.
 
 Twython is released under an MIT License - see the LICENSE file for more information.
