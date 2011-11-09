@@ -98,9 +98,9 @@ class RateLimitError(TwythonError):
         Raised when you've hit a rate limit.  retry_wait_seconds is the number of seconds to
         wait before trying again.
     """
-    def __init__(self, msg, retry_wait_seconds):
-        self.msg = msg
+    def __init__(self, msg, retry_wait_seconds, error_code):
         self.retry_wait_seconds = int(retry_wait_seconds)
+        TwythonError.__init__(self, msg, error_code)
 
     def __str__(self):
         return repr(self.msg)
@@ -321,9 +321,12 @@ class Twython(object):
         try:
             resp, content = self.client.request(searchURL, "GET", headers = self.headers)
 
-            if resp.status == 420:
+            if int(resp.status) == 420:
                 retry_wait_seconds = resp['retry-after']
-                raise RateLimitError("getSearchTimeline() is being rate limited.  Retry after %s seconds." % retry_wait_seconds, retry_wait_seconds)
+                raise RateLimitError("getSearchTimeline() is being rate limited.  Retry after %s seconds." %
+                                     retry_wait_seconds,
+                                     retry_wait_seconds,
+                                     resp.status)
 
             return simplejson.loads(content.decode('utf-8'))
         except HTTPError, e:
