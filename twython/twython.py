@@ -210,7 +210,7 @@ class Twython(object):
             fn = api_table[api_call]
             base = re.sub(
                 '\{\{(?P<m>[a-zA-Z_]+)\}\}',
-                lambda m: "%s" % kwargs.get(m.group(1), '1'),\ 
+                lambda m: "%s" % kwargs.get(m.group(1), '1'),\
                 # The '1' here catches the API version. Slightly hilarious.
                 base_url + fn['url']
             )
@@ -460,7 +460,7 @@ class Twython(object):
                                                                  e.code, e.code)
 
     def isListSubscriber(self, username, list_id, id, version = 1):
-        """ isListSubscriber(self, list_id, id, version)
+        """ isListSubscriber(self, username, list_id, id, version)
 
             Check if a specified user (id) is a subscriber of the list in \
             question (list_id).
@@ -531,7 +531,7 @@ class Twython(object):
             Updates the authenticating user's profile image (avatar).
 
             Parameters:
-                image - Required. Must be a valid GIF, JPG, or PNG image of \
+                filename - Required. Must be a valid GIF, JPG, or PNG image of \
                 less than 700 kilobytes in size. Images with width larger than \
                 500 pixels will be scaled down.
 
