@@ -49,7 +49,25 @@ Example Use
     # More function definitions can be found by reading over twython/twitter_endpoints.py, as well  
     # as skimming the source file. Both are kept human-readable, and are pretty well documented or  
     # very self documenting.  
+
+    Twython is now implemented using requests(http://python-requests.org).
+    from twythonrequests import Twython
     
+    twitter = Twython()
+    results = twitter.search(q='python')
+
+    # All the functions of twython is supported in twythonrequests.
+    Note:
+        Don't do this
+        from twython import Twython
+        from twythonrequests import Twython
+
+    instead try this 
+        import twython 
+        import twythonrequests
+
+    since you can hack both twython features.
+
 A note about the development of Twython (specifically, 1.3)
 ----------------------------------------------------------------------------------------------------
 As of version 1.3, Twython has been extensively overhauled. Most API endpoint definitions are stored

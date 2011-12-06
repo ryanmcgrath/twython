@@ -18,10 +18,6 @@ __version__ = "0.0.1"
     requests supports 2.5 and above and no support for 3.x.
 
 """
-import mimetypes
-import mimetools
-import re
-import inspect
 from urlparse import parse_qs
 from urllib2 import HTTPError
 try:
@@ -446,15 +442,15 @@ class Twython(object):
         url = "http://api.twitter.com/%s/users/profile_image/%s.json"%\
                    (version, username)
         try:
-            self.response = requests.post(url, size=size)
-            self.raise_for_status()
+            self.response = requests.get(url, data={'size': size})
             if self.response.status_code in (301, 302, 303, 307):
-                return self.response['location']
-            else:
-                return json.loads(self.response.content)
-        except:
-            return TwythonError("getProfileIMageUrl() failed with %d \
-                                       error code"% self.response.status_code)
+                return self.response.headers['location']
+            elif self.response.status_code == 200:
+                return self.response.url
+            self.raise_for_status()
+        except HTTPError, e:
+            raise TwythonError("getProfileIMageUrl() failed with %d \
+                                       error code"% `e.code`, e.code)
 
     @staticmethod
     def unicode2utf8(text):

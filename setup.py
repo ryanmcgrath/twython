@@ -17,7 +17,8 @@ setup(
 	include_package_data = True,
 
 	# Package dependencies.
-	install_requires = ['simplejson', 'oauth2', 'httplib2'],
+	install_requires = ['simplejson', 'oauth2', 'httplib2', 'requests', 
+                        'oauth_hook'],
 
 	# Metadata for PyPI.
 	author = 'Ryan McGrath',
