@@ -5,4 +5,4 @@ twitter = Twython()
 public_timeline = twitter.getPublicTimeline()
 
 for tweet in public_timeline:
-	print tweet["text"]
+    print tweet["text"]
