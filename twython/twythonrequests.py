@@ -100,6 +100,7 @@ class Twython(object):
             OAuthHook.consumer_secret = self.twitter_secret
 
         #if users pass oauth token and secret we initialize with oauth_hook
+        #code taken from maraujop/requests-oauth
         if self.oauth_token and self.oauth_secret:
             #Creating OAuthHooks
             self.oauth_hook = oauth_hook.OAuthHook(self.oauth_auth_token,\
