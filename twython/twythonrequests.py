@@ -192,7 +192,7 @@ class Twython(object):
             kwargs['screen_name'] = ','.join(screen_names)
 
         try:
-            self.response = requests.post("\
+            self.response = requests.get("\
                         http://api.twitter.com/%d/users/lookup.json" %version,\
                         kwargs)
             self.response.raise_for_status()
@@ -201,7 +201,7 @@ class Twython(object):
             raise TwythonError("bulkUserLookup() failed with a %s error code."\
                                                           % `e.code`, e.code)
 
-    def search(self, **kwargs):
+    def search(self, q, **kwargs):
         """
             search(**kwargs)
                
@@ -221,22 +221,22 @@ class Twython(object):
 
         """
         try:
-            self.response = requests.post(\
+            self.response = requests.get(\
                                        "http://search.twitter.com/search.json",\
-                                        data=kwargs)
+                                        params={'q': q}, **kwargs)
             self.response.raise_for_status()
             return json.loads(self.response.content)
         except HTTPError, e:
             raise TwythonError("search() failed with %s error code" \
                                    % `e.code`, e.code)
 
-    def searchTwitter(self, **kwargs):
+    def searchTwitter(self, q, **kwargs):
         """
            use search(). This will be removed soon.
         """
-        return self.search(**kwargs)
+        return self.search(q, **kwargs)
 
-    def searchGen(self, **kwargs):
+    def searchGen(self, q, **kwargs):
         """
            seaarchGen(self, **kwargs)
 
@@ -248,7 +248,7 @@ class Twython(object):
 
          """
         try:
-            self.response = self.search(kwargs)
+            self.response = self.search(q, **kwargs)
             self.response.raise_for_status()
             self.response = json.loads(self.response.content)
         except HTTPError, e:
@@ -280,11 +280,11 @@ class Twython(object):
             yield tweet
 
 
-    def searchTwitterGen(self, **kwargs):
+    def searchTwitterGen(self, q, **kwargs):
         """
             use searchGen(). This will be removed soon.
          """
-        return self.searchGen(kwargs)
+        return self.searchGen(q, **kwargs)
                     
     def isListMember(self, list_id, id, username, version = 1):
         """
@@ -443,12 +443,12 @@ class Twython(object):
         url = "http://api.twitter.com/%s/users/profile_image/%s.json"%\
                    (version, username)
         try:
-            self.response = requests.get(url, data={'size': size})
+            self.response = requests.get(url, params={'size': size})
             if self.response.status_code in (301, 302, 303, 307):
                 return self.response.headers['location']
             elif self.response.status_code == 200:
                 return self.response.url
-            self.raise_for_status()
+            self.response.raise_for_status()
         except HTTPError, e:
             raise TwythonError("getProfileIMageUrl() failed with %d \
                                        error code"% `e.code`, e.code)
