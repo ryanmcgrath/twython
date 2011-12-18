@@ -124,7 +124,7 @@ class Twython(object):
         pass
 
     def get_authorized_tokens(self):
-        return self.get_autheentication_tokens(internal = 1)
+        return self.get_authentication_tokens(internal = 1)
 
     def get_authentication_tokens(self, internal = None):
         """
