@@ -42,9 +42,48 @@ except ImportError:
         # This must be dead code still worth 
         raise Exception("twythonrequests")
 
-#imports required for Error Handling. Now I am importing from twython file in 
-# future, it will be include in the same file, Hope ryan agrees :)
-from twython import TwythonError, APILimit, AuthError
+class TwythonError(AttributeError):
+    """
+        Generic error class, catch-all for most Twython issues.
+        Special cases are handled by APILimit and AuthError.
+
+        Note: To use these, the syntax has changed as of Twython 1.3. To catch \
+        these, you need to explicitly import them into your code, e.g:
+
+        from twython import TwythonError, APILimit, AuthError
+    """
+    def __init__(self, msg, error_code=None):
+        self.msg = msg
+        if error_code == 400:
+            raise APILimit(msg)
+
+    def __str__(self):
+        return repr(self.msg)
+
+
+class APILimit(TwythonError):
+    """
+        Raised when you've hit an API limit. Try to avoid these, read the API
+        docs if you're running into issues here, Twython does not concern \
+        itself with this matter beyond telling you that you've done goofed.
+    """
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return repr(self.msg)
+
+
+class AuthError(TwythonError):
+    """
+        Raised when you try to access a protected resource and it fails due \
+        to some issue with your authentication.
+    """
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return repr(self.msg)
 
 class Twython(object):
     def __init__(self, twitter_token = None, twitter_secret = None, \
@@ -152,26 +191,28 @@ class Twython(object):
                              Error Message:%s"%(self.response.status_code,\
                                                 self.response.error.msg))  
 
-    @staticmethod
-    def constructApiURL(base_url, params):
-        """
-           We don't need this since requests will build url for us
-        """
-        return base_url + "?" + "&".join(["%s=%s" %(Twython.unicode2utf8(key),\
-                              urllib.quote_plus(Twython.unicode2utf8(value)))\
-                              for (key, value) in params.iteritems()])
 
     @staticmethod
-    def shortenURL(url_to_shorten, shortener = "http://is.gd/api.php",\
-                                   query = "longurl"):
+    def shortenURL(url_to_shorten):
         """ 
-            Nowadays twitter automatically shortens urls in the tweets, so 
-            there isn't real need to shorten url, unless explicitly you want to
-            use your own fav services like goo.gl. 
+            This is the function which will shorten url.
+            It uses is.gd.
+            Url: http://is.gd/create.php
 
-            We will implement this one soon 
+            Parameters:
+              url_to_shorten - string - Long url which is to be shortened.
+              
+            Returns shorten url which is in unicode format.
         """
-        pass
+        try:
+            response = requests.post("http://is.gd/create.php", \
+                            data={'format': 'simple', 'url': url_to_shorten})
+            response.raise_for_status()
+            return response.content
+        except HTTPError, e:
+            raise TwythonError("shortenURL() failed with a %s error code."\
+                                                          % `e.code`, e.code)
+        
 
     def bulkUserLookup(self, ids = None, screen_names = None, version = 1,\
                                                               **kwargs):
