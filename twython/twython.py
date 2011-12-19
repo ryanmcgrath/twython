@@ -168,45 +168,32 @@ class Twython(object):
         else:
             # If they don't do authentication, but still want to request unprotected resources, we need an opener.
             self.client = httplib2.Http(**client_args)
+        # register available funcs to allow listing name when debugging.
+        for key in api_table.keys():
+            self.__dict__[key] = lambda **kwargs: self._constructFunc(key, **kwargs)
 
-    def __getattr__(self, api_call):
-        """
-            The most magically awesome block of code you'll see in 2010.
+    def _constructFunc(self, api_call, **kwargs):
+        # Go through and replace any mustaches that are in our API url.
+        fn = api_table[api_call]
+        base = re.sub(
+            '\{\{(?P<m>[a-zA-Z_]+)\}\}',
+            # The '1' here catches the API version. Slightly
+            # hilarious.
+            lambda m: "%s" % kwargs.get(m.group(1), '1'),
+            base_url + fn['url']
+        )
 
-            Rather than list out 9 million damn methods for this API, we just keep a table (see above) of
-            every API endpoint and their corresponding function id for this library. This pretty much gives
-            unlimited flexibility in API support - there's a slight chance of a performance hit here, but if this is
-            going to be your bottleneck... well, don't use Python. ;P
-
-            For those who don't get what's going on here, Python classes have this great feature known as __getattr__().
-            It's called when an attribute that was called on an object doesn't seem to exist - since it doesn't exist,
-            we can take over and find the API method in our table. We then return a function that downloads and parses
-            what we're looking for, based on the keywords passed in.
-
-            I'll hate myself for saying this, but this is heavily inspired by Ruby's "method_missing".
-        """
-        def get(self, **kwargs):
-            # Go through and replace any mustaches that are in our API url.
-            fn = api_table[api_call]
-            base = re.sub(
-                '\{\{(?P<m>[a-zA-Z_]+)\}\}',
-                lambda m: "%s" % kwargs.get(m.group(1), '1'), # The '1' here catches the API version. Slightly hilarious.
-                base_url + fn['url']
-            )
-
-            # Then open and load that shiiit, yo. TODO: check HTTP method and junk, handle errors/authentication
-            if fn['method'] == 'POST':
-                resp, content = self.client.request(base, fn['method'], urllib.urlencode(dict([k, Twython.encode(v)] for k, v in kwargs.items())), headers = self.headers)
-            else:
-                url = base + "?" + "&".join(["%s=%s" %(key, value) for (key, value) in kwargs.iteritems()])
-                resp, content = self.client.request(url, fn['method'], headers = self.headers)
-
-            return simplejson.loads(content.decode('utf-8'))
-
-        if api_call in api_table:
-            return get.__get__(self)
+        # Then open and load that shiiit, yo. TODO: check HTTP method
+        # and junk, handle errors/authentication
+        if fn['method'] == 'POST':
+            myargs = urllib.urlencode(dict([k, Twython.encode(v)] for k, v in kwargs.items()))
+            resp, content = self.client.request(base, fn['method'], myargs, headers = self.headers)
         else:
-            raise TwythonError, api_call
+            myargs = ["%s=%s" %(key, value) for (key, value) in kwargs.iteritems()]
+            url = "%s?%s" %(base, "&".join(myargs))
+            resp, content = self.client.request(url, fn['method'], headers=self.headers)
+
+        return simplejson.loads(content.decode('utf-8'))
 
     def get_authentication_tokens(self):
         """
