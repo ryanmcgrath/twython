@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import sys, os
 from setuptools import setup
@@ -17,7 +17,7 @@ setup(
 	include_package_data = True,
 
 	# Package dependencies.
-	install_requires = ['simplejson', 'oauth2', 'httplib2'],
+	install_requires = ['simplejson', 'oauth2', 'httplib2', 'requests'],
 
 	# Metadata for PyPI.
 	author = 'Ryan McGrath',
