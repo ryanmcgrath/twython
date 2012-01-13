@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """
     Twython is a library for Python that wraps the Twitter API.
@@ -21,8 +21,15 @@ import mimetypes
 import mimetools
 import re
 import inspect
+import time
 
+import requests
 import oauth2 as oauth
+
+try:
+    from urlparse import parse_qsl
+except ImportError:
+    from cgi import parse_qsl
 
 # Twython maps keyword based arguments to Twitter API endpoints. The endpoints
 # table is a file with a dictionary of every API endpoint that Twython supports.
@@ -151,20 +158,20 @@ class Twython(object):
         if self.headers is None:
             self.headers = {'User-agent': 'Twython Python Twitter Library v1.3'}
 
-        consumer = None
-        token = None
+        self.consumer = None
+        self.token = None
 
         if self.twitter_token is not None and self.twitter_secret is not None:
-            consumer = oauth.Consumer(self.twitter_token, self.twitter_secret)
+            self.consumer = oauth.Consumer(self.twitter_token, self.twitter_secret)
 
         if self.oauth_token is not None and self.oauth_secret is not None:
-            token = oauth.Token(oauth_token, oauth_token_secret)
+            self.token = oauth.Token(oauth_token, oauth_token_secret)
 
         # Filter down through the possibilities here - if they have a token, if they're first stage, etc.
-        if consumer is not None and token is not None:
-            self.client = oauth.Client(consumer, token, **client_args)
-        elif consumer is not None:
-            self.client = oauth.Client(consumer, **client_args)
+        if self.consumer is not None and self.token is not None:
+            self.client = oauth.Client(self.consumer, self.token, **client_args)
+        elif self.consumer is not None:
+            self.client = oauth.Client(self.consumer, **client_args)
         else:
             # If they don't do authentication, but still want to request unprotected resources, we need an opener.
             self.client = httplib2.Http(**client_args)
@@ -212,10 +219,7 @@ class Twython(object):
         if resp['status'] != '200':
             raise AuthError("Seems something couldn't be verified with your OAuth junk. Error: %s, Message: %s" % (resp['status'], content))
         
-        try:
-            request_tokens = dict(urlparse.parse_qsl(content))
-        except:
-            request_tokens = dict(cgi.parse_qsl(content))
+        request_tokens = dict(parse_qsl(content))
         
         oauth_callback_confirmed = request_tokens.get('oauth_callback_confirmed')=='true'
         
@@ -243,10 +247,7 @@ class Twython(object):
             Returns authorized tokens after they go through the auth_url phase.
         """
         resp, content = self.client.request(self.access_token_url, "GET")
-        try:
-            return dict(urlparse.parse_qsl(content))
-        except:
-            return dict(cgi.parse_qsl(content))
+        return dict(parse_qsl(content))
     
     # ------------------------------------------------------------------------------------------------------------------------
     # The following methods are all different in some manner or require special attention with regards to the Twitter API.
@@ -408,26 +409,36 @@ class Twython(object):
             raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
 
     # The following methods are apart from the other Account methods, because they rely on a whole multipart-data posting function set.
-    def updateProfileBackgroundImage(self, filename, tile="true", version = 1):
-        """ updateProfileBackgroundImage(filename, tile="true")
+    def updateProfileBackgroundImage(self, filename, tile=True, version = 1):
+        """ updateProfileBackgroundImage(filename, tile=True)
 
             Updates the authenticating user's profile background image.
 
             Parameters:
                 image - Required. Must be a valid GIF, JPG, or PNG image of less than 800 kilobytes in size. Images with width larger than 2048 pixels will be forceably scaled down.
-                tile - Optional (defaults to true). If set to true the background image will be displayed tiled. The image will not be tiled otherwise.
-                ** Note: It's sad, but when using this method, pass the tile value as a string, e.g tile="false"
+                tile - Optional (defaults to True). If set to true the background image will be displayed tiled. The image will not be tiled otherwise.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        try:
-            files = [("image", filename, open(filename, 'rb').read())]
-            fields = []
-            content_type, body = Twython.encode_multipart_formdata(fields, files)
-            headers = {'Content-Type': content_type, 'Content-Length': str(len(body))}
-            r = urllib2.Request("http://api.twitter.com/%d/account/update_profile_background_image.json?tile=%s" % (version, tile), body, headers)
-            return urllib2.urlopen(r).read()
-        except HTTPError, e:
-            raise TwythonError("updateProfileBackgroundImage() failed with a %d error code." % e.code, e.code)
+        upload_url = 'http://api.twitter.com/%d/account/update_profile_background_image.json' % version
+        params = {
+            'oauth_version': "1.0",
+            'oauth_nonce': oauth.generate_nonce(length=41),
+            'oauth_timestamp': int(time.time()),
+        }
+
+        #create a fake request with your upload url and parameters
+        faux_req = oauth.Request(method='POST', url=upload_url, parameters=params)
+    
+        #sign the fake request.
+        signature_method = oauth.SignatureMethod_HMAC_SHA1()
+        faux_req.sign_request(signature_method, self.consumer, self.token)
+    
+        #create a dict out of the fake request signed params
+        params = dict(parse_qsl(faux_req.to_postdata()))
+        self.headers.update(faux_req.to_header())
+
+        req = requests.post(upload_url, data={'tile':tile}, files={'image':(filename, open(filename, 'rb'))}, headers=self.headers)
+        return req.content
 
     def updateProfileImage(self, filename, version = 1):
         """ updateProfileImage(filename)
@@ -438,15 +449,26 @@ class Twython(object):
                 image - Required. Must be a valid GIF, JPG, or PNG image of less than 700 kilobytes in size. Images with width larger than 500 pixels will be scaled down.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        try:
-            files = [("image", filename, open(filename, 'rb').read())]
-            fields = []
-            content_type, body = Twython.encode_multipart_formdata(fields, files)
-            headers = {'Content-Type': content_type, 'Content-Length': str(len(body))}
-            r = urllib2.Request("http://api.twitter.com/%d/account/update_profile_image.json" % version, body, headers)
-            return urllib2.urlopen(r).read()
-        except HTTPError, e:
-            raise TwythonError("updateProfileImage() failed with a %d error code." % e.code, e.code)
+        upload_url = 'http://api.twitter.com/%d/account/update_profile_image.json' % version
+        params = {
+            'oauth_version': "1.0",
+            'oauth_nonce': oauth.generate_nonce(length=41),
+            'oauth_timestamp': int(time.time()),
+        }
+
+        #create a fake request with your upload url and parameters
+        faux_req = oauth.Request(method='POST', url=upload_url, parameters=params)
+    
+        #sign the fake request.
+        signature_method = oauth.SignatureMethod_HMAC_SHA1()
+        faux_req.sign_request(signature_method, self.consumer, self.token)
+    
+        #create a dict out of the fake request signed params
+        params = dict(parse_qsl(faux_req.to_postdata()))
+        self.headers.update(faux_req.to_header())
+
+        req = requests.post(upload_url, files={'image':(filename, open(filename, 'rb'))}, headers=self.headers)
+        return req.content
         
     def getProfileImageUrl(self, username, size=None, version=1):
         """ getProfileImageUrl(username)
@@ -472,29 +494,7 @@ class Twython(object):
             return simplejson.loads(content.decode('utf-8'))
         
         raise TwythonError("getProfileImageUrl() failed with a %d error code." % resp.status, resp.status)
-
-    @staticmethod
-    def encode_multipart_formdata(fields, files):
-        BOUNDARY = mimetools.choose_boundary()
-        CRLF = '\r\n'
-        L = []
-        for (key, value) in fields:
-            L.append('--' + BOUNDARY)
-            L.append('Content-Disposition: form-data; name="%s"' % key)
-            L.append('')
-            L.append(value)
-        for (key, filename, value) in files:
-            L.append('--' + BOUNDARY)
-            L.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename))
-            L.append('Content-Type: %s' % mimetypes.guess_type(filename)[0] or 'application/octet-stream')
-            L.append('')
-            L.append(value)
-        L.append('--' + BOUNDARY + '--')
-        L.append('')
-        body = CRLF.join(L)
-        content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
-        return content_type, body
-
+    
     @staticmethod
     def unicode2utf8(text):
         try:
