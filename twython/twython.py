@@ -409,7 +409,7 @@ class Twython(object):
             raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
 
     # The following methods are apart from the other Account methods, because they rely on a whole multipart-data posting function set.
-    def updateProfileBackgroundImage(self, filename, tile=True, version = 1):
+    def updateProfileBackgroundImage(self, file_, tile=True, version=1):
         """ updateProfileBackgroundImage(filename, tile=True)
 
             Updates the authenticating user's profile background image.
@@ -419,28 +419,9 @@ class Twython(object):
                 tile - Optional (defaults to True). If set to true the background image will be displayed tiled. The image will not be tiled otherwise.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        upload_url = 'http://api.twitter.com/%d/account/update_profile_background_image.json' % version
-        params = {
-            'oauth_version': "1.0",
-            'oauth_nonce': oauth.generate_nonce(length=41),
-            'oauth_timestamp': int(time.time()),
-        }
+        return self._media_update('http://api.twitter.com/%d/account/update_profile_background_image.json' % version, {'image':(file_, open(file_, 'rb'))}, params={'tile':tile})
 
-        #create a fake request with your upload url and parameters
-        faux_req = oauth.Request(method='POST', url=upload_url, parameters=params)
-    
-        #sign the fake request.
-        signature_method = oauth.SignatureMethod_HMAC_SHA1()
-        faux_req.sign_request(signature_method, self.consumer, self.token)
-    
-        #create a dict out of the fake request signed params
-        params = dict(parse_qsl(faux_req.to_postdata()))
-        self.headers.update(faux_req.to_header())
-
-        req = requests.post(upload_url, data={'tile':tile}, files={'image':(filename, open(filename, 'rb'))}, headers=self.headers)
-        return req.content
-
-    def updateProfileImage(self, filename, version = 1):
+    def updateProfileImage(self, file_, version=1):
         """ updateProfileImage(filename)
 
             Updates the authenticating user's profile image (avatar).
@@ -449,26 +430,40 @@ class Twython(object):
                 image - Required. Must be a valid GIF, JPG, or PNG image of less than 700 kilobytes in size. Images with width larger than 500 pixels will be scaled down.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        upload_url = 'http://api.twitter.com/%d/account/update_profile_image.json' % version
-        params = {
+        return self._media_update('http://api.twitter.com/%d/account/update_profile_image.json' % version, {'image':(file_, open(file_, 'rb'))})
+
+    # statuses/update_with_media
+    def updateStatusWithMedia(self, file_, version=1, **params):
+        """ updateStatusWithMedia(filename)
+
+            Updates the authenticating user's profile image (avatar).
+
+            Parameters:
+                image - Required. Must be a valid GIF, JPG, or PNG image of less than 700 kilobytes in size. Images with width larger than 500 pixels will be scaled down.
+                version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+        """
+        return self._media_update('https://upload.twitter.com/%d/statuses/update_with_media.json' % version, {'media':(file_, open(file_, 'rb'))}, **params)
+
+    def _media_update(self, url, file_, params={}):
+        oauth_params = {
             'oauth_version': "1.0",
             'oauth_nonce': oauth.generate_nonce(length=41),
             'oauth_timestamp': int(time.time()),
         }
 
         #create a fake request with your upload url and parameters
-        faux_req = oauth.Request(method='POST', url=upload_url, parameters=params)
+        faux_req = oauth.Request(method='POST', url=url, parameters=oauth_params)
     
         #sign the fake request.
         signature_method = oauth.SignatureMethod_HMAC_SHA1()
         faux_req.sign_request(signature_method, self.consumer, self.token)
     
         #create a dict out of the fake request signed params
-        params = dict(parse_qsl(faux_req.to_postdata()))
         self.headers.update(faux_req.to_header())
 
-        req = requests.post(upload_url, files={'image':(filename, open(filename, 'rb'))}, headers=self.headers)
+        req = requests.post(url, data=params, files=file_, headers=self.headers)
         return req.content
+
         
     def getProfileImageUrl(self, username, size=None, version=1):
         """ getProfileImageUrl(username)
