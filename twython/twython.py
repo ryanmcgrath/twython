@@ -1,4 +1,4 @@
-#!/usr/bin/env
+#!/usr/bin/env python
 
 """
     Twython is a library for Python that wraps the Twitter API.
