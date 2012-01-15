@@ -176,8 +176,10 @@ class Twython(object):
             # If they don't do authentication, but still want to request unprotected resources, we need an opener.
             self.client = httplib2.Http(**client_args)
         # register available funcs to allow listing name when debugging.
+        def setFunc(key):
+            return lambda **kwargs: self._constructFunc(key, **kwargs)
         for key in api_table.keys():
-            self.__dict__[key] = lambda **kwargs: self._constructFunc(key, **kwargs)
+            self.__dict__[key] = setFunc(key)
 
     def _constructFunc(self, api_call, **kwargs):
         # Go through and replace any mustaches that are in our API url.
