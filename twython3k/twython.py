@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.4.4"
+__version__ = "1.4.6"
 
 import cgi
 import urllib.request, urllib.parse, urllib.error
@@ -26,7 +26,7 @@ import oauth2 as oauth
 
 # Twython maps keyword based arguments to Twitter API endpoints. The endpoints
 # table is a file with a dictionary of every API endpoint that Twython supports.
-from .twitter_endpoints import base_url, api_table
+from twitter_endpoints import base_url, api_table
 
 from urllib.error import HTTPError
 
@@ -156,9 +156,11 @@ class Twython(object):
         else:
             # If they don't do authentication, but still want to request unprotected resources, we need an opener.
             self.client = httplib2.Http(**client_args)
+        def setFunc(key):
+            return lambda **kwargs: self._constructFunc(key, **kwargs)
         # register available funcs to allow listing name when debugging.
         for key in api_table.keys():
-            self.__dict__[key] = lambda **kwargs: self._constructFunc(key, **kwargs)
+            self.__dict__[key] = setFunc(key)
 
     def _constructFunc(self, api_call, **kwargs):
         # Go through and replace any mustaches that are in our API url.
