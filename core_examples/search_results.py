@@ -5,4 +5,5 @@ twitter = Twython()
 search_results = twitter.searchTwitter(q="WebsDotCom", rpp="50")
 
 for tweet in search_results["results"]:
-    print tweet["text"]
+    print "Tweet from @%s Date: %s" % (tweet['from_user'].encode('utf-8'),tweet['created_at'])
+    print tweet['text'].encode('utf-8'),"\n"
