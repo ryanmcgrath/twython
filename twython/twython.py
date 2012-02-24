@@ -374,7 +374,7 @@ class Twython(object):
            searchTwitterGen()"""
         return self.searchGen(search_query, **kwargs)
 
-    def isListMember(self, list_id, id_, username, version=1):
+    def isListMember(self, list_id, id, username, version=1):
         """ isListMember(self, list_id, id, version)
 
             Check if a specified user (id) is a member of the list in question (list_id).
@@ -388,12 +388,12 @@ class Twython(object):
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
         try:
-            resp, content = self.client.request("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, username, list_id, id_), headers=self.headers)
+            resp, content = self.client.request("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, username, list_id, id), headers=self.headers)
             return simplejson.loads(content.decode('utf-8'))
         except HTTPError, e:
             raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
 
-    def isListSubscriber(self, username, list_id, id_, version=1):
+    def isListSubscriber(self, username, list_id, id, version=1):
         """ isListSubscriber(self, list_id, id, version)
 
             Check if a specified user (id) is a subscriber of the list in question (list_id).
@@ -407,7 +407,7 @@ class Twython(object):
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
         try:
-            resp, content = self.client.request("http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, username, list_id, id_), headers=self.headers)
+            resp, content = self.client.request("http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, username, list_id, id), headers=self.headers)
             return simplejson.loads(content.decode('utf-8'))
         except HTTPError, e:
             raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
