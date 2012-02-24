@@ -72,23 +72,23 @@ else:
 class TwythonError(AttributeError):
     """
         Generic error class, catch-all for most Twython issues.
-        Special cases are handled by APILimit and AuthError.
+        Special cases are handled by TwythonAPILimit and TwythonAuthError.
 
         Note: To use these, the syntax has changed as of Twython 1.3. To catch these,
         you need to explicitly import them into your code, e.g:
 
-        from twython import TwythonError, APILimit, AuthError
+        from twython import TwythonError, TwythonAPILimit, TwythonAuthError
     """
     def __init__(self, msg, error_code=None):
         self.msg = msg
         if error_code == 400:
-            raise APILimit(msg)
+            raise TwythonAPILimit(msg)
 
     def __str__(self):
         return repr(self.msg)
 
 
-class APILimit(TwythonError):
+class TwythonAPILimit(TwythonError):
     """
         Raised when you've hit an API limit. Try to avoid these, read the API
         docs if you're running into issues here, Twython does not concern itself with
@@ -100,7 +100,7 @@ class APILimit(TwythonError):
     def __str__(self):
         return repr(self.msg)
 
-class RateLimitError(TwythonError):
+class TwythonRateLimitError(TwythonError):
     """
         Raised when you've hit a rate limit.  retry_wait_seconds is the number of seconds to
         wait before trying again.
@@ -113,7 +113,7 @@ class RateLimitError(TwythonError):
         return repr(self.msg)
 
 
-class AuthError(TwythonError):
+class TwythonAuthError(TwythonError):
     """
         Raised when you try to access a protected resource and it fails due to some issue with
         your authentication.
@@ -219,7 +219,7 @@ class Twython(object):
         resp, content = self.client.request(self.request_token_url, "GET", **request_args)
 
         if resp['status'] != '200':
-            raise AuthError("Seems something couldn't be verified with your OAuth junk. Error: %s, Message: %s" % (resp['status'], content))
+            raise TwythonAuthError("Seems something couldn't be verified with your OAuth junk. Error: %s, Message: %s" % (resp['status'], content))
         
         request_tokens = dict(parse_qsl(content))
         
@@ -313,7 +313,7 @@ class Twython(object):
 
             if int(resp.status) == 420:
                 retry_wait_seconds = resp['retry-after']
-                raise RateLimitError("getSearchTimeline() is being rate limited.  Retry after %s seconds." %
+                raise TwythonRateLimitError("getSearchTimeline() is being rate limited.  Retry after %s seconds." %
                                      retry_wait_seconds,
                                      retry_wait_seconds,
                                      resp.status)
