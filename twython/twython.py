@@ -15,7 +15,6 @@ import urllib
 import urllib2
 import httplib2
 import re
-import inspect
 import time
 
 import requests
@@ -49,20 +48,6 @@ except ImportError:
         except:
             # Seriously wtf is wrong with you if you get this Exception.
             raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
-
-# Try and gauge the old OAuth2 library spec. Versions 1.5 and greater no longer have the callback
-# url as part of the request object; older versions we need to patch for Python 2.5... ugh. ;P
-OAUTH_CALLBACK_IN_URL = False
-OAUTH_LIB_SUPPORTS_CALLBACK = False
-if not hasattr(oauth, '_version') or float(oauth._version.manual_verstr) <= 1.4:
-    OAUTH_CLIENT_INSPECTION = inspect.getargspec(oauth.Client.request)
-    try:
-        OAUTH_LIB_SUPPORTS_CALLBACK = 'callback_url' in OAUTH_CLIENT_INSPECTION.args
-    except AttributeError:
-        # Python 2.5 doesn't return named tuples, so don't look for an args section specifically.
-        OAUTH_LIB_SUPPORTS_CALLBACK = 'callback_url' in OAUTH_CLIENT_INSPECTION
-else:
-    OAUTH_CALLBACK_IN_URL = True
 
 
 class TwythonError(AttributeError):
@@ -124,7 +109,7 @@ class TwythonAuthError(TwythonError):
 
 class Twython(object):
     def __init__(self, twitter_token=None, twitter_secret=None, oauth_token=None, oauth_token_secret=None, \
-                headers=None, callback_url=None, client_args=None):
+                headers=None, client_args=None):
         """setup(self, oauth_token = None, headers = None)
 
             Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
@@ -150,7 +135,6 @@ class Twython(object):
         self.twitter_secret = twitter_secret
         self.oauth_token = oauth_token
         self.oauth_secret = oauth_token_secret
-        self.callback_url = callback_url
 
         # If there's headers, set them, otherwise be an embarassing parent for their own good.
         self.headers = headers
@@ -212,11 +196,7 @@ class Twython(object):
 
             Returns an authorization URL for a user to hit.
         """
-        callback_url = self.callback_url or 'oob'
-
         request_args = {}
-        if OAUTH_LIB_SUPPORTS_CALLBACK:
-            request_args['callback_url'] = callback_url
 
         resp, content = self.client.request(self.request_token_url, "GET", **request_args)
 
@@ -225,20 +205,9 @@ class Twython(object):
 
         request_tokens = dict(parse_qsl(content))
 
-        oauth_callback_confirmed = request_tokens.get('oauth_callback_confirmed') == 'true'
-
-        if not OAUTH_LIB_SUPPORTS_CALLBACK and callback_url != 'oob' and oauth_callback_confirmed:
-            import warnings
-            warnings.warn("oauth2 library doesn't support OAuth 1.0a type callback, but remote requires it")
-            oauth_callback_confirmed = False
-
         auth_url_params = {
             'oauth_token': request_tokens['oauth_token'],
         }
-
-        # Use old-style callback argument
-        if OAUTH_CALLBACK_IN_URL or (callback_url != 'oob' and not oauth_callback_confirmed):
-            auth_url_params['oauth_callback'] = callback_url
 
         request_tokens['auth_url'] = self.authenticate_url + '?' + urllib.urlencode(auth_url_params)
 
@@ -507,3 +476,15 @@ class Twython(object):
         if isinstance(text, (str, unicode)):
             return Twython.unicode2utf8(text)
         return str(text)
+
+if __name__ == '__main__':
+    t = Twython('OZpEzBbXBin6U0BnZNBTQ', 'PyK5bJG68qDkVBtI5xTghkY1BvQvZTB2JtlqxJjzE')
+    req_tokens = t.get_authentication_tokens()
+    oauth_secret = req_tokens['oauth_token_secret']
+    print 'Go to %s' % req_tokens['auth_url']
+
+    oauth_token = raw_input('OAuth Token: ')
+
+    t = Twython('OZpEzBbXBin6U0BnZNBTQ', 'PyK5bJG68qDkVBtI5xTghkY1BvQvZTB2JtlqxJjzE', oauth_token, oauth_secret)
+    final_tokens = t.get_authorized_tokens()
+    print final_tokens
