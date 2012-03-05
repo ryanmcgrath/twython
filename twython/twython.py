@@ -244,13 +244,13 @@ class Twython(object):
 
         return request_tokens
 
-    def get_authorized_tokens(self):
+    def get_authorized_tokens(self, oauth_verifier):
         """
             get_authorized_tokens
 
-            Returns authorized tokens after they go through the auth_url phase.
+            Returns authorized tokens and basic user info after they go through the auth_url phase.
         """
-        resp, content = self.client.request(self.access_token_url, "GET")
+        resp, content = self.client.request(self.access_token_url, "POST", body="oauth_verifier=%s" % oauth_verifier)
         return dict(parse_qsl(content))
 
     # ------------------------------------------------------------------------------------------------------------------------
