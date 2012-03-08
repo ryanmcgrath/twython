@@ -12,7 +12,6 @@ __author__ = "Ryan McGrath <ryan@venodesigns.net>"
 __version__ = "1.4.6"
 
 import urllib
-import urllib2
 import re
 import inspect
 import time
@@ -31,7 +30,6 @@ except ImportError:
 # table is a file with a dictionary of every API endpoint that Twython supports.
 from twitter_endpoints import base_url, api_table
 
-from urllib2 import HTTPError
 
 # There are some special setups (like, oh, a Django application) where
 # simplejson exists behind the scenes anyway. Past Python 2.6, this should
@@ -271,22 +269,6 @@ class Twython(object):
     @staticmethod
     def constructApiURL(base_url, params):
         return base_url + "?" + "&".join(["%s=%s" % (Twython.unicode2utf8(key), urllib.quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.iteritems()])
-
-    @staticmethod
-    def shortenURL(url_to_shorten, shortener="http://is.gd/api.php", query="longurl"):
-        """shortenURL(url_to_shorten, shortener = "http://is.gd/api.php", query = "longurl")
-
-            Shortens url specified by url_to_shorten.
-
-            Parameters:
-                url_to_shorten - URL to shorten.
-                shortener - In case you want to use a url shortening service other than is.gd.
-        """
-        try:
-            content = urllib2.urlopen(shortener + "?" + urllib.urlencode({query: Twython.unicode2utf8(url_to_shorten)})).read()
-            return content
-        except HTTPError, e:
-            raise TwythonError("shortenURL() failed with a %s error code." % e.code)
 
     def bulkUserLookup(self, ids=None, screen_names=None, version=1, **kwargs):
         """ bulkUserLookup(self, ids = None, screen_names = None, version = 1, **kwargs)
