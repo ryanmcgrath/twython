@@ -215,10 +215,15 @@ class Twython(object):
         callback_url = self.callback_url or 'oob'
 
         request_args = {}
+        method = 'GET'
         if OAUTH_LIB_SUPPORTS_CALLBACK:
             request_args['callback_url'] = callback_url
+        else:
+            # This is a hack for versions of oauth that don't support the callback url
+            request_args['body'] = urllib.urlencode({'oauth_callback': callback_url})
+            method = 'POST'
 
-        resp, content = self.client.request(self.request_token_url, "GET", **request_args)
+        resp, content = self.client.request(self.request_token_url, method, **request_args)
 
         if resp['status'] != '200':
             raise TwythonAuthError("Seems something couldn't be verified with your OAuth junk. Error: %s, Message: %s" % (resp['status'], content))
