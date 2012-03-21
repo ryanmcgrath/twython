@@ -16,7 +16,7 @@ for those types of use cases. Twython cannot help you with that or fix the annoy
 If you need OAuth, though, Twython now supports it, and ships with a skeleton Django application to get you started.
 Enjoy!
 
-Requirements (2.7 and below; for 3k, read section further down)
+Requirements (2.6~ and below; for 3k, read section further down)
 -----------------------------------------------------------------------------------------------------
 Twython (for versions of Python before 2.6) requires a library called
 "simplejson". Depending on your flavor of package manager, you can do the following...
@@ -52,6 +52,32 @@ results = twitter.search(q = "bert")
 # as skimming the source file. Both are kept human-readable, and are pretty well documented or
 # very self documenting.
 ```
+
+Streaming API
+----------------------------------------------------------------------------------------------------
+Twython, as of v1.5.0, now includes an experimental **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-api)** handler.
+Usage is as follows; it's designed to be open-ended enough that you can adapt it to higher-level (read: Twitter must give you access)
+streams. This also exists in large part (read: pretty much in full) thanks to the excellent **[python-requests](http://docs.python-requests.org/en/latest/) library by
+Kenneth Reitz.
+
+**Example Usage:**
+``` python
+import json
+from twython import Twython
+
+def on_results(results):
+    """
+        A callback to handle passed results. Wheeee.
+    """
+    print json.dumps(results)
+
+Twython.stream({
+    'username': 'your_username',
+    'password': 'your_password',
+    'track': 'python'
+}, on_results)
+```
+
 
 A note about the development of Twython (specifically, 1.3)
 ----------------------------------------------------------------------------------------------------
