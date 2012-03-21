@@ -242,9 +242,6 @@ class Twython(object):
         request_args['oauth_callback'] = callback_url
         method = 'get'
         
-        if not OAUTH_LIB_SUPPORTS_CALLBACK:
-            method = 'post'
-        
         func = getattr(self.client, method)
         response = func(self.request_token_url, data=request_args)
         
