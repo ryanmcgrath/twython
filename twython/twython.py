@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.4.6"
+__version__ = "1.5.0"
 
 import urllib
 import re
@@ -95,6 +95,20 @@ class TwythonAPILimit(TwythonError):
     def __str__(self):
         return repr(self.msg)
 
+class APILimit(TwythonError):
+    """
+        Raised when you've hit an API limit. Try to avoid these, read the API
+        docs if you're running into issues here, Twython does not concern itself with
+        this matter beyond telling you that you've done goofed.
+    
+        DEPRECATED, import and catch TwythonAPILimit instead.
+    """
+    def __init__(self, msg):
+        self.msg = '%s\n Notice: APILimit is deprecated and soon to be removed, catch on TwythonAPILimit instead!' % msg
+
+    def __str__(self):
+        return repr(self.msg)
+
 
 class TwythonRateLimitError(TwythonError):
     """
@@ -121,6 +135,18 @@ class TwythonAuthError(TwythonError):
         return repr(self.msg)
 
 
+class AuthError(TwythonError):
+    """
+        Raised when you try to access a protected resource and it fails due to some issue with
+        your authentication.
+    """
+    def __init__(self, msg):
+        self.msg = '%s\n Notice: AuthError is deprecated and soon to be removed, catch on TwythonAuthError instead!' % msg
+
+    def __str__(self):
+        return repr(self.msg)
+
+
 class Twython(object):
     def __init__(self, twitter_token=None, twitter_secret=None, oauth_token=None, oauth_token_secret=None, \
                 headers=None, callback_url=None):
@@ -140,72 +166,70 @@ class Twython(object):
                 ** Note: versioning is not currently used by search.twitter functions;
                          when Twitter moves their junk, it'll be supported.
         """
-
         OAuthHook.consumer_key = twitter_token
         OAuthHook.consumer_secret = twitter_secret
-
+        
         # Needed for hitting that there API.
         self.request_token_url = 'http://twitter.com/oauth/request_token'
         self.access_token_url = 'http://twitter.com/oauth/access_token'
         self.authorize_url = 'http://twitter.com/oauth/authorize'
         self.authenticate_url = 'http://twitter.com/oauth/authenticate'
-
+        
         self.twitter_token = twitter_token
         self.twitter_secret = twitter_secret
         self.oauth_token = oauth_token
         self.oauth_secret = oauth_token_secret
         self.callback_url = callback_url
-
+        
         # If there's headers, set them, otherwise be an embarassing parent for their own good.
         self.headers = headers
         if self.headers is None:
-            self.headers = {'User-agent': 'Twython Python Twitter Library v1.4.6'}
-
+            self.headers = {'User-agent': 'Twython Python Twitter Library v' + __version__}
+        
         self.client = None
-
+        
         if self.twitter_token is not None and self.twitter_secret is not None:
             self.client = requests.session(hooks={'pre_request': OAuthHook()})
-
+        
         if self.oauth_token is not None and self.oauth_secret is not None:
             self.oauth_hook = OAuthHook(self.oauth_token, self.oauth_secret)
             self.client = requests.session(hooks={'pre_request': self.oauth_hook})
-
+        
         # Filter down through the possibilities here - if they have a token, if they're first stage, etc.
         if self.client is None:
             # If they don't do authentication, but still want to request unprotected resources, we need an opener.
             self.client = requests.session()
-
+        
         # register available funcs to allow listing name when debugging.
         def setFunc(key):
             return lambda **kwargs: self._constructFunc(key, **kwargs)
         for key in api_table.keys():
             self.__dict__[key] = setFunc(key)
-
+    
     def _constructFunc(self, api_call, **kwargs):
         # Go through and replace any mustaches that are in our API url.
         fn = api_table[api_call]
         base = re.sub(
             '\{\{(?P<m>[a-zA-Z_]+)\}\}',
-            # The '1' here catches the API version. Slightly
-            # hilarious.
+            # The '1' here catches the API version. Slightly hilarious.
             lambda m: "%s" % kwargs.get(m.group(1), '1'),
             base_url + fn['url']
         )
-
+        
         method = fn['method'].lower()
         if not method in ('get', 'post', 'delete'):
             raise TwythonError('Method must be of GET, POST or DELETE')
-
+        
         if method == 'get':
             myargs = ['%s=%s' % (key, value) for (key, value) in kwargs.iteritems()]
         else:
             myargs = kwargs
-
+        
         func = getattr(self.client, method)
         response = func(base, data=myargs)
-
+        
         return simplejson.loads(response.content.decode('utf-8'))
-
+    
     def get_authentication_tokens(self):
         """
             get_auth_url(self)
@@ -213,41 +237,41 @@ class Twython(object):
             Returns an authorization URL for a user to hit.
         """
         callback_url = self.callback_url or 'oob'
-
+        
         request_args = {}
         request_args['oauth_callback'] = callback_url
         method = 'get'
-
+        
         if not OAUTH_LIB_SUPPORTS_CALLBACK:
             method = 'post'
-
+        
         func = getattr(self.client, method)
         response = func(self.request_token_url, data=request_args)
-
+        
         if response.status_code != 200:
             raise TwythonAuthError("Seems something couldn't be verified with your OAuth junk. Error: %s, Message: %s" % (response.status_code, response.content))
-
+        
         request_tokens = dict(parse_qsl(response.content))
         if not request_tokens:
             raise TwythonError('Unable to decode request tokens.')
-
+        
         oauth_callback_confirmed = request_tokens.get('oauth_callback_confirmed') == 'true'
-
+        
         if not OAUTH_LIB_SUPPORTS_CALLBACK and callback_url != 'oob' and oauth_callback_confirmed:
             import warnings
             warnings.warn("oauth2 library doesn't support OAuth 1.0a type callback, but remote requires it")
             oauth_callback_confirmed = False
-
+        
         auth_url_params = {
             'oauth_token': request_tokens['oauth_token'],
         }
-
+        
         # Use old-style callback argument
         if OAUTH_CALLBACK_IN_URL or (callback_url != 'oob' and not oauth_callback_confirmed):
             auth_url_params['oauth_callback'] = callback_url
-
+        
         request_tokens['auth_url'] = self.authenticate_url + '?' + urllib.urlencode(auth_url_params)
-
+        
         return request_tokens
 
     def get_authorized_tokens(self):
@@ -256,20 +280,41 @@ class Twython(object):
 
             Returns authorized tokens after they go through the auth_url phase.
         """
-
         response = self.client.get(self.access_token_url)
         authorized_tokens = dict(parse_qsl(response.content))
         if not authorized_tokens:
             raise TwythonError('Unable to decode authorized tokens.')
 
         return authorized_tokens
-
+    
     # ------------------------------------------------------------------------------------------------------------------------
     # The following methods are all different in some manner or require special attention with regards to the Twitter API.
     # Because of this, we keep them separate from all the other endpoint definitions - ideally this should be change-able,
     # but it's not high on the priority list at the moment.
     # ------------------------------------------------------------------------------------------------------------------------
+    
+    @staticmethod
+    def shortenURL(url_to_shorten, shortener = "http://is.gd/api.php", query="longurl"):
+        """
+            shortenURL(url_to_shorten, shortener = "http://is.gd/api.php", query="longurl")
 
+            Shortens url specified by url_to_shorten. 
+            Note: Twitter automatically shortens all URLs behind their own custom t.co shortener now,
+                but we keep this here for anyone who was previously using it for alternative purposes. ;)
+        
+            Parameters:
+                url_to_shorten - URL to shorten.
+                shortener = In case you want to use a url shortening service other than is.gd.
+        """
+        request = requests.get('http://is.gd/api.php' , params = {
+            'query': url_to_shorten
+        })
+        
+        if r.status_code in [301, 201, 200]:
+            return request.text
+        else:
+            raise TwythonError('shortenURL() failed with a %s error code.' % r.status_code)
+    
     @staticmethod
     def constructApiURL(base_url, params):
         return base_url + "?" + "&".join(["%s=%s" % (Twython.unicode2utf8(key), urllib.quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.iteritems()])
@@ -286,14 +331,14 @@ class Twython(object):
             kwargs['user_id'] = ','.join(map(str, ids))
         if screen_names:
             kwargs['screen_name'] = ','.join(screen_names)
-
+        
         lookupURL = Twython.constructApiURL("http://api.twitter.com/%d/users/lookup.json" % version, kwargs)
         try:
             response = self.client.post(lookupURL, headers=self.headers)
             return simplejson.loads(response.content.decode('utf-8'))
         except RequestException, e:
             raise TwythonError("bulkUserLookup() failed with a %s error code." % e.code, e.code)
-
+    
     def search(self, **kwargs):
         """search(search_query, **kwargs)
 
@@ -314,16 +359,16 @@ class Twython(object):
                                      retry_wait_seconds,
                                      retry_wait_seconds,
                                      response.status_code)
-
+            
             return simplejson.loads(response.content.decode('utf-8'))
         except RequestException, e:
             raise TwythonError("getSearchTimeline() failed with a %s error code." % e.code, e.code)
-
+    
     def searchTwitter(self, **kwargs):
         """use search() ,this is a fall back method to support searchTwitter()
         """
         return self.search(**kwargs)
-
+    
     def searchGen(self, search_query, **kwargs):
         """searchGen(search_query, **kwargs)
 
@@ -341,13 +386,13 @@ class Twython(object):
             data = simplejson.loads(response.content.decode('utf-8'))
         except RequestException, e:
             raise TwythonError("searchGen() failed with a %s error code." % e.code, e.code)
-
+        
         if not data['results']:
             raise StopIteration
-
+        
         for tweet in data['results']:
             yield tweet
-
+        
         if 'page' not in kwargs:
             kwargs['page'] = '2'
         else:
@@ -360,15 +405,15 @@ class Twython(object):
             except e:
                 raise TwythonError("searchGen() failed with %s error code" % \
                                     e.code, e.code)
-
+        
         for tweet in self.searchGen(search_query, **kwargs):
             yield tweet
-
+    
     def searchTwitterGen(self, search_query, **kwargs):
         """use searchGen(), this is a fallback method to support
            searchTwitterGen()"""
         return self.searchGen(search_query, **kwargs)
-
+    
     def isListMember(self, list_id, id, username, version=1):
         """ isListMember(self, list_id, id, version)
 
@@ -387,7 +432,7 @@ class Twython(object):
             return simplejson.loads(response.content.decode('utf-8'))
         except RequestException, e:
             raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
-
+    
     def isListSubscriber(self, username, list_id, id, version=1):
         """ isListSubscriber(self, list_id, id, version)
 
@@ -406,7 +451,7 @@ class Twython(object):
             return simplejson.loads(response.content.decode('utf-8'))
         except RequestException, e:
             raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
-
+    
     # The following methods are apart from the other Account methods, because they rely on a whole multipart-data posting function set.
     def updateProfileBackgroundImage(self, file_, tile=True, version=1):
         """ updateProfileBackgroundImage(filename, tile=True)
@@ -418,8 +463,10 @@ class Twython(object):
                 tile - Optional (defaults to True). If set to true the background image will be displayed tiled. The image will not be tiled otherwise.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        return self._media_update('http://api.twitter.com/%d/account/update_profile_background_image.json' % version, {'image': (file_, open(file_, 'rb'))}, params={'tile': tile})
-
+        return self._media_update('http://api.twitter.com/%d/account/update_profile_background_image.json' % version, {
+            'image': (file_, open(file_, 'rb'))
+        }, params = {'tile': tile})
+    
     def updateProfileImage(self, file_, version=1):
         """ updateProfileImage(filename)
 
@@ -429,8 +476,10 @@ class Twython(object):
                 image - Required. Must be a valid GIF, JPG, or PNG image of less than 700 kilobytes in size. Images with width larger than 500 pixels will be scaled down.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        return self._media_update('http://api.twitter.com/%d/account/update_profile_image.json' % version, {'image': (file_, open(file_, 'rb'))})
-
+        return self._media_update('http://api.twitter.com/%d/account/update_profile_image.json' % version, {
+            'image': (file_, open(file_, 'rb'))
+        })
+    
     # statuses/update_with_media
     def updateStatusWithMedia(self, file_, version=1, **params):
         """ updateStatusWithMedia(filename)
@@ -441,8 +490,10 @@ class Twython(object):
                 image - Required. Must be a valid GIF, JPG, or PNG image of less than 700 kilobytes in size. Images with width larger than 500 pixels will be scaled down.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        return self._media_update('https://upload.twitter.com/%d/statuses/update_with_media.json' % version, {'media': (file_, open(file_, 'rb'))}, **params)
-
+        return self._media_update('https://upload.twitter.com/%d/statuses/update_with_media.json' % version, {
+            'media': (file_, open(file_, 'rb'))
+        }, **params)
+    
     def _media_update(self, url, file_, params=None):
         params = params or {}
 
@@ -459,7 +510,7 @@ class Twython(object):
         header.. that MIGHT be why it's not working..
         I haven't debugged enough.
 
-                                            - Mike Helmick
+                - Mike Helmick
         ***
 
         self.oauth_hook.header_auth = True
@@ -474,24 +525,24 @@ class Twython(object):
             'oauth_token': self.oauth_token,
             'oauth_timestamp': int(time.time()),
         }
-
+        
         #create a fake request with your upload url and parameters
         faux_req = oauth.Request(method='POST', url=url, parameters=oauth_params)
-
+        
         #sign the fake request.
         signature_method = oauth.SignatureMethod_HMAC_SHA1()
-
+        
         class dotdict(dict):
             """
             This is a helper func. because python-oauth2 wants a
             dict in dot notation.
             """
-
+            
             def __getattr__(self, attr):
                 return self.get(attr, None)
             __setattr__ = dict.__setitem__
             __delattr__ = dict.__delitem__
-
+        
         consumer = {
             'key': self.oauth_hook.consumer_key,
             'secret': self.oauth_hook.consumer_secret
@@ -500,15 +551,15 @@ class Twython(object):
             'key': self.oauth_token,
             'secret': self.oauth_secret
         }
-
+        
         faux_req.sign_request(signature_method, dotdict(consumer), dotdict(token))
-
+        
         #create a dict out of the fake request signed params
         self.headers.update(faux_req.to_header())
-
+        
         req = requests.post(url, data=params, files=file_, headers=self.headers)
         return req.content
-
+    
     def getProfileImageUrl(self, username, size=None, version=1):
         """ getProfileImageUrl(username)
 
@@ -522,16 +573,58 @@ class Twython(object):
         url = "http://api.twitter.com/%s/users/profile_image/%s.json" % (version, username)
         if size:
             url = self.constructApiURL(url, {'size': size})
-
+        
         #client.follow_redirects = False
         response = self.client.get(url, allow_redirects=False)
         image_url = response.headers.get('location')
-
+        
         if response.status_code in (301, 302, 303, 307) and image_url is not None:
             return image_url
-
+        
         raise TwythonError("getProfileImageUrl() failed with a %d error code." % response.status_code, response.status_code)
+    
+    @staticmethod
+    def stream(data, callback):
+        """
+            A Streaming API endpoint, because requests (by the lovely Kenneth Reitz) makes this not
+            stupidly annoying to implement. In reality, Twython does absolutely *nothing special* here,
+            but people new to programming expect this type of function to exist for this library, so we
+            provide it for convenience.
 
+            Seriously, this is nothing special. :)
+
+            For the basic stream you're probably accessing, you'll want to pass the following as data dictionary
+            keys. If you need to use OAuth (newer streams), passing secrets/etc as keys SHOULD work...
+
+                username - Required. User name, self explanatory.
+                password - Required. The Streaming API doesn't use OAuth, so we do this the old school way. It's all
+                    done over SSL (https://), so you're not left totally vulnerable.
+                endpoint - Optional. Override the endpoint you're using with the Twitter Streaming API. This is defaulted to the one
+                    that everyone has access to, but if Twitter <3's you feel free to set this to your wildest desires.
+  
+            Parameters:
+                data - Required. Dictionary of attributes to attach to the request (see: params https://dev.twitter.com/docs/streaming-api/methods)
+                callback - Required. Callback function to be fired when tweets come in (this is an event-based-ish API).
+        """
+        endpoint = 'https://stream.twitter.com/1/statuses/filter.json'
+        if 'endpoint' in data:
+            endpoint = data.pop('endpoint')
+        
+        needs_basic_auth = False
+        if 'username' in data:
+            needs_basic_auth = True
+            username = data.pop('username')
+            password = data.pop('password')
+        
+        if needs_basic_auth:
+            stream = requests.post(endpoint, data = data, auth = (username, password))
+        else:
+            stream = requests.post(endpoint, data = data)
+        
+        for line in stream.iter_lines():
+            if line:
+                callback(json.loads(line))
+    
     @staticmethod
     def unicode2utf8(text):
         try:
@@ -540,7 +633,7 @@ class Twython(object):
         except:
             pass
         return text
-
+    
     @staticmethod
     def encode(text):
         if isinstance(text, (str, unicode)):

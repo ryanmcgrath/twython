@@ -16,7 +16,7 @@ for those types of use cases. Twython cannot help you with that or fix the annoy
 If you need OAuth, though, Twython now supports it, and ships with a skeleton Django application to get you started.
 Enjoy!
 
-Requirements
+Requirements (2.7 and below; for 3k, read section further down)
 -----------------------------------------------------------------------------------------------------
 Twython (for versions of Python before 2.6) requires a library called
 "simplejson". Depending on your flavor of package manager, you can do the following...
@@ -35,20 +35,23 @@ Installing Twython is fairly easy. You can...
 
 ...or, you can clone the repo and install it the old fashioned way.
 
+
     git clone git://github.com/ryanmcgrath/twython.git
     cd twython
     sudo python setup.py install
 
 Example Use
 -----------------------------------------------------------------------------------------------------
-    from twython import Twython
+``` python
+from twython import Twython
 
-    twitter = Twython()
-    results = twitter.searchTwitter(q="bert")
+twitter = Twython()
+results = twitter.search(q = "bert")
 
-    # More function definitions can be found by reading over twython/twitter_endpoints.py, as well
-    # as skimming the source file. Both are kept human-readable, and are pretty well documented or
-    # very self documenting.
+# More function definitions can be found by reading over twython/twitter_endpoints.py, as well
+# as skimming the source file. Both are kept human-readable, and are pretty well documented or
+# very self documenting.
+```
 
 A note about the development of Twython (specifically, 1.3)
 ----------------------------------------------------------------------------------------------------
@@ -65,17 +68,19 @@ Arguments to functions are now exact keyword matches for the Twitter API documen
 whatever query parameter arguments you read on Twitter's documentation (http://dev.twitter.com/doc) gets mapped
 as a named argument to any Twitter function.
 
-For example: the search API looks for arguments under the name "q", so you pass q="query_here" to searchTwitter().
+For example: the search API looks for arguments under the name "q", so you pass q="query_here" to search().
 
 Doing this allows us to be incredibly flexible in querying the Twitter API, so changes to the API aren't held up
 from you using them by this library.
 
 Twython 3k
 -----------------------------------------------------------------------------------------------------
-There's an experimental version of Twython that's made for Python 3k. This is currently not guaranteed
-to work (especially with regards to OAuth), but it's provided so that others can grab it and hack on it.
+There's an experimental version of Twython that's made for Python 3k. This is currently not guaranteed to
+work in all situations, but it's provided so that others can grab it and hack on it.
 If you choose to try it out, be aware of this.
 
+**OAuth is now working thanks to updates from [Hades](https://github.com/hades). You'll need to grab
+his [Python 3 branch for python-oauth2](https://github.com/hades/python-oauth2/tree/python3) to have it work, though.**
 
 Questions, Comments, etc?
 -----------------------------------------------------------------------------------------------------
@@ -83,4 +88,30 @@ My hope is that Twython is so simple that you'd never *have* to ask any question
 you feel the need to contact me for this (or other) reasons, you can hit me up
 at ryan@venodesigns.net.
 
+You can also follow me on Twitter - **[@ryanmcgrath](http://twitter.com/ryanmcgrath)**.
+
 Twython is released under an MIT License - see the LICENSE file for more information.
+
+Special Thanks to...
+-----------------------------------------------------------------------------------------------------
+This is a list of all those who have contributed code to Twython in some way, shape, or form. I think it's
+exhaustive, but I could be wrong - if you think your name should be here and it's not, please contact
+me and let me know (or just issue a pull request on GitHub, and leave a note about it so I can just accept it ;)).
+
+- **[Mike Helmick (michaelhelmick)](https://github.com/michaelhelmick)**, multiple fixes and proper `requests` integration.  
+- **[kracekumar](https://github.com/kracekumar)**, early `requests` work and various fixes.  
+- **[Erik Scheffers (eriks5)](https://github.com/eriks5)**, various fixes regarding OAuth callback URLs.  
+- **[Jordan Bouvier (jbouvier)](https://github.com/jbouvier)**, various fixes regarding OAuth callback URLs.  
+- **[Dick Brouwer (dikbrouwer)](https://github.com/dikbrouwer)**, fixes for OAuth Verifier in `get_authorized_tokens`.  
+- **[hades](https://github.com/hades)**, Fixes to various initial OAuth issues and updates to `Twython3k` to stay current.  
+- **[Alex Sutton (alexdsutton)](https://github.com/alexsdutton/twython/)**, fix for parameter substitution regular expression (catch underscores!).  
+- **[Levgen Pyvovarov (bsn)](https://github.com/bsn)**, Various argument fixes, cyrillic text support.  
+- **[Mark Liu (mliu7)](https://github.com/mliu7)**, Missing parameter fix for `addListMember`.  
+- **[Randall Degges (rdegges)](https://github.com/rdegges)**, PEP-8 fixes, MANIFEST.in, installer fixes.  
+- **[Idris Mokhtarzada (idris)](https://github.com/idris)**, Fixes for various example code pieces.  
+- **[Jonathan Elsas (jelsas)](https://github.com/jelsas)**, Fix for original Streaming API stub causing import errors.  
+- **[LuqueDaniel](https://github.com/LuqueDaniel)**, Extended example code where necessary.  
+- **[Mesar Hameed (mhameed)](https://github.com/mhameed)**, Commit to swap `__getattr__` trick for a more debuggable solution.  
+- **[Remy DeCausemaker (decause)](https://github.com/decause)**, PEP-8 contributions.  
+- **[mckellister](https://github.com/mckellister)**, Fixes to `Exception`s raised by Twython (Rate Limits, etc).  
+- **[tatz_tsuchiya](http://d.hatena.ne.jp/tatz_tsuchiya/20120115/1326623451), Fix for `lambda` scoping in key injection phase.  

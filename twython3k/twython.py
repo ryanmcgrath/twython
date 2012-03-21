@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.4.6"
+__version__ = "1.4.7"
 
 import cgi
 import urllib.request, urllib.parse, urllib.error
@@ -37,16 +37,8 @@ try:
     # Python 2.6 and up
     import json as simplejson
 except ImportError:
-    try:
-        # Python 2.6 and below (2.4/2.5, 2.3 is not guranteed to work with this library to begin with)
-        import simplejson
-    except ImportError:
-        try:
-            # This case gets rarer by the day, but if we need to, we can pull it from Django provided it's there.
-            from django.utils import simplejson
-        except:
-            # Seriously wtf is wrong with you if you get this Exception.
-            raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
+    # Seriously wtf is wrong with you if you get this Exception.
+    raise Exception("Twython3k requires a json library to work. http://www.undefined.org/python/")
 
 # Try and gauge the old OAuth2 library spec. Versions 1.5 and greater no longer have the callback
 # url as part of the request object; older versions we need to patch for Python 2.5... ugh. ;P
@@ -81,7 +73,7 @@ class TwythonError(AttributeError):
         return repr(self.msg)
 
 
-class APILimit(TwythonError):
+class TwythonAPILimit(TwythonError):
     """
         Raised when you've hit an API limit. Try to avoid these, read the API
         docs if you're running into issues here, Twython does not concern itself with
@@ -94,7 +86,22 @@ class APILimit(TwythonError):
         return repr(self.msg)
 
 
-class AuthError(TwythonError):
+class APILimit(TwythonError):
+    """
+        Raised when you've hit an API limit. Try to avoid these, read the API
+        docs if you're running into issues here, Twython does not concern itself with
+        this matter beyond telling you that you've done goofed.
+    
+        DEPRECATED, you should be importing TwythonAPILimit instead. :)
+    """
+    def __init__(self, msg):
+        self.msg = '%s\n Notice: APILimit is deprecated and soon to be removed, catch TwythonAPILimit instead!' % msg
+
+    def __str__(self):
+        return repr(self.msg)
+
+
+class TwythonAuthError(TwythonError):
     """
         Raised when you try to access a protected resource and it fails due to some issue with
         your authentication.
@@ -102,6 +109,19 @@ class AuthError(TwythonError):
     def __init__(self, msg):
         self.msg = msg
 
+    def __str__(self):
+        return repr(self.msg)
+
+class AuthError(TwythonError):
+    """
+        Raised when you try to access a protected resource and it fails due to some issue with
+        your authentication.
+    
+        DEPRECATED, you should be importing TwythonAuthError instead.
+    """
+    def __init__(self, msg):
+        self.msg = '%s\n Notice: AuthLimit is deprecated and soon to be removed, catch TwythonAPILimit instead!' % msg
+    
     def __str__(self):
         return repr(self.msg)
 
@@ -189,10 +209,16 @@ class Twython(object):
         callback_url = self.callback_url or 'oob'
         
         request_args = {}
+        method = 'GET'
         if OAUTH_LIB_SUPPORTS_CALLBACK:
             request_args['callback_url'] = callback_url
+        else:
+            # This is a hack for versions of oauth that don't support the callback URL. This is also
+            # done differently than the Python2 version of Twython, which uses Requests internally (as opposed to httplib2).
+            request_args['body'] = urllib.urlencode({'oauth_callback': callback_url})
+            method = 'POST'
         
-        resp, content = self.client.request(self.request_token_url, "GET", **request_args)
+        resp, content = self.client.request(self.request_token_url, method, **request_args)
 
         if resp['status'] != '200':
             raise AuthError("Seems something couldn't be verified with your OAuth junk. Error: %s, Message: %s" % (resp['status'], content))
@@ -213,7 +239,6 @@ class Twython(object):
             'oauth_token' : request_tokens['oauth_token'],
         }
         
-        # Use old-style callback argument
         if OAUTH_CALLBACK_IN_URL or (callback_url!='oob' and not oauth_callback_confirmed):
             auth_url_params['oauth_callback'] = callback_url
         
