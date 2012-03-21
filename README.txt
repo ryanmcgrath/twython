@@ -60,7 +60,7 @@ Usage is as follows; it's designed to be open-ended enough that you can adapt it
 streams. This also exists in large part (read: pretty much in full) thanks to the excellent **[python-requests](http://docs.python-requests.org/en/latest/) library by
 Kenneth Reitz.
 
-**Example Usage:**
+**Example Usage:**  
 ``` python
 import json
 from twython import Twython
@@ -117,6 +117,13 @@ at ryan@venodesigns.net.
 You can also follow me on Twitter - **[@ryanmcgrath](http://twitter.com/ryanmcgrath)**.
 
 Twython is released under an MIT License - see the LICENSE file for more information.
+
+Want to help?
+-----------------------------------------------------------------------------------------------------
+Twython is useful, but ultimately only as useful as the people using it (say that ten times fast!). If you'd
+like to help, write example code, contribute patches, document things on the wiki, tweet about it. Your help
+is always appreciated!
+
 
 Special Thanks to...
 -----------------------------------------------------------------------------------------------------
