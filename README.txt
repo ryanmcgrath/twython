@@ -61,22 +61,22 @@ streams. This also exists in large part (read: pretty much in full) thanks to th
 Kenneth Reitz.
 
 **Example Usage:**  
-``` python
-import json
-from twython import Twython
+``` python  
+import json  
+from twython import Twython  
 
-def on_results(results):
-    """
-        A callback to handle passed results. Wheeee.
-    """
-    print json.dumps(results)
+def on_results(results):  
+    """  
+        A callback to handle passed results. Wheeee.  
+    """  
+    print json.dumps(results)  
 
-Twython.stream({
-    'username': 'your_username',
-    'password': 'your_password',
-    'track': 'python'
-}, on_results)
-```
+Twython.stream({  
+    'username': 'your_username',  
+    'password': 'your_password',  
+    'track': 'python'  
+}, on_results)  
+```  
 
 
 A note about the development of Twython (specifically, 1.3)
