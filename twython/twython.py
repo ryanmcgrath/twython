@@ -215,10 +215,14 @@ class Twython(object):
         callback_url = self.callback_url or 'oob'
 
         request_args = {}
-        if OAUTH_LIB_SUPPORTS_CALLBACK:
-            request_args['callback_url'] = callback_url
+        request_args['oauth_callback'] = callback_url
+        method = 'get'
 
-        response = self.client.get(self.request_token_url, **request_args)
+        if not OAUTH_LIB_SUPPORTS_CALLBACK:
+            method = 'post'
+
+        func = getattr(self.client, method)
+        response = func(self.request_token_url, data=request_args)
 
         if response.status_code != 200:
             raise TwythonAuthError("Seems something couldn't be verified with your OAuth junk. Error: %s, Message: %s" % (response.status_code, response.content))
