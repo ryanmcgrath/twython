@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.5.1"
+__version__ = "1.5.2"
 
 import urllib
 import re
@@ -210,7 +210,7 @@ class Twython(object):
     def _constructFunc(self, api_call, **kwargs):
         # Go through and replace any mustaches that are in our API url.
         fn = api_table[api_call]
-        base = re.sub(
+        url = re.sub(
             '\{\{(?P<m>[a-zA-Z_]+)\}\}',
             # The '1' here catches the API version. Slightly hilarious.
             lambda m: "%s" % kwargs.get(m.group(1), '1'),
@@ -221,13 +221,14 @@ class Twython(object):
         if not method in ('get', 'post', 'delete'):
             raise TwythonError('Method must be of GET, POST or DELETE')
 
+        myargs = {}
         if method == 'get':
-            myargs = ['%s=%s' % (key, value) for (key, value) in kwargs.iteritems()]
+            url = '%s?%s' % (url, urllib.urlencode(kwargs))
         else:
             myargs = kwargs
 
         func = getattr(self.client, method)
-        response = func(base, data=myargs)
+        response = func(url, data=myargs)
 
         return simplejson.loads(response.content.decode('utf-8'))
 
