@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.5.2"
+__version__ = "1.6.0"
 
 import urllib
 import re
@@ -175,6 +175,7 @@ class Twython(object):
         self.access_token_url = 'http://twitter.com/oauth/access_token'
         self.authorize_url = 'http://twitter.com/oauth/authorize'
         self.authenticate_url = 'http://twitter.com/oauth/authenticate'
+        self.api_url = 'http://api.twitter.com/1/'
 
         self.twitter_token = twitter_token
         self.twitter_secret = twitter_secret
@@ -221,16 +222,55 @@ class Twython(object):
         if not method in ('get', 'post', 'delete'):
             raise TwythonError('Method must be of GET, POST or DELETE')
 
+        response = self._request(url, method=method, params=kwargs)
+
+        return simplejson.loads(response.content.decode('utf-8'))
+
+    def _request(self, url, method='GET', params=None):
+        '''
+        Internal response generator, not sense in repeating the same
+        code twice, right? ;)
+        '''
         myargs = {}
+        method = method.lower()
         if method == 'get':
-            url = '%s?%s' % (url, urllib.urlencode(kwargs))
+            url = '%s?%s' % (url, urllib.urlencode(params))
         else:
-            myargs = kwargs
+            myargs = params
 
         func = getattr(self.client, method)
         response = func(url, data=myargs)
 
+        return response
+
+    '''
+    # Dynamic Request Methods
+    Just in case Twitter releases something in their API
+    and a developer wants to implement it on their app, but
+    we haven't gotten around to putting it in Twython yet. :)
+    '''
+
+    def request(self, endpoint, method='GET', params=None):
+        params = params or {}
+        url = '%s%s.json' % (self.api_url, endpoint)
+
+        response = self._request(url, method=method, params=params)
+
         return simplejson.loads(response.content.decode('utf-8'))
+
+    def get(self, endpoint, params=None):
+        params = params or {}
+        return self.request(endpoint, params=params)
+
+    def post(self, endpoint, params=None):
+        params = params or {}
+        return self.request(endpoint, 'POST', params=params)
+
+    def delete(self, endpoint, params=None):
+        params = params or {}
+        return self.request(endpoint, 'DELETE', params=params)
+
+    # End Dynamic Request Methods
 
     def get_authentication_tokens(self):
         """
