@@ -194,7 +194,7 @@ class Twython(object):
             self.client = requests.session(hooks={'pre_request': OAuthHook()})
 
         if self.oauth_token is not None and self.oauth_secret is not None:
-            self.oauth_hook = OAuthHook(self.oauth_token, self.oauth_secret)
+            self.oauth_hook = OAuthHook(self.oauth_token, self.oauth_secret, header_auth=True)
             self.client = requests.session(hooks={'pre_request': self.oauth_hook})
 
         # Filter down through the possibilities here - if they have a token, if they're first stage, etc.
@@ -678,3 +678,18 @@ class Twython(object):
         if isinstance(text, (str, unicode)):
             return Twython.unicode2utf8(text)
         return str(text)
+
+
+if __name__ == '__main__':
+    t_token = 'tWcBBbw1RPw1xqByfmuacA'
+    t_secret = '8OUkoA2aXr2gTMI2gx7oDgw46UuG6ez8wIqV980m4'
+    f_oauth_secret = '66XY3rAamLbwWC0KNwUG9QxdsnfPNZBji2UKNhVh4'
+    f_oauth_token = '29251354-UCmNcr9y3lflHqN9Gvwc7A0JlH0H4FOhO0JgJxS7t'
+
+    t = Twython(twitter_token=t_token,
+                twitter_secret=t_secret,
+                oauth_token=f_oauth_token,
+                oauth_token_secret=f_oauth_secret)
+
+    user = t.post('statuses/update', params={'status': 'Testing Twython Library'})
+    print user
