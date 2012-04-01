@@ -678,18 +678,3 @@ class Twython(object):
         if isinstance(text, (str, unicode)):
             return Twython.unicode2utf8(text)
         return str(text)
-
-
-if __name__ == '__main__':
-    t_token = 'tWcBBbw1RPw1xqByfmuacA'
-    t_secret = '8OUkoA2aXr2gTMI2gx7oDgw46UuG6ez8wIqV980m4'
-    f_oauth_secret = '66XY3rAamLbwWC0KNwUG9QxdsnfPNZBji2UKNhVh4'
-    f_oauth_token = '29251354-UCmNcr9y3lflHqN9Gvwc7A0JlH0H4FOhO0JgJxS7t'
-
-    t = Twython(twitter_token=t_token,
-                twitter_secret=t_secret,
-                oauth_token=f_oauth_token,
-                oauth_token_secret=f_oauth_secret)
-
-    user = t.post('statuses/update', params={'status': 'Testing Twython Library'})
-    print user
