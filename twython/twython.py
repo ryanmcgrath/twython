@@ -223,10 +223,12 @@ class Twython(object):
 
             Returns an authorization URL for a user to hit.
         """
-        callback_url = self.callback_url or 'oob'
+        callback_url = self.callback_url
 
         request_args = {}
-        request_args['oauth_callback'] = callback_url
+        if callback_url:
+            request_args['oauth_callback'] = callback_url
+            
         method = 'get'
 
         func = getattr(self.client, method)
