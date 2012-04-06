@@ -240,7 +240,6 @@ class Twython(object):
             url = '%s?%s' % (url, urllib.urlencode(params))
         else:
             myargs = params
-        print url
 
         func = getattr(self.client, method)
         response = func(url, data=myargs)
