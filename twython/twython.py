@@ -13,7 +13,6 @@ __version__ = "1.5.2"
 
 import urllib
 import re
-import inspect
 import time
 
 import requests
