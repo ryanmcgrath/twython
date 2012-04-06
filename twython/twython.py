@@ -248,7 +248,7 @@ class Twython(object):
         }
 
         # Use old-style callback argument if server didn't accept new-style
-        if callback_url != 'oob' and not oauth_callback_confirmed:
+        if callback_url and not oauth_callback_confirmed:
             auth_url_params['oauth_callback'] = callback_url
 
         request_tokens['auth_url'] = self.authenticate_url + '?' + urllib.urlencode(auth_url_params)
