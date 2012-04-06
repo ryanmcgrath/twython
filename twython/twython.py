@@ -35,12 +35,14 @@ from twitter_endpoints import base_url, api_table
 # simplejson exists behind the scenes anyway. Past Python 2.6, this should
 # never really cause any problems to begin with.
 try:
-    # Python 2.6 and up
-    import json as simplejson
+    # Python 2.6 and below (2.4/2.5, 2.3 is not guranteed to work with this library to begin with)
+    # If they have simplejson, we should try and load that first,
+    # if they have the library, chances are they're gonna want to use that.
+    import simplejson
 except ImportError:
     try:
-        # Python 2.6 and below (2.4/2.5, 2.3 is not guranteed to work with this library to begin with)
-        import simplejson
+        # Python 2.6 and up
+        import json as simplejson
     except ImportError:
         try:
             # This case gets rarer by the day, but if we need to, we can pull it from Django provided it's there.
@@ -175,7 +177,7 @@ class Twython(object):
         self.access_token_url = 'http://twitter.com/oauth/access_token'
         self.authorize_url = 'http://twitter.com/oauth/authorize'
         self.authenticate_url = 'http://twitter.com/oauth/authenticate'
-        self.api_url = 'http://api.twitter.com/1/'
+        self.api_url = 'http://api.twitter.com/%s/'
 
         self.twitter_token = twitter_token
         self.twitter_secret = twitter_secret
@@ -222,9 +224,9 @@ class Twython(object):
         if not method in ('get', 'post', 'delete'):
             raise TwythonError('Method must be of GET, POST or DELETE')
 
-        response = self._request(url, method=method, params=kwargs)
+        content = self._request(url, method=method, params=kwargs)
 
-        return simplejson.loads(response.content.decode('utf-8'))
+        return content
 
     def _request(self, url, method='GET', params=None):
         '''
@@ -233,15 +235,34 @@ class Twython(object):
         '''
         myargs = {}
         method = method.lower()
+
         if method == 'get':
             url = '%s?%s' % (url, urllib.urlencode(params))
         else:
             myargs = params
+        print url
 
         func = getattr(self.client, method)
         response = func(url, data=myargs)
 
-        return response
+        # Python 2.6 `json` will throw a ValueError if it
+        # can't load the string as valid JSON,
+        # `simplejson` will throw simplejson.decoder.JSONDecodeError
+        # But excepting just ValueError will work with both. o.O
+        try:
+            content = simplejson.loads(response.content.decode('utf-8'))
+        except ValueError:
+            raise TwythonError('Response was not valid JSON, unable to decode.')
+
+        if response.status_code > 302:
+            # Just incase there is no error message, let's set a default
+            error_msg = 'An error occurred processing your request.'
+            if content.get('error') is not None:
+                error_msg = content['error']
+
+            raise TwythonError(error_msg, error_code=response.status_code)
+
+        return content
 
     '''
     # Dynamic Request Methods
@@ -250,25 +271,31 @@ class Twython(object):
     we haven't gotten around to putting it in Twython yet. :)
     '''
 
-    def request(self, endpoint, method='GET', params=None):
+    def request(self, endpoint, method='GET', params=None, version=1):
         params = params or {}
-        url = '%s%s.json' % (self.api_url, endpoint)
 
-        response = self._request(url, method=method, params=params)
+        # In case they want to pass a full Twitter URL
+        # i.e. http://search.twitter.com/
+        if endpoint.startswith('http://'):
+            url = endpoint
+        else:
+            url = '%s%s.json' % (self.api_url % version, endpoint)
 
-        return simplejson.loads(response.content.decode('utf-8'))
+        content = self._request(url, method=method, params=params)
 
-    def get(self, endpoint, params=None):
+        return content
+
+    def get(self, endpoint, params=None, version=1):
         params = params or {}
-        return self.request(endpoint, params=params)
+        return self.request(endpoint, params=params, version=version)
 
-    def post(self, endpoint, params=None):
+    def post(self, endpoint, params=None, version=1):
         params = params or {}
-        return self.request(endpoint, 'POST', params=params)
+        return self.request(endpoint, 'POST', params=params, version=version)
 
-    def delete(self, endpoint, params=None):
+    def delete(self, endpoint, params=None, version=1):
         params = params or {}
-        return self.request(endpoint, 'DELETE', params=params)
+        return self.request(endpoint, 'DELETE', params=params, version=version)
 
     # End Dynamic Request Methods
 
