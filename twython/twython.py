@@ -28,7 +28,7 @@ except ImportError:
 
 # Twython maps keyword based arguments to Twitter API endpoints. The endpoints
 # table is a file with a dictionary of every API endpoint that Twython supports.
-from twitter_endpoints import base_url, api_table
+from twitter_endpoints import base_url, api_table , twitter_http_status_codes
 
 
 # There are some special setups (like, oh, a Django application) where
@@ -207,6 +207,9 @@ class Twython(object):
         for key in api_table.keys():
             self.__dict__[key] = setFunc(key)
 
+        # create stash for last call intel
+        self._last_call= None
+
     def _constructFunc(self, api_call, **kwargs):
         # Go through and replace any mustaches that are in our API url.
         fn = api_table[api_call]
@@ -229,8 +232,58 @@ class Twython(object):
 
         func = getattr(self.client, method)
         response = func(url, data=myargs)
+        content= response.content.decode('utf-8')
 
-        return simplejson.loads(response.content.decode('utf-8'))
+        # create stash for last function intel
+        self._last_call= {
+            'api_call':api_call,
+            'api_error':None,
+            'cookies':response.cookies,
+            'error':response.error,
+            'headers':response.headers,
+            'status_code':response.status_code,
+            'url':response.url,
+            'content':content,
+        }
+        
+        if response.status_code not in ( 200 , 304 ):
+            # handle rate limiting first
+            if response.status_code == 420 :
+                raise TwythonAPILimit( "420 || %s || %s" % twitter_http_status_codes[420] )
+            if content:
+                try:
+                    as_json= simplejson.loads(content)
+                    if 'error' in as_json:
+                        self._last_call['api_error']= as_json['error']
+                except:
+                    pass
+            raise TwythonError( "%s || %s || %s" % ( response.status_code , twitter_http_status_codes[response.status_code][0] , twitter_http_status_codes[response.status_code][1] ) , error_code=response.status_code )
+            
+        try:
+            # sometimes this causes an error, and i haven't caught it yet!
+            return simplejson.loads(content)
+        except:
+            raise
+
+    def get_lastfunction_header(self,header):
+        """
+            get_lastfunction_header(self)
+
+            returns the header in the last function
+            this must be called after an API call, as it returns header based information.
+            this will return None if the header is not present
+            
+            most useful for the following header information:
+                x-ratelimit-limit
+                x-ratelimit-remaining
+                x-ratelimit-class
+                x-ratelimit-reset
+        """
+        if self._last_call is None:
+            raise TwythonError('This function must be called after an API call.  It delivers header information.')
+        if header in self._last_call['headers']:
+            return self._last_call['headers'][header]
+        return None
 
     def get_authentication_tokens(self):
         """
