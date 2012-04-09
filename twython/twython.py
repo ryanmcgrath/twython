@@ -13,7 +13,6 @@ __version__ = "1.6.0"
 
 import urllib
 import re
-import inspect
 import time
 
 import requests
@@ -51,20 +50,6 @@ except ImportError:
             # Seriously wtf is wrong with you if you get this Exception.
             raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
 
-# Try and gauge the old OAuth2 library spec. Versions 1.5 and greater no longer have the callback
-# url as part of the request object; older versions we need to patch for Python 2.5... ugh. ;P
-OAUTH_CALLBACK_IN_URL = False
-OAUTH_LIB_SUPPORTS_CALLBACK = False
-if not hasattr(oauth, '_version') or float(oauth._version.manual_verstr) <= 1.4:
-    OAUTH_CLIENT_INSPECTION = inspect.getargspec(oauth.Client.request)
-    try:
-        OAUTH_LIB_SUPPORTS_CALLBACK = 'callback_url' in OAUTH_CLIENT_INSPECTION.args
-    except AttributeError:
-        # Python 2.5 doesn't return named tuples, so don't look for an args section specifically.
-        OAUTH_LIB_SUPPORTS_CALLBACK = 'callback_url' in OAUTH_CLIENT_INSPECTION
-else:
-    OAUTH_CALLBACK_IN_URL = True
-
 
 class TwythonError(AttributeError):
     """
@@ -78,8 +63,12 @@ class TwythonError(AttributeError):
     """
     def __init__(self, msg, error_code=None):
         self.msg = msg
-        if error_code == 400:
-            raise TwythonAPILimit(msg)
+
+        if error_code is not None:
+            self.msg = self.msg + ' Please see https://dev.twitter.com/docs/error-codes-responses for additional information.'
+
+        if error_code == 400 or error_code == 420:
+            raise TwythonAPILimit(self.msg)
 
     def __str__(self):
         return repr(self.msg)
@@ -210,6 +199,9 @@ class Twython(object):
         for key in api_table.keys():
             self.__dict__[key] = setFunc(key)
 
+        # create stash for last call intel
+        self._last_call = None
+
     def _constructFunc(self, api_call, **kwargs):
         # Go through and replace any mustaches that are in our API url.
         fn = api_table[api_call]
@@ -228,7 +220,7 @@ class Twython(object):
 
         return content
 
-    def _request(self, url, method='GET', params=None):
+    def _request(self, url, method='GET', params=None, api_call=None):
         '''
         Internal response generator, not sense in repeating the same
         code twice, right? ;)
@@ -243,21 +235,36 @@ class Twython(object):
 
         func = getattr(self.client, method)
         response = func(url, data=myargs)
+        content = response.content.decode('utf-8')
+
+        # create stash for last function intel
+        self._last_call = {
+            'api_call': api_call,
+            'api_error': None,
+            'cookies': response.cookies,
+            'error': response.error,
+            'headers': response.headers,
+            'status_code': response.status_code,
+            'url': response.url,
+            'content': content,
+        }
 
         # Python 2.6 `json` will throw a ValueError if it
         # can't load the string as valid JSON,
         # `simplejson` will throw simplejson.decoder.JSONDecodeError
         # But excepting just ValueError will work with both. o.O
         try:
-            content = simplejson.loads(response.content.decode('utf-8'))
+            content = simplejson.loads(content)
         except ValueError:
             raise TwythonError('Response was not valid JSON, unable to decode.')
 
-        if response.status_code > 302:
+        if response.status_code > 304:
             # Just incase there is no error message, let's set a default
             error_msg = 'An error occurred processing your request.'
             if content.get('error') is not None:
                 error_msg = content['error']
+
+            self._last_call = error_msg
 
             raise TwythonError(error_msg, error_code=response.status_code)
 
@@ -280,7 +287,7 @@ class Twython(object):
         else:
             url = '%s%s.json' % (self.api_url % version, endpoint)
 
-        content = self._request(url, method=method, params=params)
+        content = self._request(url, method=method, params=params, api_call=url)
 
         return content
 
@@ -298,16 +305,38 @@ class Twython(object):
 
     # End Dynamic Request Methods
 
+    def get_lastfunction_header(self, header):
+        """
+            get_lastfunction_header(self)
+
+            returns the header in the last function
+            this must be called after an API call, as it returns header based information.
+            this will return None if the header is not present
+
+            most useful for the following header information:
+                x-ratelimit-limit
+                x-ratelimit-remaining
+                x-ratelimit-class
+                x-ratelimit-reset
+        """
+        if self._last_call is None:
+            raise TwythonError('This function must be called after an API call.  It delivers header information.')
+        if header in self._last_call['headers']:
+            return self._last_call['headers'][header]
+        return None
+
     def get_authentication_tokens(self):
         """
             get_auth_url(self)
 
             Returns an authorization URL for a user to hit.
         """
-        callback_url = self.callback_url or 'oob'
+        callback_url = self.callback_url
 
         request_args = {}
-        request_args['oauth_callback'] = callback_url
+        if callback_url:
+            request_args['oauth_callback'] = callback_url
+
         method = 'get'
 
         func = getattr(self.client, method)
@@ -322,17 +351,12 @@ class Twython(object):
 
         oauth_callback_confirmed = request_tokens.get('oauth_callback_confirmed') == 'true'
 
-        if not OAUTH_LIB_SUPPORTS_CALLBACK and callback_url != 'oob' and oauth_callback_confirmed:
-            import warnings
-            warnings.warn("oauth2 library doesn't support OAuth 1.0a type callback, but remote requires it")
-            oauth_callback_confirmed = False
-
         auth_url_params = {
             'oauth_token': request_tokens['oauth_token'],
         }
 
-        # Use old-style callback argument
-        if OAUTH_CALLBACK_IN_URL or (callback_url != 'oob' and not oauth_callback_confirmed):
+        # Use old-style callback argument if server didn't accept new-style
+        if callback_url and not oauth_callback_confirmed:
             auth_url_params['oauth_callback'] = callback_url
 
         request_tokens['auth_url'] = self.authenticate_url + '?' + urllib.urlencode(auth_url_params)
