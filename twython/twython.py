@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.5.2"
+__version__ = "1.6.0"
 
 import urllib
 import re
@@ -27,19 +27,21 @@ except ImportError:
 
 # Twython maps keyword based arguments to Twitter API endpoints. The endpoints
 # table is a file with a dictionary of every API endpoint that Twython supports.
-from twitter_endpoints import base_url, api_table , twitter_http_status_codes
+from twitter_endpoints import base_url, api_table, twitter_http_status_codes
 
 
 # There are some special setups (like, oh, a Django application) where
 # simplejson exists behind the scenes anyway. Past Python 2.6, this should
 # never really cause any problems to begin with.
 try:
-    # Python 2.6 and up
-    import json as simplejson
+    # Python 2.6 and below (2.4/2.5, 2.3 is not guranteed to work with this library to begin with)
+    # If they have simplejson, we should try and load that first,
+    # if they have the library, chances are they're gonna want to use that.
+    import simplejson
 except ImportError:
     try:
-        # Python 2.6 and below (2.4/2.5, 2.3 is not guranteed to work with this library to begin with)
-        import simplejson
+        # Python 2.6 and up
+        import json as simplejson
     except ImportError:
         try:
             # This case gets rarer by the day, but if we need to, we can pull it from Django provided it's there.
@@ -47,6 +49,7 @@ except ImportError:
         except:
             # Seriously wtf is wrong with you if you get this Exception.
             raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
+
 
 class TwythonError(AttributeError):
     """
@@ -60,8 +63,15 @@ class TwythonError(AttributeError):
     """
     def __init__(self, msg, error_code=None):
         self.msg = msg
-        if error_code == 400:
-            raise TwythonAPILimit(msg)
+
+        if error_code is not None and error_code in twitter_http_status_codes:
+            self.msg = '%s: %s -- %s' % \
+                        (twitter_http_status_codes[error_code][0],
+                         twitter_http_status_codes[error_code][1],
+                         self.msg)
+
+        if error_code == 400 or error_code == 420:
+            raise TwythonAPILimit(self.msg)
 
     def __str__(self):
         return repr(self.msg)
@@ -159,6 +169,7 @@ class Twython(object):
         self.access_token_url = 'http://twitter.com/oauth/access_token'
         self.authorize_url = 'http://twitter.com/oauth/authorize'
         self.authenticate_url = 'http://twitter.com/oauth/authenticate'
+        self.api_url = 'http://api.twitter.com/%s/'
 
         self.twitter_token = twitter_token
         self.twitter_secret = twitter_secret
@@ -177,7 +188,7 @@ class Twython(object):
             self.client = requests.session(hooks={'pre_request': OAuthHook()})
 
         if self.oauth_token is not None and self.oauth_secret is not None:
-            self.oauth_hook = OAuthHook(self.oauth_token, self.oauth_secret)
+            self.oauth_hook = OAuthHook(self.oauth_token, self.oauth_secret, header_auth=True)
             self.client = requests.session(hooks={'pre_request': self.oauth_hook})
 
         # Filter down through the possibilities here - if they have a token, if they're first stage, etc.
@@ -192,7 +203,7 @@ class Twython(object):
             self.__dict__[key] = setFunc(key)
 
         # create stash for last call intel
-        self._last_call= None
+        self._last_call = None
 
     def _constructFunc(self, api_call, **kwargs):
         # Go through and replace any mustaches that are in our API url.
@@ -208,55 +219,103 @@ class Twython(object):
         if not method in ('get', 'post', 'delete'):
             raise TwythonError('Method must be of GET, POST or DELETE')
 
+        content = self._request(url, method=method, params=kwargs)
+
+        return content
+
+    def _request(self, url, method='GET', params=None, api_call=None):
+        '''
+        Internal response generator, not sense in repeating the same
+        code twice, right? ;)
+        '''
         myargs = {}
+        method = method.lower()
+
         if method == 'get':
-            url = '%s?%s' % (url, urllib.urlencode(kwargs))
+            url = '%s?%s' % (url, urllib.urlencode(params))
         else:
-            myargs = kwargs
+            myargs = params
 
         func = getattr(self.client, method)
         response = func(url, data=myargs)
-        content= response.content.decode('utf-8')
+        content = response.content.decode('utf-8')
 
         # create stash for last function intel
-        self._last_call= {
-            'api_call':api_call,
-            'api_error':None,
-            'cookies':response.cookies,
-            'error':response.error,
-            'headers':response.headers,
-            'status_code':response.status_code,
-            'url':response.url,
-            'content':content,
+        self._last_call = {
+            'api_call': api_call,
+            'api_error': None,
+            'cookies': response.cookies,
+            'error': response.error,
+            'headers': response.headers,
+            'status_code': response.status_code,
+            'url': response.url,
+            'content': content,
         }
-        
-        if response.status_code not in ( 200 , 304 ):
-            # handle rate limiting first
-            if response.status_code == 420 :
-                raise TwythonAPILimit( "420 || %s || %s" % twitter_http_status_codes[420] )
-            if content:
-                try:
-                    as_json= simplejson.loads(content)
-                    if 'error' in as_json:
-                        self._last_call['api_error']= as_json['error']
-                except:
-                    pass
-            raise TwythonError( "%s || %s || %s" % ( response.status_code , twitter_http_status_codes[response.status_code][0] , twitter_http_status_codes[response.status_code][1] ) , error_code=response.status_code )
-            
-        try:
-            # sometimes this causes an error, and i haven't caught it yet!
-            return simplejson.loads(content)
-        except:
-            raise
 
-    def get_lastfunction_header(self,header):
+        # Python 2.6 `json` will throw a ValueError if it
+        # can't load the string as valid JSON,
+        # `simplejson` will throw simplejson.decoder.JSONDecodeError
+        # But excepting just ValueError will work with both. o.O
+        try:
+            content = simplejson.loads(content)
+        except ValueError:
+            raise TwythonError('Response was not valid JSON, unable to decode.')
+
+        if response.status_code > 304:
+            # Just incase there is no error message, let's set a default
+            error_msg = 'An error occurred processing your request.'
+            if content.get('error') is not None:
+                error_msg = content['error']
+
+            self._last_call = error_msg
+
+            raise TwythonError(error_msg, error_code=response.status_code)
+
+        return content
+
+    '''
+    # Dynamic Request Methods
+    Just in case Twitter releases something in their API
+    and a developer wants to implement it on their app, but
+    we haven't gotten around to putting it in Twython yet. :)
+    '''
+
+    def request(self, endpoint, method='GET', params=None, version=1):
+        params = params or {}
+
+        # In case they want to pass a full Twitter URL
+        # i.e. http://search.twitter.com/
+        if endpoint.startswith('http://'):
+            url = endpoint
+        else:
+            url = '%s%s.json' % (self.api_url % version, endpoint)
+
+        content = self._request(url, method=method, params=params, api_call=url)
+
+        return content
+
+    def get(self, endpoint, params=None, version=1):
+        params = params or {}
+        return self.request(endpoint, params=params, version=version)
+
+    def post(self, endpoint, params=None, version=1):
+        params = params or {}
+        return self.request(endpoint, 'POST', params=params, version=version)
+
+    def delete(self, endpoint, params=None, version=1):
+        params = params or {}
+        return self.request(endpoint, 'DELETE', params=params, version=version)
+
+    # End Dynamic Request Methods
+
+    def get_lastfunction_header(self, header):
         """
             get_lastfunction_header(self)
 
             returns the header in the last function
             this must be called after an API call, as it returns header based information.
             this will return None if the header is not present
-            
+
             most useful for the following header information:
                 x-ratelimit-limit
                 x-ratelimit-remaining
@@ -280,7 +339,7 @@ class Twython(object):
         request_args = {}
         if callback_url:
             request_args['oauth_callback'] = callback_url
-            
+
         method = 'get'
 
         func = getattr(self.client, method)
