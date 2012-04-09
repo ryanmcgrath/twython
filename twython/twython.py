@@ -27,7 +27,7 @@ except ImportError:
 
 # Twython maps keyword based arguments to Twitter API endpoints. The endpoints
 # table is a file with a dictionary of every API endpoint that Twython supports.
-from twitter_endpoints import base_url, api_table
+from twitter_endpoints import base_url, api_table, twitter_http_status_codes
 
 
 # There are some special setups (like, oh, a Django application) where
@@ -64,8 +64,11 @@ class TwythonError(AttributeError):
     def __init__(self, msg, error_code=None):
         self.msg = msg
 
-        if error_code is not None:
-            self.msg = self.msg + ' Please see https://dev.twitter.com/docs/error-codes-responses for additional information.'
+        if error_code is not None and error_code in twitter_http_status_codes:
+            self.msg = '%s: %s -- %s' % \
+                        (twitter_http_status_codes[error_code][0],
+                         twitter_http_status_codes[error_code][1],
+                         self.msg)
 
         if error_code == 400 or error_code == 420:
             raise TwythonAPILimit(self.msg)
