@@ -63,6 +63,7 @@ class TwythonError(AttributeError):
     """
     def __init__(self, msg, error_code=None):
         self.msg = msg
+        self.error_code = error_code
 
         if error_code is not None and error_code in twitter_http_status_codes:
             self.msg = '%s: %s -- %s' % \
@@ -71,7 +72,7 @@ class TwythonError(AttributeError):
                          self.msg)
 
         if error_code == 400 or error_code == 420:
-            raise TwythonAPILimit(self.msg)
+            raise TwythonAPILimit( self.msg , error_code)
 
     def __str__(self):
         return repr(self.msg)
@@ -83,8 +84,9 @@ class TwythonAPILimit(TwythonError):
         docs if you're running into issues here, Twython does not concern itself with
         this matter beyond telling you that you've done goofed.
     """
-    def __init__(self, msg):
+    def __init__(self, msg, error_code=None):
         self.msg = msg
+        self.error_code = error_code
 
     def __str__(self):
         return repr(self.msg)
@@ -123,8 +125,9 @@ class TwythonAuthError(TwythonError):
         Raised when you try to access a protected resource and it fails due to some issue with
         your authentication.
     """
-    def __init__(self, msg):
+    def __init__(self, msg, error_code=None ):
         self.msg = msg
+        self.error_code = error_code
 
     def __str__(self):
         return repr(self.msg)
@@ -135,8 +138,9 @@ class AuthError(TwythonError):
         Raised when you try to access a protected resource and it fails due to some issue with
         your authentication.
     """
-    def __init__(self, msg):
+    def __init__(self, msg , error_code=None ):
         self.msg = '%s\n Notice: AuthError is deprecated and soon to be removed, catch on TwythonAuthError instead!' % msg
+        self.error_code = error_code
 
     def __str__(self):
         return repr(self.msg)
@@ -405,7 +409,7 @@ class Twython(object):
         if request.status_code in [301, 201, 200]:
             return request.text
         else:
-            raise TwythonError('shortenURL() failed with a %s error code.' % request.status_code)
+            raise TwythonError('shortenURL() failed with a %s error code.' % request.status_code , request.status_code )
 
     @staticmethod
     def constructApiURL(base_url, params):
