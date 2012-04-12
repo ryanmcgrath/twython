@@ -9,14 +9,13 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.6.0"
+__version__ = "1.7.0"
 
 import urllib
 import re
 import time
 
 import requests
-from requests.exceptions import RequestException
 from oauth_hook import OAuthHook
 import oauth2 as oauth
 
@@ -61,6 +60,7 @@ class TwythonError(AttributeError):
     """
     def __init__(self, msg, error_code=None, retry_after=None):
         self.msg = msg
+        self.error_code = error_code
 
         if error_code is not None and error_code in twitter_http_status_codes:
             self.msg = '%s: %s -- %s' % \
@@ -69,28 +69,29 @@ class TwythonError(AttributeError):
                          self.msg)
 
         if error_code == 400 or error_code == 420:
-            raise TwythonRateLimitError(self.msg, retry_after=retry_after)
+            raise TwythonRateLimitError(self.msg,
+                                        error_code,
+                                        retry_after=retry_after)
 
     def __str__(self):
         return repr(self.msg)
 
 
 class TwythonAuthError(TwythonError):
+    """ Raised when you try to access a protected resource and it fails due to
+        some issue with your authentication.
     """
-        Raised when you try to access a protected resource and it fails due to some issue with
-        your authentication.
-    """
-    def __init__(self, msg):
+    def __init__(self, msg, error_code=None):
         self.msg = msg
+        self.error_code = error_code
 
     def __str__(self):
         return repr(self.msg)
 
 
 class TwythonRateLimitError(TwythonError):
-    """
-        Raised when you've hit a rate limit.  retry_wait_seconds is the number of seconds to
-        wait before trying again.
+    """ Raised when you've hit a rate limit.
+        retry_wait_seconds is the number of seconds to wait before trying again.
     """
     def __init__(self, msg, error_code, retry_after=None):
         retry_after = int(retry_after)
@@ -107,40 +108,40 @@ class TwythonRateLimitError(TwythonError):
 
 
 class TwythonAPILimit(TwythonError):
-    """
-        Raised when you've hit an API limit. Try to avoid these, read the API
+    """ Raised when you've hit an API limit. Try to avoid these, read the API
         docs if you're running into issues here, Twython does not concern itself with
         this matter beyond telling you that you've done goofed.
     """
-    def __init__(self, msg):
-        self.msg = msg
+    def __init__(self, msg, error_code=None):
+        self.msg = '%s\n Notice: APILimit is deprecated and soon to be removed, catch on TwythonRateLimitLimit instead!' % msg
+        self.error_code = error_code
 
     def __str__(self):
         return repr(self.msg)
 
 
 class APILimit(TwythonError):
-    """
-        Raised when you've hit an API limit. Try to avoid these, read the API
+    """ Raised when you've hit an API limit. Try to avoid these, read the API
         docs if you're running into issues here, Twython does not concern itself with
         this matter beyond telling you that you've done goofed.
 
         DEPRECATED, import and catch TwythonAPILimit instead.
     """
-    def __init__(self, msg):
-        self.msg = '%s\n Notice: APILimit is deprecated and soon to be removed, catch on TwythonAPILimit instead!' % msg
+    def __init__(self, msg, error_code=None):
+        self.msg = '%s\n Notice: APILimit is deprecated and soon to be removed, catch on TwythonRateLimitLimit instead!' % msg
+        self.error_code = error_code
 
     def __str__(self):
         return repr(self.msg)
 
 
 class AuthError(TwythonError):
-    """
-        Raised when you try to access a protected resource and it fails due to some issue with
+    """ Raised when you try to access a protected resource and it fails due to some issue with
         your authentication.
     """
-    def __init__(self, msg):
+    def __init__(self, msg, error_code=None):
         self.msg = '%s\n Notice: AuthError is deprecated and soon to be removed, catch on TwythonAuthError instead!' % msg
+        self.error_code = error_code
 
     def __str__(self):
         return repr(self.msg)
@@ -414,7 +415,7 @@ class Twython(object):
         if request.status_code in [301, 201, 200]:
             return request.text
         else:
-            raise TwythonError('shortenURL() failed with a %s error code.' % request.status_code)
+            raise TwythonError('shortenURL() failed with a %s error code.' % request.status_code , request.status_code )
 
     @staticmethod
     def constructApiURL(base_url, params):
