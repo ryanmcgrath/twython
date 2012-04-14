@@ -476,7 +476,7 @@ class Twython(object):
                 e.g x.searchGen("python", page="2") or
                     x.searchGen(search_query = "python", page = "2")
         """
-        searchURL = Twython.constructApiURL("http://search.twitter.com/search.json?q=%s" % Twython.unicode2utf8(search_query), kwargs)
+        searchURL = Twython.constructApiURL("http://search.twitter.com/search.json?q=%s" % urllib.quote_plus(Twython.unicode2utf8(search_query)), kwargs)
         try:
             response = self.client.get(searchURL, headers=self.headers)
             data = simplejson.loads(response.content.decode('utf-8'))
