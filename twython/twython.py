@@ -169,11 +169,11 @@ class Twython(object):
         OAuthHook.consumer_secret = twitter_secret
 
         # Needed for hitting that there API.
-        self.request_token_url = 'http://twitter.com/oauth/request_token'
-        self.access_token_url = 'http://twitter.com/oauth/access_token'
-        self.authorize_url = 'http://twitter.com/oauth/authorize'
-        self.authenticate_url = 'http://twitter.com/oauth/authenticate'
-        self.api_url = 'http://api.twitter.com/%s/'
+        self.request_token_url = 'https://twitter.com/oauth/request_token'
+        self.access_token_url = 'https://twitter.com/oauth/access_token'
+        self.authorize_url = 'https://twitter.com/oauth/authorize'
+        self.authenticate_url = 'https://twitter.com/oauth/authenticate'
+        self.api_url = 'https://api.twitter.com/%s/'
 
         self.twitter_token = twitter_token
         self.twitter_secret = twitter_secret
@@ -428,7 +428,7 @@ class Twython(object):
         if screen_names:
             kwargs['screen_name'] = ','.join(screen_names)
 
-        lookupURL = Twython.constructApiURL("http://api.twitter.com/%d/users/lookup.json" % version, kwargs)
+        lookupURL = Twython.constructApiURL("https://api.twitter.com/%d/users/lookup.json" % version, kwargs)
         try:
             response = self.client.post(lookupURL, headers=self.headers)
             return simplejson.loads(response.content.decode('utf-8'))
@@ -445,7 +445,7 @@ class Twython(object):
 
                 e.g x.search(q = "jjndf", page = '2')
         """
-        searchURL = Twython.constructApiURL("http://search.twitter.com/search.json", kwargs)
+        searchURL = Twython.constructApiURL("https://search.twitter.com/search.json", kwargs)
         try:
             response = self.client.get(searchURL, headers=self.headers)
 
@@ -476,7 +476,7 @@ class Twython(object):
                 e.g x.searchGen("python", page="2") or
                     x.searchGen(search_query = "python", page = "2")
         """
-        searchURL = Twython.constructApiURL("http://search.twitter.com/search.json?q=%s" % Twython.unicode2utf8(search_query), kwargs)
+        searchURL = Twython.constructApiURL("https://search.twitter.com/search.json?q=%s" % Twython.unicode2utf8(search_query), kwargs)
         try:
             response = self.client.get(searchURL, headers=self.headers)
             data = simplejson.loads(response.content.decode('utf-8'))
@@ -524,7 +524,7 @@ class Twython(object):
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
         try:
-            response = self.client.get("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, username, list_id, id), headers=self.headers)
+            response = self.client.get("https://api.twitter.com/%d/%s/%s/members/%s.json" % (version, username, list_id, id), headers=self.headers)
             return simplejson.loads(response.content.decode('utf-8'))
         except RequestException, e:
             raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
@@ -543,7 +543,7 @@ class Twython(object):
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
         try:
-            response = self.client.get("http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, username, list_id, id), headers=self.headers)
+            response = self.client.get("https://api.twitter.com/%d/%s/%s/following/%s.json" % (version, username, list_id, id), headers=self.headers)
             return simplejson.loads(response.content.decode('utf-8'))
         except RequestException, e:
             raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
@@ -559,7 +559,7 @@ class Twython(object):
                 tile - Optional (defaults to True). If set to true the background image will be displayed tiled. The image will not be tiled otherwise.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        return self._media_update('http://api.twitter.com/%d/account/update_profile_background_image.json' % version, {
+        return self._media_update('https://api.twitter.com/%d/account/update_profile_background_image.json' % version, {
             'image': (file_, open(file_, 'rb'))
         }, params={'tile': tile})
 
@@ -572,7 +572,7 @@ class Twython(object):
                 image - Required. Must be a valid GIF, JPG, or PNG image of less than 700 kilobytes in size. Images with width larger than 500 pixels will be scaled down.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        return self._media_update('http://api.twitter.com/%d/account/update_profile_image.json' % version, {
+        return self._media_update('https://api.twitter.com/%d/account/update_profile_image.json' % version, {
             'image': (file_, open(file_, 'rb'))
         })
 
@@ -666,7 +666,7 @@ class Twython(object):
                 size - Optional. Image size. Valid options include 'normal', 'mini' and 'bigger'. Defaults to 'normal' if not given.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        url = "http://api.twitter.com/%s/users/profile_image/%s.json" % (version, username)
+        url = "https://api.twitter.com/%s/users/profile_image/%s.json" % (version, username)
         if size:
             url = self.constructApiURL(url, {'size': size})
 
