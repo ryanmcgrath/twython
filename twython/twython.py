@@ -289,6 +289,9 @@ class Twython(object):
 
         # In case they want to pass a full Twitter URL
         # i.e. http://search.twitter.com/
+        # convert any http Twitter url into https, for the sake of user security
+        # only convert the protocol part, not all occurences of http://, in case users want to search that
+        endpoint = endpoint.replace('http://','https://',1)
         if endpoint.startswith('http://'):
             url = endpoint
         else:
