@@ -127,6 +127,7 @@ class APILimit(TwythonError):
 
         DEPRECATED, import and catch TwythonAPILimit instead.
     """
+
     def __init__(self, msg, error_code=None):
         self.msg = '%s\n Notice: APILimit is deprecated and soon to be removed, catch on TwythonRateLimitLimit instead!' % msg
         self.error_code = error_code
@@ -139,6 +140,7 @@ class AuthError(TwythonError):
     """ Raised when you try to access a protected resource and it fails due to some issue with
         your authentication.
     """
+
     def __init__(self, msg, error_code=None):
         self.msg = '%s\n Notice: AuthError is deprecated and soon to be removed, catch on TwythonAuthError instead!' % msg
         self.error_code = error_code
@@ -173,11 +175,11 @@ class Twython(object):
         OAuthHook.consumer_secret = twitter_secret
 
         # Needed for hitting that there API.
-        self.request_token_url = 'http://twitter.com/oauth/request_token'
-        self.access_token_url = 'http://twitter.com/oauth/access_token'
-        self.authorize_url = 'http://twitter.com/oauth/authorize'
-        self.authenticate_url = 'http://twitter.com/oauth/authenticate'
-        self.api_url = 'http://api.twitter.com/%s/'
+        self.request_token_url = 'https://twitter.com/oauth/request_token'
+        self.access_token_url = 'https://twitter.com/oauth/access_token'
+        self.authorize_url = 'https://twitter.com/oauth/authorize'
+        self.authenticate_url = 'https://twitter.com/oauth/authenticate'
+        self.api_url = 'https://api.twitter.com/%s/'
 
         self.twitter_token = twitter_token
         self.twitter_secret = twitter_secret
@@ -232,8 +234,7 @@ class Twython(object):
         return content
 
     def _request(self, url, method='GET', params=None, api_call=None):
-        '''
-        Internal response generator, not sense in repeating the same
+        '''Internal response generator, no sense in repeating the same
         code twice, right? ;)
         '''
         myargs = {}
@@ -295,7 +296,7 @@ class Twython(object):
 
         # In case they want to pass a full Twitter URL
         # i.e. http://search.twitter.com/
-        if endpoint.startswith('http://'):
+        if endpoint.startswith('http://') or endpoint.startswith('https://'):
             url = endpoint
         else:
             url = '%s%s.json' % (self.api_url % version, endpoint)
@@ -415,11 +416,7 @@ class Twython(object):
         if request.status_code in [301, 201, 200]:
             return request.text
         else:
-            raise TwythonError('shortenURL() failed with a %s error code.' % request.status_code , request.status_code )
-
-    @staticmethod
-    def constructApiURL(base_url, params):
-        return base_url + "?" + "&".join(["%s=%s" % (Twython.unicode2utf8(key), urllib.quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.iteritems()])
+            raise TwythonError('shortenURL() failed with a %s error code.' % request.status_code, request.status_code)
 
     def bulkUserLookup(self, ids=None, screen_names=None, version=1, **kwargs):
         """ A method to do bulk user lookups against the Twitter API.
@@ -479,6 +476,9 @@ class Twython(object):
 
             e.g x.search(q='jjndf', page='2')
         """
+        if 'q' in kwargs:
+            kwargs['q'] = urllib.quote_plus(Twython.unicode2utf8(kwargs['q']))
+
         return self.get('http://search.twitter.com/search.json', params=kwargs)
 
     def searchGen(self, search_query, **kwargs):
@@ -492,7 +492,7 @@ class Twython(object):
                 for result in search:
                     print result
         """
-        kwargs['q'] = search_query
+        kwargs['q'] = urllib.quote_plus(Twython.unicode2utf8(search_query))
         content = self.get('http://search.twitter.com/search.json', params=kwargs)
 
         if not content['results']:
@@ -682,7 +682,7 @@ class Twython(object):
         req = requests.post(url, data=params, files=file_, headers=self.headers)
         return req.content
 
-    def getProfileImageUrl(self, username, size=None, version=1):
+    def getProfileImageUrl(self, username, size='normal', version=1):
         """ getProfileImageUrl(username)
 
             Gets the URL for the user's profile image.
@@ -692,20 +692,17 @@ class Twython(object):
                 size - Optional. Image size. Valid options include 'normal', 'mini' and 'bigger'. Defaults to 'normal' if not given.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        url = "http://api.twitter.com/%s/users/profile_image/%s.json" % \
-              (version, username)
 
-        if size:
-            url = self.constructApiURL(url, {'size': size})
+        endpoint = 'users/profile_image/%s' % username
+        url = self.api_url % version + endpoint + '?' + urllib.urlencode({'size': size})
 
-        #client.follow_redirects = False
         response = self.client.get(url, allow_redirects=False)
         image_url = response.headers.get('location')
 
         if response.status_code in (301, 302, 303, 307) and image_url is not None:
             return image_url
-
-        raise TwythonError("getProfileImageUrl() failed with a %d error code." % response.status_code, response.status_code)
+        else:
+            raise TwythonError('getProfileImageUrl() threw an error.', error_code=response.status_code)
 
     @staticmethod
     def stream(data, callback):
