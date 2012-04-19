@@ -144,10 +144,10 @@ class Twython(object):
                 ** Note: versioning is not currently used by search.twitter functions; when Twitter moves their junk, it'll be supported.
         """
         # Needed for hitting that there API.
-        self.request_token_url = 'http://twitter.com/oauth/request_token'
-        self.access_token_url = 'http://twitter.com/oauth/access_token'
-        self.authorize_url = 'http://twitter.com/oauth/authorize'
-        self.authenticate_url = 'http://twitter.com/oauth/authenticate'
+        self.request_token_url = 'https://twitter.com/oauth/request_token'
+        self.access_token_url = 'https://twitter.com/oauth/access_token'
+        self.authorize_url = 'https://twitter.com/oauth/authorize'
+        self.authenticate_url = 'https://twitter.com/oauth/authenticate'
         self.twitter_token = twitter_token
         self.twitter_secret = twitter_secret
         self.oauth_token = oauth_token
@@ -297,7 +297,7 @@ class Twython(object):
         if screen_names:
             kwargs['screen_name'] = ','.join(screen_names)
             
-        lookupURL = Twython.constructApiURL("http://api.twitter.com/%d/users/lookup.json" % version, kwargs)
+        lookupURL = Twython.constructApiURL("https://api.twitter.com/%d/users/lookup.json" % version, kwargs)
         try:
             resp, content = self.client.request(lookupURL, "POST", headers = self.headers)
             return simplejson.loads(content.decode('utf-8'))
@@ -314,7 +314,7 @@ class Twython(object):
 
                 e.g x.search(q = "jjndf", page = '2')
         """
-        searchURL = Twython.constructApiURL("http://search.twitter.com/search.json", kwargs)
+        searchURL = Twython.constructApiURL("https://search.twitter.com/search.json", kwargs)
         try:
             resp, content = self.client.request(searchURL, "GET", headers = self.headers)
             return simplejson.loads(content.decode('utf-8'))
@@ -337,7 +337,7 @@ class Twython(object):
                 e.g x.searchGen("python", page="2") or
                     x.searchGen(search_query = "python", page = "2")
         """
-        searchURL = Twython.constructApiURL("http://search.twitter.com/search.json?q=%s" % Twython.unicode2utf8(search_query), kwargs)
+        searchURL = Twython.constructApiURL("https://search.twitter.com/search.json?q=%s" % Twython.unicode2utf8(search_query), kwargs)
         try:
             resp, content = self.client.request(searchURL, "GET", headers = self.headers)
             data = simplejson.loads(content.decode('utf-8'))
@@ -385,7 +385,7 @@ class Twython(object):
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
         try:
-            resp, content = self.client.request("http://api.twitter.com/%d/%s/%s/members/%s.json" % (version, username, list_id, repr(id)), headers = self.headers)
+            resp, content = self.client.request("https://api.twitter.com/%d/%s/%s/members/%s.json" % (version, username, list_id, repr(id)), headers = self.headers)
             return simplejson.loads(content.decode('utf-8'))
         except HTTPError as e:
             raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
@@ -404,7 +404,7 @@ class Twython(object):
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
         try:
-            resp, content = self.client.request("http://api.twitter.com/%d/%s/%s/following/%s.json" % (version, username, list_id, repr(id)), headers = self.headers)
+            resp, content = self.client.request("https://api.twitter.com/%d/%s/%s/following/%s.json" % (version, username, list_id, repr(id)), headers = self.headers)
             return simplejson.loads(content.decode('utf-8'))
         except HTTPError as e:
             raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
@@ -426,7 +426,7 @@ class Twython(object):
             fields = []
             content_type, body = Twython.encode_multipart_formdata(fields, files)
             headers = {'Content-Type': content_type, 'Content-Length': str(len(body))}
-            r = urllib.request.Request("http://api.twitter.com/%d/account/update_profile_background_image.json?tile=%s" % (version, tile), body, headers)
+            r = urllib.request.Request("https://api.twitter.com/%d/account/update_profile_background_image.json?tile=%s" % (version, tile), body, headers)
             return urllib.request.urlopen(r).read()
         except HTTPError as e:
             raise TwythonError("updateProfileBackgroundImage() failed with a %d error code." % e.code, e.code)
@@ -445,7 +445,7 @@ class Twython(object):
             fields = []
             content_type, body = Twython.encode_multipart_formdata(fields, files)
             headers = {'Content-Type': content_type, 'Content-Length': str(len(body))}
-            r = urllib.request.Request("http://api.twitter.com/%d/account/update_profile_image.json" % version, body, headers)
+            r = urllib.request.Request("https://api.twitter.com/%d/account/update_profile_image.json" % version, body, headers)
             return urllib.request.urlopen(r).read()
         except HTTPError as e:
             raise TwythonError("updateProfileImage() failed with a %d error code." % e.code, e.code)

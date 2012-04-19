@@ -147,3 +147,4 @@ me and let me know (or just issue a pull request on GitHub, and leave a note abo
 - **[Remy DeCausemaker (decause)](https://github.com/decause)**, PEP-8 contributions.  
 - **[mckellister](https://github.com/mckellister)**, Fixes to `Exception`s raised by Twython (Rate Limits, etc).  
 - **[tatz_tsuchiya](http://d.hatena.ne.jp/tatz_tsuchiya/20120115/1326623451)**, Fix for `lambda` scoping in key injection phase.  
+- **[Voulnet (Mohammed ALDOUB)](https://github.com/Voulnet)**, Fixes for `http`/`https` access endpoints  
