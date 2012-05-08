@@ -68,7 +68,7 @@ class TwythonError(AttributeError):
                          twitter_http_status_codes[error_code][1],
                          self.msg)
 
-        if error_code == 400 or error_code == 420:
+        if error_code == 420:
             raise TwythonRateLimitError(self.msg,
                                         error_code,
                                         retry_after=retry_after)
@@ -94,9 +94,9 @@ class TwythonRateLimitError(TwythonError):
         retry_wait_seconds is the number of seconds to wait before trying again.
     """
     def __init__(self, msg, error_code, retry_after=None):
-        retry_after = int(retry_after)
-        self.msg = '%s (Retry after %s seconds)' % (msg, retry_after)
-        TwythonError.__init__(self, msg, error_code)
+        if isinstance(retry_after, int):
+            retry_after = int(retry_after)
+            self.msg = '%s (Retry after %s seconds)' % (msg, retry_after)
 
     def __str__(self):
         return repr(self.msg)
@@ -175,11 +175,11 @@ class Twython(object):
         OAuthHook.consumer_secret = twitter_secret
 
         # Needed for hitting that there API.
-        self.request_token_url = 'https://twitter.com/oauth/request_token'
-        self.access_token_url = 'https://twitter.com/oauth/access_token'
-        self.authorize_url = 'https://twitter.com/oauth/authorize'
-        self.authenticate_url = 'https://twitter.com/oauth/authenticate'
-        self.api_url = 'https://api.twitter.com/%s/'
+        self.api_url = 'https://api.twitter.com/%s'
+        self.request_token_url = self.api_url % 'oauth/request_token'
+        self.access_token_url = self.api_url % 'oauth/access_token'
+        self.authorize_url = self.api_url % 'oauth/authorize'
+        self.authenticate_url = self.api_url % 'oauth/authenticate'
 
         self.twitter_token = twitter_token
         self.twitter_secret = twitter_secret
@@ -299,7 +299,7 @@ class Twython(object):
         if endpoint.startswith('http://') or endpoint.startswith('https://'):
             url = endpoint
         else:
-            url = '%s%s.json' % (self.api_url % version, endpoint)
+            url = '%s/%s.json' % (self.api_url % version, endpoint)
 
         content = self._request(url, method=method, params=params, api_call=url)
 
@@ -694,7 +694,7 @@ class Twython(object):
         """
 
         endpoint = 'users/profile_image/%s' % username
-        url = self.api_url % version + endpoint + '?' + urllib.urlencode({'size': size})
+        url = self.api_url % version + '/' + endpoint + '?' + urllib.urlencode({'size': size})
 
         response = self.client.get(url, allow_redirects=False)
         image_url = response.headers.get('location')
