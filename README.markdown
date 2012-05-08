@@ -40,6 +40,10 @@ Installing Twython is fairly easy. You can...
     cd twython
     sudo python setup.py install
 
+Please note:
+-----------------------------------------------------------------------------------------------------
+As of Twython 1.7.0, we have change routes for functions to abide by the Twitter Spring 2012 clean up (https://dev.twitter.com/docs/deprecations/spring-2012). Please make changes to your code accordingly.
+
 Example Use
 -----------------------------------------------------------------------------------------------------
 ``` python
@@ -75,8 +79,7 @@ Twython.stream({
     'password': 'your_password',  
     'track': 'python'  
 }, on_results)  
-```  
-  
+```
 
 A note about the development of Twython (specifically, 1.3)
 ----------------------------------------------------------------------------------------------------
