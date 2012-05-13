@@ -4,28 +4,11 @@ Ah, Twitter, your API used to be so awesome, before you went and implemented the
 as OAuth 1.0. However, since you decided to force your entire development community over a barrel
 about it, I suppose Twython has to support this. So, that said...
 
-If you used this library and it all stopped working, it's because of the Authentication method change.
+Does Twython handle OAuth?
 =========================================================================================================
-Twitter recently disabled the use of "Basic Authentication", which is why, if you used Twython previously,
-you probably started getting a ton of 401 errors. To fix this, we should note one thing...
-
-You need to change how authentication works in your program/application. If you're using a command line
-application or something, you'll probably languish in hell for a bit, because OAuth wasn't really designed
-for those types of use cases. Twython cannot help you with that or fix the annoying parts of OAuth.
-
-If you need OAuth, though, Twython now supports it, and ships with a skeleton Django application to get you started.
-Enjoy!
-
-Requirements (2.6~ and below; for 3k, read section further down)
------------------------------------------------------------------------------------------------------
-Twython (for versions of Python before 2.6) requires a library called
-"simplejson". Depending on your flavor of package manager, you can do the following...
-
-    (pip install | easy_install) simplejson
-
-Twython also requires the (most excellent) OAuth2 library for handling OAuth tokens/signing/etc. Again...
-
-    (pip install | easy_install) oauth2
+Yes, in a sense. There's a variety of builtin-methods that you can use to handle the authentication ritual.
+There's an **[example Django application](https://github.com/ryanmcgrath/twython-django)** that showcases
+this - feel free to peruse and use!
 
 Installation
 -----------------------------------------------------------------------------------------------------
@@ -35,10 +18,14 @@ Installing Twython is fairly easy. You can...
 
 ...or, you can clone the repo and install it the old fashioned way.
 
-
     git clone git://github.com/ryanmcgrath/twython.git
     cd twython
     sudo python setup.py install
+
+Please note:
+-----------------------------------------------------------------------------------------------------
+As of Twython 2.0.0, we have changed routes for functions to abide by the **[Twitter Spring 2012 clean up](https://dev.twitter.com/docs/deprecations/spring-2012)**. 
+Please make changes to your code accordingly.
 
 Example Use
 -----------------------------------------------------------------------------------------------------
@@ -75,8 +62,7 @@ Twython.stream({
     'password': 'your_password',  
     'track': 'python'  
 }, on_results)  
-```  
-  
+```
 
 A note about the development of Twython (specifically, 1.3)
 ----------------------------------------------------------------------------------------------------

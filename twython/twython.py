@@ -9,14 +9,13 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "1.6.0"
+__version__ = "2.0.0"
 
 import urllib
 import re
 import time
 
 import requests
-from requests.exceptions import RequestException
 from oauth_hook import OAuthHook
 import oauth2 as oauth
 
@@ -34,9 +33,7 @@ from twitter_endpoints import base_url, api_table, twitter_http_status_codes
 # simplejson exists behind the scenes anyway. Past Python 2.6, this should
 # never really cause any problems to begin with.
 try:
-    # Python 2.6 and below (2.4/2.5, 2.3 is not guranteed to work with this library to begin with)
-    # If they have simplejson, we should try and load that first,
-    # if they have the library, chances are they're gonna want to use that.
+    # If they have the library, chances are they're gonna want to use that.
     import simplejson
 except ImportError:
     try:
@@ -61,7 +58,7 @@ class TwythonError(AttributeError):
 
         from twython import TwythonError, TwythonAPILimit, TwythonAuthError
     """
-    def __init__(self, msg, error_code=None):
+    def __init__(self, msg, error_code=None, retry_after=None):
         self.msg = msg
         self.error_code = error_code
 
@@ -70,19 +67,22 @@ class TwythonError(AttributeError):
                         (twitter_http_status_codes[error_code][0],
                          twitter_http_status_codes[error_code][1],
                          self.msg)
-
-        if error_code == 400 or error_code == 420:
+        
+        if error_code == 400:
             raise TwythonAPILimit( self.msg , error_code)
-
+        
+        if error_code == 420:
+            raise TwythonRateLimitError(self.msg,
+                                        error_code,
+                                        retry_after=retry_after)
+    
     def __str__(self):
         return repr(self.msg)
 
 
-class TwythonAPILimit(TwythonError):
-    """
-        Raised when you've hit an API limit. Try to avoid these, read the API
-        docs if you're running into issues here, Twython does not concern itself with
-        this matter beyond telling you that you've done goofed.
+class TwythonAuthError(TwythonError):
+    """ Raised when you try to access a protected resource and it fails due to
+        some issue with your authentication.
     """
     def __init__(self, msg, error_code=None):
         self.msg = msg
@@ -92,41 +92,46 @@ class TwythonAPILimit(TwythonError):
         return repr(self.msg)
 
 
-class APILimit(TwythonError):
+class TwythonRateLimitError(TwythonError):
+    """ Raised when you've hit a rate limit.
+        retry_wait_seconds is the number of seconds to wait before trying again.
     """
-        Raised when you've hit an API limit. Try to avoid these, read the API
+    def __init__(self, msg, error_code, retry_after=None):
+        if isinstance(retry_after, int):
+            retry_after = int(retry_after)
+            self.msg = '%s (Retry after %s seconds)' % (msg, retry_after)
+
+    def __str__(self):
+        return repr(self.msg)
+
+
+''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
+''' REMOVE THE FOLLOWING IN TWYTHON 2.0 '''
+''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
+
+
+class TwythonAPILimit(TwythonError):
+    """ Raised when you've hit an API limit. Try to avoid these, read the API
+        docs if you're running into issues here, Twython does not concern itself with
+        this matter beyond telling you that you've done goofed.
+    """
+    def __init__(self, msg, error_code=None):
+        self.msg = '%s\n Notice: APILimit is deprecated and soon to be removed, catch on TwythonRateLimitLimit instead!' % msg
+        self.error_code = error_code
+
+    def __str__(self):
+        return repr(self.msg)
+
+
+class APILimit(TwythonError):
+    """ Raised when you've hit an API limit. Try to avoid these, read the API
         docs if you're running into issues here, Twython does not concern itself with
         this matter beyond telling you that you've done goofed.
 
         DEPRECATED, import and catch TwythonAPILimit instead.
     """
-    def __init__(self, msg):
-        self.msg = '%s\n Notice: APILimit is deprecated and soon to be removed, catch on TwythonAPILimit instead!' % msg
-
-    def __str__(self):
-        return repr(self.msg)
-
-
-class TwythonRateLimitError(TwythonError):
-    """
-        Raised when you've hit a rate limit.  retry_wait_seconds is the number of seconds to
-        wait before trying again.
-    """
-    def __init__(self, msg, retry_wait_seconds, error_code):
-        self.retry_wait_seconds = int(retry_wait_seconds)
-        TwythonError.__init__(self, msg, error_code)
-
-    def __str__(self):
-        return repr(self.msg)
-
-
-class TwythonAuthError(TwythonError):
-    """
-        Raised when you try to access a protected resource and it fails due to some issue with
-        your authentication.
-    """
-    def __init__(self, msg, error_code=None ):
-        self.msg = msg
+    def __init__(self, msg, error_code=None):
+        self.msg = '%s\n Notice: APILimit is deprecated and soon to be removed, catch on TwythonRateLimitLimit instead!' % msg
         self.error_code = error_code
 
     def __str__(self):
@@ -134,16 +139,18 @@ class TwythonAuthError(TwythonError):
 
 
 class AuthError(TwythonError):
-    """
-        Raised when you try to access a protected resource and it fails due to some issue with
+    """ Raised when you try to access a protected resource and it fails due to some issue with
         your authentication.
     """
-    def __init__(self, msg , error_code=None ):
+    def __init__(self, msg, error_code=None):
         self.msg = '%s\n Notice: AuthError is deprecated and soon to be removed, catch on TwythonAuthError instead!' % msg
         self.error_code = error_code
 
     def __str__(self):
         return repr(self.msg)
+
+''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
+''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
 
 
 class Twython(object):
@@ -169,11 +176,11 @@ class Twython(object):
         OAuthHook.consumer_secret = twitter_secret
 
         # Needed for hitting that there API.
-        self.request_token_url = 'https://twitter.com/oauth/request_token'
-        self.access_token_url = 'https://twitter.com/oauth/access_token'
-        self.authorize_url = 'https://twitter.com/oauth/authorize'
-        self.authenticate_url = 'https://twitter.com/oauth/authenticate'
-        self.api_url = 'https://api.twitter.com/%s/'
+        self.api_url = 'https://api.twitter.com/%s'
+        self.request_token_url = self.api_url % 'oauth/request_token'
+        self.access_token_url = self.api_url % 'oauth/access_token'
+        self.authorize_url = self.api_url % 'oauth/authorize'
+        self.authenticate_url = self.api_url % 'oauth/authenticate'
 
         self.twitter_token = twitter_token
         self.twitter_secret = twitter_secret
@@ -228,8 +235,7 @@ class Twython(object):
         return content
 
     def _request(self, url, method='GET', params=None, api_call=None):
-        '''
-        Internal response generator, not sense in repeating the same
+        '''Internal response generator, no sense in repeating the same
         code twice, right? ;)
         '''
         myargs = {}
@@ -271,9 +277,11 @@ class Twython(object):
             if content.get('error') is not None:
                 error_msg = content['error']
 
-            self._last_call = error_msg
+            self._last_call['api_error'] = error_msg
 
-            raise TwythonError(error_msg, error_code=response.status_code)
+            raise TwythonError(error_msg,
+                               error_code=response.status_code,
+                               retry_after=response.headers.get('retry-after'))
 
         return content
 
@@ -289,10 +297,10 @@ class Twython(object):
 
         # In case they want to pass a full Twitter URL
         # i.e. http://search.twitter.com/
-        if endpoint.startswith('http://') or endpoint.startwith('https://'):
+        if endpoint.startswith('http://') or endpoint.startswith('https://'):
             url = endpoint
         else:
-            url = '%s%s.json' % (self.api_url % version, endpoint)
+            url = '%s/%s.json' % (self.api_url % version, endpoint)
 
         content = self._request(url, method=method, params=params, api_call=url)
 
@@ -416,77 +424,86 @@ class Twython(object):
         return base_url + "?" + "&".join(["%s=%s" % (Twython.unicode2utf8(key), urllib.quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.iteritems()])
 
     def bulkUserLookup(self, ids=None, screen_names=None, version=1, **kwargs):
-        """ bulkUserLookup(self, ids = None, screen_names = None, version = 1, **kwargs)
+        """ A method to do bulk user lookups against the Twitter API.
 
-            A method to do bulk user lookups against the Twitter API. Arguments (ids (numbers) / screen_names (strings)) should be flat Arrays that
-            contain their respective data sets.
+            Documentation: https://dev.twitter.com/docs/api/1/get/users/lookup
 
-            Statuses for the users in question will be returned inline if they exist. Requires authentication!
+            :ids or screen_names: (required)
+            :param ids: (optional) A list of integers of Twitter User IDs
+            :param screen_names: (optional) A list of strings of Twitter Screen Names
+
+            :param include_entities: (optional) When set to either true, t or 1,
+                                     each tweet will include a node called
+                                     "entities,". This node offers a variety of
+                                     metadata about the tweet in a discreet structure
+
+            e.g x.bulkUserLookup(screen_names=['ryanmcgrath', 'mikehelmick'],
+                                 include_entities=1)
         """
-        if ids:
+        if ids is None and screen_names is None:
+            raise TwythonError('Please supply either a list of ids or \
+                                screen_names for this method.')
+
+        if ids is not None:
             kwargs['user_id'] = ','.join(map(str, ids))
-        if screen_names:
+        if screen_names is not None:
             kwargs['screen_name'] = ','.join(screen_names)
 
-        lookupURL = Twython.constructApiURL("https://api.twitter.com/%d/users/lookup.json" % version, kwargs)
-        try:
-            response = self.client.post(lookupURL, headers=self.headers)
-            return simplejson.loads(response.content.decode('utf-8'))
-        except RequestException, e:
-            raise TwythonError("bulkUserLookup() failed with a %s error code." % e.code, e.code)
+        return self.get('users/lookup', params=kwargs, version=version)
 
     def search(self, **kwargs):
-        """search(search_query, **kwargs)
+        """ Returns tweets that match a specified query.
 
-            Returns tweets that match a specified query.
+            Documentation: https://dev.twitter.com/
 
-            Parameters:
-                See the documentation at http://dev.twitter.com/doc/get/search. Pass in the API supported arguments as named parameters.
+            :param q: (required) The query you want to search Twitter for
 
-                e.g x.search(q = "jjndf", page = '2')
+            :param geocode: (optional) Returns tweets by users located within
+                            a given radius of the given latitude/longitude.
+                            The parameter value is specified by
+                            "latitude,longitude,radius", where radius units
+                            must be specified as either "mi" (miles) or
+                            "km" (kilometers).
+                            Example Values: 37.781157,-122.398720,1mi
+            :param lang: (optional) Restricts tweets to the given language,
+                         given by an ISO 639-1 code.
+            :param locale: (optional) Specify the language of the query you
+                           are sending. Only ``ja`` is currently effective.
+            :param page: (optional) The page number (starting at 1) to return
+                         Max ~1500 results
+            :param result_type: (optional) Default ``mixed``
+                                mixed: Include both popular and real time
+                                       results in the response.
+                                recent: return only the most recent results in
+                                        the response
+                                popular: return only the most popular results
+                                         in the response.
+
+            e.g x.search(q='jjndf', page='2')
         """
-        searchURL = Twython.constructApiURL("https://search.twitter.com/search.json", kwargs)
-        try:
-            response = self.client.get(searchURL, headers=self.headers)
+        if 'q' in kwargs:
+            kwargs['q'] = urllib.quote_plus(Twython.unicode2utf8(kwargs['q']))
 
-            if response.status_code == 420:
-                retry_wait_seconds = response.headers.get('retry-after')
-                raise TwythonRateLimitError("getSearchTimeline() is being rate limited.  Retry after %s seconds." %
-                                     retry_wait_seconds,
-                                     retry_wait_seconds,
-                                     response.status_code)
-
-            return simplejson.loads(response.content.decode('utf-8'))
-        except RequestException, e:
-            raise TwythonError("getSearchTimeline() failed with a %s error code." % e.code, e.code)
-
-    def searchTwitter(self, **kwargs):
-        """use search() ,this is a fall back method to support searchTwitter()
-        """
-        return self.search(**kwargs)
+        return self.get('http://search.twitter.com/search.json', params=kwargs)
 
     def searchGen(self, search_query, **kwargs):
-        """searchGen(search_query, **kwargs)
+        """ Returns a generator of tweets that match a specified query.
 
-            Returns a generator of tweets that match a specified query.
+            Documentation: https://dev.twitter.com/doc/get/search.
 
-            Parameters:
-                See the documentation at http://dev.twitter.com/doc/get/search. Pass in the API supported arguments as named parameters.
+            See Twython.search() for acceptable parameters
 
-                e.g x.searchGen("python", page="2") or
-                    x.searchGen(search_query = "python", page = "2")
+            e.g search = x.searchGen('python')
+                for result in search:
+                    print result
         """
-        searchURL = Twython.constructApiURL("http://search.twitter.com/search.json?q=%s" % urllib.quote_plus(Twython.unicode2utf8(search_query)), kwargs)
-        try:
-            response = self.client.get(searchURL, headers=self.headers)
-            data = simplejson.loads(response.content.decode('utf-8'))
-        except RequestException, e:
-            raise TwythonError("searchGen() failed with a %s error code." % e.code, e.code)
+        kwargs['q'] = urllib.quote_plus(Twython.unicode2utf8(search_query))
+        content = self.get('http://search.twitter.com/search.json', params=kwargs)
 
-        if not data['results']:
+        if not content['results']:
             raise StopIteration
 
-        for tweet in data['results']:
+        for tweet in content['results']:
             yield tweet
 
         if 'page' not in kwargs:
@@ -497,58 +514,70 @@ class Twython(object):
                 kwargs['page'] += 1
                 kwargs['page'] = str(kwargs['page'])
             except TypeError:
-                raise TwythonError("searchGen() exited because page takes str")
-            except e:
-                raise TwythonError("searchGen() failed with %s error code" % \
-                                    e.code, e.code)
+                raise TwythonError("searchGen() exited because page takes type str")
 
         for tweet in self.searchGen(search_query, **kwargs):
             yield tweet
 
-    def searchTwitterGen(self, search_query, **kwargs):
-        """use searchGen(), this is a fallback method to support
-           searchTwitterGen()"""
-        return self.searchGen(search_query, **kwargs)
+    def isListMember(self, list_id, id, username, version=1, **kwargs):
+        """ Check if a specified user (username) is a member of the list in question (list_id).
 
-    def isListMember(self, list_id, id, username, version=1):
-        """ isListMember(self, list_id, id, version)
+            Documentation: https://dev.twitter.com/docs/api/1/get/lists/members/show
 
-            Check if a specified user (id) is a member of the list in question (list_id).
+            **Note: This method may not work for private/protected lists,
+                    unless you're authenticated and have access to those lists.
 
-            **Note: This method may not work for private/protected lists, unless you're authenticated and have access to those lists.
+            :param list_id: (required) The numerical id of the list.
+            :param username: (required) The screen name for whom to return results for
+            :param version: (optional) Currently, default (only effective value) is 1
+            :param id: (deprecated) This value is no longer needed.
 
-            Parameters:
-                list_id - Required. The slug of the list to check against.
-                id - Required. The ID of the user being checked in the list.
-                username - User who owns the list you're checking against (username)
-                version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+            e.g.
+            **Note: currently TwythonError is not descriptive enough
+                    to handle specific errors, those errors will be
+                    included in the library soon enough
+            try:
+                x.isListMember(53131724, None, 'ryanmcgrath')
+            except TwythonError:
+                print 'User is not a member'
         """
-        try:
-            response = self.client.get("https://api.twitter.com/%d/%s/%s/members/%s.json" % (version, username, list_id, id), headers=self.headers)
-            return simplejson.loads(response.content.decode('utf-8'))
-        except RequestException, e:
-            raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
+        kwargs['list_id'] = list_id
+        kwargs['screen_name'] = username
+        return self.get('lists/members/show', params=kwargs)
 
-    def isListSubscriber(self, username, list_id, id, version=1):
-        """ isListSubscriber(self, list_id, id, version)
+    def isListSubscriber(self, username, list_id, id, version=1, **kwargs):
+        """ Check if a specified user (username) is a subscriber of the list in question (list_id).
 
-            Check if a specified user (id) is a subscriber of the list in question (list_id).
+            Documentation: https://dev.twitter.com/docs/api/1/get/lists/subscribers/show
 
-            **Note: This method may not work for private/protected lists, unless you're authenticated and have access to those lists.
+            **Note: This method may not work for private/protected lists,
+                    unless you're authenticated and have access to those lists.
 
-            Parameters:
-                list_id - Required. The slug of the list to check against.
-                id - Required. The ID of the user being checked in the list.
-                username - Required. The username of the owner of the list that you're seeing if someone is subscribed to.
-                version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
+            :param list_id: (required) The numerical id of the list.
+            :param username: (required) The screen name for whom to return results for
+            :param version: (optional) Currently, default (only effective value) is 1
+            :param id: (deprecated) This value is no longer needed.
+
+            e.g.
+            **Note: currently TwythonError is not descriptive enough
+                    to handle specific errors, those errors will be
+                    included in the library soon enough
+            try:
+                x.isListSubscriber('ryanmcgrath', 53131724, None)
+            except TwythonError:
+                print 'User is not a member'
+
+            The above throws a TwythonError, the following returns data about
+            the user since they follow the specific list:
+
+            x.isListSubscriber('icelsius', 53131724, None)
         """
-        try:
-            response = self.client.get("https://api.twitter.com/%d/%s/%s/following/%s.json" % (version, username, list_id, id), headers=self.headers)
-            return simplejson.loads(response.content.decode('utf-8'))
-        except RequestException, e:
-            raise TwythonError("isListMember() failed with a %d error code." % e.code, e.code)
+        kwargs['list_id'] = list_id
+        kwargs['screen_name'] = username
+        return self.get('lists/subscribers/show', params=kwargs)
 
-    # The following methods are apart from the other Account methods, because they rely on a whole multipart-data posting function set.
+    # The following methods are apart from the other Account methods,
+    # because they rely on a whole multipart-data posting function set.
     def updateProfileBackgroundImage(self, file_, tile=True, version=1):
         """ updateProfileBackgroundImage(filename, tile=True)
 
@@ -559,9 +588,10 @@ class Twython(object):
                 tile - Optional (defaults to True). If set to true the background image will be displayed tiled. The image will not be tiled otherwise.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        return self._media_update('http://api.twitter.com/%d/account/update_profile_background_image.json' % version, {
-            'image': (file_, open(file_, 'rb'))
-        }, params={'tile': tile})
+        url = 'http://api.twitter.com/%d/account/update_profile_background_image.json' % version
+        return self._media_update(url,
+                                  {'image': (file_, open(file_, 'rb'))},
+                                  params={'tile': tile})
 
     def updateProfileImage(self, file_, version=1):
         """ updateProfileImage(filename)
@@ -572,9 +602,9 @@ class Twython(object):
                 image - Required. Must be a valid GIF, JPG, or PNG image of less than 700 kilobytes in size. Images with width larger than 500 pixels will be scaled down.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        return self._media_update('http://api.twitter.com/%d/account/update_profile_image.json' % version, {
-            'image': (file_, open(file_, 'rb'))
-        })
+        url = 'http://api.twitter.com/%d/account/update_profile_image.json' % version
+        return self._media_update(url,
+                                  {'image': (file_, open(file_, 'rb'))})
 
     # statuses/update_with_media
     def updateStatusWithMedia(self, file_, version=1, **params):
@@ -586,9 +616,10 @@ class Twython(object):
                 image - Required. Must be a valid GIF, JPG, or PNG image of less than 700 kilobytes in size. Images with width larger than 500 pixels will be scaled down.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        return self._media_update('https://upload.twitter.com/%d/statuses/update_with_media.json' % version, {
-            'media': (file_, open(file_, 'rb'))
-        }, **params)
+        url = 'https://upload.twitter.com/%d/statuses/update_with_media.json' % version
+        return self._media_update(url,
+                                  {'media': (file_, open(file_, 'rb'))},
+                                  **params)
 
     def _media_update(self, url, file_, params=None):
         params = params or {}
@@ -656,7 +687,7 @@ class Twython(object):
         req = requests.post(url, data=params, files=file_, headers=self.headers)
         return req.content
 
-    def getProfileImageUrl(self, username, size=None, version=1):
+    def getProfileImageUrl(self, username, size='normal', version=1):
         """ getProfileImageUrl(username)
 
             Gets the URL for the user's profile image.
@@ -666,18 +697,16 @@ class Twython(object):
                 size - Optional. Image size. Valid options include 'normal', 'mini' and 'bigger'. Defaults to 'normal' if not given.
                 version (number) - Optional. API version to request. Entire Twython class defaults to 1, but you can override on a function-by-function or class basis - (version=2), etc.
         """
-        url = "https://api.twitter.com/%s/users/profile_image/%s.json" % (version, username)
-        if size:
-            url = self.constructApiURL(url, {'size': size})
+        endpoint = 'users/profile_image/%s' % username
+        url = self.api_url % version + '/' + endpoint + '?' + urllib.urlencode({'size': size})
 
-        #client.follow_redirects = False
         response = self.client.get(url, allow_redirects=False)
         image_url = response.headers.get('location')
 
         if response.status_code in (301, 302, 303, 307) and image_url is not None:
             return image_url
-
-        raise TwythonError("getProfileImageUrl() failed with a %d error code." % response.status_code, response.status_code)
+        else:
+            raise TwythonError('getProfileImageUrl() threw an error.', error_code=response.status_code)
 
     @staticmethod
     def stream(data, callback):
@@ -735,3 +764,19 @@ class Twython(object):
         if isinstance(text, (str, unicode)):
             return Twython.unicode2utf8(text)
         return str(text)
+
+    ''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
+    ''' REMOVE THE FOLLOWING IN TWYTHON 2.0 '''
+    ''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
+
+    def searchTwitter(self, **kwargs):
+        """use search() ,this is a fall back method to support searchTwitter()
+        """
+        return self.search(**kwargs)
+
+    def searchTwitterGen(self, search_query, **kwargs):
+        """use searchGen(), this is a fallback method to support
+           searchTwitterGen()"""
+        return self.searchGen(search_query, **kwargs)
+
+    ''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''

@@ -32,10 +32,6 @@ api_table = {
     },
 
     # Timeline methods
-    'getPublicTimeline': {
-        'url': '/statuses/public_timeline.json',
-        'method': 'GET',
-    },
     'getHomeTimeline': {
         'url': '/statuses/home_timeline.json',
         'method': 'GET',
@@ -44,22 +40,10 @@ api_table = {
         'url': '/statuses/user_timeline.json',
         'method': 'GET',
     },
-    'getFriendsTimeline': {
-        'url': '/statuses/friends_timeline.json',
-        'method': 'GET',
-    },
 
     # Interfacing with friends/followers
     'getUserMentions': {
         'url': '/statuses/mentions.json',
-        'method': 'GET',
-    },
-    'getFriendsStatus': {
-        'url': '/statuses/friends.json',
-        'method': 'GET',
-    },
-    'getFollowersStatus': {
-        'url': '/statuses/followers.json',
         'method': 'GET',
     },
     'createFriendship': {
@@ -126,7 +110,7 @@ api_table = {
 
     # Status methods - showing, updating, destroying, etc.
     'showStatus': {
-        'url': '/statuses/show/{{id}}.json',
+        'url': '/statuses/show.json',
         'method': 'GET',
     },
     'updateStatus': {
@@ -254,60 +238,64 @@ api_table = {
 
     # List API methods/endpoints. Fairly exhaustive and annoying in general. ;P
     'createList': {
-        'url': '/{{username}}/lists.json',
+        'url': '/lists/create.json',
         'method': 'POST',
     },
     'updateList': {
-        'url': '/{{username}}/lists/{{list_id}}.json',
+        'url': '/lists/update.json',
         'method': 'POST',
     },
     'showLists': {
-        'url': '/{{username}}/lists.json',
+        'url': '/lists.json',
         'method': 'GET',
     },
     'getListMemberships': {
-        'url': '/{{username}}/lists/memberships.json',
+        'url': '/lists/memberships.json',
         'method': 'GET',
     },
     'getListSubscriptions': {
-        'url': '/{{username}}/lists/subscriptions.json',
+        'url': '/lists/subscriptions.json',
         'method': 'GET',
     },
     'deleteList': {
-        'url': '/{{username}}/lists/{{list_id}}.json',
-        'method': 'DELETE',
+        'url': '/lists/destroy.json',
+        'method': 'POST',
     },
     'getListTimeline': {
         'url': '/{{username}}/lists/{{list_id}}/statuses.json',
         'method': 'GET',
     },
     'getSpecificList': {
-        'url': '/{{username}}/lists/{{list_id}}/statuses.json',
+        'url': '/lists/show.json',
         'method': 'GET',
     },
+    'getListStatuses': {
+        'url': '/lists/statuses.json',
+        'method': 'GET'
+    },
     'addListMember': {
-        'url': '/{{username}}/{{list_id}}/members.json',
+        'url': '/lists/members/create.json',
         'method': 'POST',
     },
     'getListMembers': {
-        'url': '/{{username}}/{{list_id}}/members.json',
+        'url': '/lists/members.json',
         'method': 'GET',
     },
     'deleteListMember': {
-        'url': '/{{username}}/{{list_id}}/members.json',
-        'method': 'DELETE',
+        'url': '/lists/members/destroy.json',
+        'method': 'POST',
     },
     'getListSubscribers': {
-        'url': '/{{username}}/{{list_id}}/subscribers.json',
+        'url': '/lists/subscribers.json',
         'method': 'GET',
     },
     'subscribeToList': {
-        'url': '/{{username}}/{{list_id}}/subscribers.json',
+        'url': '/lists/subscribers/create.json',
         'method': 'POST',
     },
     'unsubscribeFromList': {
-        'url': '/{{username}}/{{list_id}}/subscribers.json',
-        'method': 'DELETE',
+        'url': '/lists/subscribers/destroy.json',
+        'method': 'POST',
     },
 
     # The one-offs
