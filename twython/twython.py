@@ -67,15 +67,12 @@ class TwythonError(AttributeError):
                         (twitter_http_status_codes[error_code][0],
                          twitter_http_status_codes[error_code][1],
                          self.msg)
-        
-        if error_code == 400:
-            raise TwythonAPILimit( self.msg , error_code)
-        
+
         if error_code == 420:
             raise TwythonRateLimitError(self.msg,
                                         error_code,
                                         retry_after=retry_after)
-    
+
     def __str__(self):
         return repr(self.msg)
 
@@ -105,75 +102,18 @@ class TwythonRateLimitError(TwythonError):
         return repr(self.msg)
 
 
-''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
-''' REMOVE THE FOLLOWING IN TWYTHON 2.0 '''
-''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
-
-
-class TwythonAPILimit(TwythonError):
-    """ Raised when you've hit an API limit. Try to avoid these, read the API
-        docs if you're running into issues here, Twython does not concern itself with
-        this matter beyond telling you that you've done goofed.
-    """
-    def __init__(self, msg, error_code=None):
-        self.msg = '%s\n Notice: APILimit is deprecated and soon to be removed, catch on TwythonRateLimitLimit instead!' % msg
-        self.error_code = error_code
-
-    def __str__(self):
-        return repr(self.msg)
-
-
-class APILimit(TwythonError):
-    """ Raised when you've hit an API limit. Try to avoid these, read the API
-        docs if you're running into issues here, Twython does not concern itself with
-        this matter beyond telling you that you've done goofed.
-
-        DEPRECATED, import and catch TwythonAPILimit instead.
-    """
-    def __init__(self, msg, error_code=None):
-        self.msg = '%s\n Notice: APILimit is deprecated and soon to be removed, catch on TwythonRateLimitLimit instead!' % msg
-        self.error_code = error_code
-
-    def __str__(self):
-        return repr(self.msg)
-
-
-class AuthError(TwythonError):
-    """ Raised when you try to access a protected resource and it fails due to some issue with
-        your authentication.
-    """
-    def __init__(self, msg, error_code=None):
-        self.msg = '%s\n Notice: AuthError is deprecated and soon to be removed, catch on TwythonAuthError instead!' % msg
-        self.error_code = error_code
-
-    def __str__(self):
-        return repr(self.msg)
-
-''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
-''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
-
-
 class Twython(object):
-    def __init__(self, twitter_token=None, twitter_secret=None, oauth_token=None, oauth_token_secret=None, \
-                headers=None, callback_url=None):
-        """setup(self, oauth_token = None, headers = None)
+    def __init__(self, app_key=None, app_secret=None, oauth_token=None, oauth_token_secret=None, \
+                headers=None, callback_url=None, twitter_token=None, twitter_secret=None):
+        """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
-            Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
-
-            Parameters:
-                twitter_token - Given to you when you register your application with Twitter.
-                twitter_secret - Given to you when you register your application with Twitter.
-                oauth_token - If you've gone through the authentication process and have a token for this user,
-                    pass it in and it'll be used for all requests going forward.
-                oauth_token_secret - see oauth_token; it's the other half.
-                headers - User agent header, dictionary style ala {'User-Agent': 'Bert'}
-                client_args - additional arguments for HTTP client (see httplib2.Http.__init__), e.g. {'timeout': 10.0}
-
-                ** Note: versioning is not currently used by search.twitter functions;
-                         when Twitter moves their junk, it'll be supported.
+            :param app_key: (optional) Your applications key
+            :param app_secret: (optional) Your applications secret key
+            :param oauth_token: (optional) Used with oauth_secret to make authenticated calls
+            :param oauth_secret: (optional) Used with oauth_token to make authenticated calls
+            :param headers: (optional) Custom headers to send along with the request
+            :param callback_url: (optional) If set, will overwrite the callback url set in your application
         """
-        OAuthHook.consumer_key = twitter_token
-        OAuthHook.consumer_secret = twitter_secret
 
         # Needed for hitting that there API.
         self.api_url = 'https://api.twitter.com/%s'
@@ -182,8 +122,8 @@ class Twython(object):
         self.authorize_url = self.api_url % 'oauth/authorize'
         self.authenticate_url = self.api_url % 'oauth/authenticate'
 
-        self.twitter_token = twitter_token
-        self.twitter_secret = twitter_secret
+        OAuthHook.consumer_key = self.app_key = app_key or twitter_token
+        OAuthHook.consumer_secret = self.app_secret = app_secret or twitter_secret
         self.oauth_token = oauth_token
         self.oauth_secret = oauth_token_secret
         self.callback_url = callback_url
@@ -195,7 +135,7 @@ class Twython(object):
 
         self.client = None
 
-        if self.twitter_token is not None and self.twitter_secret is not None:
+        if self.app_key is not None and self.app_secret is not None:
             self.client = requests.session(hooks={'pre_request': OAuthHook()})
 
         if self.oauth_token is not None and self.oauth_secret is not None:
@@ -341,10 +281,7 @@ class Twython(object):
         return None
 
     def get_authentication_tokens(self):
-        """
-            get_auth_url(self)
-
-            Returns an authorization URL for a user to hit.
+        """Returns an authorization URL for a user to hit.
         """
         callback_url = self.callback_url
 
@@ -379,10 +316,7 @@ class Twython(object):
         return request_tokens
 
     def get_authorized_tokens(self):
-        """
-            get_authorized_tokens
-
-            Returns authorized tokens after they go through the auth_url phase.
+        """Returns authorized tokens after they go through the auth_url phase.
         """
         response = self.client.get(self.access_token_url)
         authorized_tokens = dict(parse_qsl(response.content))
@@ -399,10 +333,7 @@ class Twython(object):
 
     @staticmethod
     def shortenURL(url_to_shorten, shortener="http://is.gd/api.php", query="longurl"):
-        """
-            shortenURL(url_to_shorten, shortener = "http://is.gd/api.php", query="longurl")
-
-            Shortens url specified by url_to_shorten.
+        """Shortens url specified by url_to_shorten.
             Note: Twitter automatically shortens all URLs behind their own custom t.co shortener now,
                 but we keep this here for anyone who was previously using it for alternative purposes. ;)
 
@@ -417,7 +348,7 @@ class Twython(object):
         if request.status_code in [301, 201, 200]:
             return request.text
         else:
-            raise TwythonError('shortenURL() failed with a %s error code.' % request.status_code , request.status_code )
+            raise TwythonError('shortenURL() failed with a %s error code.' % request.status_code, request.status_code)
 
     @staticmethod
     def constructApiURL(base_url, params):
@@ -454,7 +385,7 @@ class Twython(object):
     def search(self, **kwargs):
         """ Returns tweets that match a specified query.
 
-            Documentation: https://dev.twitter.com/
+            Documentation: https://dev.twitter.com/doc/get/search
 
             :param q: (required) The query you want to search Twitter for
 
@@ -484,12 +415,12 @@ class Twython(object):
         if 'q' in kwargs:
             kwargs['q'] = urllib.quote_plus(Twython.unicode2utf8(kwargs['q']))
 
-        return self.get('http://search.twitter.com/search.json', params=kwargs)
+        return self.get('https://search.twitter.com/search.json', params=kwargs)
 
     def searchGen(self, search_query, **kwargs):
         """ Returns a generator of tweets that match a specified query.
 
-            Documentation: https://dev.twitter.com/doc/get/search.
+            Documentation: https://dev.twitter.com/doc/get/search
 
             See Twython.search() for acceptable parameters
 
@@ -498,7 +429,7 @@ class Twython(object):
                     print result
         """
         kwargs['q'] = urllib.quote_plus(Twython.unicode2utf8(search_query))
-        content = self.get('http://search.twitter.com/search.json', params=kwargs)
+        content = self.get('https://search.twitter.com/search.json', params=kwargs)
 
         if not content['results']:
             raise StopIteration
@@ -518,63 +449,6 @@ class Twython(object):
 
         for tweet in self.searchGen(search_query, **kwargs):
             yield tweet
-
-    def isListMember(self, list_id, id, username, version=1, **kwargs):
-        """ Check if a specified user (username) is a member of the list in question (list_id).
-
-            Documentation: https://dev.twitter.com/docs/api/1/get/lists/members/show
-
-            **Note: This method may not work for private/protected lists,
-                    unless you're authenticated and have access to those lists.
-
-            :param list_id: (required) The numerical id of the list.
-            :param username: (required) The screen name for whom to return results for
-            :param version: (optional) Currently, default (only effective value) is 1
-            :param id: (deprecated) This value is no longer needed.
-
-            e.g.
-            **Note: currently TwythonError is not descriptive enough
-                    to handle specific errors, those errors will be
-                    included in the library soon enough
-            try:
-                x.isListMember(53131724, None, 'ryanmcgrath')
-            except TwythonError:
-                print 'User is not a member'
-        """
-        kwargs['list_id'] = list_id
-        kwargs['screen_name'] = username
-        return self.get('lists/members/show', params=kwargs)
-
-    def isListSubscriber(self, username, list_id, id, version=1, **kwargs):
-        """ Check if a specified user (username) is a subscriber of the list in question (list_id).
-
-            Documentation: https://dev.twitter.com/docs/api/1/get/lists/subscribers/show
-
-            **Note: This method may not work for private/protected lists,
-                    unless you're authenticated and have access to those lists.
-
-            :param list_id: (required) The numerical id of the list.
-            :param username: (required) The screen name for whom to return results for
-            :param version: (optional) Currently, default (only effective value) is 1
-            :param id: (deprecated) This value is no longer needed.
-
-            e.g.
-            **Note: currently TwythonError is not descriptive enough
-                    to handle specific errors, those errors will be
-                    included in the library soon enough
-            try:
-                x.isListSubscriber('ryanmcgrath', 53131724, None)
-            except TwythonError:
-                print 'User is not a member'
-
-            The above throws a TwythonError, the following returns data about
-            the user since they follow the specific list:
-
-            x.isListSubscriber('icelsius', 53131724, None)
-        """
-        kwargs['list_id'] = list_id
-        kwargs['screen_name'] = username
-        return self.get('lists/subscribers/show', params=kwargs)
 
     # The following methods are apart from the other Account methods,
     # because they rely on a whole multipart-data posting function set.
@@ -764,19 +638,3 @@ class Twython(object):
         if isinstance(text, (str, unicode)):
             return Twython.unicode2utf8(text)
         return str(text)
-
-    ''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
-    ''' REMOVE THE FOLLOWING IN TWYTHON 2.0 '''
-    ''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
-
-    def searchTwitter(self, **kwargs):
-        """use search() ,this is a fall back method to support searchTwitter()
-        """
-        return self.search(**kwargs)
-
-    def searchTwitterGen(self, search_query, **kwargs):
-        """use searchGen(), this is a fallback method to support
-           searchTwitterGen()"""
-        return self.searchGen(search_query, **kwargs)
-
-    ''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''

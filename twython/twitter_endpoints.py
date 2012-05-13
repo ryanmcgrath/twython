@@ -257,6 +257,10 @@ api_table = {
         'url': '/lists/subscriptions.json',
         'method': 'GET',
     },
+    'isListSubscriber': {
+        'url': '/lists/subscribers/show.json',
+        'method': 'GET',
+    },
     'deleteList': {
         'url': '/lists/destroy.json',
         'method': 'POST',
@@ -272,6 +276,10 @@ api_table = {
     'getListStatuses': {
         'url': '/lists/statuses.json',
         'method': 'GET'
+    },
+    'isListMember': {
+        'url': '/lists/members/show.json',
+        'method': 'GET',
     },
     'addListMember': {
         'url': '/lists/members/create.json',
