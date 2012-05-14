@@ -125,11 +125,11 @@ class Twython(object):
         # Enforce unicode on keys and secrets
         self.app_key = None
         if app_key is not None or twitter_token is not None:
-            self.app_key = u'%s' % app_key or twitter_token
+            self.app_key = u'%s' % (app_key or twitter_token)
 
         self.app_secret = None
         if app_secret is not None or twitter_secret is not None:
-            self.app_secret = u'%s' % app_secret or twitter_secret
+            self.app_secret = u'%s' % (app_secret or twitter_secret)
 
         self.oauth_token = None
         if oauth_token is not None:
@@ -138,8 +138,6 @@ class Twython(object):
         self.oauth_secret = None
         if oauth_token_secret is not None:
             self.oauth_secret = u'%s' % oauth_token_secret
-
-        print type(self.app_key), type(self.app_secret), type(self.oauth_token), type(self.oauth_secret)
 
         self.callback_url = callback_url
 
@@ -191,7 +189,7 @@ class Twython(object):
 
         return content
 
-    def _request(self, url, method='GET', params=None, files=None, api_call=None):
+    def _request(self, url, method='GET', params=None, api_call=None):
         '''Internal response generator, no sense in repeating the same
         code twice, right? ;)
         '''
@@ -204,7 +202,7 @@ class Twython(object):
             myargs = params
 
         func = getattr(self.client, method)
-        response = func(url, data=myargs, files=files, auth=self.auth)
+        response = func(url, data=myargs, auth=self.auth)
         content = response.content.decode('utf-8')
 
         # create stash for last function intel
@@ -224,7 +222,6 @@ class Twython(object):
         # `simplejson` will throw simplejson.decoder.JSONDecodeError
         # But excepting just ValueError will work with both. o.O
         try:
-            print content
             content = simplejson.loads(content)
         except ValueError:
             raise TwythonError('Response was not valid JSON, unable to decode.')
@@ -250,7 +247,7 @@ class Twython(object):
     we haven't gotten around to putting it in Twython yet. :)
     '''
 
-    def request(self, endpoint, method='GET', params=None, files=None, version=1):
+    def request(self, endpoint, method='GET', params=None, version=1):
         params = params or {}
 
         # In case they want to pass a full Twitter URL
@@ -260,7 +257,7 @@ class Twython(object):
         else:
             url = '%s/%s.json' % (self.api_url % version, endpoint)
 
-        content = self._request(url, method=method, params=params, files=files, api_call=url)
+        content = self._request(url, method=method, params=params, api_call=url)
 
         return content
 
@@ -268,9 +265,9 @@ class Twython(object):
         params = params or {}
         return self.request(endpoint, params=params, version=version)
 
-    def post(self, endpoint, params=None, files=None, version=1):
+    def post(self, endpoint, params=None, version=1):
         params = params or {}
-        return self.request(endpoint, 'POST', params=params, files=files, version=version)
+        return self.request(endpoint, 'POST', params=params, version=version)
 
     def delete(self, endpoint, params=None, version=1):
         params = params or {}
@@ -643,17 +640,3 @@ class Twython(object):
         if isinstance(text, (str, unicode)):
             return Twython.unicode2utf8(text)
         return str(text)
-
-if __name__ == '__main__':
-    apk = 'hoLZOOxQAdzzmQEH4KoZ2A'
-    aps = 'IUgE3lIPVoaacV0O2o8GTYHSyoKdFIsERbBBRNEk'
-    ot = '142832463-Nlu6m5iBWIus8tTSr5ewoxAdf6AWyxfvYcbeTlaO'
-    ots = '9PVW2xz2xSeHY8VhVvtV9ph9LHgRQva1KAjKNVg2VpQ'
-
-    t = Twython(app_key=apk,
-                app_secret=aps,
-                oauth_token=ot,
-                oauth_token_secret=ots)
-
-    file_ = '/Users/michaelhelmick/Dropbox/Avatars/avvy1004112.jpg'
-    print t.updateStatusWithMedia(file_, params={'status':'TESTING STfasdfssfdFF OUTTT !!!'})
