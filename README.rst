@@ -23,7 +23,7 @@ Installation
 
     pip install twython
 
-...or, you can clone the repo and install it the old fashioned way.
+... or, you can clone the repo and install it the old fashioned way
 
 ::
 
@@ -88,16 +88,16 @@ Getting a user home timeline
     # Returns an dict of the user home timeline
     print t.getHomeTimeline()
 
-Get a user avatar url (no authentication needed)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Get a user avatar url *(no authentication needed)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
     t = Twython()
     print t.getProfileImageUrl('ryanmcgrath', size='bigger')
     print t.getProfileImageUrl('mikehelmick')
 
-Search Twitter (no authentication needed)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Search Twitter *(no authentication needed)*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
     t = Twython()
@@ -125,11 +125,11 @@ streams.*
 
 Notes
 -----
-As of Twython 2.0.0, we have changed routes for functions to abide by the `Twitter Spring 2012 clean up <https://dev.twitter.com/docs/deprecations/spring-2012>`_ Please make changes to your code accordingly.
+* As of Twython 2.0.0, we have changed routes for functions to abide by the `Twitter Spring 2012 clean up <https://dev.twitter.com/docs/deprecations/spring-2012>`_ Please make changes to your code accordingly.
 
 
-A note about the development of Twython (specifically, 1.3)
------------------------------------------------------------
+Development of Twython (specifically, 1.3)
+------------------------------------------
 As of version 1.3, Twython has been extensively overhauled. Most API endpoint definitions are stored
 in a separate Python file, and the class itself catches calls to methods that match up in said table.
 
