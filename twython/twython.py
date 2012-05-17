@@ -145,6 +145,7 @@ class Twython(object):
             self.headers = {'User-agent': 'Twython Python Twitter Library v' + __version__}
 
         self.client = None
+        self.auth = None
 
         if self.app_key is not None and self.app_secret is not None:
             self.auth = OAuth1(self.app_key, self.app_secret,
