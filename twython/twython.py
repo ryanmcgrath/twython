@@ -147,6 +147,7 @@ class Twython(object):
             self.headers = {'User-agent': 'Twython Python Twitter Library v' + __version__}
 
         self.client = None
+        self.auth = None
 
         if self.app_key is not None and self.app_secret is not None:
             self.auth = OAuth1(self.app_key, self.app_secret,
@@ -157,9 +158,9 @@ class Twython(object):
                                self.oauth_token, self.oauth_secret,
                                signature_type='auth_header')
 
-        # Filter down through the possibilities here - if they have a token, if they're first stage, etc.
         if self.client is None:
-            # If they don't do authentication, but still want to request unprotected resources, we need an opener.
+            # If they don't do authentication, but still want to request
+            # unprotected resources, we need an opener.
             self.client = requests.session()
 
         # register available funcs to allow listing name when debugging.
@@ -297,16 +298,12 @@ class Twython(object):
     def get_authentication_tokens(self):
         """Returns an authorization URL for a user to hit.
         """
-        callback_url = self.callback_url
-
         request_args = {}
-        if callback_url:
-            request_args['oauth_callback'] = callback_url
+        if self.callback_url:
+            request_args['oauth_callback'] = self.callback_url
 
-        method = 'get'
-
-        func = getattr(self.client, method)
-        response = func(self.request_token_url, data=request_args, auth=self.auth)
+        req_url = self.request_token_url + '?' + urllib.urlencode(request_args)
+        response = self.client.get(req_url, headers=self.headers, auth=self.auth)
 
         if response.status_code != 200:
             raise TwythonAuthError("Seems something couldn't be verified with your OAuth junk. Error: %s, Message: %s" % (response.status_code, response.content))
@@ -322,8 +319,8 @@ class Twython(object):
         }
 
         # Use old-style callback argument if server didn't accept new-style
-        if callback_url and not oauth_callback_confirmed:
-            auth_url_params['oauth_callback'] = callback_url
+        if self.callback_url and not oauth_callback_confirmed:
+            auth_url_params['oauth_callback'] = self.callback_url
 
         request_tokens['auth_url'] = self.authenticate_url + '?' + urllib.urlencode(auth_url_params)
 
