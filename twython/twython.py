@@ -104,7 +104,7 @@ class TwythonRateLimitError(TwythonError):
 
 class Twython(object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None, oauth_token_secret=None, \
-                headers=None, callback_url=None, twitter_token=None, twitter_secret=None):
+                headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
             :param app_key: (optional) Your applications key
@@ -113,6 +113,7 @@ class Twython(object):
             :param oauth_secret: (optional) Used with oauth_token to make authenticated calls
             :param headers: (optional) Custom headers to send along with the request
             :param callback_url: (optional) If set, will overwrite the callback url set in your application
+            :param proxies: (optional) A dictionary of proxies, for example {"http":"proxy.example.org:8080", "https":"proxy.example.org:8081"}.
         """
 
         # Needed for hitting that there API.
@@ -161,7 +162,8 @@ class Twython(object):
         if self.client is None:
             # If they don't do authentication, but still want to request
             # unprotected resources, we need an opener.
-            self.client = requests.session()
+            print proxies
+            self.client = requests.session(proxies=proxies)
 
         # register available funcs to allow listing name when debugging.
         def setFunc(key):
