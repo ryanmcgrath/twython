@@ -162,7 +162,6 @@ class Twython(object):
         if self.client is None:
             # If they don't do authentication, but still want to request
             # unprotected resources, we need an opener.
-            print proxies
             self.client = requests.session(proxies=proxies)
 
         # register available funcs to allow listing name when debugging.
