@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "2.0.1"
+__version__ = "2.0.2"
 
 import urllib
 import re
@@ -68,11 +68,6 @@ class TwythonError(Exception):
                          twitter_http_status_codes[error_code][1],
                          self.msg)
 
-        if error_code == 420:
-            raise TwythonRateLimitError(self.msg,
-                                        error_code,
-                                        retry_after=retry_after)
-
     def __str__(self):
         return repr(self.msg)
 
@@ -81,12 +76,7 @@ class TwythonAuthError(TwythonError):
     """ Raised when you try to access a protected resource and it fails due to
         some issue with your authentication.
     """
-    def __init__(self, msg, error_code=None):
-        self.msg = msg
-        self.error_code = error_code
-
-    def __str__(self):
-        return repr(self.msg)
+    pass
 
 
 class TwythonRateLimitError(TwythonError):
@@ -94,12 +84,9 @@ class TwythonRateLimitError(TwythonError):
         retry_wait_seconds is the number of seconds to wait before trying again.
     """
     def __init__(self, msg, error_code, retry_after=None):
+        TwythonError.__init__(self, msg, error_code=error_code)
         if isinstance(retry_after, int):
-            retry_after = int(retry_after)
-            self.msg = '%s (Retry after %s seconds)' % (msg, retry_after)
-
-    def __str__(self):
-        return repr(self.msg)
+            self.msg = '%s (Retry after %d seconds)' % (msg, retry_after)
 
 
 class Twython(object):
@@ -229,16 +216,19 @@ class Twython(object):
             raise TwythonError('Response was not valid JSON, unable to decode.')
 
         if response.status_code > 304:
-            # Just incase there is no error message, let's set a default
-            error_msg = 'An error occurred processing your request.'
-            if content.get('error') is not None:
-                error_msg = content['error']
-
+            # If there is no error message, use a default.
+            error_msg = content.get(
+                'error', 'An error occurred processing your request.')
             self._last_call['api_error'] = error_msg
 
-            raise TwythonError(error_msg,
-                               error_code=response.status_code,
-                               retry_after=response.headers.get('retry-after'))
+            if response.status_code == 420:
+                exceptionType = TwythonRateLimitError
+            else:
+                exceptionType = TwythonError
+
+            raise exceptionType(error_msg,
+                                error_code=response.status_code,
+                                retry_after=response.headers.get('retry-after'))
 
         return content
 
@@ -363,7 +353,7 @@ class Twython(object):
         if request.status_code in [301, 201, 200]:
             return request.text
         else:
-            raise TwythonError('shortenURL() failed with a %s error code.' % request.status_code, request.status_code)
+            raise TwythonError('shortenURL() failed with a %s error code.' % request.status_code)
 
     @staticmethod
     def constructApiURL(base_url, params):
