@@ -37,7 +37,8 @@ Usage
 Authorization URL
 ~~~~~~~~~~~~~~~~~
 ::
-
+    from twython import Twython
+    
     t = Twython(app_key=app_key,
                 app_secret=app_secret,
                 callback_url='http://google.com/')
@@ -59,6 +60,7 @@ Handling the callback
     oauth_token and oauth_token_secret come from the previous step
     if needed, store those in a session variable or something
     '''
+    from twython import Twython
 
     t = Twython(app_key=app_key,
                 app_secret=app_secret,
@@ -78,19 +80,22 @@ Getting a user home timeline
     oauth_token and oauth_token_secret are the final tokens produced
     from the `Handling the callback` step
     '''
-
+    from twython import Twython
+    
     t = Twython(app_key=app_key,
                 app_secret=app_secret,
                 oauth_token=oauth_token,
                 oauth_token_secret=oauth_token_secret)
-
+    
     # Returns an dict of the user home timeline
     print t.getHomeTimeline()
 
 Get a user avatar url *(no authentication needed)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
-
+    
+    from twython import Twython
+    
     t = Twython()
     print t.getProfileImageUrl('ryanmcgrath', size='bigger')
     print t.getProfileImageUrl('mikehelmick')
@@ -98,7 +103,8 @@ Get a user avatar url *(no authentication needed)*
 Search Twitter *(no authentication needed)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
-
+    
+    from twython import Twython
     t = Twython()
     print t.search(q='python')
 
@@ -109,6 +115,8 @@ streams.*
 
 ::
 
+    from twython import Twython
+    
     def on_results(results):
         """A callback to handle passed results. Wheeee.
         """
