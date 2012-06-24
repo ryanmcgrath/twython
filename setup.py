@@ -4,7 +4,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '2.0.1'
+__version__ = '2.3.0'
 
 setup(
     # Basic package information.
@@ -16,7 +16,7 @@ setup(
     include_package_data=True,
 
     # Package dependencies.
-    install_requires=['simplejson', 'oauth2', 'requests'],
+    install_requires=['simplejson', 'requests>=0.13.0'],
 
     # Metadata for PyPI.
     author='Ryan McGrath',
@@ -25,7 +25,7 @@ setup(
     url='http://github.com/ryanmcgrath/twython/tree/master',
     keywords='twitter search api tweet twython',
     description='An easy (and up to date) way to access Twitter data with Python.',
-    long_description=open('README.markdown').read(),
+    long_description=open('README.rst').read(),
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

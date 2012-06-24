@@ -1,71 +1,128 @@
-Twython - Easy Twitter utilities in Python
-=========================================================================================
-Ah, Twitter, your API used to be so awesome, before you went and implemented the crap known
-as OAuth 1.0. However, since you decided to force your entire development community over a barrel
-about it, I suppose Twython has to support this. So, that said...
+Twython
+=======
 
-Does Twython handle OAuth?
-=========================================================================================================
-Yes, in a sense. There's a variety of builtin-methods that you can use to handle the authentication ritual.
-There's an **[example Django application](https://github.com/ryanmcgrath/twython-django)** that showcases
-this - feel free to peruse and use!
+```Twython``` is library providing an easy (and up-to-date) way to access Twitter data in Python
+
+Features
+--------
+
+* Query data for:
+   - User information
+   - Twitter lists
+   - Timelines
+   - User avatar URL
+   - and anything found in `the docs <https://dev.twitter.com/docs/api>`_
+* Image Uploading!
+   - **Update user status with an image**
+   - Change user avatar
+   - Change user background image
 
 Installation
------------------------------------------------------------------------------------------------------
-Installing Twython is fairly easy. You can...
+------------
 
     (pip install | easy_install) twython
 
-...or, you can clone the repo and install it the old fashioned way.
+... or, you can clone the repo and install it the old fashioned way
 
     git clone git://github.com/ryanmcgrath/twython.git
     cd twython
     sudo python setup.py install
 
-Please note:
------------------------------------------------------------------------------------------------------
-As of Twython 2.0.0, we have changed routes for functions to abide by the **[Twitter Spring 2012 clean up](https://dev.twitter.com/docs/deprecations/spring-2012)**. 
-Please make changes to your code accordingly.
+Usage
+-----
 
-Example Use
------------------------------------------------------------------------------------------------------
-``` python
-from twython import Twython
+Authorization URL
 
-twitter = Twython()
-results = twitter.search(q = "bert")
+```python
+t = Twython(app_key=app_key,
+            app_secret=app_secret,
+            callback_url='http://google.com/')
 
-# More function definitions can be found by reading over twython/twitter_endpoints.py, as well
-# as skimming the source file. Both are kept human-readable, and are pretty well documented or
-# very self documenting.
+auth_props = t.get_authentication_tokens()
+
+oauth_token = auth_props['oauth_token']
+oauth_token_secret = auth_props['oauth_token_secret']
+
+print 'Connect to Twitter via: %s' % auth_props['auth_url']
+```
+
+Be sure you have a URL set up to handle the callback after the user has allowed your app to access their data, the callback can be used for storing their final OAuth Token and OAuth Token Secret in a database for use at a later date.
+
+Handling the callback
+
+```python
+'''
+oauth_token and oauth_token_secret come from the previous step
+if needed, store those in a session variable or something
+'''
+
+t = Twython(app_key=app_key,
+            app_secret=app_secret,
+            oauth_token=oauth_token,
+            oauth_token_secret=oauth_token_secret)
+
+auth_tokens = t.get_authorized_tokens()
+print auth_tokens
+```
+
+*Function definitions (i.e. getHomeTimeline()) can be found by reading over twython/twitter_endpoints.py*
+
+Getting a user home timeline
+
+```python
+'''
+oauth_token and oauth_token_secret are the final tokens produced
+from the `Handling the callback` step
+'''
+
+t = Twython(app_key=app_key,
+            app_secret=app_secret,
+            oauth_token=oauth_token,
+            oauth_token_secret=oauth_token_secret)
+
+# Returns an dict of the user home timeline
+print t.getHomeTimeline()
+```
+
+Get a user avatar url *(no authentication needed)*
+
+```python
+t = Twython()
+print t.getProfileImageUrl('ryanmcgrath', size='bigger')
+print t.getProfileImageUrl('mikehelmick')
+```
+
+Search Twitter *(no authentication needed)*
+
+```python
+t = Twython()
+print t.search(q='python')
 ```
 
 Streaming API
-----------------------------------------------------------------------------------------------------
-Twython, as of v1.5.0, now includes an experimental **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-api)** handler.
-Usage is as follows; it's designed to be open-ended enough that you can adapt it to higher-level (read: Twitter must give you access)
-streams. This also exists in large part (read: pretty much in full) thanks to the excellent **[python-requests](http://docs.python-requests.org/en/latest/)** library by
-Kenneth Reitz.
-  
-``` python  
-import json  
-from twython import Twython  
+*Usage is as follows; it's designed to be open-ended enough that you can adapt it to higher-level (read: Twitter must give you access)
+streams.*
 
-def on_results(results):  
-    """  
-        A callback to handle passed results. Wheeee.  
-    """  
-    print json.dumps(results)  
+```python
+def on_results(results):
+    """A callback to handle passed results. Wheeee.
+    """
 
-Twython.stream({  
-    'username': 'your_username',  
-    'password': 'your_password',  
-    'track': 'python'  
-}, on_results)  
+    print results
+
+Twython.stream({
+    'username': 'your_username',
+    'password': 'your_password',
+    'track': 'python'
+}, on_results)
 ```
 
-A note about the development of Twython (specifically, 1.3)
-----------------------------------------------------------------------------------------------------
+Notes
+-----
+As of Twython 2.0.0, we have changed routes for functions to abide by the **[Twitter Spring 2012 clean up](https://dev.twitter.com/docs/deprecations/spring-2012)** Please make changes to your code accordingly.
+
+Development of Twython (specifically, 1.3)
+------------------------------------------
 As of version 1.3, Twython has been extensively overhauled. Most API endpoint definitions are stored
 in a separate Python file, and the class itself catches calls to methods that match up in said table.
 
@@ -85,7 +142,7 @@ Doing this allows us to be incredibly flexible in querying the Twitter API, so c
 from you using them by this library.
 
 Twython 3k
------------------------------------------------------------------------------------------------------
+----------
 There's an experimental version of Twython that's made for Python 3k. This is currently not guaranteed to
 work in all situations, but it's provided so that others can grab it and hack on it.
 If you choose to try it out, be aware of this.
@@ -94,9 +151,8 @@ If you choose to try it out, be aware of this.
 his [Python 3 branch for python-oauth2](https://github.com/hades/python-oauth2/tree/python3) to have it work, though.**
 
 Questions, Comments, etc?
------------------------------------------------------------------------------------------------------
-My hope is that Twython is so simple that you'd never *have* to ask any questions, but if
-you feel the need to contact me for this (or other) reasons, you can hit me up
+-------------------------
+My hope is that Twython is so simple that you'd never *have* to ask any questions, but if you feel the need to contact me for this (or other) reasons, you can hit me up
 at ryan@venodesigns.net.
 
 You can also follow me on Twitter - **[@ryanmcgrath](http://twitter.com/ryanmcgrath)**.
@@ -104,10 +160,8 @@ You can also follow me on Twitter - **[@ryanmcgrath](http://twitter.com/ryanmcgr
 Twython is released under an MIT License - see the LICENSE file for more information.
 
 Want to help?
------------------------------------------------------------------------------------------------------
-Twython is useful, but ultimately only as useful as the people using it (say that ten times fast!). If you'd
-like to help, write example code, contribute patches, document things on the wiki, tweet about it. Your help
-is always appreciated!
+-------------
+Twython is useful, but ultimately only as useful as the people using it (say that ten times fast!). If you'd like to help, write example code, contribute patches, document things on the wiki, tweet about it. Your help is always appreciated!
 
 
 Special Thanks to...
@@ -134,3 +188,6 @@ me and let me know (or just issue a pull request on GitHub, and leave a note abo
 - **[mckellister](https://github.com/mckellister)**, Fixes to `Exception`s raised by Twython (Rate Limits, etc).  
 - **[tatz_tsuchiya](http://d.hatena.ne.jp/tatz_tsuchiya/20120115/1326623451)**, Fix for `lambda` scoping in key injection phase.  
 - **[Voulnet (Mohammed ALDOUB)](https://github.com/Voulnet)**, Fixes for `http`/`https` access endpoints  
+- **[fumieval](https://github.com/fumieval)**, Re-added Proxy support for 2.3.0.  
+- **[terrycojones](https://github.com/terrycojones)**, Error cleanup and Exception processing in 2.3.0.  
+- **[Leandro Ferreira](https://github.com/leandroferreira)**, Fix for double-encoding of search queries in 2.3.0.  

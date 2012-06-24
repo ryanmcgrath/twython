@@ -9,15 +9,14 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "2.0.2"
+__version__ = "2.3.0"
 
 import urllib
 import re
-import time
+import warnings
 
 import requests
 from requests.auth import OAuth1
-import oauth2 as oauth
 
 try:
     from urlparse import parse_qsl
@@ -96,8 +95,8 @@ class Twython(object):
 
             :param app_key: (optional) Your applications key
             :param app_secret: (optional) Your applications secret key
-            :param oauth_token: (optional) Used with oauth_secret to make authenticated calls
-            :param oauth_secret: (optional) Used with oauth_token to make authenticated calls
+            :param oauth_token: (optional) Used with oauth_token_secret to make authenticated calls
+            :param oauth_token_secret: (optional) Used with oauth_token to make authenticated calls
             :param headers: (optional) Custom headers to send along with the request
             :param callback_url: (optional) If set, will overwrite the callback url set in your application
             :param proxies: (optional) A dictionary of proxies, for example {"http":"proxy.example.org:8080", "https":"proxy.example.org:8081"}.
@@ -123,9 +122,9 @@ class Twython(object):
         if oauth_token is not None:
             self.oauth_token = u'%s' % oauth_token
 
-        self.oauth_secret = None
+        self.oauth_token_secret = None
         if oauth_token_secret is not None:
-            self.oauth_secret = u'%s' % oauth_token_secret
+            self.oauth_token_secret = u'%s' % oauth_token_secret
 
         self.callback_url = callback_url
 
@@ -141,9 +140,9 @@ class Twython(object):
             self.auth = OAuth1(self.app_key, self.app_secret,
                                signature_type='auth_header')
 
-        if self.oauth_token is not None and self.oauth_secret is not None:
+        if self.oauth_token is not None and self.oauth_token_secret is not None:
             self.auth = OAuth1(self.app_key, self.app_secret,
-                               self.oauth_token, self.oauth_secret,
+                               self.oauth_token, self.oauth_token_secret,
                                signature_type='auth_header')
 
         if self.client is None:
@@ -171,19 +170,21 @@ class Twython(object):
         )
 
         method = fn['method'].lower()
-        if not method in ('get', 'post', 'delete'):
-            raise TwythonError('Method must be of GET, POST or DELETE')
+        if not method in ('get', 'post'):
+            raise TwythonError('Method must be of GET or POST')
 
         content = self._request(url, method=method, params=kwargs)
 
         return content
 
-    def _request(self, url, method='GET', params=None, api_call=None):
+    def _request(self, url, method='GET', params=None, files=None, api_call=None):
         '''Internal response generator, no sense in repeating the same
         code twice, right? ;)
         '''
         myargs = {}
         method = method.lower()
+
+        params = params or {}
 
         if method == 'get':
             url = '%s?%s' % (url, urllib.urlencode(params))
@@ -191,7 +192,7 @@ class Twython(object):
             myargs = params
 
         func = getattr(self.client, method)
-        response = func(url, data=myargs, auth=self.auth)
+        response = func(url, data=myargs, files=files, headers=self.headers, auth=self.auth)
         content = response.content.decode('utf-8')
 
         # create stash for last function intel
@@ -239,31 +240,23 @@ class Twython(object):
     we haven't gotten around to putting it in Twython yet. :)
     '''
 
-    def request(self, endpoint, method='GET', params=None, version=1):
-        params = params or {}
-
+    def request(self, endpoint, method='GET', params=None, files=None, version=1):
         # In case they want to pass a full Twitter URL
-        # i.e. http://search.twitter.com/
+        # i.e. https://search.twitter.com/
         if endpoint.startswith('http://') or endpoint.startswith('https://'):
             url = endpoint
         else:
             url = '%s/%s.json' % (self.api_url % version, endpoint)
 
-        content = self._request(url, method=method, params=params, api_call=url)
+        content = self._request(url, method=method, params=params, files=files, api_call=url)
 
         return content
 
     def get(self, endpoint, params=None, version=1):
-        params = params or {}
         return self.request(endpoint, params=params, version=version)
 
-    def post(self, endpoint, params=None, version=1):
-        params = params or {}
-        return self.request(endpoint, 'POST', params=params, version=version)
-
-    def delete(self, endpoint, params=None, version=1):
-        params = params or {}
-        return self.request(endpoint, 'DELETE', params=params, version=version)
+    def post(self, endpoint, params=None, files=None, version=1):
+        return self.request(endpoint, 'POST', params=params, files=files, version=version)
 
     # End Dynamic Request Methods
 
@@ -320,7 +313,7 @@ class Twython(object):
     def get_authorized_tokens(self):
         """Returns authorized tokens after they go through the auth_url phase.
         """
-        response = self.client.get(self.access_token_url, auth=self.auth)
+        response = self.client.get(self.access_token_url, headers=self.headers, auth=self.auth)
         authorized_tokens = dict(parse_qsl(response.content))
         if not authorized_tokens:
             raise TwythonError('Unable to decode authorized tokens.')
@@ -358,34 +351,6 @@ class Twython(object):
     @staticmethod
     def constructApiURL(base_url, params):
         return base_url + "?" + "&".join(["%s=%s" % (Twython.unicode2utf8(key), urllib.quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.iteritems()])
-
-    def bulkUserLookup(self, ids=None, screen_names=None, version=1, **kwargs):
-        """ A method to do bulk user lookups against the Twitter API.
-
-            Documentation: https://dev.twitter.com/docs/api/1/get/users/lookup
-
-            :ids or screen_names: (required)
-            :param ids: (optional) A list of integers of Twitter User IDs
-            :param screen_names: (optional) A list of strings of Twitter Screen Names
-
-            :param include_entities: (optional) When set to either true, t or 1,
-                                     each tweet will include a node called
-                                     "entities,". This node offers a variety of
-                                     metadata about the tweet in a discreet structure
-
-            e.g x.bulkUserLookup(screen_names=['ryanmcgrath', 'mikehelmick'],
-                                 include_entities=1)
-        """
-        if ids is None and screen_names is None:
-            raise TwythonError('Please supply either a list of ids or \
-                                screen_names for this method.')
-
-        if ids is not None:
-            kwargs['user_id'] = ','.join(map(str, ids))
-        if screen_names is not None:
-            kwargs['screen_name'] = ','.join(screen_names)
-
-        return self.get('users/lookup', params=kwargs, version=version)
 
     def search(self, **kwargs):
         """ Returns tweets that match a specified query.
@@ -471,7 +436,17 @@ class Twython(object):
         return self._media_update(url,
                                   {'image': (file_, open(file_, 'rb'))},
                                   params={'tile': tile})
-
+    
+    def bulkUserLookup(self, **kwargs):
+        """Stub for a method that has been deprecated, kept for now to raise errors
+            properly if people are relying on this (which they are...).
+        """
+        warnings.warn(
+            "This function has been deprecated. Please migrate to .lookupUser() - params should be the same.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+    
     def updateProfileImage(self, file_, version=1):
         """Updates the authenticating user's profile image (avatar).
 
@@ -500,44 +475,7 @@ class Twython(object):
                                   **params)
 
     def _media_update(self, url, file_, params=None):
-        params = params or {}
-        oauth_params = {
-            'oauth_timestamp': int(time.time()),
-        }
-
-        #create a fake request with your upload url and parameters
-        faux_req = oauth.Request(method='POST', url=url, parameters=oauth_params)
-
-        #sign the fake request.
-        signature_method = oauth.SignatureMethod_HMAC_SHA1()
-
-        class dotdict(dict):
-            """
-            This is a helper func. because python-oauth2 wants a
-            dict in dot notation.
-            """
-
-            def __getattr__(self, attr):
-                return self.get(attr, None)
-            __setattr__ = dict.__setitem__
-            __delattr__ = dict.__delitem__
-
-        consumer = {
-            'key': self.app_key,
-            'secret': self.app_secret
-        }
-        token = {
-            'key': self.oauth_token,
-            'secret': self.oauth_secret
-        }
-
-        faux_req.sign_request(signature_method, dotdict(consumer), dotdict(token))
-
-        #create a dict out of the fake request signed params
-        self.headers.update(faux_req.to_header())
-
-        req = requests.post(url, data=params, files=file_, headers=self.headers)
-        return req.content
+        return self.post(url, params=params, files=file_)
 
     def getProfileImageUrl(self, username, size='normal', version=1):
         """Gets the URL for the user's profile image.
@@ -612,7 +550,10 @@ class Twython(object):
 
         for line in stream.iter_lines():
             if line:
-                callback(simplejson.loads(line))
+                try:
+                    callback(simplejson.loads(line))
+                except ValueError:
+                    raise TwythonError('Response was not valid JSON, unable to decode.')
 
     @staticmethod
     def unicode2utf8(text):
