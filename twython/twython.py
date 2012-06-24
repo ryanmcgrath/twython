@@ -428,7 +428,7 @@ class Twython(object):
             e.g x.search(q='jjndf', page='2')
         """
         if 'q' in kwargs:
-            kwargs['q'] = urllib.quote_plus(Twython.unicode2utf8(kwargs['q']))
+            kwargs['q'] = urllib.quote_plus(Twython.unicode2utf8(kwargs['q'], ':'))
 
         return self.get('https://search.twitter.com/search.json', params=kwargs)
 
