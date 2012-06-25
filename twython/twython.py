@@ -27,12 +27,7 @@ except ImportError:
 # table is a file with a dictionary of every API endpoint that Twython supports.
 from twitter_endpoints import base_url, api_table, twitter_http_status_codes
 
-
-# There are some special setups (like, oh, a Django application) where
-# simplejson exists behind the scenes anyway. Past Python 2.6, this should
-# never really cause any problems to begin with.
 try:
-    # If they have the library, chances are they're gonna want to use that.
     import simplejson
 except ImportError:
     try:
@@ -40,7 +35,6 @@ except ImportError:
         import json as simplejson
     except ImportError:
         try:
-            # This case gets rarer by the day, but if we need to, we can pull it from Django provided it's there.
             from django.utils import simplejson
         except:
             # Seriously wtf is wrong with you if you get this Exception.
@@ -110,21 +104,11 @@ class Twython(object):
         self.authenticate_url = self.api_url % 'oauth/authenticate'
 
         # Enforce unicode on keys and secrets
-        self.app_key = None
-        if app_key is not None or twitter_token is not None:
-            self.app_key = u'%s' % (app_key or twitter_token)
+        self.app_key = app_key and unicode(app_key) or twitter_token and unicode(twitter_token)
+        self.app_secret = app_key and unicode(app_secret) or twitter_secret and unicode(twitter_secret)
 
-        self.app_secret = None
-        if app_secret is not None or twitter_secret is not None:
-            self.app_secret = u'%s' % (app_secret or twitter_secret)
-
-        self.oauth_token = None
-        if oauth_token is not None:
-            self.oauth_token = u'%s' % oauth_token
-
-        self.oauth_token_secret = None
-        if oauth_token_secret is not None:
-            self.oauth_token_secret = u'%s' % oauth_token_secret
+        self.oauth_token = oauth_token and u'%s' % oauth_token
+        self.oauth_token_secret = oauth_token_secret and u'%s' % oauth_token_secret
 
         self.callback_url = callback_url
 
@@ -146,8 +130,7 @@ class Twython(object):
                                signature_type='auth_header')
 
         if self.client is None:
-            # If they don't do authentication, but still want to request
-            # unprotected resources, we need an opener.
+            # Allow unauthenticated requests to be made.
             self.client = requests.session(proxies=proxies)
 
         # register available funcs to allow listing name when debugging.
@@ -181,11 +164,16 @@ class Twython(object):
         '''Internal response generator, no sense in repeating the same
         code twice, right? ;)
         '''
-        myargs = {}
         method = method.lower()
+        if not method in ('get', 'post'):
+            raise TwythonError('Method must be of GET or POST')
 
         params = params or {}
 
+        # In the next release of requests after 0.13.1, we can get rid of this
+        # myargs variable and line 184, urlencoding the params and just
+        # pass params=params in the func()
+        myargs = {}
         if method == 'get':
             url = '%s?%s' % (url, urllib.urlencode(params))
         else:
@@ -207,10 +195,6 @@ class Twython(object):
             'content': content,
         }
 
-        # Python 2.6 `json` will throw a ValueError if it
-        # can't load the string as valid JSON,
-        # `simplejson` will throw simplejson.decoder.JSONDecodeError
-        # But excepting just ValueError will work with both. o.O
         try:
             content = simplejson.loads(content)
         except ValueError:
@@ -436,7 +420,7 @@ class Twython(object):
         return self._media_update(url,
                                   {'image': (file_, open(file_, 'rb'))},
                                   params={'tile': tile})
-    
+
     def bulkUserLookup(self, **kwargs):
         """Stub for a method that has been deprecated, kept for now to raise errors
             properly if people are relying on this (which they are...).
@@ -446,7 +430,7 @@ class Twython(object):
             DeprecationWarning,
             stacklevel=2
         )
-    
+
     def updateProfileImage(self, file_, version=1):
         """Updates the authenticating user's profile image (avatar).
 
@@ -458,7 +442,6 @@ class Twython(object):
         return self._media_update(url,
                                   {'image': (file_, open(file_, 'rb'))})
 
-    # statuses/update_with_media
     def updateStatusWithMedia(self, file_, version=1, **params):
         """Updates the users status with media
 

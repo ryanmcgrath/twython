@@ -11,7 +11,7 @@ Features
    - Twitter lists
    - Timelines
    - User avatar URL
-   - and anything found in `the docs <https://dev.twitter.com/docs/api>`_
+   - and anything found in [the docs](https://dev.twitter.com/docs/api)
 * Image Uploading!
    - **Update user status with an image**
    - Change user avatar
