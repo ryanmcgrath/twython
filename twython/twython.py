@@ -435,8 +435,8 @@ class Twython(object):
         url = 'https://api.twitter.com/%d/account/update_profile_background_image.json' % version
         return self._media_update(url,
                                   {'image': (file_, open(file_, 'rb'))},
-                                  params={'tile': tile})
-    
+                                  **{'tile': tile})
+
     def bulkUserLookup(self, **kwargs):
         """Stub for a method that has been deprecated, kept for now to raise errors
             properly if people are relying on this (which they are...).
@@ -446,7 +446,7 @@ class Twython(object):
             DeprecationWarning,
             stacklevel=2
         )
-    
+
     def updateProfileImage(self, file_, version=1):
         """Updates the authenticating user's profile image (avatar).
 
@@ -474,7 +474,7 @@ class Twython(object):
                                   {'media': (file_, open(file_, 'rb'))},
                                   **params)
 
-    def _media_update(self, url, file_, params=None):
+    def _media_update(self, url, file_, **params):
         return self.post(url, params=params, files=file_)
 
     def getProfileImageUrl(self, username, size='normal', version=1):
