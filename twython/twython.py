@@ -380,7 +380,7 @@ class Twython(object):
                 for result in search:
                     print result
         """
-        kwargs['q'] = urllib.quote_plus(Twython.unicode2utf8(search_query))
+        kwargs['q'] = search_query
         content = self.get('https://search.twitter.com/search.json', params=kwargs)
 
         if not content['results']:
