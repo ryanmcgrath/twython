@@ -11,7 +11,7 @@ Features
    - Twitter lists
    - Timelines
    - User avatar URL
-   - and anything found in `the docs <https://dev.twitter.com/docs/api>`_
+   - and anything found in [the docs](https://dev.twitter.com/docs/api)
 * Image Uploading!
    - **Update user status with an image**
    - Change user avatar
@@ -31,7 +31,7 @@ Installation
 Usage
 -----
 
-Authorization URL
+###### Authorization URL
 
 ```python
 from twython import Twython
@@ -50,7 +50,7 @@ print 'Connect to Twitter via: %s' % auth_props['auth_url']
 
 Be sure you have a URL set up to handle the callback after the user has allowed your app to access their data, the callback can be used for storing their final OAuth Token and OAuth Token Secret in a database for use at a later date.
 
-Handling the callback
+###### Handling the callback
 
 ```python
 from twython import Twython
@@ -71,7 +71,7 @@ print auth_tokens
 
 *Function definitions (i.e. getHomeTimeline()) can be found by reading over twython/twitter_endpoints.py*
 
-Getting a user home timeline
+###### Getting a user home timeline
 
 ```python
 from twython import Twython
@@ -90,7 +90,7 @@ t = Twython(app_key=app_key,
 print t.getHomeTimeline()
 ```
 
-Get a user avatar url *(no authentication needed)*
+###### Get a user avatar url *(no authentication needed)*
 
 ```python
 from twython import Twython
@@ -100,7 +100,7 @@ print t.getProfileImageUrl('ryanmcgrath', size='bigger')
 print t.getProfileImageUrl('mikehelmick')
 ```
 
-Search Twitter *(no authentication needed)*
+###### Search Twitter *(no authentication needed)*
 
 ```python
 from twython import Twython
@@ -109,7 +109,7 @@ t = Twython()
 print t.search(q='python')
 ```
 
-Streaming API
+###### Streaming API
 *Usage is as follows; it's designed to be open-ended enough that you can adapt it to higher-level (read: Twitter must give you access)
 streams.*
 
