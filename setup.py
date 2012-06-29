@@ -4,7 +4,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '2.3.1'
+__version__ = '2.3.2'
 
 setup(
     # Basic package information.
@@ -16,7 +16,7 @@ setup(
     include_package_data=True,
 
     # Package dependencies.
-    install_requires=['simplejson', 'requests>=0.13.0'],
+    install_requires=['simplejson', 'requests>=0.13.2'],
 
     # Metadata for PyPI.
     author='Ryan McGrath',
