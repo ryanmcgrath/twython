@@ -113,25 +113,25 @@ class Twython(object):
         self.callback_url = callback_url
 
         # If there's headers, set them, otherwise be an embarassing parent for their own good.
-        self.headers = headers
-        if self.headers is None:
-            self.headers = {'User-agent': 'Twython Python Twitter Library v' + __version__}
+        self.headers = headers or {'User-Agent': 'Twython v' + __version__}
 
-        self.client = None
+        # Allow for unauthenticated requests
+        self.client = requests.session(proxies=proxies)
         self.auth = None
 
-        if self.app_key is not None and self.app_secret is not None:
+        if self.app_key is not None and self.app_secret is not None and \
+        self.oauth_token is None and self.oauth_token_secret is None:
             self.auth = OAuth1(self.app_key, self.app_secret,
                                signature_type='auth_header')
 
-        if self.oauth_token is not None and self.oauth_token_secret is not None:
+        if self.app_key is not None and self.app_secret is not None and \
+        self.oauth_token is not None and self.oauth_token_secret is not None:
             self.auth = OAuth1(self.app_key, self.app_secret,
                                self.oauth_token, self.oauth_token_secret,
                                signature_type='auth_header')
 
-        if self.client is None:
-            # Allow unauthenticated requests to be made.
-            self.client = requests.session(proxies=proxies)
+        if self.auth is not None:
+            self.client = requests.session(headers=self.headers, auth=self.auth, proxies=proxies)
 
         # register available funcs to allow listing name when debugging.
         def setFunc(key):
@@ -152,11 +152,7 @@ class Twython(object):
             base_url + fn['url']
         )
 
-        method = fn['method'].lower()
-        if not method in ('get', 'post'):
-            raise TwythonError('Method must be of GET or POST')
-
-        content = self._request(url, method=method, params=kwargs)
+        content = self._request(url, method=fn['method'], params=kwargs)
 
         return content
 
@@ -170,17 +166,13 @@ class Twython(object):
 
         params = params or {}
 
-        # In the next release of requests after 0.13.1, we can get rid of this
-        # myargs variable and line 184, urlencoding the params and just
-        # pass params=params in the func()
-        myargs = {}
-        if method == 'get':
-            url = '%s?%s' % (url, urllib.urlencode(params))
-        else:
-            myargs = params
-
         func = getattr(self.client, method)
-        response = func(url, data=myargs, files=files, headers=self.headers, auth=self.auth)
+        if method == 'get':
+            # Still wasn't fixed in `requests` 0.13.2? :(
+            url = url + '?' + urllib.urlencode(params)
+            response = func(url)
+        else:
+            response = func(url, data=params, files=files)
         content = response.content.decode('utf-8')
 
         # create stash for last function intel
@@ -271,7 +263,7 @@ class Twython(object):
             request_args['oauth_callback'] = self.callback_url
 
         req_url = self.request_token_url + '?' + urllib.urlencode(request_args)
-        response = self.client.get(req_url, headers=self.headers, auth=self.auth)
+        response = self.client.get(req_url)
 
         if response.status_code != 200:
             raise TwythonAuthError("Seems something couldn't be verified with your OAuth junk. Error: %s, Message: %s" % (response.status_code, response.content))
@@ -297,7 +289,7 @@ class Twython(object):
     def get_authorized_tokens(self):
         """Returns authorized tokens after they go through the auth_url phase.
         """
-        response = self.client.get(self.access_token_url, headers=self.headers, auth=self.auth)
+        response = self.client.get(self.access_token_url)
         authorized_tokens = dict(parse_qsl(response.content))
         if not authorized_tokens:
             raise TwythonError('Unable to decode authorized tokens.')

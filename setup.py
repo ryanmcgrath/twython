@@ -16,7 +16,7 @@ setup(
     include_package_data=True,
 
     # Package dependencies.
-    install_requires=['simplejson', 'requests>=0.13.0'],
+    install_requires=['simplejson', 'requests>=0.13.2'],
 
     # Metadata for PyPI.
     author='Ryan McGrath',
