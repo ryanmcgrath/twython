@@ -175,6 +175,9 @@ class Twython(object):
             response = func(url, data=params, files=files)
         content = response.content.decode('utf-8')
 
+        print response
+        print response.__dict__
+
         # create stash for last function intel
         self._last_call = {
             'api_call': api_call,
@@ -187,10 +190,15 @@ class Twython(object):
             'content': content,
         }
 
+
+        #  wrap the json loads in a try, and defer an error
+        #  why? twitter will return invalid json with an error code in the headers
+        json_error = False
         try:
             content = simplejson.loads(content)
         except ValueError:
-            raise TwythonError('Response was not valid JSON, unable to decode.')
+            json_error= True
+            content= {}
 
         if response.status_code > 304:
             # If there is no error message, use a default.
@@ -206,6 +214,10 @@ class Twython(object):
             raise exceptionType(error_msg,
                                 error_code=response.status_code,
                                 retry_after=response.headers.get('retry-after'))
+
+        # if we have a json error here , then it's not an official TwitterAPI error
+        if json_error:
+            raise TwythonError('Response was not valid JSON, unable to decode.')
 
         return content
 
