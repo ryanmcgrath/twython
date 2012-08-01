@@ -175,9 +175,6 @@ class Twython(object):
             response = func(url, data=params, files=files)
         content = response.content.decode('utf-8')
 
-        print response
-        print response.__dict__
-
         # create stash for last function intel
         self._last_call = {
             'api_call': api_call,
