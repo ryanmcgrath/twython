@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "2.3.3"
+__version__ = "2.3.4"
 
 import urllib
 import re
@@ -168,9 +168,7 @@ class Twython(object):
 
         func = getattr(self.client, method)
         if method == 'get':
-            # Still wasn't fixed in `requests` 0.13.2? :(
-            url = url + '?' + urllib.urlencode(params)
-            response = func(url)
+            response = func(url, params=params)
         else:
             response = func(url, data=params, files=files)
         content = response.content.decode('utf-8')
@@ -262,8 +260,7 @@ class Twython(object):
         if self.callback_url:
             request_args['oauth_callback'] = self.callback_url
 
-        req_url = self.request_token_url + '?' + urllib.urlencode(request_args)
-        response = self.client.get(req_url)
+        response = self.client.get(self.request_token_url, params=request_args)
 
         if response.status_code != 200:
             raise TwythonAuthError("Seems something couldn't be verified with your OAuth junk. Error: %s, Message: %s" % (response.status_code, response.content))
@@ -463,9 +460,9 @@ class Twython(object):
                             version Twitter has now
         """
         endpoint = 'users/profile_image/%s' % username
-        url = self.api_url % version + '/' + endpoint + '?' + urllib.urlencode({'size': size})
+        url = self.api_url % version + '/' + endpoint
 
-        response = self.client.get(url, allow_redirects=False)
+        response = self.client.get(url, params={'size': size}, allow_redirects=False)
         image_url = response.headers.get('location')
 
         if response.status_code in (301, 302, 303, 307) and image_url is not None:
