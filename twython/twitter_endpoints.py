@@ -159,6 +159,10 @@ api_table = {
         'url': '/account/update_profile_colors.json',
         'method': 'POST',
     },
+    'myTotals': {
+        'url' : '/account/totals.json',
+        'method': 'GET',
+    },
 
     # Favorites methods
     'getFavorites': {
