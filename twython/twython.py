@@ -223,7 +223,7 @@ class Twython(object):
     we haven't gotten around to putting it in Twython yet. :)
     '''
 
-    def request(self, endpoint, method='GET', params=None, files=None, version=1):
+    def request(self, endpoint, method='GET', params=None, files=None, version='1.1'):
         # In case they want to pass a full Twitter URL
         # i.e. https://search.twitter.com/
         if endpoint.startswith('http://') or endpoint.startswith('https://'):
@@ -235,10 +235,10 @@ class Twython(object):
 
         return content
 
-    def get(self, endpoint, params=None, version=1):
+    def get(self, endpoint, params=None, version='1.1'):
         return self.request(endpoint, params=params, version=version)
 
-    def post(self, endpoint, params=None, files=None, version=1):
+    def post(self, endpoint, params=None, files=None, version='1.1'):
         return self.request(endpoint, 'POST', params=params, files=files, version=version)
 
     # End Dynamic Request Methods
@@ -365,7 +365,7 @@ class Twython(object):
             e.g x.search(q='jjndf', page='2')
         """
 
-        return self.get('https://search.twitter.com/search.json', params=kwargs)
+        return self.get('https://api.twitter.com/1.1/search/tweets.json', params=kwargs)
 
     def searchGen(self, search_query, **kwargs):
         """ Returns a generator of tweets that match a specified query.
@@ -379,7 +379,7 @@ class Twython(object):
                     print result
         """
         kwargs['q'] = search_query
-        content = self.get('https://search.twitter.com/search.json', params=kwargs)
+        content = self.get('https://api.twitter.com/1.1/search/tweets.json', params=kwargs)
 
         if not content['results']:
             raise StopIteration
@@ -402,7 +402,7 @@ class Twython(object):
 
     # The following methods are apart from the other Account methods,
     # because they rely on a whole multipart-data posting function set.
-    def updateProfileBackgroundImage(self, file_, tile=True, version=1):
+    def updateProfileBackgroundImage(self, file_, tile=True, version='1.1'):
         """Updates the authenticating user's profile background image.
 
             :param file_: (required) A string to the location of the file
@@ -427,7 +427,7 @@ class Twython(object):
             stacklevel=2
         )
 
-    def updateProfileImage(self, file_, version=1):
+    def updateProfileImage(self, file_, version='1.1'):
         """Updates the authenticating user's profile image (avatar).
 
             :param file_: (required) A string to the location of the file
@@ -438,7 +438,7 @@ class Twython(object):
         return self._media_update(url,
                                   {'image': (file_, open(file_, 'rb'))})
 
-    def updateStatusWithMedia(self, file_, version=1, **params):
+    def updateStatusWithMedia(self, file_, version='1.1', **params):
         """Updates the users status with media
 
             :param file_: (required) A string to the location of the file
@@ -456,7 +456,7 @@ class Twython(object):
     def _media_update(self, url, file_, **params):
         return self.post(url, params=params, files=file_)
 
-    def getProfileImageUrl(self, username, size='normal', version=1):
+    def getProfileImageUrl(self, username, size='normal', version='1.1'):
         """Gets the URL for the user's profile image.
 
             :param username: (required) Username, self explanatory.
