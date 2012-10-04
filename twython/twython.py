@@ -567,16 +567,3 @@ class Twython(object):
         if isinstance(text, (str, unicode)):
             return Twython.unicode2utf8(text)
         return str(text)
-
-if __name__ == '__main__':
-    app_key = 'KEkNAu84zC5brBehnhAz9g'
-    app_secret = 'Z0KOh2Oyf1yDVnQAvRemIslaZfeDfaG79TJ4JoJHXbk'
-    oauth_token = '142832463-U6l4WX5pnxSY9wdDWE0Ahzz03yYuhiUvsIjBAyOH'
-    oauth_token_secret = 'PJBXfanIZ89hLLDI7ylNDvWyqALVxBMOBELhLW0A'
-
-    t = Twython(app_key=app_key,
-                app_secret=app_secret,
-                oauth_token=oauth_token,
-                oauth_token_secret=oauth_token_secret)
-
-    print t.updateProfileBannerImage('/Users/mikehelmick/Desktop/Stuff/Screen Shot 2012-08-15 at 2.54.58 PM.png')
