@@ -160,8 +160,12 @@ api_table = {
         'method': 'POST',
     },
     'myTotals': {
-        'url' : '/account/totals.json',
+        'url': '/account/totals.json',
         'method': 'GET',
+    },
+    'removeProfileBanner': {
+        'url': '/account/remove_profile_banner.json',
+        'method': 'POST',
     },
 
     # Favorites methods
