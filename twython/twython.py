@@ -165,6 +165,11 @@ class Twython(object):
             raise TwythonError('Method must be of GET or POST')
 
         params = params or {}
+        # requests doesn't like items that can't be converted to unicode,
+        # so let's be nice and do that for the user
+        for k, v in params.items():
+            if isinstance(v, (int, bool)):
+                params[k] = u'%s' % v
 
         func = getattr(self.client, method)
         if method == 'get':
@@ -185,15 +190,14 @@ class Twython(object):
             'content': content,
         }
 
-
         #  wrap the json loads in a try, and defer an error
         #  why? twitter will return invalid json with an error code in the headers
         json_error = False
         try:
             content = simplejson.loads(content)
         except ValueError:
-            json_error= True
-            content= {}
+            json_error = True
+            content = {}
 
         if response.status_code > 304:
             # If there is no error message, use a default.
