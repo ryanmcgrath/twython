@@ -185,15 +185,14 @@ class Twython(object):
             'content': content,
         }
 
-
         #  wrap the json loads in a try, and defer an error
         #  why? twitter will return invalid json with an error code in the headers
         json_error = False
         try:
             content = simplejson.loads(content)
         except ValueError:
-            json_error= True
-            content= {}
+            json_error = True
+            content = {}
 
         if response.status_code > 304:
             # If there is no error message, use a default.
@@ -210,8 +209,8 @@ class Twython(object):
                                 error_code=response.status_code,
                                 retry_after=response.headers.get('retry-after'))
 
-        # if we have a json error here , then it's not an official TwitterAPI error
-        if json_error:
+        # if we have a json error here, then it's not an official TwitterAPI error
+        if json_error and not response.status_code in (200, 201, 202):
             raise TwythonError('Response was not valid JSON, unable to decode.')
 
         return content
@@ -400,8 +399,24 @@ class Twython(object):
         for tweet in self.searchGen(search_query, **kwargs):
             yield tweet
 
+    def bulkUserLookup(self, **kwargs):
+        """Stub for a method that has been deprecated, kept for now to raise errors
+            properly if people are relying on this (which they are...).
+        """
+        warnings.warn(
+            "This function has been deprecated. Please migrate to .lookupUser() - params should be the same.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+
     # The following methods are apart from the other Account methods,
     # because they rely on a whole multipart-data posting function set.
+
+    ## Media Uploading functions ##############################################
+
+    def _media_update(self, url, file_, **params):
+        return self.post(url, params=params, files=file_)
+
     def updateProfileBackgroundImage(self, file_, tile=True, version=1):
         """Updates the authenticating user's profile background image.
 
@@ -416,16 +431,6 @@ class Twython(object):
         return self._media_update(url,
                                   {'image': (file_, open(file_, 'rb'))},
                                   **{'tile': tile})
-
-    def bulkUserLookup(self, **kwargs):
-        """Stub for a method that has been deprecated, kept for now to raise errors
-            properly if people are relying on this (which they are...).
-        """
-        warnings.warn(
-            "This function has been deprecated. Please migrate to .lookupUser() - params should be the same.",
-            DeprecationWarning,
-            stacklevel=2
-        )
 
     def updateProfileImage(self, file_, version=1):
         """Updates the authenticating user's profile image (avatar).
@@ -453,8 +458,22 @@ class Twython(object):
                                   {'media': (file_, open(file_, 'rb'))},
                                   **params)
 
-    def _media_update(self, url, file_, **params):
-        return self.post(url, params=params, files=file_)
+    def updateProfileBannerImage(self, file_, version=1, **params):
+        """Updates the users profile banner
+
+            :param file_: (required) A string to the location of the file
+            :param version: (optional) A number, default 1 because that's the
+                            only API version Twitter has now
+
+            **params - You may pass items that are taken in this doc
+                       (https://dev.twitter.com/docs/api/1/post/account/update_profile_banner)
+        """
+        url = 'https://api.twitter.com/%d/account/update_profile_banner.json' % version
+        return self._media_update(url,
+                                  {'banner': (file_, open(file_, 'rb'))},
+                                  **params)
+
+    ###########################################################################
 
     def getProfileImageUrl(self, username, size='normal', version=1):
         """Gets the URL for the user's profile image.
