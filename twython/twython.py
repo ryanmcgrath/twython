@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
     Twython is a library for Python that wraps the Twitter API.
     It aims to abstract away all the API endpoints, so that additions to the library
@@ -9,7 +7,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "2.5.0"
+__version__ = "2.5.1"
 
 import urllib
 import re
