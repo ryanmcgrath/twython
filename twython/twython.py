@@ -9,7 +9,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "2.4.0"
+__version__ = "2.5.0"
 
 import urllib
 import re
@@ -165,6 +165,11 @@ class Twython(object):
             raise TwythonError('Method must be of GET or POST')
 
         params = params or {}
+        # requests doesn't like items that can't be converted to unicode,
+        # so let's be nice and do that for the user
+        for k, v in params.items():
+            if isinstance(v, (int, bool)):
+                params[k] = u'%s' % v
 
         func = getattr(self.client, method)
         if method == 'get':
