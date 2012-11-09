@@ -208,3 +208,4 @@ me and let me know (or just issue a pull request on GitHub, and leave a note abo
 - `fumieval <https://github.com/fumieval>`_, Re-added Proxy support for 2.3.0.  
 - `terrycojones <https://github.com/terrycojones>`_, Error cleanup and Exception processing in 2.3.0.  
 - `Leandro Ferreira <https://github.com/leandroferreira>`_, Fix for double-encoding of search queries in 2.3.0.  
+- `Chris Brown <https://github.com/chbrown>`_, Updated to use v1.1 endpoints over v1  
