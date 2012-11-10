@@ -448,7 +448,7 @@ class Twython(object):
         return self._media_update(url,
                                   {'image': (file_, open(file_, 'rb'))})
 
-    def updateStatusWithMedia(self, file_, version='1.1', **params):
+    def updateStatusWithMedia(self, file_, version=1.1, **params):
         """Updates the users status with media
 
             :param file_: (required) A string to the location of the file
