@@ -203,10 +203,7 @@ class Twython(object):
                 'error', 'An error occurred processing your request.')
             self._last_call['api_error'] = error_msg
 
-            if response.status_code == 420:
-                exceptionType = TwythonRateLimitError
-            else:
-                exceptionType = TwythonError
+            exceptionType = TwythonRateLimitError if response.status_code == 420 else TwythonError
 
             raise exceptionType(error_msg,
                                 error_code=response.status_code,
@@ -420,43 +417,48 @@ class Twython(object):
     def _media_update(self, url, file_, **params):
         return self.post(url, params=params, files=file_)
 
-    def updateProfileBackgroundImage(self, file_, tile=True, version=1):
+    def updateProfileBackgroundImage(self, file_, version='1.1', **params):
         """Updates the authenticating user's profile background image.
 
             :param file_: (required) A string to the location of the file
                           (less than 800KB in size, larger than 2048px width will scale down)
-            :param tile: (optional) Default ``True`` If set to true the background image
-                         will be displayed tiled. The image will not be tiled otherwise.
-            :param version: (optional) A number, default 1 because that's the
-                            only API version Twitter has now
+            :param version: (optional) A number, default 1.1 because that's the
+                            current API version for Twitter (Legacy = 1)
+
+            **params - You may pass items that are stated in this doc
+                       (https://dev.twitter.com/docs/api/1.1/post/account/update_profile_background_image)
         """
-        url = 'https://api.twitter.com/%d/account/update_profile_background_image.json' % version
+        url = 'https://api.twitter.com/%s/account/update_profile_background_image.json' % version
         return self._media_update(url,
                                   {'image': (file_, open(file_, 'rb'))},
-                                  **{'tile': tile})
+                                  **params)
 
-    def updateProfileImage(self, file_, version=1):
+    def updateProfileImage(self, file_, version='1.1', **params):
         """Updates the authenticating user's profile image (avatar).
 
             :param file_: (required) A string to the location of the file
-            :param version: (optional) A number, default 1 because that's the
-                            only API version Twitter has now
+            :param version: (optional) A number, default 1.1 because that's the
+                            current API version for Twitter (Legacy = 1)
+
+            **params - You may pass items that are stated in this doc
+                       (https://dev.twitter.com/docs/api/1.1/post/account/update_profile_image)
         """
-        url = 'https://api.twitter.com/%d/account/update_profile_image.json' % version
+        url = 'https://api.twitter.com/%s/account/update_profile_image.json' % version
         return self._media_update(url,
-                                  {'image': (file_, open(file_, 'rb'))})
+                                  {'image': (file_, open(file_, 'rb'))},
+                                  **params)
 
     def updateStatusWithMedia(self, file_, version='1.1', **params):
         """Updates the users status with media
 
             :param file_: (required) A string to the location of the file
-            :param version: (optional) A number, default 1 because that's the
-                            only API version Twitter has now
+            :param version: (optional) A number, default 1.1 because that's the
+                            current API version for Twitter (Legacy = 1)
 
             **params - You may pass items that are taken in this doc
-                       (https://dev.twitter.com/docs/api/1/post/statuses/update_with_media)
+                       (https://dev.twitter.com/docs/api/1.1/post/statuses/update_with_media)
         """
-        url = 'https://upload.twitter.com/%d/statuses/update_with_media.json' % version
+        url = 'https://upload.twitter.com/%s/statuses/update_with_media.json' % version
         return self._media_update(url,
                                   {'media': (file_, open(file_, 'rb'))},
                                   **params)
@@ -466,7 +468,7 @@ class Twython(object):
 
             :param file_: (required) A string to the location of the file
             :param version: (optional) A number, default 1 because that's the
-                            only API version Twitter has now
+                            only API version for Twitter that supports this call
 
             **params - You may pass items that are taken in this doc
                        (https://dev.twitter.com/docs/api/1/post/account/update_profile_banner)
@@ -478,7 +480,7 @@ class Twython(object):
 
     ###########################################################################
 
-    def getProfileImageUrl(self, username, size='normal', version='1.1'):
+    def getProfileImageUrl(self, username, size='normal', version='1'):
         """Gets the URL for the user's profile image.
 
             :param username: (required) Username, self explanatory.
@@ -487,8 +489,8 @@ class Twython(object):
                             mini - 24px by 24px
                             original - undefined, be careful -- images may be
                                        large in bytes and/or size.
-            :param version: A number, default 1 because that's the only API
-                            version Twitter has now
+            :param version: (optional) A number, default 1 because that's the
+                            only API version for Twitter that supports this call
         """
         endpoint = 'users/profile_image/%s' % username
         url = self.api_url % version + '/' + endpoint
