@@ -458,7 +458,8 @@ class Twython(object):
             **params - You may pass items that are taken in this doc
                        (https://dev.twitter.com/docs/api/1.1/post/statuses/update_with_media)
         """
-        url = 'https://upload.twitter.com/%s/statuses/update_with_media.json' % version
+        subdomain = 'upload' if version == '1' else 'api'
+        url = 'https://%s.twitter.com/%s/statuses/update_with_media.json' % (subdomain, version)
         return self._media_update(url,
                                   {'media': (file_, open(file_, 'rb'))},
                                   **params)
