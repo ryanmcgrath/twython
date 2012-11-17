@@ -364,7 +364,7 @@ class Twython(object):
             e.g x.search(q='jjndf', page='2')
         """
 
-        return self.get('https://api.twitter.com/1.1/search/tweets.json', params=kwargs)
+        return self.get('https://search.twitter.com/search.json', params=kwargs)
 
     def searchGen(self, search_query, **kwargs):
         """ Returns a generator of tweets that match a specified query.
