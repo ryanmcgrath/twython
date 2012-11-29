@@ -62,6 +62,14 @@ api_table = {
         'url': '/followers/ids.json',
         'method': 'GET',
     },
+    'getFriendsList': {
+        'url': '/friends/list.json',
+        'method': 'GET',
+    },
+    'getFollowersList': {
+        'url': '/followers/list.json',
+        'method': 'GET',
+    },
     'getIncomingFriendshipIDs': {
         'url': '/friendships/incoming.json',
         'method': 'GET',
