@@ -339,6 +339,10 @@ api_table = {
         'url': '/report_spam.json',
         'method': 'POST',
     },
+    'getOembedTweet': {
+    'url': '/statuses/oembed.json',
+        'method': 'GET',
+    },
 }
 
 # from https://dev.twitter.com/docs/error-codes-responses
