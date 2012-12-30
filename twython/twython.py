@@ -82,7 +82,7 @@ class TwythonRateLimitError(TwythonError):
 
 class Twython(object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None, oauth_token_secret=None, \
-                headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None):
+                headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None, version='1'):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
             :param app_key: (optional) Your applications key
@@ -95,6 +95,7 @@ class Twython(object):
         """
 
         # Needed for hitting that there API.
+        self.api_version = version
         self.api_url = 'https://api.twitter.com/%s'
         self.request_token_url = self.api_url % 'oauth/request_token'
         self.access_token_url = self.api_url % 'oauth/access_token'
@@ -145,8 +146,7 @@ class Twython(object):
         fn = api_table[api_call]
         url = re.sub(
             '\{\{(?P<m>[a-zA-Z_]+)\}\}',
-            # The '1' here catches the API version. Slightly hilarious.
-            lambda m: "%s" % kwargs.get(m.group(1), '1'),
+            lambda m: "%s" % kwargs.get(m.group(1), self.api_version),
             base_url + fn['url']
         )
 
