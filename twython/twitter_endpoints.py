@@ -309,6 +309,10 @@ api_table = {
         'url': '/lists/members/destroy.json',
         'method': 'POST',
     },
+    'deleteListMembers': {
+        'url': '/lists/members/destroy_all.json',
+        'method': 'POST'
+    },
     'getListSubscribers': {
         'url': '/lists/subscribers.json',
         'method': 'GET',
