@@ -7,7 +7,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "2.5.4"
+__version__ = "2.5.5"
 
 import urllib
 import re
