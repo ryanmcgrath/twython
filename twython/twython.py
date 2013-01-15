@@ -203,7 +203,7 @@ class Twython(object):
                 'error', 'An error occurred processing your request.')
             self._last_call['api_error'] = error_msg
 
-            exceptionType = TwythonRateLimitError if response.status_code == 420 else TwythonError
+            exceptionType = TwythonRateLimitError if response.status_code == 429 else TwythonError
 
             raise exceptionType(error_msg,
                                 error_code=response.status_code,
