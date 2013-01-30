@@ -169,11 +169,11 @@ class Twython(object):
         OAuthHook.consumer_secret = twitter_secret
 
         # Needed for hitting that there API.
-        self.request_token_url = 'http://twitter.com/oauth/request_token'
-        self.access_token_url = 'http://twitter.com/oauth/access_token'
-        self.authorize_url = 'http://twitter.com/oauth/authorize'
-        self.authenticate_url = 'http://twitter.com/oauth/authenticate'
-        self.api_url = 'http://api.twitter.com/%s/'
+        self.request_token_url = 'https://twitter.com/oauth/request_token'
+        self.access_token_url = 'https://twitter.com/oauth/access_token'
+        self.authorize_url = 'https://twitter.com/oauth/authorize'
+        self.authenticate_url = 'https://twitter.com/oauth/authenticate'
+        self.api_url = 'https://api.twitter.com/%s/'
 
         self.twitter_token = twitter_token
         self.twitter_secret = twitter_secret
