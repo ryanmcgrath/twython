@@ -13,7 +13,7 @@
 """
 
 # Base Twitter API url, no need to repeat this junk...
-base_url = 'http://api.twitter.com/{{version}}'
+base_url = 'https://api.twitter.com/{{version}}'
 
 api_table = {
     'getRateLimitStatus': {
