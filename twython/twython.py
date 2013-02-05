@@ -259,7 +259,7 @@ class Twython(object):
             raise TwythonError('This function must be called after an API call.  It delivers header information.')
         if header in self._last_call['headers']:
             return self._last_call['headers'][header]
-        return None
+        return self._last_call
 
     def get_authentication_tokens(self):
         """Returns an authorization URL for a user to hit.
