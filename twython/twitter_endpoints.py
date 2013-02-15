@@ -17,7 +17,7 @@ base_url = 'http://api.twitter.com/{{version}}'
 
 api_table = {
     'getRateLimitStatus': {
-        'url': '/account/rate_limit_status.json',
+        'url': '/application/rate_limit_status.json',
         'method': 'GET',
     },
 
