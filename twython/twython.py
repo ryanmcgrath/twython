@@ -206,7 +206,8 @@ class Twython(object):
                 'error', 'An error occurred processing your request.')
             self._last_call['api_error'] = error_msg
 
-            exceptionType = TwythonRateLimitError if response.status_code == 420 else TwythonError
+            #Twitter API 1.1 , always return 429 when rate limit is exceeded
+            exceptionType = TwythonRateLimitError if response.status_code == 429 else TwythonError
 
             raise exceptionType(error_msg,
                                 error_code=response.status_code,
