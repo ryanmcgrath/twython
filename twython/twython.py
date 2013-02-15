@@ -14,7 +14,7 @@ import re
 import warnings
 
 import requests
-from requests.auth import OAuth1
+from requests_oauthlib import OAuth1
 
 try:
     from urlparse import parse_qsl
@@ -115,7 +115,8 @@ class Twython(object):
         self.headers = headers or {'User-Agent': 'Twython v' + __version__}
 
         # Allow for unauthenticated requests
-        self.client = requests.session(proxies=proxies)
+        self.client = requests.Session()
+        self.client.proxies = proxies
         self.auth = None
 
         if self.app_key is not None and self.app_secret is not None and \
@@ -130,7 +131,10 @@ class Twython(object):
                                signature_type='auth_header')
 
         if self.auth is not None:
-            self.client = requests.session(headers=self.headers, auth=self.auth, proxies=proxies)
+            self.client = requests.Session()
+            self.client.headers = self.headers
+            self.client.auth = self.auth
+            self.client.proxies = proxies
 
         # register available funcs to allow listing name when debugging.
         def setFunc(key):
@@ -181,7 +185,6 @@ class Twython(object):
             'api_call': api_call,
             'api_error': None,
             'cookies': response.cookies,
-            'error': response.error,
             'headers': response.headers,
             'status_code': response.status_code,
             'url': response.url,
