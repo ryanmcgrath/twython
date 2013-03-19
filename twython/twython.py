@@ -7,7 +7,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "2.5.5"
+__version__ = "2.6.0"
 
 import urllib
 import re
@@ -337,39 +337,6 @@ class Twython(object):
     def constructApiURL(base_url, params):
         return base_url + "?" + "&".join(["%s=%s" % (Twython.unicode2utf8(key), urllib.quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.iteritems()])
 
-    def search(self, **kwargs):
-        """ Returns tweets that match a specified query.
-
-            Documentation: https://dev.twitter.com/doc/get/search
-
-            :param q: (required) The query you want to search Twitter for
-
-            :param geocode: (optional) Returns tweets by users located within
-                            a given radius of the given latitude/longitude.
-                            The parameter value is specified by
-                            "latitude,longitude,radius", where radius units
-                            must be specified as either "mi" (miles) or
-                            "km" (kilometers).
-                            Example Values: 37.781157,-122.398720,1mi
-            :param lang: (optional) Restricts tweets to the given language,
-                         given by an ISO 639-1 code.
-            :param locale: (optional) Specify the language of the query you
-                           are sending. Only ``ja`` is currently effective.
-            :param page: (optional) The page number (starting at 1) to return
-                         Max ~1500 results
-            :param result_type: (optional) Default ``mixed``
-                                mixed: Include both popular and real time
-                                       results in the response.
-                                recent: return only the most recent results in
-                                        the response
-                                popular: return only the most popular results
-                                         in the response.
-
-            e.g x.search(q='jjndf', page='2')
-        """
-
-        return self.get('https://api.twitter.com/1.1/search/tweets.json', params=kwargs)
-
     def searchGen(self, search_query, **kwargs):
         """ Returns a generator of tweets that match a specified query.
 
@@ -382,7 +349,7 @@ class Twython(object):
                     print result
         """
         kwargs['q'] = search_query
-        content = self.get('https://api.twitter.com/1.1/search/tweets.json', params=kwargs)
+        content = self.search(q=search_query, **kwargs)
 
         if not content['results']:
             raise StopIteration
