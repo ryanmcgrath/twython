@@ -100,15 +100,6 @@ print t.getProfileImageUrl('ryanmcgrath', size='bigger')
 print t.getProfileImageUrl('mikehelmick')
 ```
 
-###### Search Twitter *(no authentication needed)*
-
-```python
-from twython import Twython
-
-t = Twython()
-print t.search(q='python')
-```
-
 ###### Streaming API
 *Usage is as follows; it's designed to be open-ended enough that you can adapt it to higher-level (read: Twitter must give you access)
 streams.*

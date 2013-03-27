@@ -7,14 +7,14 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "2.5.5"
+__version__ = "2.6.0"
 
 import urllib
 import re
 import warnings
 
 import requests
-from requests.auth import OAuth1
+from requests_oauthlib import OAuth1
 
 try:
     from urlparse import parse_qsl
@@ -82,7 +82,11 @@ class TwythonRateLimitError(TwythonError):
 
 class Twython(object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None, oauth_token_secret=None, \
+<<<<<<< HEAD
                 headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None, version='1' , ssl_verify=True ):
+=======
+                headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None, version='1.1'):
+>>>>>>> d6f3d731a2a89a0add5b01b918cf61cf93f97d62
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
             :param app_key: (optional) Your applications key
@@ -117,7 +121,8 @@ class Twython(object):
         self.headers = headers or {'User-Agent': 'Twython v' + __version__}
 
         # Allow for unauthenticated requests
-        self.client = requests.session(proxies=proxies)
+        self.client = requests.Session()
+        self.client.proxies = proxies
         self.auth = None
 
         if self.app_key is not None and self.app_secret is not None and \
@@ -132,7 +137,10 @@ class Twython(object):
                                signature_type='auth_header')
 
         if self.auth is not None:
-            self.client = requests.session(headers=self.headers, auth=self.auth, proxies=proxies)
+            self.client = requests.Session()
+            self.client.headers = self.headers
+            self.client.auth = self.auth
+            self.client.proxies = proxies
 
         # register available funcs to allow listing name when debugging.
         def setFunc(key):
@@ -183,7 +191,6 @@ class Twython(object):
             'api_call': api_call,
             'api_error': None,
             'cookies': response.cookies,
-            'error': response.error,
             'headers': response.headers,
             'status_code': response.status_code,
             'url': response.url,
@@ -205,7 +212,8 @@ class Twython(object):
                 'error', 'An error occurred processing your request.')
             self._last_call['api_error'] = error_msg
 
-            exceptionType = TwythonRateLimitError if response.status_code == 420 else TwythonError
+            #Twitter API 1.1 , always return 429 when rate limit is exceeded
+            exceptionType = TwythonRateLimitError if response.status_code == 429 else TwythonError
 
             raise exceptionType(error_msg,
                                 error_code=response.status_code,
@@ -261,7 +269,7 @@ class Twython(object):
             raise TwythonError('This function must be called after an API call.  It delivers header information.')
         if header in self._last_call['headers']:
             return self._last_call['headers'][header]
-        return None
+        return self._last_call
 
     def get_authentication_tokens(self):
         """Returns an authorization URL for a user to hit.
@@ -335,39 +343,6 @@ class Twython(object):
     def constructApiURL(base_url, params):
         return base_url + "?" + "&".join(["%s=%s" % (Twython.unicode2utf8(key), urllib.quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.iteritems()])
 
-    def search(self, **kwargs):
-        """ Returns tweets that match a specified query.
-
-            Documentation: https://dev.twitter.com/doc/get/search
-
-            :param q: (required) The query you want to search Twitter for
-
-            :param geocode: (optional) Returns tweets by users located within
-                            a given radius of the given latitude/longitude.
-                            The parameter value is specified by
-                            "latitude,longitude,radius", where radius units
-                            must be specified as either "mi" (miles) or
-                            "km" (kilometers).
-                            Example Values: 37.781157,-122.398720,1mi
-            :param lang: (optional) Restricts tweets to the given language,
-                         given by an ISO 639-1 code.
-            :param locale: (optional) Specify the language of the query you
-                           are sending. Only ``ja`` is currently effective.
-            :param page: (optional) The page number (starting at 1) to return
-                         Max ~1500 results
-            :param result_type: (optional) Default ``mixed``
-                                mixed: Include both popular and real time
-                                       results in the response.
-                                recent: return only the most recent results in
-                                        the response
-                                popular: return only the most popular results
-                                         in the response.
-
-            e.g x.search(q='jjndf', page='2')
-        """
-
-        return self.get('https://api.twitter.com/1.1/search/tweets.json', params=kwargs)
-
     def searchGen(self, search_query, **kwargs):
         """ Returns a generator of tweets that match a specified query.
 
@@ -380,7 +355,7 @@ class Twython(object):
                     print result
         """
         kwargs['q'] = search_query
-        content = self.get('https://api.twitter.com/1.1/search/tweets.json', params=kwargs)
+        content = self.search(q=search_query, **kwargs)
 
         if not content['results']:
             raise StopIteration
