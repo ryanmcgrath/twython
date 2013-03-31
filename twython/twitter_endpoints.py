@@ -21,7 +21,7 @@ base_url = 'http://api.twitter.com/{{version}}'
 api_table = {
     # Timelines
     'getMentionsTimeline': {
-        'url': 'statuses/mentions_timeline',
+        'url': '/statuses/mentions_timeline.json',
         'method': 'GET',
     },
     'getUserTimeline': {
