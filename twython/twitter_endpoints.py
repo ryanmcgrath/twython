@@ -320,6 +320,10 @@ api_table = {
         'url': '/lists/members/destroy_all.json',
         'method': 'POST'
     },
+    'showOwnedLists': {
+        'url': '/lists/ownerships.json',
+        'method': 'GET'
+    },
 
 
     # Saved Searches
