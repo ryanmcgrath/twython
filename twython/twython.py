@@ -306,7 +306,7 @@ class Twython(object):
     def get_authorized_tokens(self):
         """Returns authorized tokens after they go through the auth_url phase.
         """
-        response = self.client.get(self.access_token_url)
+        response = self.client.get(self.access_token_url,params={'oauth_verifier':self.oauth_token_secret})
         authorized_tokens = dict(parse_qsl(response.content))
         if not authorized_tokens:
             raise TwythonError('Unable to decode authorized tokens.')
