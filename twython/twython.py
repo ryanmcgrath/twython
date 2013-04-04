@@ -109,7 +109,6 @@ class Twython(object):
         self.oauth_token_secret = oauth_token_secret and u'%s' % oauth_token_secret
 
         self.callback_url = callback_url
-
         self.oauth_verifier = oauth_verifier
 
         # If there's headers, set them, otherwise be an embarassing parent for their own good.
