@@ -99,7 +99,6 @@ class Twython(object):
         self.api_url = 'https://api.twitter.com/%s'
         self.request_token_url = self.api_url % 'oauth/request_token'
         self.access_token_url = self.api_url % 'oauth/access_token'
-        self.authorize_url = self.api_url % 'oauth/authorize'
         self.authenticate_url = self.api_url % 'oauth/authenticate'
 
         # Enforce unicode on keys and secrets
@@ -265,8 +264,11 @@ class Twython(object):
             return self._last_call['headers'][header]
         return self._last_call
 
-    def get_authentication_tokens(self):
+    def get_authentication_tokens(self, force_login=False, screen_name=''):
         """Returns an authorization URL for a user to hit.
+
+            :param force_login: (optional) Forces the user to enter their credentials to ensure the correct users account is authorized.
+            :param app_secret: (optional) If forced_login is set OR user is not currently logged in, Prefills the username input box of the OAuth login screen with the given value
         """
         request_args = {}
         if self.callback_url:
@@ -286,6 +288,12 @@ class Twython(object):
         auth_url_params = {
             'oauth_token': request_tokens['oauth_token'],
         }
+
+        if force_login:
+            auth_url_params.update({
+                'force_login': force_login,
+                'screen_name': screen_name
+            })
 
         # Use old-style callback argument if server didn't accept new-style
         if self.callback_url and not oauth_callback_confirmed:
@@ -453,28 +461,12 @@ class Twython(object):
     ###########################################################################
 
     def getProfileImageUrl(self, username, size='normal', version='1'):
-        """Gets the URL for the user's profile image.
-
-            :param username: (required) Username, self explanatory.
-            :param size: (optional) Default 'normal' (48px by 48px)
-                            bigger - 73px by 73px
-                            mini - 24px by 24px
-                            original - undefined, be careful -- images may be
-                                       large in bytes and/or size.
-            :param version: (optional) A number, default 1 because that's the
-                            only API version for Twitter that supports this call
-        """
-        endpoint = 'users/profile_image/%s' % username
-        url = self.api_url % version + '/' + endpoint
-
-        response = self.client.get(url, params={'size': size}, allow_redirects=False)
-        image_url = response.headers.get('location')
-
-        if response.status_code in (301, 302, 303, 307) and image_url is not None:
-            return image_url
-        else:
-            raise TwythonError('getProfileImageUrl() threw an error.',
-                                error_code=response.status_code)
+        warnings.warn(
+            "This function has been deprecated. Twitter API v1.1 will not have a dedicated endpoint \
+            for this functionality.",
+            DeprecationWarning,
+            stacklevel=2
+        )
 
     @staticmethod
     def stream(data, callback):
