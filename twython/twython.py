@@ -81,7 +81,7 @@ class TwythonRateLimitError(TwythonError):
 
 
 class Twython(object):
-    def __init__(self, app_key=None, app_secret=None, oauth_token=None, oauth_token_secret=None, oauth_verifier=None, \
+    def __init__(self, app_key=None, app_secret=None, oauth_token=None, oauth_token_secret=None, \
                 headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None, version='1.1'):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
@@ -109,7 +109,6 @@ class Twython(object):
         self.oauth_token_secret = oauth_token_secret and u'%s' % oauth_token_secret
 
         self.callback_url = callback_url
-        self.oauth_verifier = oauth_verifier
 
         # If there's headers, set them, otherwise be an embarassing parent for their own good.
         self.headers = headers or {'User-Agent': 'Twython v' + __version__}
@@ -304,10 +303,10 @@ class Twython(object):
 
         return request_tokens
 
-    def get_authorized_tokens(self):
+    def get_authorized_tokens(self, oauth_verifier):
         """Returns authorized tokens after they go through the auth_url phase.
         """
-        response = self.client.get(self.access_token_url,params={'oauth_verifier' : self.oauth_verifier})
+        response = self.client.get(self.access_token_url, params={'oauth_verifier' : oauth_verifier})
         authorized_tokens = dict(parse_qsl(response.content))
         if not authorized_tokens:
             raise TwythonError('Unable to decode authorized tokens.')
