@@ -4,6 +4,15 @@ from setuptools import find_packages
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
 __version__ = '2.7.0'
 
+install_requires = ['requests>=1.0.0, <2.0.0', 'requests_oauthlib==0.3.0']
+try:
+    import json
+except ImportError:
+    try:
+        from django.utils import simplejson
+    except ImportError:
+        install_requires.append('simplejson')
+
 setup(
     # Basic package information.
     name='twython',
@@ -14,7 +23,7 @@ setup(
     include_package_data=True,
 
     # Package dependencies.
-    install_requires=['simplejson', 'requests>=1.0.0, <2.0.0', 'requests_oauthlib==0.3.0'],
+    install_requires=install_requires,
 
     # Metadata for PyPI.
     author='Ryan McGrath',
