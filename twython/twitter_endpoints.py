@@ -40,12 +40,12 @@ api_table = {
         'url': '/statuses/user_timeline.json',
         'method': 'GET',
     },
-
-    # Interfacing with friends/followers
-    'getUserMentions': {
-        'url': '/statuses/mentions.json',
+    'getMentionsTimeline': {
+        'url': '/statuses/mentions_timeline.json',
         'method': 'GET',
     },
+
+    # Interfacing with friends/followers
     'createFriendship': {
         'url': '/friendships/create.json',
         'method': 'POST',
@@ -82,10 +82,6 @@ api_table = {
     },
     'retweetedOfMe': {
         'url': '/statuses/retweets_of_me.json',
-        'method': 'GET',
-    },
-    'retweetedByMe': {
-        'url': '/statuses/retweeted_by_me.json',
         'method': 'GET',
     },
     'retweetedToMe': {
@@ -131,18 +127,22 @@ api_table = {
         'url': '/direct_messages/sent.json',
         'method': 'GET',
     },
+    'showDirectMessages': {
+        'url': '/direct_messages/show.json',
+        'method': 'GET',
+    },
     'sendDirectMessage': {
         'url': '/direct_messages/new.json',
         'method': 'POST',
     },
     'destroyDirectMessage': {
-        'url': '/direct_messages/destroy/{{id}}.json',
+        'url': '/direct_messages/destroy.json',
         'method': 'POST',
     },
 
     # Friendship methods
-    'checkIfFriendshipExists': {
-        'url': '/friendships/exists.json',
+    'lookupFriendship': {
+        'url': '/friendships/lookup.json',
         'method': 'GET',
     },
     'showFriendship': {
@@ -162,37 +162,33 @@ api_table = {
 
     # Favorites methods
     'getFavorites': {
-        'url': '/favorites.json',
+        'url': '/favorites/list.json',
         'method': 'GET',
     },
     'createFavorite': {
-        'url': '/favorites/create/{{id}}.json',
+        'url': '/favorites/create.json',
         'method': 'POST',
     },
     'destroyFavorite': {
-        'url': '/favorites/destroy/{{id}}.json',
+        'url': '/favorites/destroy.json',
         'method': 'POST',
     },
 
     # Blocking methods
     'createBlock': {
-        'url': '/blocks/create/{{id}}.json',
+        'url': '/blocks/create.json',
         'method': 'POST',
     },
     'destroyBlock': {
-        'url': '/blocks/destroy/{{id}}.json',
+        'url': '/blocks/destroy.json',
         'method': 'POST',
     },
     'getBlocking': {
-        'url': '/blocks/blocking.json',
+        'url': '/blocks/list.json',
         'method': 'GET',
     },
     'getBlockedIDs': {
-        'url': '/blocks/blocking/ids.json',
-        'method': 'GET',
-    },
-    'checkIfBlockExists': {
-        'url': '/blocks/exists.json',
+        'url': '/blocks/ids.json',
         'method': 'GET',
     },
 
@@ -266,7 +262,7 @@ api_table = {
         'method': 'POST',
     },
     'getListTimeline': {
-        'url': '/{{username}}/lists/{{list_id}}/statuses.json',
+        'url': '/lists/statuses.json',
         'method': 'GET',
     },
     'getSpecificList': {
