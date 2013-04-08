@@ -26,17 +26,9 @@ except ImportError:
 from twitter_endpoints import base_url, api_table, twitter_http_status_codes
 
 try:
-    import simplejson
+    import simplejson as json
 except ImportError:
-    try:
-        # Python 2.6 and up
-        import json as simplejson
-    except ImportError:
-        try:
-            from django.utils import simplejson
-        except:
-            # Seriously wtf is wrong with you if you get this Exception.
-            raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
+    import json
 
 
 class TwythonError(Exception):
@@ -194,7 +186,7 @@ class Twython(object):
         #  why? twitter will return invalid json with an error code in the headers
         json_error = False
         try:
-            content = simplejson.loads(content)
+            content = content.json()
         except ValueError:
             json_error = True
             content = {}
@@ -437,13 +429,13 @@ class Twython(object):
             **params - You may pass items that are taken in this doc
                        (https://dev.twitter.com/docs/api/1.1/post/statuses/update_with_media)
         """
-        subdomain = 'upload' if version == '1' else 'api'
-        url = 'https://%s.twitter.com/%s/statuses/update_with_media.json' % (subdomain, version)
+
+        url = 'https://api.twitter.com/%s/statuses/update_with_media.json' % version
         return self._media_update(url,
                                   {'media': (file_, open(file_, 'rb'))},
                                   **params)
 
-    def updateProfileBannerImage(self, file_, version=1, **params):
+    def updateProfileBannerImage(self, file_, version='1.1', **params):
         """Updates the users profile banner
 
             :param file_: (required) A string to the location of the file
@@ -453,7 +445,7 @@ class Twython(object):
             **params - You may pass items that are taken in this doc
                        (https://dev.twitter.com/docs/api/1/post/account/update_profile_banner)
         """
-        url = 'https://api.twitter.com/%d/account/update_profile_banner.json' % version
+        url = 'https://api.twitter.com/%s/account/update_profile_banner.json' % version
         return self._media_update(url,
                                   {'banner': (file_, open(file_, 'rb'))},
                                   **params)
@@ -518,7 +510,7 @@ class Twython(object):
         for line in stream.iter_lines():
             if line:
                 try:
-                    callback(simplejson.loads(line))
+                    callback(json.loads(line))
                 except ValueError:
                     raise TwythonError('Response was not valid JSON, unable to decode.')
 

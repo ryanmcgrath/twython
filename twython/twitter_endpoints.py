@@ -9,7 +9,7 @@
     will be replaced with the keyword that gets passed in to the function at call time.
 
     i.e, in this case, if I pass version = 47 to any function, {{version}} will be replaced
-    with 47, instead of defaulting to 1 (said defaulting takes place at conversion time).
+    with 47, instead of defaulting to 1.1 (said defaulting takes place at conversion time).
 
     This map is organized the order functions are documented at:
     https://dev.twitter.com/docs/api/1.1
@@ -87,7 +87,7 @@ api_table = {
         'method': 'GET',
     },
     'destroyDirectMessage': {
-        'url': '/direct_messages/destroy/{{id}}.json',
+        'url': '/direct_messages/destroy.json',
         'method': 'POST',
     },
     'sendDirectMessage': {
@@ -183,11 +183,11 @@ api_table = {
         'method': 'GET',
     },
     'createBlock': {
-        'url': '/blocks/create/{{id}}.json',
+        'url': '/blocks/create.json',
         'method': 'POST',
     },
     'destroyBlock': {
-        'url': '/blocks/destroy/{{id}}.json',
+        'url': '/blocks/destroy.json',
         'method': 'POST',
     },
     'lookupUser': {
@@ -215,6 +215,10 @@ api_table = {
         'method': 'POST',
     },
     # See twython.py for update_profile_banner
+    'getProfileBannerSizes': {
+        'url': '/users/profile_banner.json',
+        'method': 'GET',
+    },
 
 
     # Suggested Users

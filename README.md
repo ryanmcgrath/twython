@@ -11,7 +11,7 @@ Features
    - Twitter lists
    - Timelines
    - User avatar URL
-   - and anything found in [the docs](https://dev.twitter.com/docs/api)
+   - and anything found in [the docs](https://dev.twitter.com/docs/api/1.1)
 * Image Uploading!
    - **Update user status with an image**
    - Change user avatar
@@ -57,7 +57,7 @@ from twython import Twython
 
 '''
 oauth_token and oauth_token_secret come from the previous step
-if needed, store those in a session variable or something
+if needed, store those in a session variable or something. oauth_verifier from the previous call is now required to pass to get_authorized_tokens
 '''
 
 t = Twython(app_key=app_key,
@@ -65,7 +65,7 @@ t = Twython(app_key=app_key,
             oauth_token=oauth_token,
             oauth_token_secret=oauth_token_secret)
 
-auth_tokens = t.get_authorized_tokens()
+auth_tokens = t.get_authorized_tokens(oauth_verifier)
 print auth_tokens
 ```
 
@@ -90,16 +90,6 @@ t = Twython(app_key=app_key,
 print t.getHomeTimeline()
 ```
 
-###### Get a user avatar url *(no authentication needed)*
-
-```python
-from twython import Twython
-
-t = Twython()
-print t.getProfileImageUrl('ryanmcgrath', size='bigger')
-print t.getProfileImageUrl('mikehelmick')
-```
-
 ###### Streaming API
 *Usage is as follows; it's designed to be open-ended enough that you can adapt it to higher-level (read: Twitter must give you access)
 streams.*
@@ -122,6 +112,8 @@ Twython.stream({
 
 Notes
 -----
+Twython (as of 2.7.0) is currently in the process of ONLY supporting Twitter v1.1 endpoints and deprecating all v1 endpoints! Please see the **[Twitter v1.1 API Documentation](https://dev.twitter.com/docs/api/1.1)** to help migrate your API calls!
+
 As of Twython 2.0.0, we have changed routes for functions to abide by the **[Twitter Spring 2012 clean up](https://dev.twitter.com/docs/deprecations/spring-2012)** Please make changes to your code accordingly.
 
 Development of Twython (specifically, 1.3)
