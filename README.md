@@ -203,3 +203,4 @@ me and let me know (or just issue a pull request on GitHub, and leave a note abo
 - **[fumieval](https://github.com/fumieval)**, Re-added Proxy support for 2.3.0.  
 - **[terrycojones](https://github.com/terrycojones)**, Error cleanup and Exception processing in 2.3.0.  
 - **[Leandro Ferreira](https://github.com/leandroferreira)**, Fix for double-encoding of search queries in 2.3.0.  
+- **[Virendra Rajput](https://github.com/bkvirendra)**, Fixed unicode (json) encoding in twython.py 2.3.0.  
