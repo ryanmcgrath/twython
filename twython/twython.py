@@ -186,7 +186,12 @@ class Twython(object):
         #  why? twitter will return invalid json with an error code in the headers
         json_error = False
         try:
-            content = content.json()
+            try:
+                # try to get json
+                content = content.json()
+            except AttributeError:
+                # if unicode detected
+                content = json.loads(content)
         except ValueError:
             json_error = True
             content = {}
