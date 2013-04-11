@@ -195,3 +195,4 @@ me and let me know (or just issue a pull request on GitHub, and leave a note abo
 - `Leandro Ferreira <https://github.com/leandroferreira>`_, Fix for double-encoding of search queries in 2.3.0.  
 - `Chris Brown <https://github.com/chbrown>`_, Updated to use v1.1 endpoints over v1  
 - `Virendra Rajput <https://github.com/bkvirendra>`_, Fixed unicode (json) encoding in twython.py 2.7.2.  
+- `Paul Solbach <https://github.com/hansenrum>`_, fixed requirement for oauth_verifier  
