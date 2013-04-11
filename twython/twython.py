@@ -42,17 +42,18 @@ class TwythonError(Exception):
         from twython import TwythonError, TwythonAPILimit, TwythonAuthError
     """
     def __init__(self, msg, error_code=None, retry_after=None):
-        self.msg = msg
         self.error_code = error_code
 
         if error_code is not None and error_code in twitter_http_status_codes:
-            self.msg = '%s: %s -- %s' % \
-                        (twitter_http_status_codes[error_code][0],
-                         twitter_http_status_codes[error_code][1],
-                         self.msg)
+            msg = '%s: %s -- %s' % (twitter_http_status_codes[error_code][0],
+                                    twitter_http_status_codes[error_code][1],
+                                    msg)
 
-    def __str__(self):
-        return repr(self.msg)
+        super(TwythonError, self).__init__(msg)
+
+    @property
+    def msg(self):
+        return self.args[0]
 
 
 class TwythonAuthError(TwythonError):
@@ -69,7 +70,7 @@ class TwythonRateLimitError(TwythonError):
     def __init__(self, msg, error_code, retry_after=None):
         TwythonError.__init__(self, msg, error_code=error_code)
         if isinstance(retry_after, int):
-            self.msg = '%s (Retry after %d seconds)' % (msg, retry_after)
+            self.args[0] = '%s (Retry after %d seconds)' % (self.args[0], retry_after)
 
 
 class Twython(object):
