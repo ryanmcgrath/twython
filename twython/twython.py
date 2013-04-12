@@ -39,15 +39,15 @@ class TwythonError(Exception):
         Note: To use these, the syntax has changed as of Twython 1.3. To catch these,
         you need to explicitly import them into your code, e.g:
 
-        from twython import TwythonError, TwythonAPILimit, TwythonAuthError
+        from twython import TwythonError, TwythonRateLimitError, TwythonAuthError
     """
     def __init__(self, msg, error_code=None, retry_after=None):
         self.error_code = error_code
 
         if error_code is not None and error_code in twitter_http_status_codes:
-            msg = '%s: %s -- %s' % (twitter_http_status_codes[error_code][0],
-                                    twitter_http_status_codes[error_code][1],
-                                    msg)
+            msg = 'Twitter API returned a %s (%s), %s' % (error_code,
+                                                          twitter_http_status_codes[error_code][0],
+                                                          msg)
 
         super(TwythonError, self).__init__(msg)
 
@@ -74,8 +74,8 @@ class TwythonRateLimitError(TwythonError):
 
 
 class Twython(object):
-    def __init__(self, app_key=None, app_secret=None, oauth_token=None, oauth_token_secret=None, \
-                headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None, version='1.1'):
+    def __init__(self, app_key=None, app_secret=None, oauth_token=None, oauth_token_secret=None,
+                 headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None, version='1.1'):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
             :param app_key: (optional) Your applications key
@@ -199,14 +199,21 @@ class Twython(object):
 
         if response.status_code > 304:
             # If there is no error message, use a default.
-            error_msg = content.get(
-                'error', 'An error occurred processing your request.')
-            self._last_call['api_error'] = error_msg
+            errors = content.get('errors',
+                                 [{'message': 'An error occurred processing your request.'}])
+            error_message = errors[0]['message']
+            self._last_call['api_error'] = error_message
 
-            #Twitter API 1.1 , always return 429 when rate limit is exceeded
-            exceptionType = TwythonRateLimitError if response.status_code == 429 else TwythonError
+            ExceptionType = TwythonError
+            if response.status_code == 429:
+                # Twitter API 1.1, always return 429 when rate limit is exceeded
+                ExceptionType = TwythonRateLimitError
+            elif response.status_code == 401 or 'Bad Authentication data' in error_message:
+                # Twitter API 1.1, returns a 401 Unauthorized or
+                # a 400 "Bad Authentication data" for invalid/expired app keys/user tokens
+                ExceptionType = TwythonAuthError
 
-            raise exceptionType(error_msg,
+            raise ExceptionType(error_message,
                                 error_code=response.status_code,
                                 retry_after=response.headers.get('retry-after'))
 
@@ -273,9 +280,10 @@ class Twython(object):
             request_args['oauth_callback'] = self.callback_url
 
         response = self.client.get(self.request_token_url, params=request_args)
-
-        if response.status_code != 200:
-            raise TwythonAuthError("Seems something couldn't be verified with your OAuth junk. Error: %s, Message: %s" % (response.status_code, response.content))
+        if response.status_code == 401:
+            raise TwythonAuthError(response.content, error_code=response.status_code)
+        elif response.status_code != 200:
+            raise TwythonError(response.content, error_code=response.status_code)
 
         request_tokens = dict(parse_qsl(response.content))
         if not request_tokens:
@@ -304,7 +312,7 @@ class Twython(object):
     def get_authorized_tokens(self, oauth_verifier):
         """Returns authorized tokens after they go through the auth_url phase.
         """
-        response = self.client.get(self.access_token_url, params={'oauth_verifier' : oauth_verifier})
+        response = self.client.get(self.access_token_url, params={'oauth_verifier': oauth_verifier})
         authorized_tokens = dict(parse_qsl(response.content))
         if not authorized_tokens:
             raise TwythonError('Unable to decode authorized tokens.')
