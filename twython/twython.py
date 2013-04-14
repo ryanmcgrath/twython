@@ -258,10 +258,10 @@ class Twython(object):
             This will return None if the header is not present
 
             Most useful for the following header information:
-                x-ratelimit-limit
-                x-ratelimit-remaining
-                x-ratelimit-class
-                x-ratelimit-reset
+                x-rate-limit-limit
+                x-rate-limit-remaining
+                x-rate-limit-class
+                x-rate-limit-reset
         """
         if self._last_call is None:
             raise TwythonError('This function must be called after an API call.  It delivers header information.')
