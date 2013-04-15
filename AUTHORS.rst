@@ -37,3 +37,4 @@ Patches and Suggestions
 - `Chris Brown <https://github.com/chbrown>`_, Updated to use v1.1 endpoints over v1
 - `Virendra Rajput <https://github.com/bkvirendra>`_, Fixed unicode (json) encoding in twython.py 2.7.2.  
 - `Paul Solbach <https://github.com/hansenrum>`_, fixed requirement for oauth_verifier
+- `Greg Nofi <https://github.com/nofeet>`_, fixed using built-in Exception attributes for storing & retrieving error message
