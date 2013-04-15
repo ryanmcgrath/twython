@@ -1,2 +1,2 @@
 from twython import Twython
-from twython import TwythonError, TwythonRateLimitError, TwythonAuthError
+from .exceptions import TwythonError, TwythonRateLimitError, TwythonAuthError
