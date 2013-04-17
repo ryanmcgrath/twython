@@ -1,40 +1,19 @@
-"""
-    Twython is a library for Python that wraps the Twitter API.
-    It aims to abstract away all the API endpoints, so that additions to the library
-    and/or the Twitter API won't cause any overall problems.
-
-    Questions, comments? ryan@venodesigns.net
-"""
-
-__author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "2.7.3"
-
-import urllib
 import re
 import warnings
+warnings.simplefilter('default')  # For Python 2.7 >
 
 import requests
 from requests_oauthlib import OAuth1
 
-try:
-    from urlparse import parse_qsl
-except ImportError:
-    from cgi import parse_qsl
-
-# Twython maps keyword based arguments to Twitter API endpoints. The endpoints
-# table is a file with a dictionary of every API endpoint that Twython supports.
-from twitter_endpoints import base_url, api_table
+from .compat import json, urlencode, parse_qsl, quote_plus
+from .endpoints import api_table
 from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
-
-try:
-    import simplejson as json
-except ImportError:
-    import json
+from .version import __version__
 
 
 class Twython(object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None, oauth_token_secret=None,
-                 headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None, version='1.1'):
+                 headers=None, proxies=None, version='1.1', callback_url=None, twitter_token=None, twitter_secret=None):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
             :param app_key: (optional) Your applications key
@@ -46,46 +25,55 @@ class Twython(object):
             :param proxies: (optional) A dictionary of proxies, for example {"http":"proxy.example.org:8080", "https":"proxy.example.org:8081"}.
         """
 
-        # Needed for hitting that there API.
+        # API urls, OAuth urls and API version; needed for hitting that there API.
         self.api_version = version
         self.api_url = 'https://api.twitter.com/%s'
         self.request_token_url = self.api_url % 'oauth/request_token'
         self.access_token_url = self.api_url % 'oauth/access_token'
         self.authenticate_url = self.api_url % 'oauth/authenticate'
 
-        # Enforce unicode on keys and secrets
-        self.app_key = app_key and unicode(app_key) or twitter_token and unicode(twitter_token)
-        self.app_secret = app_key and unicode(app_secret) or twitter_secret and unicode(twitter_secret)
-
-        self.oauth_token = oauth_token and u'%s' % oauth_token
-        self.oauth_token_secret = oauth_token_secret and u'%s' % oauth_token_secret
+        self.app_key = app_key or twitter_token
+        self.app_secret = app_secret or twitter_secret
+        self.oauth_token = oauth_token
+        self.oauth_token_secret = oauth_token_secret
 
         self.callback_url = callback_url
 
-        # If there's headers, set them, otherwise be an embarassing parent for their own good.
-        self.headers = headers or {'User-Agent': 'Twython v' + __version__}
+        if twitter_token or twitter_secret:
+            warnings.warn(
+                'Instead of twitter_token or twitter_secret, please use app_key or app_secret (respectively).',
+                DeprecationWarning,
+                stacklevel=2
+            )
 
-        # Allow for unauthenticated requests
-        self.client = requests.Session()
-        self.client.proxies = proxies
+        if callback_url:
+            warnings.warn(
+                'Please pass callback_url to the get_authentication_tokens method rather than Twython.__init__',
+                DeprecationWarning,
+                stacklevel=2
+            )
+
+        self.headers = {'User-Agent': 'Twython v' + __version__}
+        if headers:
+            self.headers.update(headers)
+
+        # Generate OAuth authentication object for the request
+        # If no keys/tokens are passed to __init__, self.auth=None allows for
+        # unauthenticated requests, although I think all v1.1 requests need auth
         self.auth = None
+        if self.app_key is not None and self.app_secret is not None and \
+           self.oauth_token is None and self.oauth_token_secret is None:
+            self.auth = OAuth1(self.app_key, self.app_secret)
 
         if self.app_key is not None and self.app_secret is not None and \
-        self.oauth_token is None and self.oauth_token_secret is None:
+           self.oauth_token is not None and self.oauth_token_secret is not None:
             self.auth = OAuth1(self.app_key, self.app_secret,
-                               signature_type='auth_header')
+                               self.oauth_token, self.oauth_token_secret)
 
-        if self.app_key is not None and self.app_secret is not None and \
-        self.oauth_token is not None and self.oauth_token_secret is not None:
-            self.auth = OAuth1(self.app_key, self.app_secret,
-                               self.oauth_token, self.oauth_token_secret,
-                               signature_type='auth_header')
-
-        if self.auth is not None:
-            self.client = requests.Session()
-            self.client.headers = self.headers
-            self.client.auth = self.auth
-            self.client.proxies = proxies
+        self.client = requests.Session()
+        self.client.headers = self.headers
+        self.client.proxies = proxies
+        self.client.auth = self.auth
 
         # register available funcs to allow listing name when debugging.
         def setFunc(key):
@@ -101,8 +89,8 @@ class Twython(object):
         fn = api_table[api_call]
         url = re.sub(
             '\{\{(?P<m>[a-zA-Z_]+)\}\}',
-            lambda m: "%s" % kwargs.get(m.group(1), self.api_version),
-            base_url + fn['url']
+            lambda m: "%s" % kwargs.get(m.group(1)),
+            self.api_url % self.api_version + fn['url']
         )
 
         content = self._request(url, method=fn['method'], params=kwargs)
@@ -114,15 +102,7 @@ class Twython(object):
         code twice, right? ;)
         '''
         method = method.lower()
-        if not method in ('get', 'post'):
-            raise TwythonError('Method must be of GET or POST')
-
         params = params or {}
-        # requests doesn't like items that can't be converted to unicode,
-        # so let's be nice and do that for the user
-        for k, v in params.items():
-            if isinstance(v, (int, bool)):
-                params[k] = u'%s' % v
 
         func = getattr(self.client, method)
         if method == 'get':
@@ -176,7 +156,7 @@ class Twython(object):
                                 error_code=response.status_code,
                                 retry_after=response.headers.get('retry-after'))
 
-        # if we have a json error here, then it's not an official TwitterAPI error
+        # if we have a json error here, then it's not an official Twitter API error
         if json_error and not response.status_code in (200, 201, 202):
             raise TwythonError('Response was not valid JSON, unable to decode.')
 
@@ -228,23 +208,23 @@ class Twython(object):
             return self._last_call['headers'][header]
         return self._last_call
 
-    def get_authentication_tokens(self, force_login=False, screen_name=''):
-        """Returns an authorization URL for a user to hit.
+    def get_authentication_tokens(self, callback_url=None, force_login=False, screen_name=''):
+        """Returns a dict including an authorization URL (auth_url) to direct a user to
 
+            :param callback_url: (optional.. for now) Url the user is returned to after they authorize your app
             :param force_login: (optional) Forces the user to enter their credentials to ensure the correct users account is authorized.
             :param app_secret: (optional) If forced_login is set OR user is not currently logged in, Prefills the username input box of the OAuth login screen with the given value
         """
-        request_args = {}
-        if self.callback_url:
-            request_args['oauth_callback'] = self.callback_url
-
+        callback_url = callback_url or self.callback_url
+        request_args = {'oauth_callback': callback_url}
         response = self.client.get(self.request_token_url, params=request_args)
+
         if response.status_code == 401:
             raise TwythonAuthError(response.content, error_code=response.status_code)
         elif response.status_code != 200:
             raise TwythonError(response.content, error_code=response.status_code)
 
-        request_tokens = dict(parse_qsl(response.content))
+        request_tokens = dict(parse_qsl(response.content.decode('utf-8')))
         if not request_tokens:
             raise TwythonError('Unable to decode request tokens.')
 
@@ -261,18 +241,20 @@ class Twython(object):
             })
 
         # Use old-style callback argument if server didn't accept new-style
-        if self.callback_url and not oauth_callback_confirmed:
+        if callback_url and not oauth_callback_confirmed:
             auth_url_params['oauth_callback'] = self.callback_url
 
-        request_tokens['auth_url'] = self.authenticate_url + '?' + urllib.urlencode(auth_url_params)
+        request_tokens['auth_url'] = self.authenticate_url + '?' + urlencode(auth_url_params)
 
         return request_tokens
 
     def get_authorized_tokens(self, oauth_verifier):
         """Returns authorized tokens after they go through the auth_url phase.
+
+        :param oauth_verifier: (required) The oauth_verifier retrieved from the callback url querystring
         """
         response = self.client.get(self.access_token_url, params={'oauth_verifier': oauth_verifier})
-        authorized_tokens = dict(parse_qsl(response.content))
+        authorized_tokens = dict(parse_qsl(response.content.decode('utf-8')))
         if not authorized_tokens:
             raise TwythonError('Unable to decode authorized tokens.')
 
@@ -308,7 +290,7 @@ class Twython(object):
 
     @staticmethod
     def constructApiURL(base_url, params):
-        return base_url + "?" + "&".join(["%s=%s" % (Twython.unicode2utf8(key), urllib.quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.iteritems()])
+        return base_url + "?" + "&".join(["%s=%s" % (Twython.unicode2utf8(key), quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.iteritems()])
 
     def searchGen(self, search_query, **kwargs):
         """ Returns a generator of tweets that match a specified query.
@@ -331,7 +313,7 @@ class Twython(object):
             yield tweet
 
         if 'page' not in kwargs:
-            kwargs['page'] = '2'
+            kwargs['page'] = 2
         else:
             try:
                 kwargs['page'] = int(kwargs['page'])
@@ -416,7 +398,7 @@ class Twython(object):
                             only API version for Twitter that supports this call
 
             **params - You may pass items that are taken in this doc
-                       (https://dev.twitter.com/docs/api/1/post/account/update_profile_banner)
+                       (https://dev.twitter.com/docs/api/1.1/post/account/update_profile_banner)
         """
         url = 'https://api.twitter.com/%s/account/update_profile_banner.json' % version
         return self._media_update(url,

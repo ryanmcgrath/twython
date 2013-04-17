@@ -13,7 +13,7 @@ Development Lead
 Patches and Suggestions
 ````````````````````````
 
-- `Mike Helmick <https://github.com/michaelhelmick>`_, multiple fixes and proper ``requests`` integration. Too much to list here.
+- `Mike Helmick <https://github.com/michaelhelmick>`_, multiple fixes and proper ``requests`` integration, Python 3 compatibility, too much to list here.
 - `kracekumar <https://github.com/kracekumar>`_, early ``requests`` work and various fixes.
 - `Erik Scheffers <https://github.com/eriks5>`_, various fixes regarding OAuth callback URLs.
 - `Jordan Bouvier <https://github.com/jbouvier>`_, various fixes regarding OAuth callback URLs.

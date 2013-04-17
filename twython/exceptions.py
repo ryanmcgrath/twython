@@ -1,4 +1,4 @@
-from twitter_endpoints import twitter_http_status_codes
+from .endpoints import twitter_http_status_codes
 
 
 class TwythonError(Exception):

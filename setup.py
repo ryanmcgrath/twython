@@ -1,14 +1,25 @@
+import os
+import sys
+
+from twython.version import __version__
+
 from setuptools import setup
-from setuptools import find_packages
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '2.7.3'
+
+packages = [
+    'twython'
+]
+
+if sys.argv[-1] == 'publish':
+    os.system('python setup.py sdist upload')
+    sys.exit()
 
 setup(
     # Basic package information.
     name='twython',
     version=__version__,
-    packages=find_packages(),
+    packages=packages,
 
     # Packaging options.
     include_package_data=True,

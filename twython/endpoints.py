@@ -15,9 +15,6 @@
     https://dev.twitter.com/docs/api/1.1
 """
 
-# Base Twitter API url, no need to repeat this junk...
-base_url = 'http://api.twitter.com/{{version}}'
-
 api_table = {
     # Timelines
     'getMentionsTimeline': {
