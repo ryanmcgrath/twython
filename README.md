@@ -32,7 +32,7 @@ Installation
 Usage
 -----
 
-###### Authorization URL
+##### Authorization URL
 
 ```python
 from twython import Twython
@@ -49,7 +49,7 @@ print 'Connect to Twitter via: %s' % auth_props['auth_url']
 
 Be sure you have a URL set up to handle the callback after the user has allowed your app to access their data, the callback can be used for storing their final OAuth Token and OAuth Token Secret in a database for use at a later date.
 
-###### Handling the callback
+##### Handling the callback
 
 ```python
 from twython import Twython
@@ -72,7 +72,7 @@ print auth_tokens
 
 *Function definitions (i.e. getHomeTimeline()) can be found by reading over twython/endpoints.py*
 
-###### Getting a user home timeline
+##### Getting a user home timeline
 
 ```python
 from twython import Twython
@@ -87,8 +87,9 @@ t = Twython(app_key, app_secret,
 print t.getHomeTimeline()
 ```
 
-###### Catching exceptions
+##### Catching exceptions
 > Twython offers three Exceptions currently: TwythonError, TwythonAuthError and TwythonRateLimitError
+
 ```python
 from twython import Twython, TwythonAuthError
 
@@ -101,7 +102,7 @@ except TwythonAuthError as e:
     print e
 ```
 
-###### Streaming API
+##### Streaming API
 *Usage is as follows; it's designed to be open-ended enough that you can adapt it to higher-level (read: Twitter must give you access)
 streams.*
 
