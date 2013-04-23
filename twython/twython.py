@@ -82,11 +82,7 @@ class TwythonRateLimitError(TwythonError):
 
 class Twython(object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None, oauth_token_secret=None, \
-<<<<<<< HEAD
-                headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None, version='1' , ssl_verify=True ):
-=======
-                headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None, version='1.1'):
->>>>>>> d6f3d731a2a89a0add5b01b918cf61cf93f97d62
+                headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None, version='1.1' , ssl_verify=True ):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
             :param app_key: (optional) Your applications key
