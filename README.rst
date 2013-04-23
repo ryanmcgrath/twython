@@ -10,7 +10,7 @@ Features
    - Twitter lists
    - Timelines
    - User avatar URL
-   - and anything found in `the docs <https://dev.twitter.com/docs/api>`_
+   - and anything found in `the docs <https://dev.twitter.com/docs/api/1.1>`_
 * Image Uploading!
    - **Update user status with an image**
    - Change user avatar
@@ -58,7 +58,7 @@ Handling the callback
 
     '''
     oauth_token and oauth_token_secret come from the previous step
-    if needed, store those in a session variable or something
+    if needed, store those in a session variable or something. oauth_verifier from the previous call is now required to pass to get_authorized_tokens
     '''
     from twython import Twython
 
@@ -67,7 +67,7 @@ Handling the callback
                 oauth_token=oauth_token,
                 oauth_token_secret=oauth_token_secret)
 
-    auth_tokens = t.get_authorized_tokens()
+    auth_tokens = t.get_authorized_tokens(oauth_verifier)
     print auth_tokens
 
 *Function definitions (i.e. getHomeTimeline()) can be found by reading over twython/twitter_endpoints.py*
@@ -90,15 +90,6 @@ Getting a user home timeline
     # Returns an dict of the user home timeline
     print t.getHomeTimeline()
 
-Get a user avatar url *(no authentication needed)*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-::
-    
-    from twython import Twython
-    
-    t = Twython()
-    print t.getProfileImageUrl('ryanmcgrath', size='bigger')
-    print t.getProfileImageUrl('mikehelmick')
 
 Streaming API
 ~~~~~~~~~~~~~
@@ -124,8 +115,7 @@ streams.*
 
 Notes
 -----
-* As of Twython 2.0.0, we have changed routes for functions to abide by the `Twitter Spring 2012 clean up <https://dev.twitter.com/docs/deprecations/spring-2012>`_ Please make changes to your code accordingly.
-
+* Twython (as of 2.7.0) is currently in the process of ONLY supporting Twitter v1.1 endpoints and deprecating all v1 endpoints! Please see the `Twitter API Documentation <https://dev.twitter.com/docs/api/1.1>`_ to help migrate your API calls!
 
 Twython && Django
 -----------------
@@ -171,33 +161,3 @@ You can also follow me on Twitter - `@ryanmcgrath <https://twitter.com/ryanmcgra
 Want to help?
 -------------
 Twython is useful, but ultimately only as useful as the people using it (say that ten times fast!). If you'd like to help, write example code, contribute patches, document things on the wiki, tweet about it. Your help is always appreciated!
-
-
-Special Thanks to...
---------------------
-This is a list of all those who have contributed code to Twython in some way, shape, or form. I think it's
-exhaustive, but I could be wrong - if you think your name should be here and it's not, please contact
-me and let me know (or just issue a pull request on GitHub, and leave a note about it so I can just accept it ;)).
-
-- `Mike Helmick (michaelhelmick) <https://github.com/michaelhelmick>`_, multiple fixes and proper ``requests`` integration. Too much to list here.  
-- `kracekumar <https://github.com/kracekumar>`_, early ``requests`` work and various fixes.  
-- `Erik Scheffers (eriks5) <https://github.com/eriks5>`_, various fixes regarding OAuth callback URLs.
-- `Jordan Bouvier (jbouvier) <https://github.com/jbouvier>`_, various fixes regarding OAuth callback URLs.
-- `Dick Brouwer (dikbrouwer) <https://github.com/dikbrouwer>`_, fixes for OAuth Verifier in ``get_authorized_tokens``.
-- `hades <https://github.com/hades>`_, Fixes to various initial OAuth issues and updates to ``Twython3k`` to stay current.
-- `Alex Sutton (alexdsutton) <https://github.com/alexsdutton/twython/>`_, fix for parameter substitution regular expression (catch underscores!).
-- `Levgen Pyvovarov (bsn) <https://github.com/bsn>`_, Various argument fixes, cyrillic text support.
-- `Mark Liu (mliu7) <https://github.com/mliu7>`_, Missing parameter fix for ``addListMember``.
-- `Randall Degges (rdegges) <https://github.com/rdegge>`_, PEP-8 fixes, MANIFEST.in, installer fixes.
-- `Idris Mokhtarzada (idris) <https://github.com/idris>`_, Fixes for various example code pieces.
-- `Jonathan Elsas (jelsas) <https://github.com/jelsas>`_, Fix for original Streaming API stub causing import errors.
-- `LuqueDaniel <https://github.com/LuqueDaniel>`_, Extended example code where necessary.
-- `Mesar Hameed (mhameed) <https://github.com/mhameed>`_, Commit to swap ``__getattr__`` trick for a more debuggable solution.
-- `Remy DeCausemaker (decause) <https://github.com/decause>`_, PEP-8 contributions.
-- `[mckellister](https://github.com/mckellister) <https://dev.twitter.com/docs/deprecations/spring-2012>`_, Fixes to ``Exception`` raised by Twython (Rate Limits, etc).
-- `tatz_tsuchiya <http://d.hatena.ne.jp/tatz_tsuchiya/20120115/1326623451>`_, Fix for ``lambda`` scoping in key injection phase.
-- `Voulnet (Mohammed ALDOUB) <https://github.com/Voulnet>`_, Fixes for ``http/https`` access endpoints.  
-- `fumieval <https://github.com/fumieval>`_, Re-added Proxy support for 2.3.0.  
-- `terrycojones <https://github.com/terrycojones>`_, Error cleanup and Exception processing in 2.3.0.  
-- `Leandro Ferreira <https://github.com/leandroferreira>`_, Fix for double-encoding of search queries in 2.3.0.  
-- `Chris Brown <https://github.com/chbrown>`_, Updated to use v1.1 endpoints over v1  

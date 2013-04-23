@@ -7,7 +7,7 @@
 """
 
 __author__ = "Ryan McGrath <ryan@venodesigns.net>"
-__version__ = "2.6.0"
+__version__ = "2.7.3"
 
 import urllib
 import re
@@ -23,66 +23,18 @@ except ImportError:
 
 # Twython maps keyword based arguments to Twitter API endpoints. The endpoints
 # table is a file with a dictionary of every API endpoint that Twython supports.
-from twitter_endpoints import base_url, api_table, twitter_http_status_codes
+from twitter_endpoints import base_url, api_table
+from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
 
 try:
-    import simplejson
+    import simplejson as json
 except ImportError:
-    try:
-        # Python 2.6 and up
-        import json as simplejson
-    except ImportError:
-        try:
-            from django.utils import simplejson
-        except:
-            # Seriously wtf is wrong with you if you get this Exception.
-            raise Exception("Twython requires the simplejson library (or Python 2.6) to work. http://www.undefined.org/python/")
-
-
-class TwythonError(Exception):
-    """
-        Generic error class, catch-all for most Twython issues.
-        Special cases are handled by TwythonAPILimit and TwythonAuthError.
-
-        Note: To use these, the syntax has changed as of Twython 1.3. To catch these,
-        you need to explicitly import them into your code, e.g:
-
-        from twython import TwythonError, TwythonAPILimit, TwythonAuthError
-    """
-    def __init__(self, msg, error_code=None, retry_after=None):
-        self.msg = msg
-        self.error_code = error_code
-
-        if error_code is not None and error_code in twitter_http_status_codes:
-            self.msg = '%s: %s -- %s' % \
-                        (twitter_http_status_codes[error_code][0],
-                         twitter_http_status_codes[error_code][1],
-                         self.msg)
-
-    def __str__(self):
-        return repr(self.msg)
-
-
-class TwythonAuthError(TwythonError):
-    """ Raised when you try to access a protected resource and it fails due to
-        some issue with your authentication.
-    """
-    pass
-
-
-class TwythonRateLimitError(TwythonError):
-    """ Raised when you've hit a rate limit.
-        retry_wait_seconds is the number of seconds to wait before trying again.
-    """
-    def __init__(self, msg, error_code, retry_after=None):
-        TwythonError.__init__(self, msg, error_code=error_code)
-        if isinstance(retry_after, int):
-            self.msg = '%s (Retry after %d seconds)' % (msg, retry_after)
+    import json
 
 
 class Twython(object):
-    def __init__(self, app_key=None, app_secret=None, oauth_token=None, oauth_token_secret=None, \
-                headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None, version='1.1' , ssl_verify=True ):
+    def __init__(self, app_key=None, app_secret=None, oauth_token=None, oauth_token_secret=None,
+                 headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None, version='1.1'):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
             :param app_key: (optional) Your applications key
@@ -92,7 +44,6 @@ class Twython(object):
             :param headers: (optional) Custom headers to send along with the request
             :param callback_url: (optional) If set, will overwrite the callback url set in your application
             :param proxies: (optional) A dictionary of proxies, for example {"http":"proxy.example.org:8080", "https":"proxy.example.org:8081"}.
-            :param ssl_verify: (optional, default True) Turns off ssl verifiction, for when you have development server issues.
         """
 
         # Needed for hitting that there API.
@@ -100,9 +51,7 @@ class Twython(object):
         self.api_url = 'https://api.twitter.com/%s'
         self.request_token_url = self.api_url % 'oauth/request_token'
         self.access_token_url = self.api_url % 'oauth/access_token'
-        self.authorize_url = self.api_url % 'oauth/authorize'
         self.authenticate_url = self.api_url % 'oauth/authenticate'
-        self.ssl_verify = ssl_verify
 
         # Enforce unicode on keys and secrets
         self.app_key = app_key and unicode(app_key) or twitter_token and unicode(twitter_token)
@@ -197,21 +146,33 @@ class Twython(object):
         #  why? twitter will return invalid json with an error code in the headers
         json_error = False
         try:
-            content = simplejson.loads(content)
+            try:
+                # try to get json
+                content = content.json()
+            except AttributeError:
+                # if unicode detected
+                content = json.loads(content)
         except ValueError:
             json_error = True
             content = {}
 
         if response.status_code > 304:
             # If there is no error message, use a default.
-            error_msg = content.get(
-                'error', 'An error occurred processing your request.')
-            self._last_call['api_error'] = error_msg
+            errors = content.get('errors',
+                                 [{'message': 'An error occurred processing your request.'}])
+            error_message = errors[0]['message']
+            self._last_call['api_error'] = error_message
 
-            #Twitter API 1.1 , always return 429 when rate limit is exceeded
-            exceptionType = TwythonRateLimitError if response.status_code == 429 else TwythonError
+            ExceptionType = TwythonError
+            if response.status_code == 429:
+                # Twitter API 1.1, always return 429 when rate limit is exceeded
+                ExceptionType = TwythonRateLimitError
+            elif response.status_code == 401 or 'Bad Authentication data' in error_message:
+                # Twitter API 1.1, returns a 401 Unauthorized or
+                # a 400 "Bad Authentication data" for invalid/expired app keys/user tokens
+                ExceptionType = TwythonAuthError
 
-            raise exceptionType(error_msg,
+            raise ExceptionType(error_message,
                                 error_code=response.status_code,
                                 retry_after=response.headers.get('retry-after'))
 
@@ -256,10 +217,10 @@ class Twython(object):
             This will return None if the header is not present
 
             Most useful for the following header information:
-                x-ratelimit-limit
-                x-ratelimit-remaining
-                x-ratelimit-class
-                x-ratelimit-reset
+                x-rate-limit-limit
+                x-rate-limit-remaining
+                x-rate-limit-class
+                x-rate-limit-reset
         """
         if self._last_call is None:
             raise TwythonError('This function must be called after an API call.  It delivers header information.')
@@ -267,17 +228,21 @@ class Twython(object):
             return self._last_call['headers'][header]
         return self._last_call
 
-    def get_authentication_tokens(self):
+    def get_authentication_tokens(self, force_login=False, screen_name=''):
         """Returns an authorization URL for a user to hit.
+
+            :param force_login: (optional) Forces the user to enter their credentials to ensure the correct users account is authorized.
+            :param app_secret: (optional) If forced_login is set OR user is not currently logged in, Prefills the username input box of the OAuth login screen with the given value
         """
         request_args = {}
         if self.callback_url:
             request_args['oauth_callback'] = self.callback_url
 
-        response = self.client.get(self.request_token_url, params=request_args, verify=self.ssl_verify)
-
-        if response.status_code != 200:
-            raise TwythonAuthError("Seems something couldn't be verified with your OAuth junk. Error: %s, Message: %s" % (response.status_code, response.content))
+        response = self.client.get(self.request_token_url, params=request_args)
+        if response.status_code == 401:
+            raise TwythonAuthError(response.content, error_code=response.status_code)
+        elif response.status_code != 200:
+            raise TwythonError(response.content, error_code=response.status_code)
 
         request_tokens = dict(parse_qsl(response.content))
         if not request_tokens:
@@ -289,6 +254,12 @@ class Twython(object):
             'oauth_token': request_tokens['oauth_token'],
         }
 
+        if force_login:
+            auth_url_params.update({
+                'force_login': force_login,
+                'screen_name': screen_name
+            })
+
         # Use old-style callback argument if server didn't accept new-style
         if self.callback_url and not oauth_callback_confirmed:
             auth_url_params['oauth_callback'] = self.callback_url
@@ -297,10 +268,10 @@ class Twython(object):
 
         return request_tokens
 
-    def get_authorized_tokens(self):
+    def get_authorized_tokens(self, oauth_verifier):
         """Returns authorized tokens after they go through the auth_url phase.
         """
-        response = self.client.get(self.access_token_url, verify=self.ssl_verify)
+        response = self.client.get(self.access_token_url, params={'oauth_verifier': oauth_verifier})
         authorized_tokens = dict(parse_qsl(response.content))
         if not authorized_tokens:
             raise TwythonError('Unable to decode authorized tokens.')
@@ -431,13 +402,13 @@ class Twython(object):
             **params - You may pass items that are taken in this doc
                        (https://dev.twitter.com/docs/api/1.1/post/statuses/update_with_media)
         """
-        subdomain = 'upload' if version == '1' else 'api'
-        url = 'https://%s.twitter.com/%s/statuses/update_with_media.json' % (subdomain, version)
+
+        url = 'https://api.twitter.com/%s/statuses/update_with_media.json' % version
         return self._media_update(url,
                                   {'media': (file_, open(file_, 'rb'))},
                                   **params)
 
-    def updateProfileBannerImage(self, file_, version=1, **params):
+    def updateProfileBannerImage(self, file_, version='1.1', **params):
         """Updates the users profile banner
 
             :param file_: (required) A string to the location of the file
@@ -447,7 +418,7 @@ class Twython(object):
             **params - You may pass items that are taken in this doc
                        (https://dev.twitter.com/docs/api/1/post/account/update_profile_banner)
         """
-        url = 'https://api.twitter.com/%d/account/update_profile_banner.json' % version
+        url = 'https://api.twitter.com/%s/account/update_profile_banner.json' % version
         return self._media_update(url,
                                   {'banner': (file_, open(file_, 'rb'))},
                                   **params)
@@ -455,28 +426,12 @@ class Twython(object):
     ###########################################################################
 
     def getProfileImageUrl(self, username, size='normal', version='1'):
-        """Gets the URL for the user's profile image.
-
-            :param username: (required) Username, self explanatory.
-            :param size: (optional) Default 'normal' (48px by 48px)
-                            bigger - 73px by 73px
-                            mini - 24px by 24px
-                            original - undefined, be careful -- images may be
-                                       large in bytes and/or size.
-            :param version: (optional) A number, default 1 because that's the
-                            only API version for Twitter that supports this call
-        """
-        endpoint = 'users/profile_image/%s' % username
-        url = self.api_url % version + '/' + endpoint
-
-        response = self.client.get(url, params={'size': size}, allow_redirects=False, verify=self.ssl_verify)
-        image_url = response.headers.get('location')
-
-        if response.status_code in (301, 302, 303, 307) and image_url is not None:
-            return image_url
-        else:
-            raise TwythonError('getProfileImageUrl() threw an error.',
-                                error_code=response.status_code)
+        warnings.warn(
+            "This function has been deprecated. Twitter API v1.1 will not have a dedicated endpoint \
+            for this functionality.",
+            DeprecationWarning,
+            stacklevel=2
+        )
 
     @staticmethod
     def stream(data, callback):
@@ -528,7 +483,7 @@ class Twython(object):
         for line in stream.iter_lines():
             if line:
                 try:
-                    callback(simplejson.loads(line))
+                    callback(json.loads(line))
                 except ValueError:
                     raise TwythonError('Response was not valid JSON, unable to decode.')
 

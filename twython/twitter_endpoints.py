@@ -9,7 +9,7 @@
     will be replaced with the keyword that gets passed in to the function at call time.
 
     i.e, in this case, if I pass version = 47 to any function, {{version}} will be replaced
-    with 47, instead of defaulting to 1 (said defaulting takes place at conversion time).
+    with 47, instead of defaulting to 1.1 (said defaulting takes place at conversion time).
 
     This map is organized the order functions are documented at:
     https://dev.twitter.com/docs/api/1.1
@@ -21,7 +21,7 @@ base_url = 'http://api.twitter.com/{{version}}'
 api_table = {
     # Timelines
     'getMentionsTimeline': {
-        'url': 'statuses/mentions_timeline',
+        'url': '/statuses/mentions_timeline.json',
         'method': 'GET',
     },
     'getUserTimeline': {
@@ -87,7 +87,7 @@ api_table = {
         'method': 'GET',
     },
     'destroyDirectMessage': {
-        'url': '/direct_messages/destroy/{{id}}.json',
+        'url': '/direct_messages/destroy.json',
         'method': 'POST',
     },
     'sendDirectMessage': {
@@ -183,11 +183,11 @@ api_table = {
         'method': 'GET',
     },
     'createBlock': {
-        'url': '/blocks/create/{{id}}.json',
+        'url': '/blocks/create.json',
         'method': 'POST',
     },
     'destroyBlock': {
-        'url': '/blocks/destroy/{{id}}.json',
+        'url': '/blocks/destroy.json',
         'method': 'POST',
     },
     'lookupUser': {
@@ -215,6 +215,10 @@ api_table = {
         'method': 'POST',
     },
     # See twython.py for update_profile_banner
+    'getProfileBannerSizes': {
+        'url': '/users/profile_banner.json',
+        'method': 'GET',
+    },
 
 
     # Suggested Users
@@ -320,6 +324,10 @@ api_table = {
         'url': '/lists/members/destroy_all.json',
         'method': 'POST'
     },
+    'showOwnedLists': {
+        'url': '/lists/ownerships.json',
+        'method': 'GET'
+    },
 
 
     # Saved Searches
@@ -396,8 +404,11 @@ twitter_http_status_codes = {
     403: ('Forbidden', 'The request is understood, but it has been refused. An accompanying error message will explain why. This code is used when requests are being denied due to update limits.'),
     404: ('Not Found', 'The URI requested is invalid or the resource requested, such as a user, does not exists.'),
     406: ('Not Acceptable', 'Returned by the Search API when an invalid format is specified in the request.'),
-    420: ('Enhance Your Calm', 'Returned by the Search and Trends API when you are being rate limited.'),
+    410: ('Gone', 'This resource is gone. Used to indicate that an API endpoint has been turned off.'),
+    422: ('Unprocessable Entity', 'Returned when an image uploaded to POST account/update_profile_banner is unable to be processed.'),
+    429: ('Too Many Requests', 'Returned in API v1.1 when a request cannot be served due to the application\'s rate limit having been exhausted for the resource.'),
     500: ('Internal Server Error', 'Something is broken. Please post to the group so the Twitter team can investigate.'),
     502: ('Bad Gateway', 'Twitter is down or being upgraded.'),
     503: ('Service Unavailable', 'The Twitter servers are up, but overloaded with requests. Try again later.'),
+    504: ('Gateway Timeout', 'The Twitter servers are up, but the request couldn\'t be serviced due to some failure within our stack. Try again later.'),
 }
