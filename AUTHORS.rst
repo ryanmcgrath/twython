@@ -35,6 +35,7 @@ Patches and Suggestions
 - `Terry Jones <https://github.com/terrycojones>`_, Error cleanup and Exception processing in 2.3.0.
 - `Leandro Ferreira <https://github.com/leandroferreira>`_, Fix for double-encoding of search queries in 2.3.0.
 - `Chris Brown <https://github.com/chbrown>`_, Updated to use v1.1 endpoints over v1
-- `Virendra Rajput <https://github.com/bkvirendra>`_, Fixed unicode (json) encoding in twython.py 2.7.2.  
+- `Virendra Rajput <https://github.com/bkvirendra>`_, Fixed unicode (json) encoding in twython.py 2.7.2.
 - `Paul Solbach <https://github.com/hansenrum>`_, fixed requirement for oauth_verifier
 - `Greg Nofi <https://github.com/nofeet>`_, fixed using built-in Exception attributes for storing & retrieving error message
+- `Jonathan Vanasco <https://github.com/jvanasco>`_, Debugging support, error_code tracking, Twitter error API tracking, other fixes

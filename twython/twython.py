@@ -34,7 +34,7 @@ except ImportError:
 
 class Twython(object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None, oauth_token_secret=None,
-                 headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None, version='1.1'):
+                 headers=None, callback_url=None, twitter_token=None, twitter_secret=None, proxies=None, version='1.1', ssl_verify=True ):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
             :param app_key: (optional) Your applications key
@@ -44,6 +44,7 @@ class Twython(object):
             :param headers: (optional) Custom headers to send along with the request
             :param callback_url: (optional) If set, will overwrite the callback url set in your application
             :param proxies: (optional) A dictionary of proxies, for example {"http":"proxy.example.org:8080", "https":"proxy.example.org:8081"}.
+            :param ssl_verify: (optional, default True) Turns off ssl verifiction, for when you have development server issues.
         """
 
         # Needed for hitting that there API.
@@ -52,6 +53,7 @@ class Twython(object):
         self.request_token_url = self.api_url % 'oauth/request_token'
         self.access_token_url = self.api_url % 'oauth/access_token'
         self.authenticate_url = self.api_url % 'oauth/authenticate'
+        self.ssl_verify = ssl_verify
 
         # Enforce unicode on keys and secrets
         self.app_key = app_key and unicode(app_key) or twitter_token and unicode(twitter_token)
@@ -238,7 +240,7 @@ class Twython(object):
         if self.callback_url:
             request_args['oauth_callback'] = self.callback_url
 
-        response = self.client.get(self.request_token_url, params=request_args)
+        response = self.client.get(self.request_token_url, params=request_args, verify=self.ssl_verify)
         if response.status_code == 401:
             raise TwythonAuthError(response.content, error_code=response.status_code)
         elif response.status_code != 200:
@@ -271,7 +273,7 @@ class Twython(object):
     def get_authorized_tokens(self, oauth_verifier):
         """Returns authorized tokens after they go through the auth_url phase.
         """
-        response = self.client.get(self.access_token_url, params={'oauth_verifier': oauth_verifier})
+        response = self.client.get(self.access_token_url, params={'oauth_verifier': oauth_verifier}, verify=self.ssl_verify )
         authorized_tokens = dict(parse_qsl(response.content))
         if not authorized_tokens:
             raise TwythonError('Unable to decode authorized tokens.')
