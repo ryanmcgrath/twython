@@ -22,6 +22,9 @@ just define it
 - Headers now always include the User-Agent as Twython vXX unless User-Agent is overwritten
 - Removed senseless TwythonError thrown if method is not GET or POST, who cares -- if the user passes something other than GET or POST just let Twitter return the error that they messed up
 - Removed conversion to unicode of (int, bool) params passed to a requests. ``requests`` isn't greedy about variables that can't be converted to unicode anymore
+- Removed `bulkUserLookup` (please use `lookupUser` instead), removed `getProfileImageUrl` (will be completely removed from Twitter API on May 7th, 2013)
+- Updated shortenUrl to actually work for those using it, but it is being deprecated since `requests` makes it easy for developers to implement their own url shortening in their app (see https://github.com/ryanmcgrath/twython/issues/184)
+- Twython Deprecation Warnings will now be seen in shell when using Python 2.7 and greater
 
 2.7.3 (2013-04-12)
 ++++++++++++++++++

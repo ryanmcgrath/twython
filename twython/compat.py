@@ -13,13 +13,12 @@ try:
 except ImportError:
     import json
 
-try:
-    from urlparse import parse_qsl
-except ImportError:
-    from cgi import parse_qsl
-
 if is_py2:
     from urllib import urlencode, quote_plus
+    try:
+        from urlparse import parse_qsl
+    except ImportError:
+        from cgi import parse_qsl
 
     builtin_str = str
     bytes = str
@@ -29,7 +28,7 @@ if is_py2:
 
 
 elif is_py3:
-    from urllib.parse import urlencode, quote_plus
+    from urllib.parse import urlencode, quote_plus, parse_qsl
 
     builtin_str = str
     str = str

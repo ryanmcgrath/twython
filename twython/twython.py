@@ -1,14 +1,16 @@
 import re
 import warnings
-warnings.simplefilter('default')  # For Python 2.7 >
 
 import requests
 from requests_oauthlib import OAuth1
 
+from .advisory import TwythonDeprecationWarning
 from .compat import json, urlencode, parse_qsl, quote_plus
 from .endpoints import api_table
 from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
 from .version import __version__
+
+warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
 
 
 class Twython(object):
@@ -42,14 +44,14 @@ class Twython(object):
         if twitter_token or twitter_secret:
             warnings.warn(
                 'Instead of twitter_token or twitter_secret, please use app_key or app_secret (respectively).',
-                DeprecationWarning,
+                TwythonDeprecationWarning,
                 stacklevel=2
             )
 
         if callback_url:
             warnings.warn(
                 'Please pass callback_url to the get_authentication_tokens method rather than Twython.__init__',
-                DeprecationWarning,
+                TwythonDeprecationWarning,
                 stacklevel=2
             )
 
@@ -267,7 +269,7 @@ class Twython(object):
     # ------------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def shortenURL(url_to_shorten, shortener='http://is.gd/api.php'):
+    def shortenURL(url_to_shorten, shortener='http://is.gd/create.php'):
         """Shortens url specified by url_to_shorten.
             Note: Twitter automatically shortens all URLs behind their own custom t.co shortener now,
                 but we keep this here for anyone who was previously using it for alternative purposes. ;)
@@ -276,11 +278,18 @@ class Twython(object):
             :param shortener: (optional) In case you want to use a different
                               URL shortening service
         """
+        warnings.warn(
+            'With requests it\'s easy enough for a developer to implement url shortenting themselves. Please see: https://github.com/ryanmcgrath/twython/issues/184',
+            TwythonDeprecationWarning,
+            stacklevel=2
+        )
+
         if shortener == '':
             raise TwythonError('Please provide a URL shortening service.')
 
         request = requests.get(shortener, params={
-            'query': url_to_shorten
+            'format': 'json',
+            'url': url_to_shorten
         })
 
         if request.status_code in [301, 201, 200]:
@@ -290,7 +299,7 @@ class Twython(object):
 
     @staticmethod
     def constructApiURL(base_url, params):
-        return base_url + "?" + "&".join(["%s=%s" % (Twython.unicode2utf8(key), quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.iteritems()])
+        return base_url + '?' + '&'.join(['%s=%s' % (Twython.unicode2utf8(key), quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.iteritems()])
 
     def searchGen(self, search_query, **kwargs):
         """ Returns a generator of tweets that match a specified query.
@@ -312,28 +321,13 @@ class Twython(object):
         for tweet in content['results']:
             yield tweet
 
-        if 'page' not in kwargs:
-            kwargs['page'] = 2
-        else:
-            try:
-                kwargs['page'] = int(kwargs['page'])
-                kwargs['page'] += 1
-                kwargs['page'] = str(kwargs['page'])
-            except TypeError:
-                raise TwythonError("searchGen() exited because page takes type str")
+        try:
+            kwargs['page'] = 2 if not 'page' in kwargs else (int(kwargs['page']) + 1)
+        except (TypeError, ValueError):
+            raise TwythonError('Unable to generate next page of search results, `page` is not a number.')
 
         for tweet in self.searchGen(search_query, **kwargs):
             yield tweet
-
-    def bulkUserLookup(self, **kwargs):
-        """Stub for a method that has been deprecated, kept for now to raise errors
-            properly if people are relying on this (which they are...).
-        """
-        warnings.warn(
-            "This function has been deprecated. Please migrate to .lookupUser() - params should be the same.",
-            DeprecationWarning,
-            stacklevel=2
-        )
 
     # The following methods are apart from the other Account methods,
     # because they rely on a whole multipart-data posting function set.
@@ -406,14 +400,6 @@ class Twython(object):
                                   **params)
 
     ###########################################################################
-
-    def getProfileImageUrl(self, username, size='normal', version='1'):
-        warnings.warn(
-            "This function has been deprecated. Twitter API v1.1 will not have a dedicated endpoint \
-            for this functionality.",
-            DeprecationWarning,
-            stacklevel=2
-        )
 
     @staticmethod
     def stream(data, callback):
