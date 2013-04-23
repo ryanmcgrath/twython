@@ -1,0 +1,4 @@
+2013-04-23 (jvanasco)
+	- added ssl_verify param to Twython config.
+		option defaults to `True` and is proxied to the `requests` library client
+		can be set to `False`, which better supports local testing
