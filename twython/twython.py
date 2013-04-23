@@ -14,8 +14,10 @@ warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
 
 
 class Twython(object):
-    def __init__(self, app_key=None, app_secret=None, oauth_token=None, oauth_token_secret=None,
-                 headers=None, proxies=None, version='1.1', callback_url=None, twitter_token=None, twitter_secret=None):
+    def __init__(self, app_key=None, app_secret=None, oauth_token=None,
+                 oauth_token_secret=None, headers=None, proxies=None,
+                 version='1.1', callback_url=None, ssl_verify=True,
+                 twitter_token=None, twitter_secret=None):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
             :param app_key: (optional) Your applications key
@@ -25,6 +27,7 @@ class Twython(object):
             :param headers: (optional) Custom headers to send along with the request
             :param callback_url: (optional) If set, will overwrite the callback url set in your application
             :param proxies: (optional) A dictionary of proxies, for example {"http":"proxy.example.org:8080", "https":"proxy.example.org:8081"}.
+            :param ssl_verify: (optional) Turns off ssl verification when False. Useful if you have development server issues.
         """
 
         # API urls, OAuth urls and API version; needed for hitting that there API.
@@ -76,6 +79,7 @@ class Twython(object):
         self.client.headers = self.headers
         self.client.proxies = proxies
         self.client.auth = self.auth
+        self.client.verify = ssl_verify
 
         # register available funcs to allow listing name when debugging.
         def setFunc(key):
@@ -334,9 +338,6 @@ class Twython(object):
 
     ## Media Uploading functions ##############################################
 
-    def _media_update(self, url, file_, **params):
-        return self.post(url, params=params, files=file_)
-
     def updateProfileBackgroundImage(self, file_, version='1.1', **params):
         """Updates the authenticating user's profile background image.
 
@@ -348,10 +349,11 @@ class Twython(object):
             **params - You may pass items that are stated in this doc
                        (https://dev.twitter.com/docs/api/1.1/post/account/update_profile_background_image)
         """
-        url = 'https://api.twitter.com/%s/account/update_profile_background_image.json' % version
-        return self._media_update(url,
-                                  {'image': (file_, open(file_, 'rb'))},
-                                  **params)
+
+        return self.post('account/update_profile_background_image',
+                         params=params,
+                         files={'image': (file_, open(file_, 'rb'))},
+                         version=version)
 
     def updateProfileImage(self, file_, version='1.1', **params):
         """Updates the authenticating user's profile image (avatar).
@@ -363,10 +365,11 @@ class Twython(object):
             **params - You may pass items that are stated in this doc
                        (https://dev.twitter.com/docs/api/1.1/post/account/update_profile_image)
         """
-        url = 'https://api.twitter.com/%s/account/update_profile_image.json' % version
-        return self._media_update(url,
-                                  {'image': (file_, open(file_, 'rb'))},
-                                  **params)
+
+        return self.post('account/update_profile_image',
+                         params=params,
+                         files={'image': (file_, open(file_, 'rb'))},
+                         version=version)
 
     def updateStatusWithMedia(self, file_, version='1.1', **params):
         """Updates the users status with media
@@ -379,10 +382,10 @@ class Twython(object):
                        (https://dev.twitter.com/docs/api/1.1/post/statuses/update_with_media)
         """
 
-        url = 'https://api.twitter.com/%s/statuses/update_with_media.json' % version
-        return self._media_update(url,
-                                  {'media': (file_, open(file_, 'rb'))},
-                                  **params)
+        return self.post('statuses/update_with_media',
+                         params=params,
+                         files={'media': (file_, open(file_, 'rb'))},
+                         version=version)
 
     def updateProfileBannerImage(self, file_, version='1.1', **params):
         """Updates the users profile banner
@@ -394,10 +397,11 @@ class Twython(object):
             **params - You may pass items that are taken in this doc
                        (https://dev.twitter.com/docs/api/1.1/post/account/update_profile_banner)
         """
-        url = 'https://api.twitter.com/%s/account/update_profile_banner.json' % version
-        return self._media_update(url,
-                                  {'banner': (file_, open(file_, 'rb'))},
-                                  **params)
+
+        return self.post('account/update_profile_banner',
+                         params=params,
+                         files={'banner': (file_, open(file_, 'rb'))},
+                         version=version)
 
     ###########################################################################
 

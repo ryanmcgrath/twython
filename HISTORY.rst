@@ -1,7 +1,7 @@
 History
 -------
 
-2.8.0 (2013-xx-xx)
+2.8.0 (2013-04-29)
 ++++++++++++++++++
 
 - Added a ``HISTORY.rst`` to start tracking history of changes
@@ -25,6 +25,8 @@ just define it
 - Removed `bulkUserLookup` (please use `lookupUser` instead), removed `getProfileImageUrl` (will be completely removed from Twitter API on May 7th, 2013)
 - Updated shortenUrl to actually work for those using it, but it is being deprecated since `requests` makes it easy for developers to implement their own url shortening in their app (see https://github.com/ryanmcgrath/twython/issues/184)
 - Twython Deprecation Warnings will now be seen in shell when using Python 2.7 and greater
+- Twython now takes ``ssl_verify`` parameter, defaults True. Set False if you're having development server issues
+- Removed internal ``_media_update`` function, we could have always just used ``self.post``
 
 2.7.3 (2013-04-12)
 ++++++++++++++++++
