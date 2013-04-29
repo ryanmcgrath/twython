@@ -4,11 +4,11 @@ import warnings
 import requests
 from requests_oauthlib import OAuth1
 
+from . import __version__
 from .advisory import TwythonDeprecationWarning
 from .compat import json, urlencode, parse_qsl, quote_plus
 from .endpoints import api_table
 from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
-from .version import __version__
 
 warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
 

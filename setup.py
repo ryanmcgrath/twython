@@ -1,11 +1,10 @@
 import os
 import sys
 
-from twython.version import __version__
-
 from setuptools import setup
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
+__version__ = '2.8.0'
 
 packages = [
     'twython'
