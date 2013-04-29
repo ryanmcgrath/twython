@@ -10,11 +10,9 @@ History
 - Added ``compat.py`` for compatability with Python 2.6 and greater
 - Added some ascii art, moved description of Twython and ``__author__`` to ``__init__.py``
 - Added ``version.py`` to store the current Twython version, instead of repeating it twice -- it also had to go into it's own file because of dependencies of ``requests`` and ``requests-oauthlib``, install would fail because those libraries weren't installed yet (on fresh install of Twython)
-- Removed ``find_packages()`` from ``setup.py``, only one package -- we can
-just define it
+- Removed ``find_packages()`` from ``setup.py``, only one package (we can just define it)
 - added quick publish method for Ryan and I: ``python setup.py publish`` is faster to type and easier to remember than ``python setup.py sdist upload``
-- Removed ``base_url`` from ``endpoints.py`` because we're just repeating it in
-``Twython.__init__``
+- Removed ``base_url`` from ``endpoints.py`` because we're just repeating it in ``Twython.__init__``
 - ``Twython.get_authentication_tokens()`` now takes ``callback_url`` argument rather than passing the ``callback_url`` through ``Twython.__init__``, ``callback_url`` is only used in the ``get_authentication_tokens`` method and nowhere else (kept in init though for backwards compatability)
 - Updated README to better reflect current Twython codebase
 - Added ``warnings.simplefilter('default')`` line in ``twython.py`` for Python 2.7 and greater to display Deprecation Warnings in console
