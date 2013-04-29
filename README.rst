@@ -9,12 +9,13 @@ Features
    - User information
    - Twitter lists
    - Timelines
-   - User avatar URL
+   - Direct Messages
    - and anything found in `the docs <https://dev.twitter.com/docs/api/1.1>`_
 * Image Uploading!
    - **Update user status with an image**
    - Change user avatar
    - Change user background image
+   - Change user banner image
 
 Installation
 ------------
@@ -37,13 +38,12 @@ Usage
 Authorization URL
 ~~~~~~~~~~~~~~~~~
 ::
-    from twython import Twython
-    
-    t = Twython(app_key=app_key,
-                app_secret=app_secret,
-                callback_url='http://google.com/')
 
-    auth_props = t.get_authentication_tokens()
+    from twython import Twython
+
+    t = Twython(app_key, app_secret)
+
+    auth_props = t.get_authentication_tokens(callback_url='http://google.com')
 
     oauth_token = auth_props['oauth_token']
     oauth_token_secret = auth_props['oauth_token_secret']
@@ -56,39 +56,57 @@ Handling the callback
 ~~~~~~~~~~~~~~~~~~~~~
 ::
 
-    '''
-    oauth_token and oauth_token_secret come from the previous step
-    if needed, store those in a session variable or something. oauth_verifier from the previous call is now required to pass to get_authorized_tokens
-    '''
     from twython import Twython
 
-    t = Twython(app_key=app_key,
-                app_secret=app_secret,
-                oauth_token=oauth_token,
-                oauth_token_secret=oauth_token_secret)
+    # oauth_token_secret comes from the previous step
+    # if needed, store that in a session variable or something.
+    # oauth_verifier and oauth_token from the previous call is now REQUIRED # to pass to get_authorized_tokens
+
+    # In Django, to get the oauth_verifier and oauth_token from the callback
+    # url querystring, you might do something like this:
+    # oauth_token = request.GET.get('oauth_token')
+    # oauth_verifier = request.GET.get('oauth_verifier')
+
+    t = Twython(app_key, app_secret,
+                oauth_token, oauth_token_secret)
 
     auth_tokens = t.get_authorized_tokens(oauth_verifier)
     print auth_tokens
 
-*Function definitions (i.e. getHomeTimeline()) can be found by reading over twython/twitter_endpoints.py*
+*Function definitions (i.e. getHomeTimeline()) can be found by reading over twython/endpoints.py*
 
 Getting a user home timeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
-    '''
-    oauth_token and oauth_token_secret are the final tokens produced
-    from the `Handling the callback` step
-    '''
     from twython import Twython
-    
-    t = Twython(app_key=app_key,
-                app_secret=app_secret,
-                oauth_token=oauth_token,
-                oauth_token_secret=oauth_token_secret)
+
+    # oauth_token and oauth_token_secret are the final tokens produced
+    # from the 'Handling the callback' step
+
+    t = Twython(app_key, app_secret,
+                oauth_token, oauth_token_secret)
     
     # Returns an dict of the user home timeline
     print t.getHomeTimeline()
+
+
+Catching exceptions
+~~~~~~~~~~~~~~~~~~~
+
+    Twython offers three Exceptions currently: ``TwythonError``, ``TwythonAuthError`` and ``TwythonRateLimitError``
+
+::
+
+    from twython import Twython, TwythonAuthError
+
+    t = Twython(MY_WRONG_APP_KEY, MY_WRONG_APP_SECRET,
+                BAD_OAUTH_TOKEN, BAD_OAUTH_TOKEN_SECRET)
+
+    try:
+        t.verifyCredentials()
+    except TwythonAuthError as e:
+        print e
 
 
 Streaming API
@@ -143,20 +161,13 @@ from you using them by this library.
 
 Twython 3k
 ----------
-There's an experimental version of Twython that's made for Python 3k. This is currently not guaranteed to
-work in all situations, but it's provided so that others can grab it and hack on it.
-If you choose to try it out, be aware of this.
-
-**OAuth is now working thanks to updates from [Hades](https://github.com/hades). You'll need to grab
-his [Python 3 branch for python-oauth2](https://github.com/hades/python-oauth2/tree/python3) to have it work, though.**
+Full compatiabilty with Python 3 is now available seamlessly in the main Twython package. The Twython 3k package has been removed as of Twython 2.8.0
 
 Questions, Comments, etc?
 -------------------------
 My hope is that Twython is so simple that you'd never *have* to ask any questions, but if you feel the need to contact me for this (or other) reasons, you can hit me up at ryan@venodesigns.net.
 
 You can also follow me on Twitter - `@ryanmcgrath <https://twitter.com/ryanmcgrath>`_
-
-*Twython is released under an MIT License - see the LICENSE file for more information.*
 
 Want to help?
 -------------

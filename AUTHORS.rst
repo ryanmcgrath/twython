@@ -13,7 +13,7 @@ Development Lead
 Patches and Suggestions
 ````````````````````````
 
-- `Mike Helmick <https://github.com/michaelhelmick>`_, multiple fixes and proper ``requests`` integration. Too much to list here.
+- `Mike Helmick <https://github.com/michaelhelmick>`_, multiple fixes and proper ``requests`` integration, Python 3 compatibility, too much to list here.
 - `kracekumar <https://github.com/kracekumar>`_, early ``requests`` work and various fixes.
 - `Erik Scheffers <https://github.com/eriks5>`_, various fixes regarding OAuth callback URLs.
 - `Jordan Bouvier <https://github.com/jbouvier>`_, various fixes regarding OAuth callback URLs.
@@ -38,3 +38,4 @@ Patches and Suggestions
 - `Virendra Rajput <https://github.com/bkvirendra>`_, Fixed unicode (json) encoding in twython.py 2.7.2.  
 - `Paul Solbach <https://github.com/hansenrum>`_, fixed requirement for oauth_verifier
 - `Greg Nofi <https://github.com/nofeet>`_, fixed using built-in Exception attributes for storing & retrieving error message
+- `Jonathan Vanasco <https://github.com/jvanasco>`_, Debugging support, error_code tracking, Twitter error API tracking, other fixes
