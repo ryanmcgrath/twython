@@ -18,7 +18,8 @@ Questions, comments? ryan@venodesigns.net
 """
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '2.8.0'
+__version__ = '2.9.0'
 
 from .twython import Twython
+from .streaming import TwythonStreamer, TwythonStreamHandler
 from .exceptions import TwythonError, TwythonRateLimitError, TwythonAuthError

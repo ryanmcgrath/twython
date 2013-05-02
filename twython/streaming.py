@@ -1,0 +1,224 @@
+from . import __version__
+from .compat import json
+from .exceptions import TwythonStreamError
+
+import requests
+from requests_oauthlib import OAuth1
+
+import time
+
+
+class TwythonStreamHandler(object):
+    def on_success(self, data):
+        """Called when data has been successfull received from the stream
+
+        Feel free to override this in your own handler.
+        See https://dev.twitter.com/docs/streaming-apis/messages for messages
+        sent along in stream responses.
+
+        :param data: dict of data recieved from the stream
+        """
+
+        if 'delete' in data:
+            self.on_delete(data.get('delete'))
+        elif 'limit' in data:
+            self.on_limit(data.get('limit'))
+        elif 'disconnect' in data:
+            self.on_disconnect(data.get('disconnect'))
+
+    def on_error(self, status_code, data):
+        """Called when stream returns non-200 status code
+
+        :param status_code: Non-200 status code sent from stream
+        :param data: Error message sent from stream
+        """
+        return
+
+    def on_delete(self, data):
+        """Called when a deletion notice is received
+
+        Twitter docs for deletion notices: http://spen.se/8qujd
+
+        :param data: dict of data from the 'delete' key recieved from
+                     the stream
+        """
+        return data
+
+    def on_limit(self, data):
+        """Called when a limit notice is received
+
+        Twitter docs for limit notices: http://spen.se/hzt0b
+
+        :param data: dict of data from the 'limit' key recieved from
+                     the stream
+        """
+        return data
+
+    def on_disconnect(self, data):
+        """Called when a disconnect notice is received
+
+        Twitter docs for disconnect notices: http://spen.se/xb6mm
+
+        :param data: dict of data from the 'disconnect' key recieved from
+                     the stream
+        """
+        return data
+
+    def on_timeout(self):
+        return
+
+
+class TwythonStreamStatuses(object):
+    """Class for different statuses endpoints
+
+    Available so TwythonStreamer.statuses.filter() is available.
+    Just a bit cleaner than TwythonStreamer.statuses_filter(),
+    statuses_sample(), etc. all being single methods in TwythonStreamer
+    """
+    def __init__(self, streamer):
+        self.streamer = streamer
+
+    def filter(self, **params):
+        """Stream statuses/filter
+
+        Accepted params found at:
+        https://dev.twitter.com/docs/api/1.1/post/statuses/filter
+        """
+        url = 'https://stream.twitter.com/%s/statuses/filter.json' \
+              % self.streamer.api_version
+        self.streamer._request(url, 'POST', params=params)
+
+    def sample(self, **params):
+        """Stream statuses/sample
+
+        Accepted params found at:
+        https://dev.twitter.com/docs/api/1.1/get/statuses/sample
+        """
+        url = 'https://stream.twitter.com/%s/statuses/sample.json' \
+              % self.streamer.api_version
+        self.streamer._request(url, params=params)
+
+    def firehose(self, **params):
+        """Stream statuses/filter
+
+        Accepted params found at:
+        https://dev.twitter.com/docs/api/1.1/get/statuses/firehose
+        """
+        url = 'https://stream.twitter.com/%s/statuses/firehose.json' \
+              % self.streamer.api_version
+        self.streamer._request(url, params=params)
+
+
+class TwythonStreamTypes(object):
+    """Class for different stream endpoints
+
+    Not all streaming endpoints have nested endpoints.
+    User Streams and Site Streams are single streams with no nested endpoints
+    Status Streams include filter, sample and firehose endpoints
+    """
+    def __init__(self, streamer):
+        self.streamer = streamer
+        self.statuses = TwythonStreamStatuses(streamer)
+
+    def user(self, **params):
+        """Stream user
+
+        Accepted params found at:
+        https://dev.twitter.com/docs/api/1.1/get/user
+        """
+        url = 'https://userstream.twitter.com/%s/user.json' \
+              % self.streamer.api_version
+        self.streamer._request(url, params=params)
+
+    def site(self, **params):
+        """Stream site
+
+        Accepted params found at:
+        https://dev.twitter.com/docs/api/1.1/get/site
+        """
+        url = 'https://sitestream.twitter.com/%s/site.json' \
+              % self.streamer.api_version
+        self.streamer._request(url, params=params)
+
+
+class TwythonStreamer(object):
+    def __init__(self, app_key, app_secret, oauth_token, oauth_token_secret,
+                 handler, timeout=300, retry_count=None, retry_in=10,
+                 headers=None):
+        """Streaming class for a friendly streaming user experience
+
+        :param app_key: (required) Your applications key
+        :param app_secret: (required) Your applications secret key
+        :param oauth_token: (required) Used with oauth_token_secret to make
+                            authenticated calls
+        :param oauth_token_secret: (required) Used with oauth_token to make
+                                   authenticated calls
+        :param handler: (required) Instance of TwythonStreamHandler to handle
+                        stream responses
+        :param headers: (optional) Custom headers to send along with the
+                        request
+        """
+
+        self.auth = OAuth1(app_key, app_secret,
+                           oauth_token, oauth_token_secret)
+
+        self.headers = {'User-Agent': 'Twython Streaming v' + __version__}
+        if headers:
+            self.headers.update(headers)
+
+        self.client = requests.Session()
+        self.client.auth = self.auth
+        self.client.headers = self.headers
+        self.client.stream = True
+
+        self.timeout = timeout
+
+        self.api_version = '1.1'
+
+        self.handler = handler
+
+        self.retry_in = retry_in
+        self.retry_count = retry_count
+
+        # Set up type methods
+        StreamTypes = TwythonStreamTypes(self)
+        self.statuses = StreamTypes.statuses
+        self.__dict__['user'] = StreamTypes.user
+        self.__dict__['site'] = StreamTypes.site
+
+    def _request(self, url, method='GET', params=None):
+        """Internal stream request handling"""
+        retry_counter = 0
+
+        method = method.lower()
+        func = getattr(self.client, method)
+
+        def _send(retry_counter):
+            try:
+                if method == 'get':
+                    response = func(url, params=params, timeout=self.timeout)
+                else:
+                    response = func(url, data=params, timeout=self.timeout)
+            except requests.exceptions.Timeout:
+                self.handler.on_timeout()
+            else:
+                if response.status_code != 200:
+                    self.handler.on_error(response.status_code,
+                                          response.content)
+
+                if self.retry_count and (self.retry_count - retry_counter) > 0:
+                    time.sleep(self.retry_in)
+                    retry_counter += 1
+                    _send(retry_counter)
+
+                return response
+
+        response = _send(retry_counter)
+
+        for line in response.iter_lines():
+            if line:
+                try:
+                    self.handler.on_success(json.loads(line))
+                except ValueError:
+                    raise TwythonStreamError('Response was not valid JSON, \
+                                              unable to decode.')

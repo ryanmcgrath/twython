@@ -111,24 +111,27 @@ Catching exceptions
 
 Streaming API
 ~~~~~~~~~~~~~
-*Usage is as follows; it's designed to be open-ended enough that you can adapt it to higher-level (read: Twitter must give you access)
-streams.*
 
 ::
 
-    from twython import Twython
-    
-    def on_results(results):
-        """A callback to handle passed results. Wheeee.
-        """
+    from twython import TwythonStreamer, TwythonStreamHandler
 
-        print results
 
-    Twython.stream({
-        'username': 'your_username',
-        'password': 'your_password',
-        'track': 'python'
-    }, on_results)
+    class MyHandler(TwythonStreamHandler):
+        def on_success(self, data):
+            print data
+
+        def on_error(self, status_code, data):
+            print status_code, data
+
+    handler = MyHandler()
+
+    # Requires Authentication as of Twitter API v1.1
+    stream = TwythonStreamer(APP_KEY, APP_SECRET,
+                             OAUTH_TOKEN, OAUTH_TOKEN_SECRET,
+                             handler)
+
+    stream.statuses.filter(track='twitter')
 
 
 Notes

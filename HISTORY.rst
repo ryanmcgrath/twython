@@ -1,6 +1,11 @@
 History
 -------
 
+2.9.0 (2013-05-xx)
+++++++++++++++++++
+
+- Fixed streaming issue #144, added ``TwythonStreamer`` and ``TwythonStreamHandler`` to aid users in a friendly streaming experience
+
 2.8.0 (2013-04-29)
 ++++++++++++++++++
 
