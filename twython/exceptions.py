@@ -46,3 +46,8 @@ class TwythonRateLimitError(TwythonError):
         if isinstance(retry_after, int):
             msg = '%s (Retry after %d seconds)' % (msg, retry_after)
         TwythonError.__init__(self, msg, error_code=error_code)
+
+
+class TwythonStreamError(TwythonError):
+    """Test"""
+    pass
