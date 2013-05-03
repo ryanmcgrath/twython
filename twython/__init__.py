@@ -21,5 +21,5 @@ __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
 __version__ = '2.9.0'
 
 from .twython import Twython
-from .streaming import TwythonStreamer, TwythonStreamHandler
+from .streaming import TwythonStreamer
 from .exceptions import TwythonError, TwythonRateLimitError, TwythonAuthError
