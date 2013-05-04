@@ -84,7 +84,7 @@ t = Twython(app_key, app_secret,
             oauth_token, oauth_token_secret)
 
 # Returns an dict of the user home timeline
-print t.getHomeTimeline()
+print t.get_home_timeline()
 ```
 
 ##### Catching exceptions
@@ -97,7 +97,7 @@ t = Twython(MY_WRONG_APP_KEY, MY_WRONG_APP_SECRET,
             BAD_OAUTH_TOKEN, BAD_OAUTH_TOKEN_SECRET)
 
 try:
-    t.verifyCredentials()
+    t.verify_credentials()
 except TwythonAuthError as e:
     print e
 ```

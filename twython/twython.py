@@ -82,15 +82,20 @@ class Twython(object):
         self.client.verify = ssl_verify
 
         # register available funcs to allow listing name when debugging.
-        def setFunc(key):
-            return lambda **kwargs: self._constructFunc(key, **kwargs)
+        def setFunc(key, deprecated_key=None):
+            return lambda **kwargs: self._constructFunc(key, deprecated_key, **kwargs)
         for key in api_table.keys():
             self.__dict__[key] = setFunc(key)
+
+            # Allow for old camelCase functions until Twython 3.0.0
+            deprecated_key = key.title().replace('_', '')
+            deprecated_key = deprecated_key[0].lower() + deprecated_key[1:]
+            self.__dict__[deprecated_key] = setFunc(key, deprecated_key)
 
         # create stash for last call intel
         self._last_call = None
 
-    def _constructFunc(self, api_call, **kwargs):
+    def _constructFunc(self, api_call, deprecated_key, **kwargs):
         # Go through and replace any mustaches that are in our API url.
         fn = api_table[api_call]
         url = re.sub(
@@ -98,6 +103,14 @@ class Twython(object):
             lambda m: "%s" % kwargs.get(m.group(1)),
             self.api_url % self.api_version + fn['url']
         )
+
+        if deprecated_key:
+            # Until Twython 3.0.0 and the function is removed.. send deprecation warning
+            warnings.warn(
+                '`%s` is deprecated, please use `%s` instead.' % (deprecated_key, api_call),
+                TwythonDeprecationWarning,
+                stacklevel=2
+            )
 
         content = self._request(url, method=fn['method'], params=kwargs)
 
@@ -274,6 +287,10 @@ class Twython(object):
 
     @staticmethod
     def shortenURL(url_to_shorten, shortener='http://is.gd/create.php'):
+        return Twython.shorten_url(url_to_shorten, shortener)
+
+    @staticmethod
+    def shorten_url(url_to_shorten, shortener='http://is.gd/create.php'):
         """Shortens url specified by url_to_shorten.
             Note: Twitter automatically shortens all URLs behind their own custom t.co shortener now,
                 but we keep this here for anyone who was previously using it for alternative purposes. ;)
@@ -303,9 +320,26 @@ class Twython(object):
 
     @staticmethod
     def constructApiURL(base_url, params):
+        warnings.warn(
+            'This method is deprecated, please use `Twython.construct_api_url` instead.',
+            TwythonDeprecationWarning,
+            stacklevel=2
+        )
+        return Twython.construct_api_url(base_url, params)
+
+    @staticmethod
+    def construct_api_url(base_url, params):
         return base_url + '?' + '&'.join(['%s=%s' % (Twython.unicode2utf8(key), quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.iteritems()])
 
     def searchGen(self, search_query, **kwargs):
+        warnings.warn(
+            'This method is deprecated, please use `search_gen` instead.',
+            TwythonDeprecationWarning,
+            stacklevel=2
+        )
+        return self.search_gen(search_query, **kwargs)
+
+    def search_gen(self, search_query, **kwargs):
         """ Returns a generator of tweets that match a specified query.
 
             Documentation: https://dev.twitter.com/doc/get/search
@@ -339,6 +373,14 @@ class Twython(object):
     ## Media Uploading functions ##############################################
 
     def updateProfileBackgroundImage(self, file_, version='1.1', **params):
+        warnings.warn(
+            'This method is deprecated, please use `update_profile_background_image` instead.',
+            TwythonDeprecationWarning,
+            stacklevel=2
+        )
+        return self.update_profile_background_image(file_, version, **params)
+
+    def update_profile_background_image(self, file_, version='1.1', **params):
         """Updates the authenticating user's profile background image.
 
             :param file_: (required) A string to the location of the file
@@ -356,6 +398,14 @@ class Twython(object):
                          version=version)
 
     def updateProfileImage(self, file_, version='1.1', **params):
+        warnings.warn(
+            'This method is deprecated, please use `update_profile_image` instead.',
+            TwythonDeprecationWarning,
+            stacklevel=2
+        )
+        return self.update_profile_image(file_, version, **params)
+
+    def update_profile_image(self, file_, version='1.1', **params):
         """Updates the authenticating user's profile image (avatar).
 
             :param file_: (required) A string to the location of the file
@@ -372,6 +422,14 @@ class Twython(object):
                          version=version)
 
     def updateStatusWithMedia(self, file_, version='1.1', **params):
+        warnings.warn(
+            'This method is deprecated, please use `update_status_with_media` instead.',
+            TwythonDeprecationWarning,
+            stacklevel=2
+        )
+        return self.update_status_with_media(file_, version, **params)
+
+    def update_status_with_media(self, file_, version='1.1', **params):
         """Updates the users status with media
 
             :param file_: (required) A string to the location of the file
@@ -388,6 +446,14 @@ class Twython(object):
                          version=version)
 
     def updateProfileBannerImage(self, file_, version='1.1', **params):
+        warnings.warn(
+            'This method is deprecated, please use `update_profile_banner_image` instead.',
+            TwythonDeprecationWarning,
+            stacklevel=2
+        )
+        return self.update_profile_banner_image(file_, version, **params)
+
+    def update_profile_banner_image(self, file_, version='1.1', **params):
         """Updates the users profile banner
 
             :param file_: (required) A string to the location of the file

@@ -1,6 +1,6 @@
 from twython import Twython
 
 # Shortening URLs requires no authentication, huzzah
-shortURL = Twython.shortenURL('http://www.webs.com/')
+shortURL = Twython.shorten_url('http://www.webs.com/')
 
 print shortURL

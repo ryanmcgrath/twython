@@ -4,6 +4,6 @@ from twython import Twython, TwythonError
 twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
 try:
-    twitter.updateStatus(status='See how easy this was?')
+    twitter.update_status(status='See how easy this was?')
 except TwythonError as e:
     print e

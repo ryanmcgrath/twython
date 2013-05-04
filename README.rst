@@ -88,7 +88,7 @@ Getting a user home timeline
                 oauth_token, oauth_token_secret)
     
     # Returns an dict of the user home timeline
-    print t.getHomeTimeline()
+    print t.get_home_timeline()
 
 
 Catching exceptions
@@ -104,7 +104,7 @@ Catching exceptions
                 BAD_OAUTH_TOKEN, BAD_OAUTH_TOKEN_SECRET)
 
     try:
-        t.verifyCredentials()
+        t.verify_credentials()
     except TwythonAuthError as e:
         print e
 
