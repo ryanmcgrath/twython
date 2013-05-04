@@ -5,6 +5,7 @@ History
 ++++++++++++++++++
 
 - Fixed streaming issue #144, added ``TwythonStreamer`` to aid users in a friendly streaming experience (streaming examples in ``examples`` and README's have been updated as well)
+- ``Twython`` now requires ``requests-oauthlib`` 0.3.1, fixes #154 (unable to upload media when sending POST data with the file)
 
 2.8.0 (2013-04-29)
 ++++++++++++++++++
