@@ -70,7 +70,7 @@ auth_tokens = t.get_authorized_tokens(oauth_verifier)
 print auth_tokens
 ```
 
-*Function definitions (i.e. getHomeTimeline()) can be found by reading over twython/endpoints.py*
+*Function definitions (i.e. get_home_timeline()) can be found by reading over twython/endpoints.py*
 
 ##### Getting a user home timeline
 
