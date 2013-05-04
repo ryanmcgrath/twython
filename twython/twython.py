@@ -406,60 +406,6 @@ class Twython(object):
     ###########################################################################
 
     @staticmethod
-    def stream(data, callback):
-        """A Streaming API endpoint, because requests (by Kenneth Reitz)
-            makes this not stupidly annoying to implement.
-
-            In reality, Twython does absolutely *nothing special* here,
-            but people new to programming expect this type of function to
-            exist for this library, so we provide it for convenience.
-
-            Seriously, this is nothing special. :)
-
-            For the basic stream you're probably accessing, you'll want to
-            pass the following as data dictionary keys. If you need to use
-            OAuth (newer streams), passing secrets/etc
-            as keys SHOULD work...
-
-            This is all done over SSL (https://), so you're not left
-            totally vulnerable by passing your password.
-
-            :param username: (required) Username, self explanatory.
-            :param password: (required) The Streaming API doesn't use OAuth,
-                             so we do this the old school way.
-            :param callback: (required) Callback function to be fired when
-                             tweets come in (this is an event-based-ish API).
-            :param endpoint: (optional) Override the endpoint you're using
-                             with the Twitter Streaming API. This is defaulted
-                             to the one that everyone has access to, but if
-                             Twitter <3's you feel free to set this to your
-                             wildest desires.
-        """
-        endpoint = 'https://stream.twitter.com/1/statuses/filter.json'
-        if 'endpoint' in data:
-            endpoint = data.pop('endpoint')
-
-        needs_basic_auth = False
-        if 'username' in data and 'password' in data:
-            needs_basic_auth = True
-            username = data.pop('username')
-            password = data.pop('password')
-
-        if needs_basic_auth:
-            stream = requests.post(endpoint,
-                                   data=data,
-                                   auth=(username, password))
-        else:
-            stream = requests.post(endpoint, data=data)
-
-        for line in stream.iter_lines():
-            if line:
-                try:
-                    callback(json.loads(line))
-                except ValueError:
-                    raise TwythonError('Response was not valid JSON, unable to decode.')
-
-    @staticmethod
     def unicode2utf8(text):
         try:
             if isinstance(text, unicode):
