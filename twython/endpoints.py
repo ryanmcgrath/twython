@@ -17,38 +17,38 @@ https://dev.twitter.com/docs/api/1.1
 
 api_table = {
     # Timelines
-    'getMentionsTimeline': {
+    'get_mentions_timeline': {
         'url': '/statuses/mentions_timeline.json',
         'method': 'GET',
     },
-    'getUserTimeline': {
+    'get_user_timeline': {
         'url': '/statuses/user_timeline.json',
         'method': 'GET',
     },
-    'getHomeTimeline': {
+    'get_home_timeline': {
         'url': '/statuses/home_timeline.json',
         'method': 'GET',
     },
-    'retweetedOfMe': {
+    'retweeted_of_me': {
         'url': '/statuses/retweets_of_me.json',
         'method': 'GET',
     },
 
 
     # Tweets
-    'getRetweets': {
+    'get_retweets': {
         'url': '/statuses/retweets/{{id}}.json',
         'method': 'GET',
     },
-    'showStatus': {
+    'show_status': {
         'url': '/statuses/show/{{id}}.json',
         'method': 'GET',
     },
-    'destroyStatus': {
+    'destroy_status': {
         'url': '/statuses/destroy/{{id}}.json',
         'method': 'POST',
     },
-    'updateStatus': {
+    'update_status': {
         'url': '/statuses/update.json',
         'method': 'POST',
     },
@@ -57,7 +57,7 @@ api_table = {
         'method': 'POST',
     },
     # See twython.py for update_status_with_media
-    'getOembedTweet': {
+    'get_oembed_tweet': {
         'url': '/statuses/oembed.json',
         'method': 'GET',
     },
@@ -71,321 +71,321 @@ api_table = {
 
 
     # Direct Messages
-    'getDirectMessages': {
+    'get_direct_messages': {
         'url': '/direct_messages.json',
         'method': 'GET',
     },
-    'getSentMessages': {
+    'get_sent_messages': {
         'url': '/direct_messages/sent.json',
         'method': 'GET',
     },
-    'getDirectMessage': {
+    'get_direct_message': {
         'url': '/direct_messages/show.json',
         'method': 'GET',
     },
-    'destroyDirectMessage': {
+    'destroy_direct_message': {
         'url': '/direct_messages/destroy.json',
         'method': 'POST',
     },
-    'sendDirectMessage': {
+    'send_direct_message': {
         'url': '/direct_messages/new.json',
         'method': 'POST',
     },
 
 
     # Friends & Followers
-    'getUserIdsOfBlockedRetweets': {
+    'get_user_ids_of_blocked_retweets': {
         'url': '/friendships/no_retweets/ids.json',
         'method': 'GET',
     },
-    'getFriendsIDs': {
+    'get_friends_ids': {
         'url': '/friends/ids.json',
         'method': 'GET',
     },
-    'getFollowersIDs': {
+    'get_followers_ids': {
         'url': '/followers/ids.json',
         'method': 'GET',
     },
-    'lookupFriendships': {
+    'lookup_friendships': {
         'url': '/friendships/lookup.json',
         'method': 'GET',
     },
-    'getIncomingFriendshipIDs': {
+    'get_incoming_friendship_ids': {
         'url': '/friendships/incoming.json',
         'method': 'GET',
     },
-    'getOutgoingFriendshipIDs': {
+    'get_outgoing_friendship_ids': {
         'url': '/friendships/outgoing.json',
         'method': 'GET',
     },
-    'createFriendship': {
+    'create_friendship': {
         'url': '/friendships/create.json',
         'method': 'POST',
     },
-    'destroyFriendship': {
+    'destroy_friendship': {
         'url': '/friendships/destroy.json',
         'method': 'POST',
     },
-    'updateFriendship': {
+    'update_friendship': {
         'url': '/friendships/update.json',
         'method': 'POST',
     },
-    'showFriendship': {
+    'show_friendship': {
         'url': '/friendships/show.json',
         'method': 'GET',
     },
-    'getFriendsList': {
+    'get_friends_list': {
         'url': '/friends/list.json',
         'method': 'GET',
     },
-    'getFollowersList': {
+    'get_followers_list': {
         'url': '/followers/list.json',
         'method': 'GET',
     },
 
 
     # Users
-    'getAccountSettings': {
+    'get_account_settings': {
         'url': '/account/settings.json',
         'method': 'GET',
     },
-    'verifyCredentials': {
+    'verify_credentials': {
         'url': '/account/verify_credentials.json',
         'method': 'GET',
     },
-    'updateAccountSettings': {
+    'update_account_settings': {
         'url': '/account/settings.json',
         'method': 'POST',
     },
-    'updateDeliveryService': {
+    'update_delivery_service': {
         'url': '/account/update_delivery_device.json',
         'method': 'POST',
     },
-    'updateProfile': {
+    'update_profile': {
         'url': '/account/update_profile.json',
         'method': 'POST',
     },
     # See twython.py for update_profile_background_image
-    'updateProfileColors': {
+    'update_profile_colors': {
         'url': '/account/update_profile_colors.json',
         'method': 'POST',
     },
     # See twython.py for update_profile_image
-    'listBlocks': {
+    'list_blocks': {
         'url': '/blocks/list.json',
         'method': 'GET',
     },
-    'listBlockIds': {
+    'list_block_ids': {
         'url': '/blocks/ids.json',
         'method': 'GET',
     },
-    'createBlock': {
+    'create_block': {
         'url': '/blocks/create.json',
         'method': 'POST',
     },
-    'destroyBlock': {
+    'destroy_block': {
         'url': '/blocks/destroy.json',
         'method': 'POST',
     },
-    'lookupUser': {
+    'lookup_user': {
         'url': '/users/lookup.json',
         'method': 'GET',
     },
-    'showUser': {
+    'show_user': {
         'url': '/users/show.json',
         'method': 'GET',
     },
-    'searchUsers': {
+    'search_users': {
         'url': '/users/search.json',
         'method': 'GET',
     },
-    'getContributees': {
+    'get_contributees': {
         'url': '/users/contributees.json',
         'method': 'GET',
     },
-    'getContributors': {
+    'get_contributors': {
         'url': '/users/contributors.json',
         'method': 'GET',
     },
-    'removeProfileBanner': {
+    'remove_profile_banner': {
         'url': '/account/remove_profile_banner.json',
         'method': 'POST',
     },
     # See twython.py for update_profile_banner
-    'getProfileBannerSizes': {
+    'get_profile_banner_sizes': {
         'url': '/users/profile_banner.json',
         'method': 'GET',
     },
 
 
     # Suggested Users
-    'getUserSuggestionsBySlug': {
+    'get_user_suggestions_by_slug': {
         'url': '/users/suggestions/{{slug}}.json',
         'method': 'GET',
     },
-    'getUserSuggestions': {
+    'get_user_suggestions': {
         'url': '/users/suggestions.json',
         'method': 'GET',
     },
-    'getUserSuggestionsStatusesBySlug': {
+    'get_user_suggestions_statuses_by_slug': {
         'url': '/users/suggestions/{{slug}}/members.json',
         'method': 'GET',
     },
 
 
     # Favorites
-    'getFavorites': {
+    'get_favorites': {
         'url': '/favorites/list.json',
         'method': 'GET',
     },
-    'destroyFavorite': {
+    'destroy_favorite': {
         'url': '/favorites/destroy.json',
         'method': 'POST',
     },
-    'createFavorite': {
+    'create_favorite': {
         'url': '/favorites/create.json',
         'method': 'POST',
     },
 
 
     # Lists
-    'showLists': {
+    'show_lists': {
         'url': '/lists/list.json',
         'method': 'GET',
     },
-    'getListStatuses': {
+    'get_list_statuses': {
         'url': '/lists/statuses.json',
         'method': 'GET'
     },
-    'deleteListMember': {
+    'delete_list_member': {
         'url': '/lists/members/destroy.json',
         'method': 'POST',
     },
-    'getListMemberships': {
+    'get_list_memberships': {
         'url': '/lists/memberships.json',
         'method': 'GET',
     },
-    'getListSubscribers': {
+    'get_list_subscribers': {
         'url': '/lists/subscribers.json',
         'method': 'GET',
     },
-    'subscribeToList': {
+    'subscribe_to_list': {
         'url': '/lists/subscribers/create.json',
         'method': 'POST',
     },
-    'isListSubscriber': {
+    'is_list_subscriber': {
         'url': '/lists/subscribers/show.json',
         'method': 'GET',
     },
-    'unsubscribeFromList': {
+    'unsubscribe_from_list': {
         'url': '/lists/subscribers/destroy.json',
         'method': 'POST',
     },
-    'createListMembers': {
+    'create_list_members': {
         'url': '/lists/members/create_all.json',
         'method': 'POST'
     },
-    'isListMember': {
+    'is_list_member': {
         'url': '/lists/members/show.json',
         'method': 'GET',
     },
-    'getListMembers': {
+    'get_list_members': {
         'url': '/lists/members.json',
         'method': 'GET',
     },
-    'addListMember': {
+    'add_list_member': {
         'url': '/lists/members/create.json',
         'method': 'POST',
     },
-    'deleteList': {
+    'delete_list': {
         'url': '/lists/destroy.json',
         'method': 'POST',
     },
-    'updateList': {
+    'update_list': {
         'url': '/lists/update.json',
         'method': 'POST',
     },
-    'createList': {
+    'create_list': {
         'url': '/lists/create.json',
         'method': 'POST',
     },
-    'getSpecificList': {
+    'get_specific_list': {
         'url': '/lists/show.json',
         'method': 'GET',
     },
-    'getListSubscriptions': {
+    'get_list_subscriptions': {
         'url': '/lists/subscriptions.json',
         'method': 'GET',
     },
-    'deleteListMembers': {
+    'delete_list_members': {
         'url': '/lists/members/destroy_all.json',
         'method': 'POST'
     },
-    'showOwnedLists': {
+    'show_owned_lists': {
         'url': '/lists/ownerships.json',
         'method': 'GET'
     },
 
 
     # Saved Searches
-    'getSavedSearches': {
+    'get_saved_searches': {
         'url': '/saved_searches/list.json',
         'method': 'GET',
     },
-    'showSavedSearch': {
+    'show_saved_search': {
         'url': '/saved_searches/show/{{id}}.json',
         'method': 'GET',
     },
-    'createSavedSearch': {
+    'create_saved_search': {
         'url': '/saved_searches/create.json',
         'method': 'POST',
     },
-    'destroySavedSearch': {
+    'destroy_saved_search': {
         'url': '/saved_searches/destroy/{{id}}.json',
         'method': 'POST',
     },
 
 
     # Places & Geo
-    'getGeoInfo': {
+    'get_geo_info': {
         'url': '/geo/id/{{place_id}}.json',
         'method': 'GET',
     },
-    'reverseGeocode': {
+    'reverse_geocode': {
         'url': '/geo/reverse_geocode.json',
         'method': 'GET',
     },
-    'searchGeo': {
+    'search_geo': {
         'url': '/geo/search.json',
         'method': 'GET',
     },
-    'getSimilarPlaces': {
+    'get_similar_places': {
         'url': '/geo/similar_places.json',
         'method': 'GET',
     },
-    'createPlace': {
+    'create_place': {
         'url': '/geo/place.json',
         'method': 'POST',
     },
 
 
     # Trends
-    'getPlaceTrends': {
+    'get_place_trends': {
         'url': '/trends/place.json',
         'method': 'GET',
     },
-    'getAvailableTrends': {
+    'get_available_trends': {
         'url': '/trends/available.json',
         'method': 'GET',
     },
-    'getClosestTrends': {
+    'get_closest_trends': {
         'url': '/trends/closest.json',
         'method': 'GET',
     },
 
 
     # Spam Reporting
-    'reportSpam': {
+    'report_spam': {
         'url': '/users/report_spam.json',
         'method': 'POST',
     },

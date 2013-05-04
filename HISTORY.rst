@@ -1,6 +1,11 @@
 History
 -------
 
+2.9.1 (2013-05-04)
+++++++++++++++++++
+
+- "PEP8" all the functions. Switch functions from camelCase() to underscore_funcs(). (i.e. ``updateStatus()`` is now ``update_status()``)
+
 2.9.0 (2013-05-04)
 ++++++++++++++++++
 

@@ -70,7 +70,7 @@ auth_tokens = t.get_authorized_tokens(oauth_verifier)
 print auth_tokens
 ```
 
-*Function definitions (i.e. getHomeTimeline()) can be found by reading over twython/endpoints.py*
+*Function definitions (i.e. get_home_timeline()) can be found by reading over twython/endpoints.py*
 
 ##### Getting a user home timeline
 
@@ -84,7 +84,7 @@ t = Twython(app_key, app_secret,
             oauth_token, oauth_token_secret)
 
 # Returns an dict of the user home timeline
-print t.getHomeTimeline()
+print t.get_home_timeline()
 ```
 
 ##### Catching exceptions
@@ -97,7 +97,7 @@ t = Twython(MY_WRONG_APP_KEY, MY_WRONG_APP_SECRET,
             BAD_OAUTH_TOKEN, BAD_OAUTH_TOKEN_SECRET)
 
 try:
-    t.verifyCredentials()
+    t.verify_credentials()
 except TwythonAuthError as e:
     print e
 ```

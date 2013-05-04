@@ -73,7 +73,7 @@ Handling the callback
     auth_tokens = t.get_authorized_tokens(oauth_verifier)
     print auth_tokens
 
-*Function definitions (i.e. getHomeTimeline()) can be found by reading over twython/endpoints.py*
+*Function definitions (i.e. get_home_timeline()) can be found by reading over twython/endpoints.py*
 
 Getting a user home timeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,7 +88,7 @@ Getting a user home timeline
                 oauth_token, oauth_token_secret)
     
     # Returns an dict of the user home timeline
-    print t.getHomeTimeline()
+    print t.get_home_timeline()
 
 
 Catching exceptions
@@ -104,7 +104,7 @@ Catching exceptions
                 BAD_OAUTH_TOKEN, BAD_OAUTH_TOKEN_SECRET)
 
     try:
-        t.verifyCredentials()
+        t.verify_credentials()
     except TwythonAuthError as e:
         print e
 
