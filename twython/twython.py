@@ -88,8 +88,18 @@ class Twython(object):
             self.__dict__[key] = setFunc(key)
 
             # Allow for old camelCase functions until Twython 3.0.0
-            deprecated_key = key.title().replace('_', '')
-            deprecated_key = deprecated_key[0].lower() + deprecated_key[1:]
+            if key == 'get_friend_ids':
+                deprecated_key = 'getFriendIDs'
+            elif key == 'get_followers_ids':
+                deprecated_key = 'getFollowerIDs'
+            elif key == 'get_incoming_friendship_ids':
+                deprecated_key = 'getIncomingFriendshipIDs'
+            elif key == 'get_outgoing_friendship_ids':
+                deprecated_key = 'getOutgoingFriendshipIDs'
+            else:
+                deprecated_key = key.title().replace('_', '')
+                deprecated_key = deprecated_key[0].lower() + deprecated_key[1:]
+
             self.__dict__[deprecated_key] = setFunc(key, deprecated_key)
 
         # create stash for last call intel
