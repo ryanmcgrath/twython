@@ -1,6 +1,6 @@
 Twython
 =======
-``Twython`` is library providing an easy (and up-to-date) way to access Twitter data in Python
+``Twython`` is a library providing an easy (and up-to-date) way to access Twitter data in Python. Actively maintained and featuring support for both Python 2.6+ and Python 3, it's been battle tested by companies, educational institutions and individuals alike. Try it today!
 
 Features
 --------
@@ -168,11 +168,8 @@ Streaming API
 
 Notes
 -----
-* Twython (as of 2.7.0) is currently in the process of ONLY supporting Twitter v1.1 endpoints and deprecating all v1 endpoints! Please see the `Twitter API Documentation <https://dev.twitter.com/docs/api/1.1>`_ to help migrate your API calls!
-
-Twython && Django
------------------
-If you're using Twython with Django, there's a sample project showcasing OAuth and such **[that can be found here](https://github.com/ryanmcgrath/twython-django)**. Feel free to peruse!
+* Twython (as of 2.7.0) now supports ONLY Twitter v1.1 endpoints! Please see the **[Twitter v1.1 API Documentation](https://dev.twitter.com/docs/api/1.1)** to help migrate your API calls!
+* As of Twython 2.9.1, all method names conform to PEP8 standards. For backwards compatibility, we internally check and catch any calls made using the old (pre 2.9.1) camelCase method syntax. We will continue to support this for the foreseeable future for all old methods (raising a DeprecationWarning where appropriate), but you should update your code if you have the time.
 
 Questions, Comments, etc?
 -------------------------
