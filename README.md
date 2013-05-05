@@ -17,6 +17,7 @@ Features
    - Change user avatar
    - Change user background image
    - Change user banner image
+* Seamless Python 3 support!
 
 Installation
 ------------
@@ -102,6 +103,38 @@ except TwythonAuthError as e:
     print e
 ```
 
+#### Dynamic function arguments
+> Keyword arguments to functions are mapped to the functions available for each endpoint in the Twitter API docs. Doing this allows us to be incredibly flexible in querying the Twitter API, so changes to the API aren't held up from you using them by this library.
+
+> https://dev.twitter.com/docs/api/1.1/post/statuses/update says it takes "status" amongst other arguments
+
+```python
+from twython import Twython, TwythonAuthError
+
+t = Twython(app_key, app_secret,
+            oauth_token, oauth_token_secret)
+
+try:
+    t.update_status(status='Hey guys!')
+except TwythonError as e:
+    print e
+```
+
+> https://dev.twitter.com/docs/api/1.1/get/search/tweets says it takes "q" and "result_type" amongst other arguments
+
+```python
+from twython import Twython, TwythonAuthError
+
+t = Twython(app_key, app_secret,
+            oauth_token, oauth_token_secret)
+
+try:
+    t.search(q='Hey guys!')
+    t.search(q='Hey guys!', result_type='popular')
+except TwythonError as e:
+    print e
+```
+
 ##### Streaming API
 
 ```python
@@ -126,36 +159,15 @@ Notes
 -----
 Twython (as of 2.7.0) is currently in the process of ONLY supporting Twitter v1.1 endpoints and deprecating all v1 endpoints! Please see the **[Twitter v1.1 API Documentation](https://dev.twitter.com/docs/api/1.1)** to help migrate your API calls!
 
-Development of Twython (specifically, 1.3)
-------------------------------------------
-As of version 1.3, Twython has been extensively overhauled. Most API endpoint definitions are stored
-in a separate Python file, and the class itself catches calls to methods that match up in said table.
-
-Certain functions require a bit more legwork, and get to stay in the main file, but for the most part
-it's all abstracted out.
-
-As of Twython 1.3, the syntax has changed a bit as well. Instead of Twython.core, there's a main
-Twython class to import and use. If you need to catch exceptions, import those from twython as well.
-
-Arguments to functions are now exact keyword matches for the Twitter API documentation - that means that
-whatever query parameter arguments you read on Twitter's documentation (http://dev.twitter.com/doc) gets mapped
-as a named argument to any Twitter function.
-
-For example: the search API looks for arguments under the name "q", so you pass q="query_here" to search().
-
-Doing this allows us to be incredibly flexible in querying the Twitter API, so changes to the API aren't held up
-from you using them by this library.
-
-Twython 3k
-----------
-Full compatiabilty with Python 3 is now available seamlessly in the main Twython package. The Twython 3k package has been removed as of Twython 2.8.0
-
 Questions, Comments, etc?
 -------------------------
-My hope is that Twython is so simple that you'd never *have* to ask any questions, but if you feel the need to contact me for this (or other) reasons, you can hit me up
-at ryan@venodesigns.net.
+My hope is that Twython is so simple that you'd never *have* to ask any questions, but if you feel the need to contact me for this (or other) reasons, you can hit me up at ryan@venodesigns.net.
 
-You can also follow me on Twitter - **[@ryanmcgrath](http://twitter.com/ryanmcgrath)**.
+Or if I'm to busy to answer, feel free to ping mikeh@ydekproductions.com as well.
+
+Follow us on Twitter:
+* **[@ryanmcgrath](http://twitter.com/ryanmcgrath)**
+* **[@mikehelmick](http://twitter.com/mikehelmick)**
 
 Want to help?
 -------------

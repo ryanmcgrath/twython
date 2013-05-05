@@ -7,7 +7,8 @@ __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
 __version__ = '2.9.1'
 
 packages = [
-    'twython'
+    'twython',
+    'twython.streaming'
 ]
 
 if sys.argv[-1] == 'publish':
