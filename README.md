@@ -17,6 +17,7 @@ Features
    - Change user avatar
    - Change user background image
    - Change user banner image
+* Support for Twitter's Streaming API
 * Seamless Python 3 support!
 
 Installation
