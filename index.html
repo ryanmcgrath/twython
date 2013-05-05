@@ -1,0 +1,235 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Twython by ryanmcgrath</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Twython</h1>
+        <p>An actively maintained, pure Python wrapper for the Twitter API. Supports both the normal and streaming Twitter APIs.</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/ryanmcgrath/twython" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/ryanmcgrath/twython/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/ryanmcgrath/twython/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h1>Twython</h1>
+
+<p><code>Twython</code> is a library providing an easy (and up-to-date) way to access Twitter data in Python. Actively maintained and featuring support for both Python 2.6+ and Python 3, it's been battle tested by companies, educational institutions and individuals alike. Try it today!</p>
+
+<h2>Features</h2>
+
+<ul>
+<li>Query data for:
+
+<ul>
+<li>User information</li>
+<li>Twitter lists</li>
+<li>Timelines</li>
+<li>Direct Messages</li>
+<li>and anything found in <a href="https://dev.twitter.com/docs/api/1.1">the docs</a>
+</li>
+</ul>
+</li>
+<li>Image Uploading!
+
+<ul>
+<li><strong>Update user status with an image</strong></li>
+<li>Change user avatar</li>
+<li>Change user background image</li>
+<li>Change user banner image</li>
+</ul>
+</li>
+<li>Support for Twitter's Streaming API</li>
+<li>Seamless Python 3 support!</li>
+</ul><h2>Installation</h2>
+
+<pre><code>(pip install | easy_install) twython
+</code></pre>
+
+<p>... or, you can clone the repo and install it the old fashioned way</p>
+
+<pre><code>git clone git://github.com/ryanmcgrath/twython.git
+cd twython
+sudo python setup.py install
+</code></pre>
+
+<h2>Usage</h2>
+
+<h5>Authorization URL</h5>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">twython</span> <span class="kn">import</span> <span class="n">Twython</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">Twython</span><span class="p">(</span><span class="n">app_key</span><span class="p">,</span> <span class="n">app_secret</span><span class="p">)</span>
+
+<span class="n">auth_props</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get_authentication_tokens</span><span class="p">(</span><span class="n">callback_url</span><span class="o">=</span><span class="s">'http://google.com'</span><span class="p">)</span>
+
+<span class="n">oauth_token</span> <span class="o">=</span> <span class="n">auth_props</span><span class="p">[</span><span class="s">'oauth_token'</span><span class="p">]</span>
+<span class="n">oauth_token_secret</span> <span class="o">=</span> <span class="n">auth_props</span><span class="p">[</span><span class="s">'oauth_token_secret'</span><span class="p">]</span>
+
+<span class="k">print</span> <span class="s">'Connect to Twitter via: </span><span class="si">%s</span><span class="s">'</span> <span class="o">%</span> <span class="n">auth_props</span><span class="p">[</span><span class="s">'auth_url'</span><span class="p">]</span>
+</pre></div>
+
+<p>Be sure you have a URL set up to handle the callback after the user has allowed your app to access their data, the callback can be used for storing their final OAuth Token and OAuth Token Secret in a database for use at a later date.</p>
+
+<h5>Handling the callback</h5>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">twython</span> <span class="kn">import</span> <span class="n">Twython</span>
+
+<span class="c"># oauth_token_secret comes from the previous step</span>
+<span class="c"># if needed, store that in a session variable or something.</span>
+<span class="c"># oauth_verifier and oauth_token from the previous call is now REQUIRED # to pass to get_authorized_tokens</span>
+
+<span class="c"># In Django, to get the oauth_verifier and oauth_token from the callback</span>
+<span class="c"># url querystring, you might do something like this:</span>
+<span class="c"># oauth_token = request.GET.get('oauth_token')</span>
+<span class="c"># oauth_verifier = request.GET.get('oauth_verifier')</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">Twython</span><span class="p">(</span><span class="n">app_key</span><span class="p">,</span> <span class="n">app_secret</span><span class="p">,</span>
+            <span class="n">oauth_token</span><span class="p">,</span> <span class="n">oauth_token_secret</span><span class="p">)</span>
+
+<span class="n">auth_tokens</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get_authorized_tokens</span><span class="p">(</span><span class="n">oauth_verifier</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">auth_tokens</span>
+</pre></div>
+
+<p><em>Function definitions (i.e. get_home_timeline()) can be found by reading over twython/endpoints.py</em></p>
+
+<h5>Getting a user home timeline</h5>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">twython</span> <span class="kn">import</span> <span class="n">Twython</span>
+
+<span class="c"># oauth_token and oauth_token_secret are the final tokens produced</span>
+<span class="c"># from the 'Handling the callback' step</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">Twython</span><span class="p">(</span><span class="n">app_key</span><span class="p">,</span> <span class="n">app_secret</span><span class="p">,</span>
+            <span class="n">oauth_token</span><span class="p">,</span> <span class="n">oauth_token_secret</span><span class="p">)</span>
+
+<span class="c"># Returns an dict of the user home timeline</span>
+<span class="k">print</span> <span class="n">t</span><span class="o">.</span><span class="n">get_home_timeline</span><span class="p">()</span>
+</pre></div>
+
+<h5>Catching exceptions</h5>
+
+<blockquote>
+<p>Twython offers three Exceptions currently: TwythonError, TwythonAuthError and TwythonRateLimitError</p>
+</blockquote>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">twython</span> <span class="kn">import</span> <span class="n">Twython</span><span class="p">,</span> <span class="n">TwythonAuthError</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">Twython</span><span class="p">(</span><span class="n">MY_WRONG_APP_KEY</span><span class="p">,</span> <span class="n">MY_WRONG_APP_SECRET</span><span class="p">,</span>
+            <span class="n">BAD_OAUTH_TOKEN</span><span class="p">,</span> <span class="n">BAD_OAUTH_TOKEN_SECRET</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">verify_credentials</span><span class="p">()</span>
+<span class="k">except</span> <span class="n">TwythonAuthError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">e</span>
+</pre></div>
+
+<h4>Dynamic function arguments</h4>
+
+<blockquote>
+<p>Keyword arguments to functions are mapped to the functions available for each endpoint in the Twitter API docs. Doing this allows us to be incredibly flexible in querying the Twitter API, so changes to the API aren't held up from you using them by this library.</p>
+
+<p><a href="https://dev.twitter.com/docs/api/1.1/post/statuses/update">https://dev.twitter.com/docs/api/1.1/post/statuses/update</a> says it takes "status" amongst other arguments</p>
+</blockquote>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">twython</span> <span class="kn">import</span> <span class="n">Twython</span><span class="p">,</span> <span class="n">TwythonAuthError</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">Twython</span><span class="p">(</span><span class="n">app_key</span><span class="p">,</span> <span class="n">app_secret</span><span class="p">,</span>
+            <span class="n">oauth_token</span><span class="p">,</span> <span class="n">oauth_token_secret</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">update_status</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s">'Hey guys!'</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">TwythonError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">e</span>
+</pre></div>
+
+<blockquote>
+<p><a href="https://dev.twitter.com/docs/api/1.1/get/search/tweets">https://dev.twitter.com/docs/api/1.1/get/search/tweets</a> says it takes "q" and "result_type" amongst other arguments</p>
+</blockquote>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">twython</span> <span class="kn">import</span> <span class="n">Twython</span><span class="p">,</span> <span class="n">TwythonAuthError</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">Twython</span><span class="p">(</span><span class="n">app_key</span><span class="p">,</span> <span class="n">app_secret</span><span class="p">,</span>
+            <span class="n">oauth_token</span><span class="p">,</span> <span class="n">oauth_token_secret</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="s">'Hey guys!'</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="s">'Hey guys!'</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="s">'popular'</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">TwythonError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">e</span>
+</pre></div>
+
+<h5>Streaming API</h5>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">twython</span> <span class="kn">import</span> <span class="n">TwythonStreamer</span>
+
+<span class="k">class</span> <span class="nc">MyStreamer</span><span class="p">(</span><span class="n">TwythonStreamer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">on_success</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">print</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status_code</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">print</span> <span class="n">status_code</span><span class="p">,</span> <span class="n">data</span>
+
+<span class="c"># Requires Authentication as of Twitter API v1.1</span>
+<span class="n">stream</span> <span class="o">=</span> <span class="n">MyStreamer</span><span class="p">(</span><span class="n">APP_KEY</span><span class="p">,</span> <span class="n">APP_SECRET</span><span class="p">,</span>
+                    <span class="n">OAUTH_TOKEN</span><span class="p">,</span> <span class="n">OAUTH_TOKEN_SECRET</span><span class="p">)</span>
+
+<span class="n">stream</span><span class="o">.</span><span class="n">statuses</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">track</span><span class="o">=</span><span class="s">'twitter'</span><span class="p">)</span>
+</pre></div>
+
+<h2>Notes</h2>
+
+<ul>
+<li>Twython (as of 2.7.0) now supports ONLY Twitter v1.1 endpoints! Please see the <strong><a href="https://dev.twitter.com/docs/api/1.1">Twitter v1.1 API Documentation</a></strong> to help migrate your API calls!</li>
+<li>As of Twython 2.9.1, all method names conform to PEP8 standards. For backwards compatibility, we internally check and catch any calls made using the old (pre 2.9.1) camelCase method syntax. We will continue to support this for the foreseeable future for all old methods (raising a DeprecationWarning where appropriate), but you should update your code if you have the time.</li>
+</ul><h2>Questions, Comments, etc?</h2>
+
+<p>My hope is that Twython is so simple that you'd never <em>have</em> to ask any questions, but if you feel the need to contact me for this (or other) reasons, you can hit me up at <a href="mailto:ryan@venodesigns.net">ryan@venodesigns.net</a>.</p>
+
+<p>Or if I'm to busy to answer, feel free to ping <a href="mailto:mikeh@ydekproductions.com">mikeh@ydekproductions.com</a> as well.</p>
+
+<p>Follow us on Twitter:</p>
+
+<ul>
+<li><strong><a href="http://twitter.com/ryanmcgrath">@ryanmcgrath</a></strong></li>
+<li><strong><a href="http://twitter.com/mikehelmick">@mikehelmick</a></strong></li>
+</ul><h2>Want to help?</h2>
+
+<p>Twython is useful, but ultimately only as useful as the people using it (say that ten times fast!). If you'd like to help, write example code, contribute patches, document things on the wiki, tweet about it. Your help is always appreciated!</p>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/ryanmcgrath">ryanmcgrath</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
