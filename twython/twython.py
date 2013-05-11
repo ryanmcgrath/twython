@@ -114,7 +114,7 @@ class Twython(object):
             self.api_url % self.api_version + fn['url']
         )
 
-        if deprecated_key:
+        if deprecated_key and (deprecated_key != api_call):
             # Until Twython 3.0.0 and the function is removed.. send deprecation warning
             warnings.warn(
                 '`%s` is deprecated, please use `%s` instead.' % (deprecated_key, api_call),
@@ -169,7 +169,10 @@ class Twython(object):
             # If there is no error message, use a default.
             errors = content.get('errors',
                                  [{'message': 'An error occurred processing your request.'}])
-            error_message = errors[0]['message']
+            if errors and isinstance(errors, list):
+                error_message = errors[0]['message']
+            else:
+                error_message = errors
             self._last_call['api_error'] = error_message
 
             ExceptionType = TwythonError

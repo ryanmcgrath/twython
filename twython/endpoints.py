@@ -61,6 +61,10 @@ api_table = {
         'url': '/statuses/oembed.json',
         'method': 'GET',
     },
+    'get_retweeters_ids': {
+        'url': '/statuses/retweeters/ids.json',
+        'method': 'GET',
+    },
 
 
     # Search
