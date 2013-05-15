@@ -1,20 +1,19 @@
 language: python
 python:
-  - 2.6
-  - 2.7
-  - 3.3
+  - '2.6'
+  - '2.7'
+  - '3.3'
 env:
-    APP_KEY='kpowaBNkhhXwYUu3es27dQ'
-    APP_SECRET='iQ0Jr0e2xvhOwLubifWAFtmXnVT7VZAIqUXnI2FcCjU'
-    OAUTH_TOKEN='1419197916-OZKOynuB1rZ1g4DXwS2wjr1wGnknPHCUEkbvvKx'
-    OAUTH_TOKEN_SECRET='dh9YbCkDR3h3XQFXA7pjufI6S55CCZ6UjdvBNUmi1hg'
-    SCREEN_NAME='TwythonTest'
-    PROTECTED_TWITTER_1='TwythonSecure1'
-    PROTECTED_TWITTER_2='TwythonSecure2'
-    TEST_TWEET_ID='332992304010899457'
-    TEST_LIST_ID='574'
+    - APP_KEY='kpowaBNkhhXwYUu3es27dQ'
+    - APP_SECRET='iQ0Jr0e2xvhOwLubifWAFtmXnVT7VZAIqUXnI2FcCjU'
+    - OAUTH_TOKEN='1419197916-OZKOynuB1rZ1g4DXwS2wjr1wGnknPHCUEkbvvKx'
+    - OAUTH_TOKEN_SECRET='dh9YbCkDR3h3XQFXA7pjufI6S55CCZ6UjdvBNUmi1hg'
+    - SCREEN_NAME='TwythonTest'
+    - PROTECTED_TWITTER_1='TwythonSecure1'
+    - PROTECTED_TWITTER_2='TwythonSecure2'
+    - TEST_TWEET_ID='332992304010899457'
+    - TEST_LIST_ID='574'
 script: nosetests -v test_twython:TwythonAPITestCase test_twython:TwythonAuthTestCase --cover-package="twython" --with-coverage
-install:
-  - pip install -r requirements.txt
+install: pip install -r requirements.txt
 notifications:
   email: false
