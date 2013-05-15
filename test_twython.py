@@ -21,6 +21,17 @@ test_tweet_id = os.environ.get('TEST_TWEET_ID', '318577428610031617')
 test_list_id = os.environ.get('TEST_LIST_ID', '574')  # 574 is @twitter/team
 
 
+class TwythonAuthTestCase(unittest.TestCase):
+    def setUp(self):
+        self.api = Twython(app_key, app_secret)
+
+    def test_get_authentication_tokens(self):
+        '''Test getting authentication tokens works'''
+        self.api.get_authentication_tokens(callback_url='http://google.com/',
+                                           force_login=True,
+                                           screen_name=screen_name)
+
+
 class TwythonAPITestCase(unittest.TestCase):
     def setUp(self):
         self.api = Twython(app_key, app_secret,
@@ -290,7 +301,7 @@ class TwythonAPITestCase(unittest.TestCase):
     def test_get_list_statuses(self):
         '''Test timeline of tweets authored by members of the
         specified list succeeds'''
-        self.api.get_list_statuses(id=test_list_id)
+        self.api.get_list_statuses(list_id=test_list_id)
 
     def test_create_update_destroy_list_add_remove_list_members(self):
         '''Test create a list, adding and removing members then
@@ -344,11 +355,11 @@ class TwythonAPITestCase(unittest.TestCase):
     def test_get_list_subscriptions(self):
         '''Test collection of the lists the specified user is
         subscribed to succeeds'''
-        self.api.get_specific_list(screen_name='twitter')
+        self.api.get_list_subscriptions(screen_name='twitter')
 
     def test_show_owned_lists(self):
         '''Test collection of lists the specified user owns succeeds'''
-        self.api.get_owned_lists(screen_name='twitter')
+        self.api.show_owned_lists(screen_name='twitter')
 
     # Saved Searches
     def test_get_saved_searches(self):
@@ -359,11 +370,11 @@ class TwythonAPITestCase(unittest.TestCase):
     def test_create_get_destroy_saved_search(self):
         '''Test getting list of saved searches for authenticated
         user succeeds'''
-        saved_search = self.api.create_saved_search(query='#ArnoldPalmer')
+        saved_search = self.api.create_saved_search(query='#Twitter')
         saved_search_id = saved_search['id_str']
 
         self.api.show_saved_search(id=saved_search_id)
-        self.api.destory_saved_search(id=saved_search_id)
+        self.api.destroy_saved_search(id=saved_search_id)
 
     # Places & Geo
     def test_get_geo_info(self):
