@@ -1,18 +1,19 @@
 language: python
 python:
-  - '2.6'
-  - '2.7'
-  - '3.3'
+  - 2.6
+  - 2.7
+  - 3.3
 env:
-    - APP_KEY='kpowaBNkhhXwYUu3es27dQ'
-    - APP_SECRET='iQ0Jr0e2xvhOwLubifWAFtmXnVT7VZAIqUXnI2FcCjU'
-    - OAUTH_TOKEN='1419197916-OZKOynuB1rZ1g4DXwS2wjr1wGnknPHCUEkbvvKx'
-    - OAUTH_TOKEN_SECRET='dh9YbCkDR3h3XQFXA7pjufI6S55CCZ6UjdvBNUmi1hg'
-    - SCREEN_NAME='TwythonTest'
-    - PROTECTED_TWITTER_1='TwythonSecure1'
-    - PROTECTED_TWITTER_2='TwythonSecure2'
-    - TEST_TWEET_ID='332992304010899457'
-    - TEST_LIST_ID='574'
+  global:
+    - secure: "U+9hLkIIV004Ap4w7EA0THPBErvdL8fIpZ6BuwVcf6MMRwZ3Sqm4s23ukvQs\nTUGa9+97gsh41RCijpriAQLogXtyRZlwWpk3rWQmMavxaiibciNE+Py9GG5z\nUpgw+AWNS2ZfRsBsg2GhsWLk+UHb63ixFbU0PCRPalx9e6ycW2g="
+    - secure: "Zf2Q7mBwWdM7sDboyZ5KR3qj5M6J9XqCFNbDaPEHJru8FSv0HB6WCQe7ddh6\nQ3OKCGiCQyFgzBPfBKD6qIVmYYbiGqFD75grKG/0M4ZJw1CSrkOQQ3qs/Nlk\nhuKmTpY7zx+c1m/XjHSWE2nW7bWnRybDDsJL0y7gcfeupwePyDU="
+    - secure: "cXRljeHb4/jS5rMb24uLhC8pdQU0psqdT5ErZLYiOlxxG7SpM0Nn3ULiZ5xT\nK7K7s3bkt2MyFc68MST9TwZS7UUGYopDBV/SF0+EXdtMmtUZ5pm552G4Lwqf\nrXmQDYZDrLrq8T+1sMSGiLhUUP9kKyVdN8Oy1UzuVkJrN4in/Do="
+    - secure: "GqPSc1AHB8mVaQtw3NL2ZT1pOi3QARPmw+fNeU0zl66dsFIt3GsFPsk3ncjn\n5OdsRjsvwyyE/SMreJvARxnxEAlxsQ2t/UWBPwaeYJjcnkZ6wJ66UcWw63YT\nX5XEmrbJy58bo5qZ3rABFb5JW4rWb9q/02L48riHVSuvzYi6YP8="
+    - SCREEN_NAME=TwythonTest
+    - PROTECTED_TWITTER_1=TwythonSecure1
+    - PROTECTED_TWITTER_2=TwythonSecure2
+    - TEST_TWEET_ID=332992304010899457
+    - TEST_LIST_ID=574
 script: nosetests -v test_twython:TwythonAPITestCase test_twython:TwythonAuthTestCase --cover-package="twython" --with-coverage
 install: pip install -r requirements.txt
 notifications:

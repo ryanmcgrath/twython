@@ -3,10 +3,10 @@ import os
 
 from twython import Twython, TwythonError, TwythonAuthError
 
-app_key = os.environ.get('APP_KEY', 'kpowaBNkhhXwYUu3es27dQ')
-app_secret = os.environ.get('APP_SECRET', 'iQ0Jr0e2xvhOwLubifWAFtmXnVT7VZAIqUXnI2FcCjU')
-oauth_token = os.environ.get('OAUTH_TOKEN', '1419197916-OZKOynuB1rZ1g4DXwS2wjr1wGnknPHCUEkbvvKx')
-oauth_token_secret = os.environ.get('OAUTH_TOKEN_SECRET', 'dh9YbCkDR3h3XQFXA7pjufI6S55CCZ6UjdvBNUmi1hg')
+app_key = os.environ.get('APP_KEY')
+app_secret = os.environ.get('APP_SECRET')
+oauth_token = os.environ.get('OAUTH_TOKEN')
+oauth_token_secret = os.environ.get('OAUTH_TOKEN_SECRET')
 
 screen_name = os.environ.get('SCREEN_NAME', 'TwythonTest')
 
