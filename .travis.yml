@@ -3,17 +3,29 @@ python:
   - 2.6
   - 2.7
   - 3.3
-env:
-  global:
-    - secure: "U+9hLkIIV004Ap4w7EA0THPBErvdL8fIpZ6BuwVcf6MMRwZ3Sqm4s23ukvQs\nTUGa9+97gsh41RCijpriAQLogXtyRZlwWpk3rWQmMavxaiibciNE+Py9GG5z\nUpgw+AWNS2ZfRsBsg2GhsWLk+UHb63ixFbU0PCRPalx9e6ycW2g="
-    - secure: "Zf2Q7mBwWdM7sDboyZ5KR3qj5M6J9XqCFNbDaPEHJru8FSv0HB6WCQe7ddh6\nQ3OKCGiCQyFgzBPfBKD6qIVmYYbiGqFD75grKG/0M4ZJw1CSrkOQQ3qs/Nlk\nhuKmTpY7zx+c1m/XjHSWE2nW7bWnRybDDsJL0y7gcfeupwePyDU="
-    - secure: "cXRljeHb4/jS5rMb24uLhC8pdQU0psqdT5ErZLYiOlxxG7SpM0Nn3ULiZ5xT\nK7K7s3bkt2MyFc68MST9TwZS7UUGYopDBV/SF0+EXdtMmtUZ5pm552G4Lwqf\nrXmQDYZDrLrq8T+1sMSGiLhUUP9kKyVdN8Oy1UzuVkJrN4in/Do="
-    - secure: "GqPSc1AHB8mVaQtw3NL2ZT1pOi3QARPmw+fNeU0zl66dsFIt3GsFPsk3ncjn\n5OdsRjsvwyyE/SMreJvARxnxEAlxsQ2t/UWBPwaeYJjcnkZ6wJ66UcWw63YT\nX5XEmrbJy58bo5qZ3rABFb5JW4rWb9q/02L48riHVSuvzYi6YP8="
-    - SCREEN_NAME=TwythonTest
-    - PROTECTED_TWITTER_1=TwythonSecure1
-    - PROTECTED_TWITTER_2=TwythonSecure2
-    - TEST_TWEET_ID=332992304010899457
-    - TEST_LIST_ID=574
+env: 
+  global: 
+  - secure: |-
+      W+6YFPFcqhh3o9JzQj4D3FI9LdvMCrrRcbqlcbNaMqTjMo3MMLNs08bhvzFm
+      wWjU+vSdaZO79/WzHidifBf2BbAgF4xNfY/mOl9EycPmvjNPx2AzOtfG2rb/
+      PxJoY0Vloxi0ZfJqWpiAc/xTpXQ/2lRmkVbggeQ5px3wYLOfKr4=
+  - secure: |-
+      FCsHF9JqATGopWQK+M88o6ZxEYduZKTTrQeTbm4yI8g1PksjmO9vG7cYYub0
+      mlpWUwZ8EHjQKOcMPRQqE1z71rr6zGRHlyy7TaiXGZMXr3JtyTuvJDkHQjIz
+      DR1+/1FGlTl4dWGDiOfWWsLOKAOnI2/u/z9CROgwMybjFl5l3R8=
+  - secure: |-
+      XB0p3AQ4gWYhZMt0czR6qbWmx80qJHCC2W3Zi5b7JMJAP5alb4GqzbZyuf8M
+      zUFwUgM2j/93/Vds/QGL4oMVSy6ECOo4lWnXs1Gt08ZMJZrJjvTSnjWrqwL9
+      txRwyxZgFuJwtmIfIILTus+GMlGeW9lKvFDJwb698Fx3faXC35A=
+  - secure: |-
+      GCwKif9aZkpBVU6IJzDQAf0o13FrS7tRsME/CG+1xorqcLPcq+G6aN+10NGN
+      OyWCX2RceE/3dwP3fDiypwl4hIWWzKnAza3toebomvniAKSsDGOG59j+n+QY
+      TDeyJJ5oIa1DYbL94aeZyc4nn/C8ZafADqiHGfOU8swSdarnIcg=
+  - SCREEN_NAME=TwythonTest
+  - PROTECTED_TWITTER_1=TwythonSecure1
+  - PROTECTED_TWITTER_2=TwythonSecure2
+  - TEST_TWEET_ID=332992304010899457
+  - TEST_LIST_ID=574
 script: nosetests -v test_twython:TwythonAPITestCase test_twython:TwythonAuthTestCase --cover-package="twython" --with-coverage
 install: pip install -r requirements.txt
 notifications:
