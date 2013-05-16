@@ -9,6 +9,7 @@ from .advisory import TwythonDeprecationWarning
 from .compat import json, urlencode, parse_qsl, quote_plus
 from .endpoints import api_table
 from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
+from .helpers import _transparent_params
 
 warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
 
@@ -126,7 +127,7 @@ class Twython(object):
 
         return content
 
-    def _request(self, url, method='GET', params=None, files=None, api_call=None):
+    def _request(self, url, method='GET', params=None, api_call=None):
         '''Internal response generator, no sense in repeating the same
         code twice, right? ;)
         '''
@@ -134,6 +135,7 @@ class Twython(object):
         params = params or {}
 
         func = getattr(self.client, method)
+        params, files = _transparent_params(params)
         if method == 'get':
             response = func(url, params=params)
         else:
@@ -201,7 +203,7 @@ class Twython(object):
     we haven't gotten around to putting it in Twython yet. :)
     '''
 
-    def request(self, endpoint, method='GET', params=None, files=None, version='1.1'):
+    def request(self, endpoint, method='GET', params=None, version='1.1'):
         # In case they want to pass a full Twitter URL
         # i.e. https://search.twitter.com/
         if endpoint.startswith('http://') or endpoint.startswith('https://'):
@@ -209,15 +211,15 @@ class Twython(object):
         else:
             url = '%s/%s.json' % (self.api_url % version, endpoint)
 
-        content = self._request(url, method=method, params=params, files=files, api_call=url)
+        content = self._request(url, method=method, params=params, api_call=url)
 
         return content
 
     def get(self, endpoint, params=None, version='1.1'):
         return self.request(endpoint, params=params, version=version)
 
-    def post(self, endpoint, params=None, files=None, version='1.1'):
-        return self.request(endpoint, 'POST', params=params, files=files, version=version)
+    def post(self, endpoint, params=None, version='1.1'):
+        return self.request(endpoint, 'POST', params=params, version=version)
 
     # End Dynamic Request Methods
 
@@ -379,110 +381,6 @@ class Twython(object):
 
         for tweet in self.searchGen(search_query, **kwargs):
             yield tweet
-
-    # The following methods are apart from the other Account methods,
-    # because they rely on a whole multipart-data posting function set.
-
-    ## Media Uploading functions ##############################################
-
-    def updateProfileBackgroundImage(self, file_, version='1.1', **params):
-        warnings.warn(
-            'This method is deprecated, please use `update_profile_background_image` instead.',
-            TwythonDeprecationWarning,
-            stacklevel=2
-        )
-        return self.update_profile_background_image(file_, version, **params)
-
-    def update_profile_background_image(self, file_, version='1.1', **params):
-        """Updates the authenticating user's profile background image.
-
-            :param file_: (required) A string to the location of the file
-                          (less than 800KB in size, larger than 2048px width will scale down)
-            :param version: (optional) A number, default 1.1 because that's the
-                            current API version for Twitter (Legacy = 1)
-
-            **params - You may pass items that are stated in this doc
-                       (https://dev.twitter.com/docs/api/1.1/post/account/update_profile_background_image)
-        """
-
-        return self.post('account/update_profile_background_image',
-                         params=params,
-                         files={'image': (file_, open(file_, 'rb'))},
-                         version=version)
-
-    def updateProfileImage(self, file_, version='1.1', **params):
-        warnings.warn(
-            'This method is deprecated, please use `update_profile_image` instead.',
-            TwythonDeprecationWarning,
-            stacklevel=2
-        )
-        return self.update_profile_image(file_, version, **params)
-
-    def update_profile_image(self, file_, version='1.1', **params):
-        """Updates the authenticating user's profile image (avatar).
-
-            :param file_: (required) A string to the location of the file
-            :param version: (optional) A number, default 1.1 because that's the
-                            current API version for Twitter (Legacy = 1)
-
-            **params - You may pass items that are stated in this doc
-                       (https://dev.twitter.com/docs/api/1.1/post/account/update_profile_image)
-        """
-
-        return self.post('account/update_profile_image',
-                         params=params,
-                         files={'image': (file_, open(file_, 'rb'))},
-                         version=version)
-
-    def updateStatusWithMedia(self, file_, version='1.1', **params):
-        warnings.warn(
-            'This method is deprecated, please use `update_status_with_media` instead.',
-            TwythonDeprecationWarning,
-            stacklevel=2
-        )
-        return self.update_status_with_media(file_, version, **params)
-
-    def update_status_with_media(self, file_, version='1.1', **params):
-        """Updates the users status with media
-
-            :param file_: (required) A string to the location of the file
-            :param version: (optional) A number, default 1.1 because that's the
-                            current API version for Twitter (Legacy = 1)
-
-            **params - You may pass items that are taken in this doc
-                       (https://dev.twitter.com/docs/api/1.1/post/statuses/update_with_media)
-        """
-
-        return self.post('statuses/update_with_media',
-                         params=params,
-                         files={'media': (file_, open(file_, 'rb'))},
-                         version=version)
-
-    def updateProfileBannerImage(self, file_, version='1.1', **params):
-        warnings.warn(
-            'This method is deprecated, please use `update_profile_banner_image` instead.',
-            TwythonDeprecationWarning,
-            stacklevel=2
-        )
-        return self.update_profile_banner_image(file_, version, **params)
-
-    def update_profile_banner_image(self, file_, version='1.1', **params):
-        """Updates the users profile banner
-
-            :param file_: (required) A string to the location of the file
-            :param version: (optional) A number, default 1 because that's the
-                            only API version for Twitter that supports this call
-
-            **params - You may pass items that are taken in this doc
-                       (https://dev.twitter.com/docs/api/1.1/post/account/update_profile_banner)
-        """
-
-        return self.post('account/update_profile_banner',
-                         params=params,
-                         files={'banner': (file_, open(file_, 'rb'))},
-                         version=version)
-
-    ###########################################################################
 
     @staticmethod
     def unicode2utf8(text):

@@ -56,7 +56,10 @@ api_table = {
         'url': '/statuses/retweet/{{id}}.json',
         'method': 'POST',
     },
-    # See twython.py for update_status_with_media
+    'update_status_with_media': {
+        'url': '/statuses/update_with_media.json',
+        'method': 'POST',
+    },
     'get_oembed_tweet': {
         'url': '/statuses/oembed.json',
         'method': 'GET',
@@ -169,12 +172,18 @@ api_table = {
         'url': '/account/update_profile.json',
         'method': 'POST',
     },
-    # See twython.py for update_profile_background_image
+    'update_profile_background_image': {
+        'url': '/account/update_profile_banner.json',
+        'method': 'POST',
+    },
     'update_profile_colors': {
         'url': '/account/update_profile_colors.json',
         'method': 'POST',
     },
-    # See twython.py for update_profile_image
+    'update_profile_image': {
+        'url': '/account/update_profile_image.json',
+        'method': 'POST',
+    },
     'list_blocks': {
         'url': '/blocks/list.json',
         'method': 'GET',
@@ -215,7 +224,10 @@ api_table = {
         'url': '/account/remove_profile_banner.json',
         'method': 'POST',
     },
-    # See twython.py for update_profile_banner
+    'update_profile_background_image': {
+        'url': '/account/update_profile_background_image.json',
+        'method': 'POST',
+    },
     'get_profile_banner_sizes': {
         'url': '/users/profile_banner.json',
         'method': 'GET',
