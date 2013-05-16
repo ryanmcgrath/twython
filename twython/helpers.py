@@ -1,3 +1,6 @@
+from .compat import basestring
+
+
 def _transparent_params(_params):
     params = {}
     files = {}
