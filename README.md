@@ -136,6 +136,55 @@ except TwythonError as e:
     print e
 ```
 
+#### Posting a Status with an Image
+```python
+from twython import Twython
+
+t = Twython(app_key, app_secret,
+            oauth_token, oauth_token_secret)
+
+# The file key that Twitter expects for updating a status with an image
+# is 'media', so 'media' will be apart of the params dict.
+
+# You can pass any object that has a read() function (like a StringIO object)
+# In case you wanted to resize it first or something!
+
+photo = open('/path/to/file/image.jpg', 'rb')
+t.update_status_with_media(media=photo, status='Check out my image!')
+```
+
+#### Posting a Status with an Editing Image  *(This example resizes an image)*
+```python
+from twython import Twython
+
+t = Twython(app_key, app_secret,
+            oauth_token, oauth_token_secret)
+
+# Like I said in the previous section, you can pass any object that has a
+# read() method
+
+# Assume you are working with a JPEG
+
+from PIL import Image
+from StringIO import StringIO
+
+photo = Image.open('/path/to/file/image.jpg')
+
+basewidth = 320
+wpercent = (basewidth / float(photo.size[0]))
+height = int((float(photo.size[1]) * float(wpercent)))
+photo = photo.resize((basewidth, height), Image.ANTIALIAS)
+
+image_io = StringIO.StringIO()
+photo.save(image_io, format='JPEG')
+
+# If you do not seek(0), the image will be at the end of the file and
+# unable to be read
+image_io.seek(0)
+
+t.update_status_with_media(media=photo, status='Check out my edited image!')
+```
+
 ##### Streaming API
 
 ```python
