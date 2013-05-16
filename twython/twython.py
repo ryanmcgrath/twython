@@ -245,12 +245,14 @@ class Twython(object):
     def get_authentication_tokens(self, callback_url=None, force_login=False, screen_name=''):
         """Returns a dict including an authorization URL (auth_url) to direct a user to
 
-            :param callback_url: (optional.. for now) Url the user is returned to after they authorize your app
+            :param callback_url: (optional) Url the user is returned to after they authorize your app (web clients only)
             :param force_login: (optional) Forces the user to enter their credentials to ensure the correct users account is authorized.
             :param app_secret: (optional) If forced_login is set OR user is not currently logged in, Prefills the username input box of the OAuth login screen with the given value
         """
         callback_url = callback_url or self.callback_url
-        request_args = {'oauth_callback': callback_url}
+        request_args = {}
+        if callback_url:
+            request_args['oauth_callback'] = callback_url
         response = self.client.get(self.request_token_url, params=request_args)
 
         if response.status_code == 401:
@@ -285,7 +287,7 @@ class Twython(object):
     def get_authorized_tokens(self, oauth_verifier):
         """Returns authorized tokens after they go through the auth_url phase.
 
-        :param oauth_verifier: (required) The oauth_verifier retrieved from the callback url querystring
+        :param oauth_verifier: (required) The oauth_verifier (or a.k.a PIN for non web apps) retrieved from the callback url querystring
         """
         response = self.client.get(self.access_token_url, params={'oauth_verifier': oauth_verifier})
         authorized_tokens = dict(parse_qsl(response.content.decode('utf-8')))

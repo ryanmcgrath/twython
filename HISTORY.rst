@@ -6,6 +6,9 @@ History
 - Added ``get_retweeters_ids`` method
 - Fixed ``TwythonDeprecationWarning`` on camelCase functions if the camelCase was the same as the PEP8 function (i.e. ``Twython.retweet`` did not change)
 - Fixed error message bubbling when error message returned from Twitter was not an array (i.e. if you try to retweet something twice, the error is not found at index 0)
+- Added "transparent" parameters for making requests, meaning users can pass bool values (True, False) to Twython methods and we convert your params in the background to satisfy the Twitter API. Also, file objects can now be passed seamlessly (see examples in README and in /examples dir for details)
+- Callback URL is optional in ``get_authentication_tokens`` to accomedate those using OOB authorization (non web clients)
+- Not part of the python package, but tests are now available along with Travis CI hooks
 
 2.9.1 (2013-05-04)
 ++++++++++++++++++
