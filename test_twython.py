@@ -8,7 +8,7 @@ app_secret = os.environ.get('APP_SECRET')
 oauth_token = os.environ.get('OAUTH_TOKEN')
 oauth_token_secret = os.environ.get('OAUTH_TOKEN_SECRET')
 
-screen_name = os.environ.get('SCREEN_NAME', 'TwythonTest')
+screen_name = os.environ.get('SCREEN_NAME', '__twython__')
 
 # Protected Account you ARE following and they ARE following you
 protected_twitter_1 = os.environ.get('PROTECTED_TWITTER_1', 'TwythonSecure1')
