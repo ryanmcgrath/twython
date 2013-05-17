@@ -1,5 +1,9 @@
 Twython
 =======
+
+.. image:: https://pypip.in/d/twython/badge.png
+        :target: https://crate.io/packages/twython/
+
 ``Twython`` is a library providing an easy (and up-to-date) way to access Twitter data in Python. Actively maintained and featuring support for both Python 2.6+ and Python 3, it's been battle tested by companies, educational institutions and individuals alike. Try it today!
 
 Features
