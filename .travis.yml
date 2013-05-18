@@ -6,21 +6,21 @@ python:
 env: 
   global: 
   - secure: |-
-      YZRZzjEVXWcKYWz+L+TI7Odun0ak8ORBHrg4UzrzzX6ok1cZAS4UxAT42DpS
-      xknP+sUVNziHpOVDVDnIZ7XG8+NISfBC+mwFmOLfxPiXFqC+/6XZWv4FlHJO
-      op5AummUolF8bX7SFOLjG6/Eox9mFOsw8+aIqhly44hlmJ2tpLY=
+      bLlM8JPXiqKIryMwExTEFoEo5op3FqvQQu0yn0xv1okrcH/MEvJAsm4zDd7p
+      yt0riXRpp9aOkU/SkL/1TVkq5E75uXYhaLuT/BgjDmLcw/Sp7Tgsk8b5KLDM
+      RqSrsGXKu7GQCI3MhhWJEAWyU2WVyhZERh5wOY+ic9JCiZloqMw=
   - secure: |-
-      NzPo81Xb2xuMwcT1JszIPSohGDdJvwim/8zALMSr2ZirL74O3Edsq0DXG6dm
-      vy9jcppjKsa8bq9SFrqikVMDUsP/ktW+VoTDbA/JvPBtjFpdDot53T//arsA
-      bd494n9a4kQG5gnAnqSRy9QRAXMAs4M3IuccjR0CuebbsXIzLZQ=
+      JlQjabb2tADza5cEmyWuwi5pECjknkiWXj4elTl/UrSYPLeTruTBYBlvtrOl
+      4XF3RWcPwxcBr1JD/Ze1JxMVebYUpvZSTXZXFq6jbjcQTBa7QuH6rraxnj6W
+      /Abx+NYxSBcEex/RsZtSqshzCZGAOI0mdaSdQMd3k0Gxhsg+eRo=
   - secure: |-
-      Ex+cw8adFNwK7UJ1DQTz0FHprhkohsNJqRwNYrvHmaW9bIZIOAj+14uTHpN1
-      u1zteyW91/Lro9JQ32b31TXWlLG0ftl+L8WdOp9+Mx36CbvwKSvxwuTkreg/
-      UUdL2mBKMMdt+HCC8rvTnMuZhCkfqtpZIbSGQvIOZlhDdeULZFw=
+      kC9hGpdJJesmZZGMXEoPWK/lzIU6vUeguV/yI2jLgRin0EKPsgds0qR4737x
+      2Z2q1+CFUlvHkl+povGcm0/A1rkNqU0KKBcxRBu/XXRxJ3DWp7gIGsmoyWUW
+      68kdPOwxywZ+tj6BCD7zmStKn4I3mSzTmGKaWj8ZT0wQ91tl0Y8=
   - secure: |-
-      BAhyQxN6cQv9PQgtSYG2HjuOHbhfX8bePJ7QA5wQpqh5NG2jFviY/AQMAt3t
-      l7jd8ZFscac4nygpypX1T3VBd7ZjN94SND17KiLC98SSW8lJPh4Ef/+4/6L3
-      /ZSFsZebbr3y5E8Dzm5bzVlOVDC+o2mTDF51ckr+0l4VhAu6vE0=
+      Y0M90wCpDWmSdBmgPCV2N9mMSaRMdEOis5r5sfUq/5aFTB/KDaSR9scM1g+L
+      21OtvUBvaG1bdSzn0T+I5Fs/MkfbtTmuahogy83nsNDRpIZJmRIsHFmJw1fz
+      nEHD2Kbm4iLMYzrKto77KpxYSQMnc3sQKZjreaI31NLu+7raCAk=
   - SCREEN_NAME=__twython__
   - PROTECTED_TWITTER_1=TwythonSecure1
   - PROTECTED_TWITTER_2=TwythonSecure2
