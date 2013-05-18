@@ -411,11 +411,6 @@ class TwythonAPITestCase(unittest.TestCase):
         information for, closest to a specified location succeeds'''
         self.api.get_closest_trends(lat='37', long='-122')
 
-    # Spam Reporting
-    def test_report_spam(self):
-        '''Test reporting user succeeds'''
-        self.api.report_spam(screen_name='justinbieber')
-
 
 if __name__ == '__main__':
     unittest.main()
