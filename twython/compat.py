@@ -20,18 +20,10 @@ if is_py2:
     except ImportError:
         from cgi import parse_qsl
 
-    builtin_str = str
-    bytes = str
-    str = unicode
     basestring = basestring
-    numeric_types = (int, long, float)
 
 
 elif is_py3:
     from urllib.parse import urlencode, quote_plus, parse_qsl
 
-    builtin_str = str
-    str = str
-    bytes = bytes
     basestring = (str, bytes)
-    numeric_types = (int, float)
