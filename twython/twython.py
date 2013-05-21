@@ -348,9 +348,9 @@ class Twython(object):
         return Twython.construct_api_url(base_url, params)
 
     @staticmethod
-    def construct_api_url(base_url, params):
+    def construct_api_url(base_url, params=None):
         querystring = []
-        params, _ = _transparent_params(params)
+        params, _ = _transparent_params(params or {})
         params = requests.utils.to_key_val_list(params)
         for (k, v) in params:
             querystring.append(
