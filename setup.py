@@ -32,9 +32,10 @@ setup(
     author_email='ryan@venodesigns.net',
     license='MIT License',
     url='http://github.com/ryanmcgrath/twython/tree/master',
-    keywords='twitter search api tweet twython',
-    description='An easy (and up to date) way to access Twitter data with Python.',
-    long_description=open('README.rst').read(),
+    keywords='twitter search api tweet twython stream',
+    description='Actively maintained, pure Python wrapper for the Twitter API. Supports both normal and streaming Twitter APIs',
+    long_description=open('README.rst').read() + '\n\n' +
+                     open('HISTORY.rst').read(),
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
