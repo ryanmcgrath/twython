@@ -1,7 +1,9 @@
+.. :changelog:
+
 History
 -------
 
-2.10.0 (2013-05-xx)
+2.10.0 (2013-05-21)
 ++++++++++++++++++
 - Added ``get_retweeters_ids`` method
 - Fixed ``TwythonDeprecationWarning`` on camelCase functions if the camelCase was the same as the PEP8 function (i.e. ``Twython.retweet`` did not change)
@@ -11,6 +13,7 @@ History
 - Not part of the python package, but tests are now available along with Travis CI hooks
 - Added ``__repr__`` definition for Twython, when calling only returning <Twython: APP_KEY>
 - Cleaned up ``Twython.construct_api_url``, uses "transparent" parameters (see 4th bullet in this version for explaination)
+- Update ``requests`` and ``requests-oauthlib`` requirements, fixing posting files AND post data together, making authenticated requests in general in Python 3.3
 
 2.9.1 (2013-05-04)
 ++++++++++++++++++
