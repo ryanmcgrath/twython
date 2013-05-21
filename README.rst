@@ -1,6 +1,8 @@
 Twython
 =======
 
+.. image:: https://travis-ci.org/ryanmcgrath/twython.png?branch=master
+        :target: https://travis-ci.org/ryanmcgrath/twython
 .. image:: https://pypip.in/d/twython/badge.png
         :target: https://crate.io/packages/twython/
 
