@@ -25,7 +25,7 @@ setup(
     include_package_data=True,
 
     # Package dependencies.
-    install_requires=['requests==1.2.1', 'requests_oauthlib==0.3.1'],
+    install_requires=['requests==1.2.2', 'requests_oauthlib==0.3.2'],
 
     # Metadata for PyPI.
     author='Ryan McGrath',
