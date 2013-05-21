@@ -9,6 +9,9 @@ History
 - Added "transparent" parameters for making requests, meaning users can pass bool values (True, False) to Twython methods and we convert your params in the background to satisfy the Twitter API. Also, file objects can now be passed seamlessly (see examples in README and in /examples dir for details)
 - Callback URL is optional in ``get_authentication_tokens`` to accomedate those using OOB authorization (non web clients)
 - Not part of the python package, but tests are now available along with Travis CI hooks
+- Added ``__repr__`` definition for Twython, when calling only returning <Twython: APP_KEY>
+- Removed ``Twython.unicode2utf8`` and ``Twython.encode`` methods
+- Cleaned up ``Twython.construct_api_url``, uses "transparent" parameters (see 4th bullet in this version for explaination)
 
 2.9.1 (2013-05-04)
 ++++++++++++++++++

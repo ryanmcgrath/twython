@@ -6,10 +6,10 @@ from requests_oauthlib import OAuth1
 
 from . import __version__
 from .advisory import TwythonDeprecationWarning
-from .compat import json, urlencode, parse_qsl, quote_plus
+from .compat import json, urlencode, parse_qsl, quote_plus, str
 from .endpoints import api_table
 from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
-from .helpers import _transparent_params
+from .helpers import _encode, _transparent_params
 
 warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
 
@@ -105,6 +105,9 @@ class Twython(object):
 
         # create stash for last call intel
         self._last_call = None
+
+    def __repr__(self):
+        return '<Twython: %s>' % (self.app_key)
 
     def _constructFunc(self, api_call, deprecated_key, **kwargs):
         # Go through and replace any mustaches that are in our API url.
@@ -346,7 +349,14 @@ class Twython(object):
 
     @staticmethod
     def construct_api_url(base_url, params):
-        return base_url + '?' + '&'.join(['%s=%s' % (Twython.unicode2utf8(key), quote_plus(Twython.unicode2utf8(value))) for (key, value) in params.iteritems()])
+        querystring = []
+        params, _ = _transparent_params(params)
+        params = requests.utils.to_key_val_list(params)
+        for (k, v) in params:
+            querystring.append(
+                '%s=%s' % (_encode(k), quote_plus(_encode(v)))
+            )
+        return '%s?%s' % (base_url, '&'.join(querystring))
 
     def searchGen(self, search_query, **kwargs):
         warnings.warn(
@@ -383,18 +393,3 @@ class Twython(object):
 
         for tweet in self.searchGen(search_query, **kwargs):
             yield tweet
-
-    @staticmethod
-    def unicode2utf8(text):
-        try:
-            if isinstance(text, unicode):
-                text = text.encode('utf-8')
-        except:
-            pass
-        return text
-
-    @staticmethod
-    def encode(text):
-        if isinstance(text, (str, unicode)):
-            return Twython.unicode2utf8(text)
-        return str(text)

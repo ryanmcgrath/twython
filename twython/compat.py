@@ -20,10 +20,12 @@ if is_py2:
     except ImportError:
         from cgi import parse_qsl
 
+    str = unicode
     basestring = basestring
 
 
 elif is_py3:
     from urllib.parse import urlencode, quote_plus, parse_qsl
 
+    str = str
     basestring = (str, bytes)
