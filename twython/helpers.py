@@ -1,4 +1,4 @@
-from .compat import basestring, is_py2, str
+from .compat import basestring
 
 
 def _transparent_params(_params):
@@ -17,9 +17,3 @@ def _transparent_params(_params):
         else:
             continue
     return params, files
-
-
-def _encode(value):
-    if is_py2 and isinstance(value, str):
-        value.encode('utf-8')
-    return value

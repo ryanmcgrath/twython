@@ -6,10 +6,10 @@ from requests_oauthlib import OAuth1
 
 from . import __version__
 from .advisory import TwythonDeprecationWarning
-from .compat import json, urlencode, parse_qsl, quote_plus, str
+from .compat import json, urlencode, parse_qsl, quote_plus, str, is_py2
 from .endpoints import api_table
 from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
-from .helpers import _encode, _transparent_params
+from .helpers import _transparent_params
 
 warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
 
@@ -354,7 +354,7 @@ class Twython(object):
         params = requests.utils.to_key_val_list(params)
         for (k, v) in params:
             querystring.append(
-                '%s=%s' % (_encode(k), quote_plus(_encode(v)))
+                '%s=%s' % (Twython.encode(k), quote_plus(Twython.encode(v)))
             )
         return '%s?%s' % (base_url, '&'.join(querystring))
 
@@ -393,3 +393,18 @@ class Twython(object):
 
         for tweet in self.searchGen(search_query, **kwargs):
             yield tweet
+
+    @staticmethod
+    def unicode2utf8(text):
+        try:
+            if is_py2 and isinstance(text, str):
+                text = text.encode('utf-8')
+        except:
+            pass
+        return text
+
+    @staticmethod
+    def encode(text):
+        if is_py2 and isinstance(text, (str)):
+            return Twython.unicode2utf8(text)
+        return str(text)
