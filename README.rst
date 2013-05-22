@@ -153,6 +153,7 @@ and
 Posting a Status with an Image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
+
     from twython import Twython
 
     t = Twython(app_key, app_secret,
@@ -170,6 +171,7 @@ Posting a Status with an Image
 Posting a Status with an Editing Image  *(This example resizes an image)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
+
     from twython import Twython
 
     t = Twython(app_key, app_secret,
