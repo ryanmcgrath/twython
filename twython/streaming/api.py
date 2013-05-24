@@ -1,5 +1,5 @@
 from .. import __version__
-from ..compat import json
+from ..compat import json, is_py3
 from ..exceptions import TwythonStreamError
 from .types import TwythonStreamerTypes
 
@@ -93,7 +93,11 @@ class TwythonStreamer(object):
                     break
                 if line:
                     try:
-                        self.on_success(json.loads(line))
+                        if not is_py3:
+                            self.on_success(json.loads(line))
+                        else:
+                            line = line.decode('utf-8')
+                            self.on_success(json.loads(line))
                     except ValueError:
                         raise TwythonStreamError('Response was not valid JSON, \
                                                   unable to decode.')

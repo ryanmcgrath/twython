@@ -102,7 +102,7 @@ class TwythonAPITestCase(unittest.TestCase):
         counter = 0
         while counter < 2:
             counter += 1
-            result = search.next()
+            result = next(search)
             new_id_str = int(result['id_str'])
             if counter == 1:
                 prev_id_str = new_id_str
