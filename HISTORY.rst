@@ -3,6 +3,13 @@
 History
 -------
 
+2.10.1 (2013-05-xx)
+++++++++++++++++++
+- More test coverage!
+- Fix ``search_gen``
+- Fixed ``get_lastfunction_header`` to actually do what its docstring says, returns ``None`` if header is not found
+- Updated some internal API code, ``__init__`` didn't need to have ``self.auth`` and ``self.headers`` because they were never used anywhere else but the ``__init__``
+
 2.10.0 (2013-05-21)
 ++++++++++++++++++
 - Added ``get_retweeters_ids`` method

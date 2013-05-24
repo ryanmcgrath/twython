@@ -18,7 +18,7 @@ Questions, comments? ryan@venodesigns.net
 """
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '2.10.0'
+__version__ = '2.10.1'
 
 from .twython import Twython
 from .streaming import TwythonStreamer

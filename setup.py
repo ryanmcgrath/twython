@@ -1,10 +1,12 @@
+#!/usr/bin/env python
+
 import os
 import sys
 
 from setuptools import setup
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '2.10.0'
+__version__ = '2.10.1'
 
 packages = [
     'twython',

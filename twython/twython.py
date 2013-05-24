@@ -59,27 +59,27 @@ class Twython(object):
                 stacklevel=2
             )
 
-        self.headers = {'User-Agent': 'Twython v' + __version__}
+        req_headers = {'User-Agent': 'Twython v' + __version__}
         if headers:
-            self.headers.update(headers)
+            req_headers.update(headers)
 
         # Generate OAuth authentication object for the request
-        # If no keys/tokens are passed to __init__, self.auth=None allows for
+        # If no keys/tokens are passed to __init__, auth=None allows for
         # unauthenticated requests, although I think all v1.1 requests need auth
-        self.auth = None
+        auth = None
         if self.app_key is not None and self.app_secret is not None and \
            self.oauth_token is None and self.oauth_token_secret is None:
-            self.auth = OAuth1(self.app_key, self.app_secret)
+            auth = OAuth1(self.app_key, self.app_secret)
 
         if self.app_key is not None and self.app_secret is not None and \
            self.oauth_token is not None and self.oauth_token_secret is not None:
-            self.auth = OAuth1(self.app_key, self.app_secret,
-                               self.oauth_token, self.oauth_token_secret)
+            auth = OAuth1(self.app_key, self.app_secret,
+                          self.oauth_token, self.oauth_token_secret)
 
         self.client = requests.Session()
-        self.client.headers = self.headers
+        self.client.headers = req_headers
         self.client.proxies = proxies
-        self.client.auth = self.auth
+        self.client.auth = auth
         self.client.verify = ssl_verify
 
         # register available funcs to allow listing name when debugging.
@@ -208,7 +208,7 @@ class Twython(object):
 
     def request(self, endpoint, method='GET', params=None, version='1.1'):
         # In case they want to pass a full Twitter URL
-        # i.e. https://search.twitter.com/
+        # i.e. https://api.twitter.com/1.1/search/tweets.json
         if endpoint.startswith('http://') or endpoint.startswith('https://'):
             url = endpoint
         else:
@@ -241,9 +241,11 @@ class Twython(object):
         """
         if self._last_call is None:
             raise TwythonError('This function must be called after an API call.  It delivers header information.')
+
         if header in self._last_call['headers']:
             return self._last_call['headers'][header]
-        return self._last_call
+        else:
+            return None
 
     def get_authentication_tokens(self, callback_url=None, force_login=False, screen_name=''):
         """Returns a dict including an authorization URL (auth_url) to direct a user to
@@ -325,7 +327,7 @@ class Twython(object):
             stacklevel=2
         )
 
-        if shortener == '':
+        if not shortener:
             raise TwythonError('Please provide a URL shortening service.')
 
         request = requests.get(shortener, params={
@@ -336,7 +338,7 @@ class Twython(object):
         if request.status_code in [301, 201, 200]:
             return request.text
         else:
-            raise TwythonError('shortenURL() failed with a %s error code.' % request.status_code)
+            raise TwythonError('shorten_url failed with a %s error code.' % request.status_code)
 
     @staticmethod
     def constructApiURL(base_url, params):
@@ -373,17 +375,16 @@ class Twython(object):
 
             See Twython.search() for acceptable parameters
 
-            e.g search = x.searchGen('python')
+            e.g search = x.search_gen('python')
                 for result in search:
                     print result
         """
-        kwargs['q'] = search_query
         content = self.search(q=search_query, **kwargs)
 
-        if not content['results']:
+        if not content.get('statuses'):
             raise StopIteration
 
-        for tweet in content['results']:
+        for tweet in content['statuses']:
             yield tweet
 
         try:
