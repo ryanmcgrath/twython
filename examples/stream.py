@@ -4,6 +4,8 @@ from twython import TwythonStreamer
 class MyStreamer(TwythonStreamer):
     def on_success(self, data):
         print data
+        # Want to disconnect after the first result?
+        # self.disconnect()
 
     def on_error(self, status_code, data):
         print status_code, data

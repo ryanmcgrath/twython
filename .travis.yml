@@ -26,7 +26,7 @@ env:
   - PROTECTED_TWITTER_2=TwythonSecure2
   - TEST_TWEET_ID=332992304010899457
   - TEST_LIST_ID=574
-script: nosetests -v test_twython:TwythonAPITestCase test_twython:TwythonAuthTestCase --logging-filter="twython" --cover-package="twython" --with-coverage
+script: nosetests -v test_twython:TwythonAPITestCase test_twython:TwythonAuthTestCase test_twython:TwythonStreamTestCase --logging-filter="twython" --cover-package="twython" --with-coverage
 install: pip install -r requirements.txt
 notifications:
   email: false

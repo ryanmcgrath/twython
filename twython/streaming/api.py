@@ -55,41 +55,48 @@ class TwythonStreamer(object):
         self.user = StreamTypes.user
         self.site = StreamTypes.site
 
+        self.connected = False
+
     def _request(self, url, method='GET', params=None):
         """Internal stream request handling"""
+        self.connected = True
         retry_counter = 0
 
         method = method.lower()
         func = getattr(self.client, method)
 
         def _send(retry_counter):
-            try:
-                if method == 'get':
-                    response = func(url, params=params, timeout=self.timeout)
-                else:
-                    response = func(url, data=params, timeout=self.timeout)
-            except requests.exceptions.Timeout:
-                self.on_timeout()
-            else:
-                if response.status_code != 200:
-                    self.on_error(response.status_code, response.content)
-
-                if self.retry_count and (self.retry_count - retry_counter) > 0:
-                    time.sleep(self.retry_in)
-                    retry_counter += 1
-                    _send(retry_counter)
-
-                return response
-
-        response = _send(retry_counter)
-
-        for line in response.iter_lines():
-            if line:
+            while self.connected:
                 try:
-                    self.on_success(json.loads(line))
-                except ValueError:
-                    raise TwythonStreamError('Response was not valid JSON, \
-                                              unable to decode.')
+                    if method == 'get':
+                        response = func(url, params=params, timeout=self.timeout)
+                    else:
+                        response = func(url, data=params, timeout=self.timeout)
+                except requests.exceptions.Timeout:
+                    self.on_timeout()
+                else:
+                    if response.status_code != 200:
+                        self.on_error(response.status_code, response.content)
+
+                    if self.retry_count and (self.retry_count - retry_counter) > 0:
+                        time.sleep(self.retry_in)
+                        retry_counter += 1
+                        _send(retry_counter)
+
+                    return response
+
+        while self.connected:
+            response = _send(retry_counter)
+
+            for line in response.iter_lines():
+                if not self.connected:
+                    break
+                if line:
+                    try:
+                        self.on_success(json.loads(line))
+                    except ValueError:
+                        raise TwythonStreamError('Response was not valid JSON, \
+                                                  unable to decode.')
 
     def on_success(self, data):
         """Called when data has been successfull received from the stream
@@ -161,3 +168,6 @@ class TwythonStreamer(object):
 
     def on_timeout(self):
         return
+
+    def disconnect(self):
+        self.connected = False

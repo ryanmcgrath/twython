@@ -22,4 +22,7 @@ __version__ = '2.10.1'
 
 from .twython import Twython
 from .streaming import TwythonStreamer
-from .exceptions import TwythonError, TwythonRateLimitError, TwythonAuthError
+from .exceptions import (
+    TwythonError, TwythonRateLimitError, TwythonAuthError,
+    TwythonStreamError
+)

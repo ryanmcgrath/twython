@@ -388,11 +388,12 @@ class Twython(object):
             yield tweet
 
         try:
-            kwargs['page'] = 2 if not 'page' in kwargs else (int(kwargs['page']) + 1)
+            if not 'since_id' in kwargs:
+                kwargs['since_id'] = (int(content['statuses'][0]['id_str']) + 1)
         except (TypeError, ValueError):
             raise TwythonError('Unable to generate next page of search results, `page` is not a number.')
 
-        for tweet in self.searchGen(search_query, **kwargs):
+        for tweet in self.search_gen(search_query, **kwargs):
             yield tweet
 
     @staticmethod
