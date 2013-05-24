@@ -35,12 +35,12 @@ class TwythonAuthTestCase(unittest.TestCase):
     def test_get_authentication_tokens_bad_tokens(self):
         '''Test getting authentication tokens with bad tokens
         raises TwythonAuthError'''
-        self.assertRaises(TwythonAuthError, self.api.get_authentication_tokens,
+        self.assertRaises(TwythonAuthError, self.bad_api.get_authentication_tokens,
                           callback_url='http://google.com/')
 
     def test_get_authorized_tokens_bad_tokens(self):
         '''Test getting final tokens fails with wrong tokens'''
-        self.assertRaises(TwythonError, self.api.get_authorized_tokens,
+        self.assertRaises(TwythonError, self.bad_api.get_authorized_tokens,
                           'BAD_OAUTH_VERIFIER')
 
 
