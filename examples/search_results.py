@@ -7,6 +7,6 @@ try:
 except TwythonError as e:
     print e
 
-for tweet in search_results['results']:
-    print 'Tweet from @%s Date: %s' % (tweet['from_user'].encode('utf-8'), tweet['created_at'])
+for tweet in search_results['statuses']:
+    print 'Tweet from @%s Date: %s' % (tweet['user']['screen_name'].encode('utf-8'), tweet['created_at'])
     print tweet['text'].encode('utf-8'), '\n'
