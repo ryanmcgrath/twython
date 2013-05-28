@@ -12,7 +12,7 @@ def _transparent_params(_params):
                 params[k] = 'true'
             else:
                 params[k] = 'false'
-        elif isinstance(v, basestring) or isinstance(v, int):
+        elif isinstance(v, basestring) or isinstance(v, (long,int)):
             params[k] = v
         else:
             continue
