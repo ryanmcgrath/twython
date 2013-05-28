@@ -3,7 +3,8 @@ from twython import TwythonStreamer
 
 class MyStreamer(TwythonStreamer):
     def on_success(self, data):
-        print data
+        if 'text' in data:
+            print data['text'].encode('utf-8')
         # Want to disconnect after the first result?
         # self.disconnect()
 

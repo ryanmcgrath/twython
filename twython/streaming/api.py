@@ -13,6 +13,7 @@ class TwythonStreamer(object):
     def __init__(self, app_key, app_secret, oauth_token, oauth_token_secret,
                  timeout=300, retry_count=None, retry_in=10, headers=None):
         """Streaming class for a friendly streaming user experience
+        Authentication IS required to use the Twitter Streaming API
 
         :param app_key: (required) Your applications key
         :param app_secret: (required) Your applications secret key
@@ -99,8 +100,9 @@ class TwythonStreamer(object):
                             line = line.decode('utf-8')
                             self.on_success(json.loads(line))
                     except ValueError:
-                        raise TwythonStreamError('Response was not valid JSON, \
-                                                  unable to decode.')
+                        self.on_error(response.status_code, 'Unable to decode response, not vaild JSON.')
+
+        response.close()
 
     def on_success(self, data):
         """Called when data has been successfull received from the stream

@@ -154,22 +154,6 @@ class TwythonAPITestCase(unittest.TestCase):
         status = self.api.update_status(status='Test post just to get deleted :(')
         self.api.destroy_status(id=status['id_str'])
 
-    def test_retweet(self):
-        '''Test retweeting a status succeeds'''
-        retweet = self.api.retweet(id='99530515043983360')
-        self.api.destroy_status(id=retweet['id_str'])
-
-    def test_retweet_twice(self):
-        '''Test that trying to retweet a tweet twice raises a TwythonError'''
-        tweets = self.api.search(q='twitter').get('statuses')
-        if tweets:
-            retweet = self.api.retweet(id=tweets[0]['id_str'])
-            self.assertRaises(TwythonError, self.api.retweet,
-                              id=tweets[0]['id_str'])
-
-        # Then clean up
-        self.api.destroy_status(id=retweet['id_str'])
-
     def test_get_oembed_tweet(self):
         '''Test getting info to embed tweet on Third Party site succeeds'''
         self.api.get_oembed_tweet(id='99530515043983360')

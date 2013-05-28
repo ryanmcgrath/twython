@@ -11,6 +11,7 @@ History
 - Updated some internal API code, ``__init__`` didn't need to have ``self.auth`` and ``self.headers`` because they were never used anywhere else but the ``__init__``
 - Added ``disconnect`` method to ``TwythonStreamer``, allowing users to disconnect as they desire
 - Updated ``TwythonStreamError`` docstring, also allow importing it from ``twython``
+- No longer raise ``TwythonStreamError`` when stream line can't be decoded. Instead, sends signal to ``TwythonStreamer.on_error``
 
 2.10.0 (2013-05-21)
 ++++++++++++++++++
