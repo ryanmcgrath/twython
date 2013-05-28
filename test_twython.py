@@ -180,7 +180,7 @@ class TwythonAPITestCase(unittest.TestCase):
     def test_send_get_and_destroy_direct_message(self):
         '''Test sending, getting, then destory a direct message succeeds'''
         message = self.api.send_direct_message(screen_name=protected_twitter_1,
-                                               text='Hey d00d!')
+                                               text='Hey d00d! %s' % int(time.time()))
 
         self.api.get_direct_message(id=message['id_str'])
         self.api.destroy_direct_message(id=message['id_str'])
