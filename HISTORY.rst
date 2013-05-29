@@ -12,6 +12,7 @@ History
 - Added ``disconnect`` method to ``TwythonStreamer``, allowing users to disconnect as they desire
 - Updated ``TwythonStreamError`` docstring, also allow importing it from ``twython``
 - No longer raise ``TwythonStreamError`` when stream line can't be decoded. Instead, sends signal to ``TwythonStreamer.on_error``
+- Allow for (int, long, float) params to be passed to Twython Twitter API functions in Python 2, and (int, float) in Python 3
 
 2.10.0 (2013-05-21)
 ++++++++++++++++++
