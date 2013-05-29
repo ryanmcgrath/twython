@@ -1,7 +1,11 @@
-import unittest
-import os
+from twython import(
+    Twython, TwythonStreamer, TwythonError,
+    TwythonAuthError, TwythonStreamError
+)
 
-from twython import Twython, TwythonError, TwythonAuthError
+import os
+import time
+import unittest
 
 app_key = os.environ.get('APP_KEY')
 app_secret = os.environ.get('APP_SECRET')
@@ -24,6 +28,7 @@ test_list_id = os.environ.get('TEST_LIST_ID', '574')  # 574 is @twitter/team
 class TwythonAuthTestCase(unittest.TestCase):
     def setUp(self):
         self.api = Twython(app_key, app_secret)
+        self.bad_api = Twython('BAD_APP_KEY', 'BAD_APP_SECRET')
 
     def test_get_authentication_tokens(self):
         '''Test getting authentication tokens works'''
@@ -31,11 +36,83 @@ class TwythonAuthTestCase(unittest.TestCase):
                                            force_login=True,
                                            screen_name=screen_name)
 
+    def test_get_authentication_tokens_bad_tokens(self):
+        '''Test getting authentication tokens with bad tokens
+        raises TwythonAuthError'''
+        self.assertRaises(TwythonAuthError, self.bad_api.get_authentication_tokens,
+                          callback_url='http://google.com/')
+
+    def test_get_authorized_tokens_bad_tokens(self):
+        '''Test getting final tokens fails with wrong tokens'''
+        self.assertRaises(TwythonError, self.bad_api.get_authorized_tokens,
+                          'BAD_OAUTH_VERIFIER')
+
 
 class TwythonAPITestCase(unittest.TestCase):
     def setUp(self):
         self.api = Twython(app_key, app_secret,
-                           oauth_token, oauth_token_secret)
+                           oauth_token, oauth_token_secret,
+                           headers={'User-Agent': '__twython__ Test'})
+
+    def test_construct_api_url(self):
+        '''Test constructing a Twitter API url works as we expect'''
+        url = 'https://api.twitter.com/1.1/search/tweets.json'
+        constructed_url = self.api.construct_api_url(url, {'q': '#twitter'})
+        self.assertEqual(constructed_url, 'https://api.twitter.com/1.1/search/tweets.json?q=%23twitter')
+
+    def test_shorten_url(self):
+        '''Test shortening a url works'''
+        self.api.shorten_url('http://google.com')
+
+    def test_shorten_url_no_shortner(self):
+        '''Test shortening a url with no shortener provided raises TwythonError'''
+        self.assertRaises(TwythonError, self.api.shorten_url,
+                          'http://google.com', '')
+
+    def test_get(self):
+        '''Test Twython generic GET request works'''
+        self.api.get('account/verify_credentials')
+
+    def test_post(self):
+        '''Test Twython generic POST request works, with a full url and
+        with just an endpoint'''
+        update_url = 'https://api.twitter.com/1.1/statuses/update.json'
+        status = self.api.post(update_url, params={'status': 'I love Twython!'})
+        self.api.post('statuses/destroy/%s' % status['id_str'])
+
+    def test_get_lastfunction_header(self):
+        '''Test getting last specific header of the last API call works'''
+        self.api.get('statuses/home_timeline')
+        self.api.get_lastfunction_header('x-rate-limit-remaining')
+
+    def test_get_lastfunction_header_not_present(self):
+        '''Test getting specific header that does not exist from the last call returns None'''
+        self.api.get('statuses/home_timeline')
+        header = self.api.get_lastfunction_header('does-not-exist')
+        self.assertEqual(header, None)
+
+    def test_get_lastfunction_header_no_last_api_call(self):
+        '''Test attempting to get a header when no API call was made raises a TwythonError'''
+        self.assertRaises(TwythonError, self.api.get_lastfunction_header,
+                          'no-api-call-was-made')
+
+    def test_search_gen(self):
+        '''Test looping through the generator results works, at least once that is'''
+        search = self.api.search_gen('twitter', count=1)
+        counter = 0
+        while counter < 2:
+            counter += 1
+            result = next(search)
+            new_id_str = int(result['id_str'])
+            if counter == 1:
+                prev_id_str = new_id_str
+                time.sleep(1)  # Give time for another tweet to come into search
+            if counter == 2:
+                self.assertTrue(new_id_str > prev_id_str)
+
+    def test_encode(self):
+        '''Test encoding UTF-8 works'''
+        self.api.encode('Twython is awesome!')
 
     # Timelines
     def test_get_mentions_timeline(self):
@@ -77,20 +154,6 @@ class TwythonAPITestCase(unittest.TestCase):
         status = self.api.update_status(status='Test post just to get deleted :(')
         self.api.destroy_status(id=status['id_str'])
 
-    def test_retweet(self):
-        '''Test retweeting a status succeeds'''
-        retweet = self.api.retweet(id='99530515043983360')
-        self.api.destroy_status(id=retweet['id_str'])
-
-    def test_retweet_twice(self):
-        '''Test that trying to retweet a tweet twice raises a TwythonError'''
-        retweet = self.api.retweet(id='99530515043983360')
-        self.assertRaises(TwythonError, self.api.retweet,
-                          id='99530515043983360')
-
-        # Then clean up
-        self.api.destroy_status(id=retweet['id_str'])
-
     def test_get_oembed_tweet(self):
         '''Test getting info to embed tweet on Third Party site succeeds'''
         self.api.get_oembed_tweet(id='99530515043983360')
@@ -117,7 +180,7 @@ class TwythonAPITestCase(unittest.TestCase):
     def test_send_get_and_destroy_direct_message(self):
         '''Test sending, getting, then destory a direct message succeeds'''
         message = self.api.send_direct_message(screen_name=protected_twitter_1,
-                                               text='Hey d00d!')
+                                               text='Hey d00d! %s' % int(time.time()))
 
         self.api.get_direct_message(id=message['id_str'])
         self.api.destroy_direct_message(id=message['id_str'])
@@ -132,7 +195,7 @@ class TwythonAPITestCase(unittest.TestCase):
     def test_get_user_ids_of_blocked_retweets(self):
         '''Test that collection of user_ids that the authenticated user does
         not want to receive retweets from succeeds'''
-        self.api.get_user_ids_of_blocked_retweets(stringify_ids='true')
+        self.api.get_user_ids_of_blocked_retweets(stringify_ids=True)
 
     def test_get_friends_ids(self):
         '''Test returning ids of users the authenticated user and then a random
@@ -410,6 +473,48 @@ class TwythonAPITestCase(unittest.TestCase):
         '''Test getting the locations that Twitter has trending topic
         information for, closest to a specified location succeeds'''
         self.api.get_closest_trends(lat='37', long='-122')
+
+
+class TwythonStreamTestCase(unittest.TestCase):
+    def setUp(self):
+        class MyStreamer(TwythonStreamer):
+            def on_success(self, data):
+                self.disconnect()
+
+            def on_error(self, status_code, data):
+                raise TwythonStreamError(data)
+
+            def on_delete(self, data):
+                return
+
+            def on_limit(self, data):
+                return
+
+            def on_disconnect(self, data):
+                return
+
+            def on_timeout(self, data):
+                return
+
+        self.api = MyStreamer(app_key, app_secret,
+                              oauth_token, oauth_token_secret)
+
+    def test_stream_status_filter(self):
+        self.api.statuses.filter(track='twitter')
+
+    def test_stream_status_sample(self):
+        self.api.statuses.sample()
+
+    def test_stream_status_firehose(self):
+        self.assertRaises(TwythonStreamError, self.api.statuses.firehose,
+                          track='twitter')
+
+    def test_stream_site(self):
+        self.assertRaises(TwythonStreamError, self.api.site,
+                          follow='twitter')
+
+    def test_stream_user(self):
+        self.api.user(track='twitter')
 
 
 if __name__ == '__main__':

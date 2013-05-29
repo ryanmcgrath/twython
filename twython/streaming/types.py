@@ -61,7 +61,7 @@ class TwythonStreamerTypesStatuses(object):
         self.streamer._request(url, params=params)
 
     def firehose(self, **params):
-        """Stream statuses/filter
+        """Stream statuses/firehose
 
         Accepted params found at:
         https://dev.twitter.com/docs/api/1.1/get/statuses/firehose
