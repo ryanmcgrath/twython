@@ -1,6 +1,7 @@
 Twython
 =======
 
+
 .. image:: https://travis-ci.org/ryanmcgrath/twython.png?branch=master
         :target: https://travis-ci.org/ryanmcgrath/twython
 .. image:: https://pypip.in/d/twython/badge.png
@@ -12,16 +13,16 @@ Features
 --------
 
 * Query data for:
-   - User information
-   - Twitter lists
-   - Timelines
-   - Direct Messages
-   - and anything found in `the docs <https://dev.twitter.com/docs/api/1.1>`_
+    - User information
+    - Twitter lists
+    - Timelines
+    - Direct Messages
+    - and anything found in `the docs <https://dev.twitter.com/docs/api/1.1>`_
 * Image Uploading!
-   - **Update user status with an image**
-   - Change user avatar
-   - Change user background image
-   - Change user banner image
+    - **Update user status with an image**
+    - Change user avatar
+    - Change user background image
+    - Change user banner image
 * Support for Twitter's Streaming API
 * Seamless Python 3 support!
 
@@ -31,7 +32,7 @@ Installation
 
     pip install twython
 
-... or, you can clone the repo and install it the old fashioned way
+or, you can clone the repo and install it the old fashioned way
 
 ::
 
@@ -118,6 +119,7 @@ Catching exceptions
 
 Dynamic function arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     Keyword arguments to functions are mapped to the functions available for each endpoint in the Twitter API docs. Doing this allows us to be incredibly flexible in querying the Twitter API, so changes to the API aren't held up from you using them by this library.
 
     https://dev.twitter.com/docs/api/1.1/post/statuses/update says it takes "status" amongst other arguments
@@ -134,10 +136,9 @@ Dynamic function arguments
     except TwythonError as e:
         print e
 
-and
-    https://dev.twitter.com/docs/api/1.1/get/search/tweets says it takes "q" and "result_type" amongst other arguments
-
 ::
+
+    # https://dev.twitter.com/docs/api/1.1/get/search/tweets says it takes "q" and "result_type" amongst other arguments
 
     from twython import Twython, TwythonAuthError
 
@@ -152,6 +153,7 @@ and
 
 Posting a Status with an Image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 ::
 
     from twython import Twython
@@ -170,6 +172,7 @@ Posting a Status with an Image
 
 Posting a Status with an Editing Image  *(This example resizes an image)*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 ::
 
     from twython import Twython
@@ -225,11 +228,13 @@ Streaming API
 
 Notes
 -----
+
 * Twython (as of 2.7.0) now supports ONLY Twitter v1.1 endpoints! Please see the **[Twitter v1.1 API Documentation](https://dev.twitter.com/docs/api/1.1)** to help migrate your API calls!
 * As of Twython 2.9.1, all method names conform to PEP8 standards. For backwards compatibility, we internally check and catch any calls made using the old (pre 2.9.1) camelCase method syntax. We will continue to support this for the foreseeable future for all old methods (raising a DeprecationWarning where appropriate), but you should update your code if you have the time.
 
 Questions, Comments, etc?
 -------------------------
+
 My hope is that Twython is so simple that you'd never *have* to ask any questions, but if you feel the need to contact me for this (or other) reasons, you can hit me up at ryan@venodesigns.net.
 
 Or if I'm to busy to answer, feel free to ping mikeh@ydekproductions.com as well.
@@ -241,4 +246,5 @@ Follow us on Twitter:
 
 Want to help?
 -------------
+
 Twython is useful, but ultimately only as useful as the people using it (say that ten times fast!). If you'd like to help, write example code, contribute patches, document things on the wiki, tweet about it. Your help is always appreciated!
