@@ -3,7 +3,7 @@
 History
 -------
 
-2.10.1 (2013-05-xx)
+2.10.1 (2013-05-29)
 ++++++++++++++++++
 - More test coverage!
 - Fix ``search_gen``
