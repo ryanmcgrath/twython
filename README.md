@@ -138,7 +138,7 @@ except TwythonError as e:
     print e
 ```
 
-#### Posting a Status with an Image
+##### Posting a Status with an Image
 ```python
 from twython import Twython
 
@@ -155,15 +155,14 @@ photo = open('/path/to/file/image.jpg', 'rb')
 t.update_status_with_media(media=photo, status='Check out my image!')
 ```
 
-#### Posting a Status with an Editing Image  *(This example resizes an image)*
+##### Posting a Status with an Editing Image  *(This example resizes an image)*
 ```python
 from twython import Twython
 
 t = Twython(app_key, app_secret,
             oauth_token, oauth_token_secret)
 
-# Like I said in the previous section, you can pass any object that has a
-# read() method
+# Like said in the previous section, you can pass any object that has a read() method
 
 # Assume you are working with a JPEG
 
