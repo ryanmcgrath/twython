@@ -39,3 +39,4 @@ Patches and Suggestions
 - `Paul Solbach <https://github.com/hansenrum>`_, fixed requirement for oauth_verifier
 - `Greg Nofi <https://github.com/nofeet>`_, fixed using built-in Exception attributes for storing & retrieving error message
 - `Jonathan Vanasco <https://github.com/jvanasco>`_, Debugging support, error_code tracking, Twitter error API tracking, other fixes
+- `DevDave <https://github.com/devdave>`_, quick fix for longs with helper._transparent_params
