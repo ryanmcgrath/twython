@@ -3,6 +3,17 @@
 History
 -------
 
+2.10.1 (2013-05-xx)
+++++++++++++++++++
+- More test coverage!
+- Fix ``search_gen``
+- Fixed ``get_lastfunction_header`` to actually do what its docstring says, returns ``None`` if header is not found
+- Updated some internal API code, ``__init__`` didn't need to have ``self.auth`` and ``self.headers`` because they were never used anywhere else but the ``__init__``
+- Added ``disconnect`` method to ``TwythonStreamer``, allowing users to disconnect as they desire
+- Updated ``TwythonStreamError`` docstring, also allow importing it from ``twython``
+- No longer raise ``TwythonStreamError`` when stream line can't be decoded. Instead, sends signal to ``TwythonStreamer.on_error``
+- Allow for (int, long, float) params to be passed to Twython Twitter API functions in Python 2, and (int, float) in Python 3
+
 2.10.0 (2013-05-21)
 ++++++++++++++++++
 - Added ``get_retweeters_ids`` method
