@@ -1,4 +1,4 @@
-from .compat import basestring
+from .compat import basestring, numeric_types
 
 
 def _transparent_params(_params):
@@ -12,7 +12,7 @@ def _transparent_params(_params):
                 params[k] = 'true'
             else:
                 params[k] = 'false'
-        elif isinstance(v, basestring) or isinstance(v, int):
+        elif isinstance(v, basestring) or isinstance(v, numeric_types):
             params[k] = v
         else:
             continue

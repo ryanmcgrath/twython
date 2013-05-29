@@ -22,6 +22,7 @@ if is_py2:
 
     str = unicode
     basestring = basestring
+    numeric_types = (int, long, float)
 
 
 elif is_py3:
@@ -29,3 +30,4 @@ elif is_py3:
 
     str = str
     basestring = (str, bytes)
+    numeric_types = (int, float)
