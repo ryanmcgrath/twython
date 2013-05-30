@@ -12,6 +12,7 @@ History
 - ``twitter_token``, ``twitter_secret`` and ``callback_url`` are no longer passed to ``Twython.__init__``
     - ``twitter_token`` and ``twitter_secret`` have been replaced with ``app_key`` and ``app_secret`` respectively
     - ``callback_url`` is now passed through ``Twython.get_authentication_tokens``
+- Update ``test_twython.py`` docstrings per http://www.python.org/dev/peps/pep-0257/
 
 2.10.1 (2013-05-29)
 ++++++++++++++++++
