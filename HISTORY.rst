@@ -5,6 +5,7 @@ History
 
 2.10.1 (2013-05-29)
 ++++++++++++++++++
+
 - More test coverage!
 - Fix ``search_gen``
 - Fixed ``get_lastfunction_header`` to actually do what its docstring says, returns ``None`` if header is not found
@@ -16,6 +17,7 @@ History
 
 2.10.0 (2013-05-21)
 ++++++++++++++++++
+
 - Added ``get_retweeters_ids`` method
 - Fixed ``TwythonDeprecationWarning`` on camelCase functions if the camelCase was the same as the PEP8 function (i.e. ``Twython.retweet`` did not change)
 - Fixed error message bubbling when error message returned from Twitter was not an array (i.e. if you try to retweet something twice, the error is not found at index 0)
