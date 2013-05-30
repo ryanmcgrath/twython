@@ -1,24 +1,19 @@
 import re
-import warnings
 
 import requests
 from requests_oauthlib import OAuth1
 
 from . import __version__
-from .advisory import TwythonDeprecationWarning
 from .compat import json, urlencode, parse_qsl, quote_plus, str, is_py2
 from .endpoints import api_table
 from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
 from .helpers import _transparent_params
 
-warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
-
 
 class Twython(object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None,
                  oauth_token_secret=None, headers=None, proxies=None,
-                 version='1.1', callback_url=None, ssl_verify=True,
-                 twitter_token=None, twitter_secret=None):
+                 api_version='1.1', ssl_verify=True):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
             :param app_key: (optional) Your applications key
@@ -26,38 +21,21 @@ class Twython(object):
             :param oauth_token: (optional) Used with oauth_token_secret to make authenticated calls
             :param oauth_token_secret: (optional) Used with oauth_token to make authenticated calls
             :param headers: (optional) Custom headers to send along with the request
-            :param callback_url: (optional) If set, will overwrite the callback url set in your application
             :param proxies: (optional) A dictionary of proxies, for example {"http":"proxy.example.org:8080", "https":"proxy.example.org:8081"}.
             :param ssl_verify: (optional) Turns off ssl verification when False. Useful if you have development server issues.
         """
 
         # API urls, OAuth urls and API version; needed for hitting that there API.
-        self.api_version = version
+        self.api_version = api_version
         self.api_url = 'https://api.twitter.com/%s'
         self.request_token_url = self.api_url % 'oauth/request_token'
         self.access_token_url = self.api_url % 'oauth/access_token'
         self.authenticate_url = self.api_url % 'oauth/authenticate'
 
-        self.app_key = app_key or twitter_token
-        self.app_secret = app_secret or twitter_secret
+        self.app_key = app_key
+        self.app_secret = app_secret
         self.oauth_token = oauth_token
         self.oauth_token_secret = oauth_token_secret
-
-        self.callback_url = callback_url
-
-        if twitter_token or twitter_secret:
-            warnings.warn(
-                'Instead of twitter_token or twitter_secret, please use app_key or app_secret (respectively).',
-                TwythonDeprecationWarning,
-                stacklevel=2
-            )
-
-        if callback_url:
-            warnings.warn(
-                'Please pass callback_url to the get_authentication_tokens method rather than Twython.__init__',
-                TwythonDeprecationWarning,
-                stacklevel=2
-            )
 
         req_headers = {'User-Agent': 'Twython v' + __version__}
         if headers:
@@ -82,35 +60,21 @@ class Twython(object):
         self.client.auth = auth
         self.client.verify = ssl_verify
 
-        # register available funcs to allow listing name when debugging.
-        def setFunc(key, deprecated_key=None):
-            return lambda **kwargs: self._constructFunc(key, deprecated_key, **kwargs)
-        for key in api_table.keys():
-            self.__dict__[key] = setFunc(key)
-
-            # Allow for old camelCase functions until Twython 3.0.0
-            if key == 'get_friend_ids':
-                deprecated_key = 'getFriendIDs'
-            elif key == 'get_followers_ids':
-                deprecated_key = 'getFollowerIDs'
-            elif key == 'get_incoming_friendship_ids':
-                deprecated_key = 'getIncomingFriendshipIDs'
-            elif key == 'get_outgoing_friendship_ids':
-                deprecated_key = 'getOutgoingFriendshipIDs'
-            else:
-                deprecated_key = key.title().replace('_', '')
-                deprecated_key = deprecated_key[0].lower() + deprecated_key[1:]
-
-            self.__dict__[deprecated_key] = setFunc(key, deprecated_key)
-
-        # create stash for last call intel
         self._last_call = None
+
+        def _setFunc(key):
+            '''Register functions, attaching them to the Twython instance'''
+            return lambda **kwargs: self._constructFunc(key, **kwargs)
+
+        # Loop through all our Twitter API endpoints made available in endpoints.py
+        for key in api_table.keys():
+            self.__dict__[key] = _setFunc(key)
 
     def __repr__(self):
         return '<Twython: %s>' % (self.app_key)
 
-    def _constructFunc(self, api_call, deprecated_key, **kwargs):
-        # Go through and replace any mustaches that are in our API url.
+    def _constructFunc(self, api_call, **kwargs):
+        # Go through and replace any {{mustaches}} that are in our API url.
         fn = api_table[api_call]
         url = re.sub(
             '\{\{(?P<m>[a-zA-Z_]+)\}\}',
@@ -118,17 +82,7 @@ class Twython(object):
             self.api_url % self.api_version + fn['url']
         )
 
-        if deprecated_key and (deprecated_key != api_call):
-            # Until Twython 3.0.0 and the function is removed.. send deprecation warning
-            warnings.warn(
-                '`%s` is deprecated, please use `%s` instead.' % (deprecated_key, api_call),
-                TwythonDeprecationWarning,
-                stacklevel=2
-            )
-
-        content = self._request(url, method=fn['method'], params=kwargs)
-
-        return content
+        return self._request(url, method=fn['method'], params=kwargs)
 
     def _request(self, url, method='GET', params=None, api_call=None):
         '''Internal response generator, no sense in repeating the same
@@ -156,8 +110,8 @@ class Twython(object):
             'content': content,
         }
 
-        #  wrap the json loads in a try, and defer an error
-        #  why? twitter will return invalid json with an error code in the headers
+        #  Wrap the json loads in a try, and defer an error
+        #  Twitter will return invalid json with an error code in the headers
         json_error = False
         try:
             try:
@@ -292,7 +246,7 @@ class Twython(object):
     def get_authorized_tokens(self, oauth_verifier):
         """Returns authorized tokens after they go through the auth_url phase.
 
-        :param oauth_verifier: (required) The oauth_verifier (or a.k.a PIN for non web apps) retrieved from the callback url querystring
+            :param oauth_verifier: (required) The oauth_verifier (or a.k.a PIN for non web apps) retrieved from the callback url querystring
         """
         response = self.client.get(self.access_token_url, params={'oauth_verifier': oauth_verifier})
         authorized_tokens = dict(parse_qsl(response.content.decode('utf-8')))
@@ -308,48 +262,6 @@ class Twython(object):
     # ------------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def shortenURL(url_to_shorten, shortener='http://is.gd/create.php'):
-        return Twython.shorten_url(url_to_shorten, shortener)
-
-    @staticmethod
-    def shorten_url(url_to_shorten, shortener='http://is.gd/create.php'):
-        """Shortens url specified by url_to_shorten.
-            Note: Twitter automatically shortens all URLs behind their own custom t.co shortener now,
-                but we keep this here for anyone who was previously using it for alternative purposes. ;)
-
-            :param url_to_shorten: (required) The URL to shorten
-            :param shortener: (optional) In case you want to use a different
-                              URL shortening service
-        """
-        warnings.warn(
-            'With requests it\'s easy enough for a developer to implement url shortenting themselves. Please see: https://github.com/ryanmcgrath/twython/issues/184',
-            TwythonDeprecationWarning,
-            stacklevel=2
-        )
-
-        if not shortener:
-            raise TwythonError('Please provide a URL shortening service.')
-
-        request = requests.get(shortener, params={
-            'format': 'json',
-            'url': url_to_shorten
-        })
-
-        if request.status_code in [301, 201, 200]:
-            return request.text
-        else:
-            raise TwythonError('shorten_url failed with a %s error code.' % request.status_code)
-
-    @staticmethod
-    def constructApiURL(base_url, params):
-        warnings.warn(
-            'This method is deprecated, please use `Twython.construct_api_url` instead.',
-            TwythonDeprecationWarning,
-            stacklevel=2
-        )
-        return Twython.construct_api_url(base_url, params)
-
-    @staticmethod
     def construct_api_url(base_url, params=None):
         querystring = []
         params, _ = _transparent_params(params or {})
@@ -360,20 +272,10 @@ class Twython(object):
             )
         return '%s?%s' % (base_url, '&'.join(querystring))
 
-    def searchGen(self, search_query, **kwargs):
-        warnings.warn(
-            'This method is deprecated, please use `search_gen` instead.',
-            TwythonDeprecationWarning,
-            stacklevel=2
-        )
-        return self.search_gen(search_query, **kwargs)
-
     def search_gen(self, search_query, **kwargs):
-        """ Returns a generator of tweets that match a specified query.
+        """Returns a generator of tweets that match a specified query.
 
-            Documentation: https://dev.twitter.com/doc/get/search
-
-            See Twython.search() for acceptable parameters
+            Documentation: https://dev.twitter.com/docs/api/1.1/get/search/tweets
 
             e.g search = x.search_gen('python')
                 for result in search:

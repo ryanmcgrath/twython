@@ -3,6 +3,16 @@
 History
 -------
 
+3.0.0 (2013-xx-xx)
+++++++++++++++++++
+
+- Changed ``twython/twython.py`` to ``twython/api.py`` in attempt to make structure look a little neater
+- Removed all camelCase function access (anything like ``getHomeTimeline`` is now ``get_home_timeline``)
+- Removed ``shorten_url``. With the ``requests`` library, shortening a URL on your own is simple enough
+- ``twitter_token``, ``twitter_secret`` and ``callback_url`` are no longer passed to ``Twython.__init__``
+    - ``twitter_token`` and ``twitter_secret`` have been replaced with ``app_key`` and ``app_secret`` respectively
+    - ``callback_url`` is now passed through ``Twython.get_authentication_tokens``
+
 2.10.1 (2013-05-29)
 ++++++++++++++++++
 

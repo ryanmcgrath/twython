@@ -6,7 +6,7 @@ import sys
 from setuptools import setup
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '2.10.1'
+__version__ = '3.0.0'
 
 packages = [
     'twython',
