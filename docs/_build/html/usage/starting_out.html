@@ -1,0 +1,192 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Starting Out &mdash; Twython 3.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '3.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Twython 3.0.0 documentation" href="../index.html" />
+    <link rel="next" title="Basic Usage" href="basic_usage.html" />
+    <link rel="prev" title="Installation" href="install.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="basic_usage.html" title="Basic Usage"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Twython 3.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="starting-out">
+<span id="id1"></span><h1>Starting Out<a class="headerlink" href="#starting-out" title="Permalink to this headline">¶</a></h1>
+<p>This section is going to help you understand creating a Twitter Application, authenticating a user, and making basic API calls</p>
+<div class="section" id="beginning">
+<h2>Beginning<a class="headerlink" href="#beginning" title="Permalink to this headline">¶</a></h2>
+<p>First, you&#8217;ll want to head over to <a class="reference external" href="https://dev.twitter.com/apps">https://dev.twitter.com/apps</a> and register an application!</p>
+<p>After you register, grab your applications <tt class="docutils literal"><span class="pre">Consumer</span> <span class="pre">Key</span></tt> and <tt class="docutils literal"><span class="pre">Consumer</span> <span class="pre">Secret</span></tt> from the application details tab.</p>
+<p>Now you&#8217;re ready to start authentication!</p>
+</div>
+<div class="section" id="authentication">
+<h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
+<p>First, you&#8217;ll want to import Twython:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">twython</span> <span class="kn">import</span> <span class="n">Twython</span>
+</pre></div>
+</div>
+<p>Now, you&#8217;ll want to create a Twython instance with your <tt class="docutils literal"><span class="pre">Consumer</span> <span class="pre">Key</span></tt> and <tt class="docutils literal"><span class="pre">Consumer</span> <span class="pre">Secert</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">APP_KEY</span> <span class="o">=</span> <span class="s">&#39;YOUR_APP_KEY&#39;</span>
+<span class="n">APP_SECET</span> <span class="o">=</span> <span class="s">&#39;YOUR_APP_SECRET&#39;</span>
+
+<span class="n">twitter</span> <span class="o">=</span> <span class="n">Twython</span><span class="p">(</span><span class="n">APP_KEY</span><span class="p">,</span> <span class="n">APP_SECRET</span><span class="p">)</span>
+<span class="n">auth</span> <span class="o">=</span> <span class="n">twitter</span><span class="o">.</span><span class="n">get_authentication_tokens</span><span class="p">(</span><span class="n">callback_url</span><span class="o">=</span><span class="s">&#39;http://mysite.com/callback&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>From the <tt class="docutils literal"><span class="pre">auth</span></tt> variable, save the <tt class="docutils literal"><span class="pre">oauth_token_secret</span></tt> for later use. In Django or other web frameworks, you might want to store it to a session variable:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">OAUTH_TOKEN_SECRET</span> <span class="o">=</span> <span class="n">auth</span><span class="p">[</span><span class="s">&#39;oauth_token_secret&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Send the user to the authentication url, you can obtain it by accessing:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">auth</span><span class="p">[</span><span class="s">&#39;auth_url&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="handling-the-callback">
+<h2>Handling the Callback<a class="headerlink" href="#handling-the-callback" title="Permalink to this headline">¶</a></h2>
+<p>After they authorize your application to access some of their account details, they&#8217;ll be redirected to the callback url you specified in <tt class="docutils literal"><span class="pre">get_autentication_tokens</span></tt></p>
+<p>You&#8217;ll want to extract the <tt class="docutils literal"><span class="pre">oauth_token</span></tt> and <tt class="docutils literal"><span class="pre">oauth_verifier</span></tt> from the url.</p>
+<p>Django example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">OAUTH_TOKEN</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">]</span>
+<span class="n">oauth_verifier</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&#39;oauth_verifier&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Now that you have the <tt class="docutils literal"><span class="pre">oauth_token</span></tt> and <tt class="docutils literal"><span class="pre">oauth_verifier</span></tt> stored to variables, you&#8217;ll want to create a new instance of Twython and grab the final user tokens:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">twitter</span> <span class="o">=</span> <span class="n">Twython</span><span class="p">(</span><span class="n">APP_KEY</span><span class="p">,</span> <span class="n">APP_SECRET</span><span class="p">,</span>
+                  <span class="n">OAUTH_TOKEN</span><span class="p">,</span> <span class="n">OAUTH_TOKEN_SECRET</span><span class="p">)</span>
+
+<span class="n">final_step</span> <span class="o">=</span> <span class="n">twitter</span><span class="o">.</span><span class="n">get_authorized_tokens</span><span class="p">(</span><span class="n">oauth_verifier</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once you have the final user tokens, store them in a database for later use!:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">OAUTH_TOKEN</span> <span class="o">=</span> <span class="n">final_step</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">]</span>
+<span class="n">OAUTH_TOKEN_SECERT</span> <span class="o">=</span> <span class="n">final_step</span><span class="p">[</span><span class="s">&#39;oauth_token_secret&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-twython-api-table">
+<h2>The Twython API Table<a class="headerlink" href="#the-twython-api-table" title="Permalink to this headline">¶</a></h2>
+<p>In the Twython package is a file called <tt class="docutils literal"><span class="pre">endpoints.py</span></tt> which holds a dictionary of all Twitter API endpoints. This is so Twython&#8217;s core <tt class="docutils literal"><span class="pre">api.py</span></tt> isn&#8217;t cluttered with 50+ methods. We dynamically register these funtions when a Twython object is initiated.</p>
+</div>
+<div class="section" id="dynamic-function-arguments">
+<h2>Dynamic Function Arguments<a class="headerlink" href="#dynamic-function-arguments" title="Permalink to this headline">¶</a></h2>
+<p>Keyword arguments to functions are mapped to the functions available for each endpoint in the Twitter API docs. Doing this allows us to be incredibly flexible in querying the Twitter API, so changes to the API aren&#8217;t held up from you using them by this library.</p>
+<hr class="docutils" />
+<p>Now that you have your application tokens and user tokens, check out the <a class="reference internal" href="basic_usage.html#basic-usage"><em>basic usage</em></a> section.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Starting Out</a><ul>
+<li><a class="reference internal" href="#beginning">Beginning</a></li>
+<li><a class="reference internal" href="#authentication">Authentication</a></li>
+<li><a class="reference internal" href="#handling-the-callback">Handling the Callback</a></li>
+<li><a class="reference internal" href="#the-twython-api-table">The Twython API Table</a></li>
+<li><a class="reference internal" href="#dynamic-function-arguments">Dynamic Function Arguments</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="install.html"
+                        title="previous chapter">Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="basic_usage.html"
+                        title="next chapter">Basic Usage</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/usage/starting_out.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="basic_usage.html" title="Basic Usage"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation"
+             >previous</a> |</li>
+        <li><a href="../index.html">Twython 3.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ryan McGrath.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

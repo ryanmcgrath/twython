@@ -1,0 +1,1207 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Developer Interface &mdash; Twython 3.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '3.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Twython 3.0.0 documentation" href="index.html" />
+    <link rel="prev" title="Basic Usage" href="usage/basic_usage.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="usage/basic_usage.html" title="Basic Usage"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Twython 3.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-twython">
+<span id="developer-interface"></span><span id="api"></span><h1>Developer Interface<a class="headerlink" href="#module-twython" title="Permalink to this headline">¶</a></h1>
+<p>This page of the documentation will cover all methods and classes available to the developer.</p>
+<p>Twython, currently, has two main interfaces:</p>
+<ul class="simple">
+<li>Twitter&#8217;s Core API (updating statuses, getting timelines, direct messaging, etc)</li>
+<li>Twitter&#8217;s Streaming API</li>
+</ul>
+<div class="section" id="core-interface">
+<h2>Core Interface<a class="headerlink" href="#core-interface" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="twython.Twython">
+<em class="property">class </em><tt class="descclassname">twython.</tt><tt class="descname">Twython</tt><big>(</big><em>app_key=None</em>, <em>app_secret=None</em>, <em>oauth_token=None</em>, <em>oauth_token_secret=None</em>, <em>headers=None</em>, <em>proxies=None</em>, <em>api_version='1.1'</em>, <em>ssl_verify=True</em><big>)</big><a class="headerlink" href="#twython.Twython" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="twython.Twython.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>app_key=None</em>, <em>app_secret=None</em>, <em>oauth_token=None</em>, <em>oauth_token_secret=None</em>, <em>headers=None</em>, <em>proxies=None</em>, <em>api_version='1.1'</em>, <em>ssl_verify=True</em><big>)</big><a class="headerlink" href="#twython.Twython.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>app_key</strong> &#8211; (optional) Your applications key</li>
+<li><strong>app_secret</strong> &#8211; (optional) Your applications secret key</li>
+<li><strong>oauth_token</strong> &#8211; (optional) Used with oauth_token_secret to make authenticated calls</li>
+<li><strong>oauth_token_secret</strong> &#8211; (optional) Used with oauth_token to make authenticated calls</li>
+<li><strong>headers</strong> &#8211; (optional) Custom headers to send along with the request</li>
+<li><strong>proxies</strong> &#8211; (optional) A dictionary of proxies, for example {&#8220;http&#8221;:&#8221;proxy.example.org:8080&#8221;, &#8220;https&#8221;:&#8221;proxy.example.org:8081&#8221;}.</li>
+<li><strong>ssl_verify</strong> &#8211; (optional) Turns off ssl verification when False. Useful if you have development server issues.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.add_list_member">
+<tt class="descname">add_list_member</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.add_list_member" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a member to a list.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/lists/members/create">https://dev.twitter.com/docs/api/1.1/post/lists/members/create</a></p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="twython.Twython.construct_api_url">
+<em class="property">static </em><tt class="descname">construct_api_url</tt><big>(</big><em>api_url</em>, <em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.construct_api_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a Twitter API url, encoded, with parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>api_url</strong> &#8211; URL of the Twitter API endpoint you are attempting to construct</li>
+<li><strong>**params</strong> &#8211; Parameters that are accepted by Twitter for the endpoint you&#8217;re requesting</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">string</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">twython</span> <span class="kn">import</span> <span class="n">Twython</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">twitter</span> <span class="o">=</span> <span class="n">Twython</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">api_url</span> <span class="o">=</span> <span class="s">&#39;https://api.twitter.com/1.1/search/tweets.json&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">constructed_url</span> <span class="o">=</span> <span class="n">twitter</span><span class="o">.</span><span class="n">construct_api_url</span><span class="p">(</span><span class="n">api_url</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s">&#39;python&#39;</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="s">&#39;popular&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">constructed_url</span>
+<span class="go">https://api.twitter.com/1.1/search/tweets.json?q=python&amp;result_type=popular</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.create_block">
+<tt class="descname">create_block</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.create_block" title="Permalink to this definition">¶</a></dt>
+<dd><p>Blocks the specified user from following the authenticating user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/blocks/create">https://dev.twitter.com/docs/api/1.1/post/blocks/create</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.create_favorite">
+<tt class="descname">create_favorite</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.create_favorite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Favorites the status specified in the ID parameter as the authenticating user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/favorites/create">https://dev.twitter.com/docs/api/1.1/post/favorites/create</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.create_friendship">
+<tt class="descname">create_friendship</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.create_friendship" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows the authenticating users to follow the user specified
+in the ID parameter.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/friendships/create">https://dev.twitter.com/docs/api/1.1/post/friendships/create</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.create_list">
+<tt class="descname">create_list</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.create_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new list for the authenticated user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/lists/create">https://dev.twitter.com/docs/api/1.1/post/lists/create</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.create_list_members">
+<tt class="descname">create_list_members</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.create_list_members" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds multiple members to a list, by specifying a comma-separated
+list of member ids or screen names.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/lists/members/create_all">https://dev.twitter.com/docs/api/1.1/post/lists/members/create_all</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.create_place">
+<tt class="descname">create_place</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.create_place" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new place object at the given latitude and longitude.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/geo/place">https://dev.twitter.com/docs/api/1.1/post/geo/place</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.create_saved_search">
+<tt class="descname">create_saved_search</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.create_saved_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new saved search for the authenticated user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/saved_searches/create">https://dev.twitter.com/docs/api/1.1/post/saved_searches/create</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.delete_list">
+<tt class="descname">delete_list</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.delete_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the specified list.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/lists/destroy">https://dev.twitter.com/docs/api/1.1/post/lists/destroy</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.delete_list_member">
+<tt class="descname">delete_list_member</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.delete_list_member" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes the specified member from the list.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/lists/members/destroy">https://dev.twitter.com/docs/api/1.1/post/lists/members/destroy</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.delete_list_members">
+<tt class="descname">delete_list_members</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.delete_list_members" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes multiple members from a list, by specifying a
+comma-separated list of member ids or screen names.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/lists/members/destroy_all">https://dev.twitter.com/docs/api/1.1/post/lists/members/destroy_all</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.destroy_block">
+<tt class="descname">destroy_block</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.destroy_block" title="Permalink to this definition">¶</a></dt>
+<dd><p>Un-blocks the user specified in the ID parameter for the authenticating user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/blocks/destroy">https://dev.twitter.com/docs/api/1.1/post/blocks/destroy</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.destroy_direct_message">
+<tt class="descname">destroy_direct_message</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.destroy_direct_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Destroys the direct message specified in the required id parameter</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/direct_messages/destroy">https://dev.twitter.com/docs/api/1.1/post/direct_messages/destroy</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.destroy_favorite">
+<tt class="descname">destroy_favorite</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.destroy_favorite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Un-favorites the status specified in the ID parameter as the authenticating user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/favorites/destroy">https://dev.twitter.com/docs/api/1.1/post/favorites/destroy</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.destroy_friendship">
+<tt class="descname">destroy_friendship</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.destroy_friendship" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows the authenticating user to unfollow the user specified
+in the ID parameter.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/friendships/destroy">https://dev.twitter.com/docs/api/1.1/post/friendships/destroy</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.destroy_saved_search">
+<tt class="descname">destroy_saved_search</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.destroy_saved_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Destroys a saved search for the authenticating user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/saved_searches/destroy/%3Aid">https://dev.twitter.com/docs/api/1.1/post/saved_searches/destroy/%3Aid</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.destroy_status">
+<tt class="descname">destroy_status</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.destroy_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Destroys the status specified by the required ID parameter</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/statuses/destroy/%3Aid">https://dev.twitter.com/docs/api/1.1/post/statuses/destroy/%3Aid</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get">
+<tt class="descname">get</tt><big>(</big><em>endpoint</em>, <em>params=None</em>, <em>version='1.1'</em><big>)</big><a class="headerlink" href="#twython.Twython.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut for GET requests via <a class="reference internal" href="#twython.Twython.request" title="twython.Twython.request"><tt class="xref py py-class docutils literal"><span class="pre">request</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_account_settings">
+<tt class="descname">get_account_settings</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_account_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns settings (including current trend, geo and sleep time
+information) for the authenticating user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/account/settings">https://dev.twitter.com/docs/api/1.1/get/account/settings</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_authentication_tokens">
+<tt class="descname">get_authentication_tokens</tt><big>(</big><em>callback_url=None</em>, <em>force_login=False</em>, <em>screen_name=''</em><big>)</big><a class="headerlink" href="#twython.Twython.get_authentication_tokens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict including an authorization URL, <tt class="docutils literal"><span class="pre">auth_url</span></tt>, to direct a user to</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>callback_url</strong> &#8211; (optional) Url the user is returned to after they authorize your app (web clients only)</li>
+<li><strong>force_login</strong> &#8211; (optional) Forces the user to enter their credentials to ensure the correct users account is authorized.</li>
+<li><strong>app_secret</strong> &#8211; (optional) If forced_login is set OR user is not currently logged in, Prefills the username input box of the OAuth login screen with the given value</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_authorized_tokens">
+<tt class="descname">get_authorized_tokens</tt><big>(</big><em>oauth_verifier</em><big>)</big><a class="headerlink" href="#twython.Twython.get_authorized_tokens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict of authorized tokens after they go through the <a class="reference internal" href="#twython.Twython.get_authentication_tokens" title="twython.Twython.get_authentication_tokens"><tt class="xref py py-class docutils literal"><span class="pre">get_authentication_tokens</span></tt></a> phase.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>oauth_verifier</strong> &#8211; (required) The oauth_verifier (or a.k.a PIN for non web apps) retrieved from the callback url querystring</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_available_trends">
+<tt class="descname">get_available_trends</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_available_trends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the locations that Twitter has trending topic information for.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/trends/available">https://dev.twitter.com/docs/api/1.1/get/trends/available</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_closest_trends">
+<tt class="descname">get_closest_trends</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_closest_trends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the locations that Twitter has trending topic information
+for, closest to a specified location.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/trends/closest">https://dev.twitter.com/docs/api/1.1/get/trends/closest</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_contributees">
+<tt class="descname">get_contributees</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_contributees" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a collection of users that the specified user can &#8220;contribute&#8221; to.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/users/contributees">https://dev.twitter.com/docs/api/1.1/get/users/contributees</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_contributors">
+<tt class="descname">get_contributors</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_contributors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a collection of users who can contribute to the specified account.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/users/contributors">https://dev.twitter.com/docs/api/1.1/get/users/contributors</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_direct_message">
+<tt class="descname">get_direct_message</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_direct_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a single direct message, specified by an id parameter.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/direct_messages/show">https://dev.twitter.com/docs/api/1.1/get/direct_messages/show</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_direct_messages">
+<tt class="descname">get_direct_messages</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_direct_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the 20 most recent direct messages sent to the authenticating user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/direct_messages">https://dev.twitter.com/docs/api/1.1/get/direct_messages</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_favorites">
+<tt class="descname">get_favorites</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_favorites" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the 20 most recent Tweets favorited by the authenticating or specified user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/favorites/list">https://dev.twitter.com/docs/api/1.1/get/favorites/list</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_followers_ids">
+<tt class="descname">get_followers_ids</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_followers_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a cursored collection of user IDs for every user
+following the specified user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/followers/ids">https://dev.twitter.com/docs/api/1.1/get/followers/ids</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_followers_list">
+<tt class="descname">get_followers_list</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_followers_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a cursored collection of user objects for users
+following the specified user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/followers/list">https://dev.twitter.com/docs/api/1.1/get/followers/list</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_friends_ids">
+<tt class="descname">get_friends_ids</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_friends_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a cursored collection of user IDs for every user the
+specified user is following (otherwise known as their &#8220;friends&#8221;).</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/friends/ids">https://dev.twitter.com/docs/api/1.1/get/friends/ids</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_friends_list">
+<tt class="descname">get_friends_list</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_friends_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a cursored collection of user objects for every user the
+specified user is following (otherwise known as their &#8220;friends&#8221;).</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/friends/list">https://dev.twitter.com/docs/api/1.1/get/friends/list</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_geo_info">
+<tt class="descname">get_geo_info</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_geo_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all the information about a known place.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/geo/id/%3Aplace_id">https://dev.twitter.com/docs/api/1.1/get/geo/id/%3Aplace_id</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_home_timline">
+<tt class="descname">get_home_timline</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_home_timline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a collection of the most recent Tweets and retweets
+posted by the authenticating user and the users they follow.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/statuses/home_timeline">https://dev.twitter.com/docs/api/1.1/get/statuses/home_timeline</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_incoming_friendship_ids">
+<tt class="descname">get_incoming_friendship_ids</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_incoming_friendship_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a collection of numeric IDs for every user who has a
+pending request to follow the authenticating user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/friendships/incoming">https://dev.twitter.com/docs/api/1.1/get/friendships/incoming</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_lastfunction_header">
+<tt class="descname">get_lastfunction_header</tt><big>(</big><em>header</em><big>)</big><a class="headerlink" href="#twython.Twython.get_lastfunction_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a specific header from the last API call
+This will return None if the header is not present</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>header</strong> &#8211; (required) The name of the header you want to get the value of</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Most useful for the following header information:</dt>
+<dd>x-rate-limit-limit,
+x-rate-limit-remaining,
+x-rate-limit-class,
+x-rate-limit-reset</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_list_members">
+<tt class="descname">get_list_members</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_list_members" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the members of the specified list.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/lists/members">https://dev.twitter.com/docs/api/1.1/get/lists/members</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_list_statuses">
+<tt class="descname">get_list_statuses</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_list_statuses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a timeline of tweets authored by members of the specified list.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/lists/statuses">https://dev.twitter.com/docs/api/1.1/get/lists/statuses</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_list_subscribers">
+<tt class="descname">get_list_subscribers</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_list_subscribers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the subscribers of the specified list.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/lists/subscribers">https://dev.twitter.com/docs/api/1.1/get/lists/subscribers</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_list_subscriptions">
+<tt class="descname">get_list_subscriptions</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_list_subscriptions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain a collection of the lists the specified user is subscribed to.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/lists/subscriptions">https://dev.twitter.com/docs/api/1.1/get/lists/subscriptions</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_mentions_timeline">
+<tt class="descname">get_mentions_timeline</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_mentions_timeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the 20 most recent mentions (tweets containing a users&#8217;s
+&#64;screen_name) for the authenticating user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/statuses/mentions_timeline">https://dev.twitter.com/docs/api/1.1/get/statuses/mentions_timeline</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_oembed_tweet">
+<tt class="descname">get_oembed_tweet</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_oembed_tweet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns information allowing the creation of an embedded
+representation of a Tweet on third party sites.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/statuses/oembed">https://dev.twitter.com/docs/api/1.1/get/statuses/oembed</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_outgoing_friendship_ids">
+<tt class="descname">get_outgoing_friendship_ids</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_outgoing_friendship_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a collection of numeric IDs for every protected user for
+whom the authenticating user has a pending follow request.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/friendships/outgoing">https://dev.twitter.com/docs/api/1.1/get/friendships/outgoing</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_place_trends">
+<tt class="descname">get_place_trends</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_place_trends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the top 10 trending topics for a specific WOEID, if
+trending information is available for it.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/trends/place">https://dev.twitter.com/docs/api/1.1/get/trends/place</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_profile_banner_sizes">
+<tt class="descname">get_profile_banner_sizes</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_profile_banner_sizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a map of the available size variations of the specified user&#8217;s profile banner.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/users/profile_banner">https://dev.twitter.com/docs/api/1.1/get/users/profile_banner</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_retweeters_id">
+<tt class="descname">get_retweeters_id</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_retweeters_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a collection of up to 100 user IDs belonging to users who
+have retweeted the tweet specified by the id parameter.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/statuses/retweeters/ids">https://dev.twitter.com/docs/api/1.1/get/statuses/retweeters/ids</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_retweets">
+<tt class="descname">get_retweets</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_retweets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns up to 100 of the first retweets of a given tweet.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/statuses/retweets/%3Aid">https://dev.twitter.com/docs/api/1.1/get/statuses/retweets/%3Aid</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_saved_searches">
+<tt class="descname">get_saved_searches</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_saved_searches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the authenticated user&#8217;s saved search queries.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/saved_searches/list">https://dev.twitter.com/docs/api/1.1/get/saved_searches/list</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_sent_messages">
+<tt class="descname">get_sent_messages</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_sent_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the 20 most recent direct messages sent by the authenticating user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/direct_messages/sent">https://dev.twitter.com/docs/api/1.1/get/direct_messages/sent</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_similar_places">
+<tt class="descname">get_similar_places</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_similar_places" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locates places near the given coordinates which are similar in name.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/geo/similar_places">https://dev.twitter.com/docs/api/1.1/get/geo/similar_places</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_specific_list">
+<tt class="descname">get_specific_list</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_specific_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the specified list.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/lists/show">https://dev.twitter.com/docs/api/1.1/get/lists/show</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_user_ids_of_blocked_retweets">
+<tt class="descname">get_user_ids_of_blocked_retweets</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_user_ids_of_blocked_retweets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a collection of user_ids that the currently authenticated
+user does not want to receive retweets from.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/friendships/no_retweets/ids">https://dev.twitter.com/docs/api/1.1/get/friendships/no_retweets/ids</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_user_suggestions">
+<tt class="descname">get_user_suggestions</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_user_suggestions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Access to Twitter&#8217;s suggested user list.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/users/suggestions">https://dev.twitter.com/docs/api/1.1/get/users/suggestions</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_user_suggestions_by_slug">
+<tt class="descname">get_user_suggestions_by_slug</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_user_suggestions_by_slug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Access the users in a given category of the Twitter suggested user list.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/users/suggestions/%3Aslug">https://dev.twitter.com/docs/api/1.1/get/users/suggestions/%3Aslug</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_user_suggestions_statuses_by_slug">
+<tt class="descname">get_user_suggestions_statuses_by_slug</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_user_suggestions_statuses_by_slug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Access the users in a given category of the Twitter suggested user
+list and return their most recent status if they are not a protected user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/users/suggestions/%3Aslug/members">https://dev.twitter.com/docs/api/1.1/get/users/suggestions/%3Aslug/members</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.get_user_timeline">
+<tt class="descname">get_user_timeline</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.get_user_timeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a collection of the most recent Tweets posted by the user
+indicated by the screen_name or user_id parameters.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/statuses/user_timeline">https://dev.twitter.com/docs/api/1.1/get/statuses/user_timeline</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.is_list_member">
+<tt class="descname">is_list_member</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.is_list_member" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the specified user is a member of the specified list.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/lists/members/show">https://dev.twitter.com/docs/api/1.1/get/lists/members/show</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.is_list_subscriber">
+<tt class="descname">is_list_subscriber</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.is_list_subscriber" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the specified user is a subscriber of the specified list.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/lists/subscribers/show">https://dev.twitter.com/docs/api/1.1/get/lists/subscribers/show</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.list_block_ids">
+<tt class="descname">list_block_ids</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.list_block_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of numeric user ids the authenticating user is blocking.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/blocks/ids">https://dev.twitter.com/docs/api/1.1/get/blocks/ids</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.list_blocks">
+<tt class="descname">list_blocks</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.list_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a collection of user objects that the authenticating user is blocking.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/blocks/list">https://dev.twitter.com/docs/api/1.1/get/blocks/list</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.lookup_friendships">
+<tt class="descname">lookup_friendships</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.lookup_friendships" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the relationships of the authenticating user to the
+comma-separated list of up to 100 screen_names or user_ids provided.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/friendships/lookup">https://dev.twitter.com/docs/api/1.1/get/friendships/lookup</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.lookup_user">
+<tt class="descname">lookup_user</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.lookup_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns fully-hydrated user objects for up to 100 users per request,
+as specified by comma-separated values passed to the user_id and/or screen_name parameters.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/users/lookup">https://dev.twitter.com/docs/api/1.1/get/users/lookup</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.post">
+<tt class="descname">post</tt><big>(</big><em>endpoint</em>, <em>params=None</em>, <em>version='1.1'</em><big>)</big><a class="headerlink" href="#twython.Twython.post" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut for POST requests via <a class="reference internal" href="#twython.Twython.request" title="twython.Twython.request"><tt class="xref py py-class docutils literal"><span class="pre">request</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.remove_profile_banner">
+<tt class="descname">remove_profile_banner</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.remove_profile_banner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes the uploaded profile banner for the authenticating user.
+Returns HTTP 200 upon success.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/account/remove_profile_banner">https://dev.twitter.com/docs/api/1.1/post/account/remove_profile_banner</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.report_spam">
+<tt class="descname">report_spam</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.report_spam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report the specified user as a spam account to Twitter.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/users/report_spam">https://dev.twitter.com/docs/api/1.1/post/users/report_spam</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.request">
+<tt class="descname">request</tt><big>(</big><em>endpoint</em>, <em>method='GET'</em>, <em>params=None</em>, <em>version='1.1'</em><big>)</big><a class="headerlink" href="#twython.Twython.request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return dict of response received from Twitter&#8217;s API</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>endpoint</strong> (<em>string</em>) &#8211; (required) Full url or Twitter API endpoint (e.g. search/tweets)</li>
+<li><strong>method</strong> (<em>string</em>) &#8211; (optional) Method of accessing data, either GET or POST. (default GET)</li>
+<li><strong>params</strong> (<em>dict or None</em>) &#8211; (optional) Dict of parameters (if any) accepted the by Twitter API endpoint you are trying to access (default None)</li>
+<li><strong>version</strong> (<em>string</em>) &#8211; (optional) Twitter API version to access (default 1.1)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.retweet">
+<tt class="descname">retweet</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.retweet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retweets a tweet specified by the id parameter</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/statuses/retweet/%3Aid">https://dev.twitter.com/docs/api/1.1/post/statuses/retweet/%3Aid</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.retweeted_of_me">
+<tt class="descname">retweeted_of_me</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.retweeted_of_me" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the most recent tweets authored by the authenticating user
+that have been retweeted by others.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/statuses/retweets_of_me">https://dev.twitter.com/docs/api/1.1/get/statuses/retweets_of_me</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.reverse_geocode">
+<tt class="descname">reverse_geocode</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.reverse_geocode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a latitude and a longitude, searches for up to 20 places
+that can be used as a place_id when updating a status.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/geo/reverse_geocode">https://dev.twitter.com/docs/api/1.1/get/geo/reverse_geocode</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.search">
+<tt class="descname">search</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a collection of relevant Tweets matching a specified query.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/search/tweets">https://dev.twitter.com/docs/api/1.1/get/search/tweets</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.search_gen">
+<tt class="descname">search_gen</tt><big>(</big><em>search_query</em>, <em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.search_gen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a generator of tweets that match a specified query.</p>
+<p>Documentation: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/search/tweets">https://dev.twitter.com/docs/api/1.1/get/search/tweets</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>search_query</strong> &#8211; Query you intend to search Twitter for</li>
+<li><strong>**params</strong> &#8211; Extra parameters to send with your search request</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">generator</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">twython</span> <span class="kn">import</span> <span class="n">Twython</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">twitter</span> <span class="o">=</span> <span class="n">Twython</span><span class="p">(</span><span class="n">APP_KEY</span><span class="p">,</span> <span class="n">APP_SECRET</span><span class="p">,</span> <span class="n">OAUTH_TOKEN</span><span class="p">,</span> <span class="n">OAUTH_TOKEN_SECRET</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">search</span> <span class="o">=</span> <span class="n">twitter</span><span class="o">.</span><span class="n">search_gen</span><span class="p">(</span><span class="s">&#39;python&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">search</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>  <span class="k">print</span> <span class="n">result</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.search_geo">
+<tt class="descname">search_geo</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.search_geo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search for places that can be attached to a statuses/update.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/geo/search">https://dev.twitter.com/docs/api/1.1/get/geo/search</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.search_users">
+<tt class="descname">search_users</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.search_users" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides a simple, relevance-based search interface to public user accounts on Twitter.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/users/search">https://dev.twitter.com/docs/api/1.1/get/users/search</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.send_direct_message">
+<tt class="descname">send_direct_message</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.send_direct_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a new direct message to the specified user from the authenticating user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/direct_messages/new">https://dev.twitter.com/docs/api/1.1/post/direct_messages/new</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.show_friendship">
+<tt class="descname">show_friendship</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.show_friendship" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns detailed information about the relationship between two
+arbitrary users.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/friendships/show">https://dev.twitter.com/docs/api/1.1/get/friendships/show</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.show_lists">
+<tt class="descname">show_lists</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.show_lists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all lists the authenticating or specified user subscribes to, including their own.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/lists/list">https://dev.twitter.com/docs/api/1.1/get/lists/list</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.show_owned_lists">
+<tt class="descname">show_owned_lists</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.show_owned_lists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the lists owned by the specified Twitter user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/lists/ownerships">https://dev.twitter.com/docs/api/1.1/get/lists/ownerships</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.show_saved_search">
+<tt class="descname">show_saved_search</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.show_saved_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the information for the saved search represented by the given id.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/saved_searches/show/%3Aid">https://dev.twitter.com/docs/api/1.1/get/saved_searches/show/%3Aid</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.show_status">
+<tt class="descname">show_status</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.show_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a single Tweet, specified by the id parameter</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/statuses/show/%3Aid">https://dev.twitter.com/docs/api/1.1/get/statuses/show/%3Aid</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.show_user">
+<tt class="descname">show_user</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.show_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a variety of information about the user specified by the
+required user_id or screen_name parameter.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/users/show">https://dev.twitter.com/docs/api/1.1/get/users/show</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.subscribe_to_list">
+<tt class="descname">subscribe_to_list</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.subscribe_to_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subscribes the authenticated user to the specified list.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/lists/subscribers/create">https://dev.twitter.com/docs/api/1.1/post/lists/subscribers/create</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.unsubscribe_from_list">
+<tt class="descname">unsubscribe_from_list</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.unsubscribe_from_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unsubscribes the authenticated user from the specified list.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/lists/subscribers/destroy">https://dev.twitter.com/docs/api/1.1/post/lists/subscribers/destroy</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.update_account_settings">
+<tt class="descname">update_account_settings</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.update_account_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the authenticating user&#8217;s settings.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/account/settings">https://dev.twitter.com/docs/api/1.1/post/account/settings</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.update_delivery_service">
+<tt class="descname">update_delivery_service</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.update_delivery_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets which device Twitter delivers updates to for the authenticating user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/account/update_delivery_device">https://dev.twitter.com/docs/api/1.1/post/account/update_delivery_device</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.update_friendship">
+<tt class="descname">update_friendship</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.update_friendship" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows one to enable or disable retweets and device notifications
+from the specified user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/friendships/update">https://dev.twitter.com/docs/api/1.1/post/friendships/update</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.update_list">
+<tt class="descname">update_list</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.update_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the specified list.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/lists/update">https://dev.twitter.com/docs/api/1.1/post/lists/update</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.update_profile">
+<tt class="descname">update_profile</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.update_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets values that users are able to set under the &#8220;Account&#8221; tab of their settings page.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/account/update_profile">https://dev.twitter.com/docs/api/1.1/post/account/update_profile</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.update_profile_Background_image">
+<tt class="descname">update_profile_Background_image</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.update_profile_Background_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads a profile banner on behalf of the authenticating user.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/account/update_profile_banner">https://dev.twitter.com/docs/api/1.1/post/account/update_profile_banner</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.update_profile_background_image">
+<tt class="descname">update_profile_background_image</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.update_profile_background_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the authenticating user&#8217;s profile background image.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/account/update_profile_background_image">https://dev.twitter.com/docs/api/1.1/post/account/update_profile_background_image</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.update_profile_colors">
+<tt class="descname">update_profile_colors</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.update_profile_colors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets one or more hex values that control the color scheme of the
+authenticating user&#8217;s profile page on twitter.com.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/account/update_profile_colors">https://dev.twitter.com/docs/api/1.1/post/account/update_profile_colors</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.update_profile_image">
+<tt class="descname">update_profile_image</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.update_profile_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the authenticating user&#8217;s profile image.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/account/update_profile_image">https://dev.twitter.com/docs/api/1.1/post/account/update_profile_image</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.update_status">
+<tt class="descname">update_status</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.update_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the authenticating user&#8217;s current status, also known as tweeting</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/statuses/update">https://dev.twitter.com/docs/api/1.1/post/statuses/update</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.update_status_with_media">
+<tt class="descname">update_status_with_media</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.update_status_with_media" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the authenticating user&#8217;s current status and attaches media
+for upload. In other words, it creates a Tweet with a picture attached.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/statuses/update_with_media">https://dev.twitter.com/docs/api/1.1/post/statuses/update_with_media</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.Twython.verify_Credentials">
+<tt class="descname">verify_Credentials</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.Twython.verify_Credentials" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an HTTP 200 OK response code and a representation of the
+requesting user if authentication was successful; returns a 401 status
+code and an error message if not.</p>
+<p>Docs: <a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/account/verify_credentials">https://dev.twitter.com/docs/api/1.1/get/account/verify_credentials</a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="streaming-interface">
+<h2>Streaming Interface<a class="headerlink" href="#streaming-interface" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="twython.TwythonStreamer">
+<em class="property">class </em><tt class="descclassname">twython.</tt><tt class="descname">TwythonStreamer</tt><big>(</big><em>app_key</em>, <em>app_secret</em>, <em>oauth_token</em>, <em>oauth_token_secret</em>, <em>timeout=300</em>, <em>retry_count=None</em>, <em>retry_in=10</em>, <em>headers=None</em><big>)</big><a class="headerlink" href="#twython.TwythonStreamer" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="twython.TwythonStreamer.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>app_key</em>, <em>app_secret</em>, <em>oauth_token</em>, <em>oauth_token_secret</em>, <em>timeout=300</em>, <em>retry_count=None</em>, <em>retry_in=10</em>, <em>headers=None</em><big>)</big><a class="headerlink" href="#twython.TwythonStreamer.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Streaming class for a friendly streaming user experience
+Authentication IS required to use the Twitter Streaming API</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>app_key</strong> &#8211; (required) Your applications key</li>
+<li><strong>app_secret</strong> &#8211; (required) Your applications secret key</li>
+<li><strong>oauth_token</strong> &#8211; (required) Used with oauth_token_secret to make
+authenticated calls</li>
+<li><strong>oauth_token_secret</strong> &#8211; (required) Used with oauth_token to make
+authenticated calls</li>
+<li><strong>timeout</strong> &#8211; (optional) How long (in secs) the streamer should wait
+for a response from Twitter Streaming API</li>
+<li><strong>retry_count</strong> &#8211; (optional) Number of times the API call should be
+retired</li>
+<li><strong>retry_in</strong> &#8211; (optional) Amount of time (in secs) the previous
+API call should be tried again</li>
+<li><strong>headers</strong> &#8211; (optional) Custom headers to send along with the
+request</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.TwythonStreamer.disconnect">
+<tt class="descname">disconnect</tt><big>(</big><big>)</big><a class="headerlink" href="#twython.TwythonStreamer.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to disconnect the streaming client manually</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.TwythonStreamer.on_delete">
+<tt class="descname">on_delete</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#twython.TwythonStreamer.on_delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a deletion notice is received</p>
+<p>Feel free to override this to handle your streaming data how you
+want it handled.</p>
+<p>Twitter docs for deletion notices: <a class="reference external" href="http://spen.se/8qujd">http://spen.se/8qujd</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>dict</em>) &#8211; data from the &#8216;delete&#8217; key recieved from the stream</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.TwythonStreamer.on_disconnect">
+<tt class="descname">on_disconnect</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#twython.TwythonStreamer.on_disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a disconnect notice is received</p>
+<p>Feel free to override this to handle your streaming data how you
+want it handled.</p>
+<p>Twitter docs for disconnect notices: <a class="reference external" href="http://spen.se/xb6mm">http://spen.se/xb6mm</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>dict</em>) &#8211; data from the &#8216;disconnect&#8217; key recieved from the stream</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.TwythonStreamer.on_error">
+<tt class="descname">on_error</tt><big>(</big><em>status_code</em>, <em>data</em><big>)</big><a class="headerlink" href="#twython.TwythonStreamer.on_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when stream returns non-200 status code</p>
+<p>Feel free to override this to handle your streaming data how you
+want it handled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>status_code</strong> (<em>int</em>) &#8211; Non-200 status code sent from stream</li>
+<li><strong>data</strong> (<em>dict</em>) &#8211; Error message sent from stream</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.TwythonStreamer.on_limit">
+<tt class="descname">on_limit</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#twython.TwythonStreamer.on_limit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a limit notice is received</p>
+<p>Feel free to override this to handle your streaming data how you
+want it handled.</p>
+<p>Twitter docs for limit notices: <a class="reference external" href="http://spen.se/hzt0b">http://spen.se/hzt0b</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>dict</em>) &#8211; data from the &#8216;limit&#8217; key recieved from the stream</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.TwythonStreamer.on_success">
+<tt class="descname">on_success</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#twython.TwythonStreamer.on_success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when data has been successfull received from the stream</p>
+<p>Feel free to override this to handle your streaming data how you
+want it handled.
+See <a class="reference external" href="https://dev.twitter.com/docs/streaming-apis/messages">https://dev.twitter.com/docs/streaming-apis/messages</a> for messages
+sent along in stream responses.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>dict</em>) &#8211; data recieved from the stream</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.TwythonStreamer.on_timeout">
+<tt class="descname">on_timeout</tt><big>(</big><big>)</big><a class="headerlink" href="#twython.TwythonStreamer.on_timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the request has timed out</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="streaming-types">
+<h3>Streaming Types<a class="headerlink" href="#streaming-types" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="twython.streaming.types.TwythonStreamerTypes">
+<em class="property">class </em><tt class="descclassname">twython.streaming.types.</tt><tt class="descname">TwythonStreamerTypes</tt><big>(</big><em>streamer</em><big>)</big><a class="headerlink" href="#twython.streaming.types.TwythonStreamerTypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for different stream endpoints</p>
+<p>Not all streaming endpoints have nested endpoints.
+User Streams and Site Streams are single streams with no nested endpoints
+Status Streams include filter, sample and firehose endpoints</p>
+<dl class="method">
+<dt id="twython.streaming.types.TwythonStreamerTypes.site">
+<tt class="descname">site</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.streaming.types.TwythonStreamerTypes.site" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stream site</p>
+<p>Accepted params found at:
+<a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/site">https://dev.twitter.com/docs/api/1.1/get/site</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.streaming.types.TwythonStreamerTypes.user">
+<tt class="descname">user</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.streaming.types.TwythonStreamerTypes.user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stream user</p>
+<p>Accepted params found at:
+<a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/user">https://dev.twitter.com/docs/api/1.1/get/user</a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="twython.streaming.types.TwythonStreamerTypesStatuses">
+<em class="property">class </em><tt class="descclassname">twython.streaming.types.</tt><tt class="descname">TwythonStreamerTypesStatuses</tt><big>(</big><em>streamer</em><big>)</big><a class="headerlink" href="#twython.streaming.types.TwythonStreamerTypesStatuses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for different statuses endpoints</p>
+<p>Available so TwythonStreamer.statuses.filter() is available.
+Just a bit cleaner than TwythonStreamer.statuses_filter(),
+statuses_sample(), etc. all being single methods in TwythonStreamer</p>
+<dl class="method">
+<dt id="twython.streaming.types.TwythonStreamerTypesStatuses.filter">
+<tt class="descname">filter</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.streaming.types.TwythonStreamerTypesStatuses.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stream statuses/filter</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**params</strong> &#8211; Paramters to send with your stream request</td>
+</tr>
+</tbody>
+</table>
+<p>Accepted params found at:
+<a class="reference external" href="https://dev.twitter.com/docs/api/1.1/post/statuses/filter">https://dev.twitter.com/docs/api/1.1/post/statuses/filter</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.streaming.types.TwythonStreamerTypesStatuses.firehose">
+<tt class="descname">firehose</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.streaming.types.TwythonStreamerTypesStatuses.firehose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stream statuses/firehose</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**params</strong> &#8211; Paramters to send with your stream request</td>
+</tr>
+</tbody>
+</table>
+<p>Accepted params found at:
+<a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/statuses/firehose">https://dev.twitter.com/docs/api/1.1/get/statuses/firehose</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="twython.streaming.types.TwythonStreamerTypesStatuses.sample">
+<tt class="descname">sample</tt><big>(</big><em>**params</em><big>)</big><a class="headerlink" href="#twython.streaming.types.TwythonStreamerTypesStatuses.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stream statuses/sample</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**params</strong> &#8211; Paramters to send with your stream request</td>
+</tr>
+</tbody>
+</table>
+<p>Accepted params found at:
+<a class="reference external" href="https://dev.twitter.com/docs/api/1.1/get/statuses/sample">https://dev.twitter.com/docs/api/1.1/get/statuses/sample</a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="exceptions">
+<h2>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="twython.TwythonError">
+<em class="property">exception </em><tt class="descclassname">twython.</tt><tt class="descname">TwythonError</tt><big>(</big><em>msg</em>, <em>error_code=None</em>, <em>retry_after=None</em><big>)</big><a class="headerlink" href="#twython.TwythonError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic error class, catch-all for most Twython issues.
+Special cases are handled by TwythonAuthError &amp; TwythonRateLimitError.</p>
+<p>from twython import TwythonError, TwythonRateLimitError, TwythonAuthError</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="twython.TwythonAuthError">
+<em class="property">exception </em><tt class="descclassname">twython.</tt><tt class="descname">TwythonAuthError</tt><big>(</big><em>msg</em>, <em>error_code=None</em>, <em>retry_after=None</em><big>)</big><a class="headerlink" href="#twython.TwythonAuthError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when you try to access a protected resource and it fails due to
+some issue with your authentication.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="twython.TwythonRateLimitError">
+<em class="property">exception </em><tt class="descclassname">twython.</tt><tt class="descname">TwythonRateLimitError</tt><big>(</big><em>msg</em>, <em>error_code</em>, <em>retry_after=None</em><big>)</big><a class="headerlink" href="#twython.TwythonRateLimitError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when you&#8217;ve hit a rate limit.</p>
+<p>The amount of seconds to retry your request in will be appended
+to the message.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Developer Interface</a><ul>
+<li><a class="reference internal" href="#core-interface">Core Interface</a></li>
+<li><a class="reference internal" href="#streaming-interface">Streaming Interface</a><ul>
+<li><a class="reference internal" href="#streaming-types">Streaming Types</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exceptions">Exceptions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="usage/basic_usage.html"
+                        title="previous chapter">Basic Usage</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="usage/basic_usage.html" title="Basic Usage"
+             >previous</a> |</li>
+        <li><a href="index.html">Twython 3.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ryan McGrath.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+.. _quickstart:
+
+Quickstart
+==========
+
+.. module:: twython.api
+
+Eager
