@@ -14,6 +14,8 @@ def _transparent_params(_params):
                 params[k] = 'false'
         elif isinstance(v, basestring) or isinstance(v, numeric_types):
             params[k] = v
+        elif isinstance(v, list):
+            params[k] = ','.join(v)
         else:
             continue
     return params, files

@@ -13,6 +13,9 @@ History
     - ``twitter_token`` and ``twitter_secret`` have been replaced with ``app_key`` and ``app_secret`` respectively
     - ``callback_url`` is now passed through ``Twython.get_authentication_tokens``
 - Update ``test_twython.py`` docstrings per http://www.python.org/dev/peps/pep-0257/
+- Removed ``get_list_memberships``, method is Twitter API 1.0 deprecated
+- Developers can now pass an array as a parameter to Twitter API methods and they will be automatically joined by a comma and converted to a string
+- ``endpoints.py`` now contains ``EndpointsMixin`` (rather than the previous ``api_table`` dict) for Twython, which enables Twython to use functions declared in the Mixin.
 
 2.10.1 (2013-05-29)
 ++++++++++++++++++
