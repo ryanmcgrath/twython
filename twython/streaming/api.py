@@ -1,6 +1,5 @@
 from .. import __version__
 from ..compat import json, is_py3
-from ..exceptions import TwythonStreamError
 from .types import TwythonStreamerTypes
 
 import requests
@@ -112,7 +111,8 @@ class TwythonStreamer(object):
         See https://dev.twitter.com/docs/streaming-apis/messages for messages
         sent along in stream responses.
 
-        :param data: dict of data recieved from the stream
+        :param data: data recieved from the stream
+        :type data: dict
         """
 
         if 'delete' in data:
@@ -129,7 +129,10 @@ class TwythonStreamer(object):
         want it handled.
 
         :param status_code: Non-200 status code sent from stream
+        :type status_code: int
+
         :param data: Error message sent from stream
+        :type data: dict
         """
         return
 
@@ -141,8 +144,8 @@ class TwythonStreamer(object):
 
         Twitter docs for deletion notices: http://spen.se/8qujd
 
-        :param data: dict of data from the 'delete' key recieved from
-                     the stream
+        :param data: data from the 'delete' key recieved from the stream
+        :type data: dict
         """
         return
 
@@ -154,8 +157,8 @@ class TwythonStreamer(object):
 
         Twitter docs for limit notices: http://spen.se/hzt0b
 
-        :param data: dict of data from the 'limit' key recieved from
-                     the stream
+        :param data: data from the 'limit' key recieved from the stream
+        :type data: dict
         """
         return
 
@@ -167,13 +170,15 @@ class TwythonStreamer(object):
 
         Twitter docs for disconnect notices: http://spen.se/xb6mm
 
-        :param data: dict of data from the 'disconnect' key recieved from
-                     the stream
+        :param data: data from the 'disconnect' key recieved from the stream
+        :type data: dict
         """
         return
 
     def on_timeout(self):
+        """ Called when the request has timed out """
         return
 
     def disconnect(self):
+        """Used to disconnect the streaming client manually"""
         self.connected = False

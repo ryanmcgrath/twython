@@ -1,28 +1,38 @@
-import re
+# -*- coding: utf-8 -*-
+
+"""
+twython.api
+~~~~~~~~~~~
+
+This module contains functionality for access to core Twitter API calls,
+Twitter Authentication, and miscellaneous methods that are useful when
+dealing with the Twitter API
+"""
 
 import requests
 from requests_oauthlib import OAuth1
 
 from . import __version__
 from .compat import json, urlencode, parse_qsl, quote_plus, str, is_py2
-from .endpoints import api_table
+from .endpoints import EndpointsMixin
 from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
 from .helpers import _transparent_params
 
 
-class Twython(object):
+class Twython(EndpointsMixin, object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None,
                  oauth_token_secret=None, headers=None, proxies=None,
                  api_version='1.1', ssl_verify=True):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
-            :param app_key: (optional) Your applications key
-            :param app_secret: (optional) Your applications secret key
-            :param oauth_token: (optional) Used with oauth_token_secret to make authenticated calls
-            :param oauth_token_secret: (optional) Used with oauth_token to make authenticated calls
-            :param headers: (optional) Custom headers to send along with the request
-            :param proxies: (optional) A dictionary of proxies, for example {"http":"proxy.example.org:8080", "https":"proxy.example.org:8081"}.
-            :param ssl_verify: (optional) Turns off ssl verification when False. Useful if you have development server issues.
+        :param app_key: (optional) Your applications key
+        :param app_secret: (optional) Your applications secret key
+        :param oauth_token: (optional) Used with oauth_token_secret to make authenticated calls
+        :param oauth_token_secret: (optional) Used with oauth_token to make authenticated calls
+        :param headers: (optional) Custom headers to send along with the request
+        :param proxies: (optional) A dictionary of proxies, for example {"http":"proxy.example.org:8080", "https":"proxy.example.org:8081"}.
+        :param ssl_verify: (optional) Turns off ssl verification when False. Useful if you have development server issues.
+
         """
 
         # API urls, OAuth urls and API version; needed for hitting that there API.
@@ -62,32 +72,11 @@ class Twython(object):
 
         self._last_call = None
 
-        def _setFunc(key):
-            '''Register functions, attaching them to the Twython instance'''
-            return lambda **kwargs: self._constructFunc(key, **kwargs)
-
-        # Loop through all our Twitter API endpoints made available in endpoints.py
-        for key in api_table.keys():
-            self.__dict__[key] = _setFunc(key)
-
     def __repr__(self):
         return '<Twython: %s>' % (self.app_key)
 
-    def _constructFunc(self, api_call, **kwargs):
-        # Go through and replace any {{mustaches}} that are in our API url.
-        fn = api_table[api_call]
-        url = re.sub(
-            '\{\{(?P<m>[a-zA-Z_]+)\}\}',
-            lambda m: "%s" % kwargs.get(m.group(1)),
-            self.api_url % self.api_version + fn['url']
-        )
-
-        return self._request(url, method=fn['method'], params=kwargs)
-
     def _request(self, url, method='GET', params=None, api_call=None):
-        '''Internal response generator, no sense in repeating the same
-        code twice, right? ;)
-        '''
+        """Internal request method"""
         method = method.lower()
         params = params or {}
 
@@ -153,14 +142,21 @@ class Twython(object):
 
         return content
 
-    '''
-    # Dynamic Request Methods
-    Just in case Twitter releases something in their API
-    and a developer wants to implement it on their app, but
-    we haven't gotten around to putting it in Twython yet. :)
-    '''
-
     def request(self, endpoint, method='GET', params=None, version='1.1'):
+        """Return dict of response received from Twitter's API
+
+        :param endpoint: (required) Full url or Twitter API endpoint (e.g. search/tweets)
+        :type endpoint: string
+        :param method: (optional) Method of accessing data, either GET or POST. (default GET)
+        :type method: string
+        :param params: (optional) Dict of parameters (if any) accepted the by Twitter API endpoint you are trying to access (default None)
+        :type params: dict or None
+        :param version: (optional) Twitter API version to access (default 1.1)
+        :type version: string
+
+        :rtype: dict
+        """
+
         # In case they want to pass a full Twitter URL
         # i.e. https://api.twitter.com/1.1/search/tweets.json
         if endpoint.startswith('http://') or endpoint.startswith('https://'):
@@ -173,25 +169,25 @@ class Twython(object):
         return content
 
     def get(self, endpoint, params=None, version='1.1'):
+        """Shortcut for GET requests via :class:`request`"""
         return self.request(endpoint, params=params, version=version)
 
     def post(self, endpoint, params=None, version='1.1'):
+        """Shortcut for POST requests via :class:`request`"""
         return self.request(endpoint, 'POST', params=params, version=version)
 
-    # End Dynamic Request Methods
-
     def get_lastfunction_header(self, header):
-        """Returns the header in the last function
-            This must be called after an API call, as it returns header based
-            information.
+        """Returns a specific header from the last API call
+        This will return None if the header is not present
 
-            This will return None if the header is not present
+        :param header: (required) The name of the header you want to get the value of
 
-            Most useful for the following header information:
-                x-rate-limit-limit
-                x-rate-limit-remaining
-                x-rate-limit-class
-                x-rate-limit-reset
+        Most useful for the following header information:
+            x-rate-limit-limit,
+            x-rate-limit-remaining,
+            x-rate-limit-class,
+            x-rate-limit-reset
+
         """
         if self._last_call is None:
             raise TwythonError('This function must be called after an API call.  It delivers header information.')
@@ -202,11 +198,12 @@ class Twython(object):
             return None
 
     def get_authentication_tokens(self, callback_url=None, force_login=False, screen_name=''):
-        """Returns a dict including an authorization URL (auth_url) to direct a user to
+        """Returns a dict including an authorization URL, ``auth_url``, to direct a user to
 
-            :param callback_url: (optional) Url the user is returned to after they authorize your app (web clients only)
-            :param force_login: (optional) Forces the user to enter their credentials to ensure the correct users account is authorized.
-            :param app_secret: (optional) If forced_login is set OR user is not currently logged in, Prefills the username input box of the OAuth login screen with the given value
+        :param callback_url: (optional) Url the user is returned to after they authorize your app (web clients only)
+        :param force_login: (optional) Forces the user to enter their credentials to ensure the correct users account is authorized.
+        :param app_secret: (optional) If forced_login is set OR user is not currently logged in, Prefills the username input box of the OAuth login screen with the given value
+        :rtype: dict
         """
         callback_url = callback_url or self.callback_url
         request_args = {}
@@ -244,9 +241,11 @@ class Twython(object):
         return request_tokens
 
     def get_authorized_tokens(self, oauth_verifier):
-        """Returns authorized tokens after they go through the auth_url phase.
+        """Returns a dict of authorized tokens after they go through the :class:`get_authentication_tokens` phase.
 
-            :param oauth_verifier: (required) The oauth_verifier (or a.k.a PIN for non web apps) retrieved from the callback url querystring
+        :param oauth_verifier: (required) The oauth_verifier (or a.k.a PIN for non web apps) retrieved from the callback url querystring
+        :rtype: dict
+
         """
         response = self.client.get(self.access_token_url, params={'oauth_verifier': oauth_verifier})
         authorized_tokens = dict(parse_qsl(response.content.decode('utf-8')))
@@ -262,7 +261,24 @@ class Twython(object):
     # ------------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def construct_api_url(base_url, params=None):
+    def construct_api_url(api_url, **params):
+        """Construct a Twitter API url, encoded, with parameters
+
+        :param api_url: URL of the Twitter API endpoint you are attempting to construct
+        :param \*\*params: Parameters that are accepted by Twitter for the endpoint you're requesting
+        :rtype: string
+
+        Usage::
+
+          >>> from twython import Twython
+          >>> twitter = Twython()
+
+          >>> api_url = 'https://api.twitter.com/1.1/search/tweets.json'
+          >>> constructed_url = twitter.construct_api_url(api_url, q='python', result_type='popular')
+          >>> print constructed_url
+          https://api.twitter.com/1.1/search/tweets.json?q=python&result_type=popular
+
+        """
         querystring = []
         params, _ = _transparent_params(params or {})
         params = requests.utils.to_key_val_list(params)
@@ -270,18 +286,28 @@ class Twython(object):
             querystring.append(
                 '%s=%s' % (Twython.encode(k), quote_plus(Twython.encode(v)))
             )
-        return '%s?%s' % (base_url, '&'.join(querystring))
+        return '%s?%s' % (api_url, '&'.join(querystring))
 
-    def search_gen(self, search_query, **kwargs):
+    def search_gen(self, search_query, **params):
         """Returns a generator of tweets that match a specified query.
 
-            Documentation: https://dev.twitter.com/docs/api/1.1/get/search/tweets
+        Documentation: https://dev.twitter.com/docs/api/1.1/get/search/tweets
 
-            e.g search = x.search_gen('python')
-                for result in search:
-                    print result
+        :param search_query: Query you intend to search Twitter for
+        :param \*\*params: Extra parameters to send with your search request
+        :rtype: generator
+
+        Usage::
+
+          >>> from twython import Twython
+          >>> twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+
+          >>> search = twitter.search_gen('python')
+          >>> for result in search:
+          >>>   print result
+
         """
-        content = self.search(q=search_query, **kwargs)
+        content = self.search(q=search_query, **params)
 
         if not content.get('statuses'):
             raise StopIteration
@@ -290,12 +316,12 @@ class Twython(object):
             yield tweet
 
         try:
-            if not 'since_id' in kwargs:
-                kwargs['since_id'] = (int(content['statuses'][0]['id_str']) + 1)
+            if not 'since_id' in params:
+                params['since_id'] = (int(content['statuses'][0]['id_str']) + 1)
         except (TypeError, ValueError):
             raise TwythonError('Unable to generate next page of search results, `page` is not a number.')
 
-        for tweet in self.search_gen(search_query, **kwargs):
+        for tweet in self.search_gen(search_query, **params):
             yield tweet
 
     @staticmethod
