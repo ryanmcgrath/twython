@@ -1,0 +1,25 @@
+{#
+    basicstrap/searchbox.html
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    Sphinx sidebar template: quick search box.
+
+    :copyright: Copyright 2012 by tell-k.
+    :license: MIT Licence, see LICENSE for details.
+#}
+{%- if pagename != "search" %}
+<div id="searchbox">
+  <h3>{{ _('Quick search') }}</h3>
+  <form class="search form-search" action="{{ pathto('search') }}" method="get">
+      <div class="input-append">
+        <input type="text" class="search-query" name="q">
+        <input type="submit" class="btn" value="{{ _('Go') }}" />
+      </div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    {{ _('Enter search terms or a module, class or function name.') }}
+    </p>
+</div>
+{%- endif %}

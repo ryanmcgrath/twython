@@ -1,0 +1,7 @@
+.section {
+    margin-bottom: 30px !important;
+}
+
+div.tip {
+    color: #3a87ad; /* Basicstrap CSS was messed up so override it */
+}
