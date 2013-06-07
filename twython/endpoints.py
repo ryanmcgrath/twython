@@ -297,7 +297,7 @@ class EndpointsMixin(object):
         """
         return self.get('account/settings', params=params)
 
-    def verify_Credentials(self, **params):
+    def verify_credentials(self, **params):
         """Returns an HTTP 200 OK response code and a representation of the
         requesting user if authentication was successful; returns a 401 status
         code and an error message if not.
