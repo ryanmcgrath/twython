@@ -11,8 +11,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-#import sphinx_bootstrap_theme
-
 import sys, os
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -29,7 +27,7 @@ import twython
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinxjp.themecore']
+extensions = ['sphinx.ext.autodoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -241,6 +239,8 @@ texinfo_documents = [
 
 
 # Activate the theme.
+sys.path.append(os.path.abspath('_themes'))
+html_theme_path = ['_themes']
 html_theme = 'basicstrap'
 html_theme_options = {
     'inner_theme': True,
