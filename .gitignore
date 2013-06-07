@@ -36,4 +36,6 @@ nosetests.xml
 .pydevproject
 *.DS_Store
 
+docs/_build
+
 test.py

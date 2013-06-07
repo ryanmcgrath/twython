@@ -1,3 +1,4 @@
 coverage==3.6.0
 requests==1.2.2
 requests_oauthlib==0.3.2
+sphinxjp.themes.basicstrap==0.2.0

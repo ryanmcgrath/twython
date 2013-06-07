@@ -29,7 +29,7 @@ import twython
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc']
+extensions = ['sphinx.ext.autodoc', 'sphinxjp.themecore']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -241,11 +241,11 @@ texinfo_documents = [
 
 
 # Activate the theme.
-#html_theme = 'bootstrap'
-#html_theme_options = {
-#    'bootswatch_theme': 'flatly'
-#}
-#html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+html_theme = 'basicstrap'
+html_theme_options = {
+    'inner_theme': True,
+    'inner_theme_name': 'bootswatch-cerulean',
+}
 
 # Documents to append as an appendix to all manuals.
 #texinfo_appendices = []
