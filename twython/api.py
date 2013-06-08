@@ -10,7 +10,8 @@ dealing with the Twitter API
 """
 
 import requests
-from requests_oauthlib import OAuth1
+from requests.auth import HTTPBasicAuth
+from requests_oauthlib import OAuth1, OAuth2
 
 from . import __version__
 from .compat import json, urlencode, parse_qsl, quote_plus, str, is_py2
@@ -21,14 +22,19 @@ from .helpers import _transparent_params
 
 class Twython(EndpointsMixin, object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None,
-                 oauth_token_secret=None, headers=None, proxies=None,
-                 api_version='1.1', ssl_verify=True):
+                 oauth_token_secret=None, access_token=None, token_type='bearer',
+                 oauth_version=1, headers=None, proxies=None, api_version='1.1',
+                 ssl_verify=True):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
         :param app_key: (optional) Your applications key
         :param app_secret: (optional) Your applications secret key
-        :param oauth_token: (optional) Used with oauth_token_secret to make authenticated calls
-        :param oauth_token_secret: (optional) Used with oauth_token to make authenticated calls
+        :param oauth_token: (optional) When using **OAuth 1**, combined with oauth_token_secret to make authenticated calls
+        :param oauth_token_secret: (optional) When using **OAuth 1** combined with oauth_token to make authenticated calls
+        :param access_token: (optional) When using **OAuth 2**, provide a valid access token if you have one
+        :param token_type: (optional) When using **OAuth 2**, provide your token type. Default: bearer
+        :param oauth_version: (optional) Choose which OAuth version to use. Default: 1
+
         :param headers: (optional) Custom headers to send along with the request
         :param proxies: (optional) A dictionary of proxies, for example {"http":"proxy.example.org:8080", "https":"proxy.example.org:8081"}.
         :param ssl_verify: (optional) Turns off ssl verification when False. Useful if you have development server issues.
@@ -38,14 +44,24 @@ class Twython(EndpointsMixin, object):
         # API urls, OAuth urls and API version; needed for hitting that there API.
         self.api_version = api_version
         self.api_url = 'https://api.twitter.com/%s'
-        self.request_token_url = self.api_url % 'oauth/request_token'
-        self.access_token_url = self.api_url % 'oauth/access_token'
-        self.authenticate_url = self.api_url % 'oauth/authenticate'
 
         self.app_key = app_key
         self.app_secret = app_secret
         self.oauth_token = oauth_token
         self.oauth_token_secret = oauth_token_secret
+        self.access_token = access_token
+
+        # OAuth 1
+        self.request_token_url = self.api_url % 'oauth/request_token'
+        self.access_token_url = self.api_url % 'oauth/access_token'
+        self.authenticate_url = self.api_url % 'oauth/authenticate'
+
+        if self.access_token:  # If they pass an access token, force OAuth 2
+            oauth_version = 2
+
+        # OAuth 2
+        if oauth_version == 2:
+            self.request_token_url = self.api_url % 'oauth2/token'
 
         req_headers = {'User-Agent': 'Twython v' + __version__}
         if headers:
@@ -55,14 +71,20 @@ class Twython(EndpointsMixin, object):
         # If no keys/tokens are passed to __init__, auth=None allows for
         # unauthenticated requests, although I think all v1.1 requests need auth
         auth = None
-        if self.app_key is not None and self.app_secret is not None and \
-           self.oauth_token is None and self.oauth_token_secret is None:
-            auth = OAuth1(self.app_key, self.app_secret)
+        if oauth_version == 1:
+            # User Authentication is through OAuth 1
+            if self.app_key is not None and self.app_secret is not None and \
+               self.oauth_token is None and self.oauth_token_secret is None:
+                auth = OAuth1(self.app_key, self.app_secret)
 
-        if self.app_key is not None and self.app_secret is not None and \
-           self.oauth_token is not None and self.oauth_token_secret is not None:
-            auth = OAuth1(self.app_key, self.app_secret,
-                          self.oauth_token, self.oauth_token_secret)
+            if self.app_key is not None and self.app_secret is not None and \
+               self.oauth_token is not None and self.oauth_token_secret is not None:
+                auth = OAuth1(self.app_key, self.app_secret,
+                              self.oauth_token, self.oauth_token_secret)
+        elif oauth_version == 2 and self.access_token:
+            # Application Authentication is through OAuth 2
+            token = {'token_type': token_type, 'access_token': self.access_token}
+            auth = OAuth2(self.app_key, token=token)
 
         self.client = requests.Session()
         self.client.headers = req_headers
@@ -205,6 +227,9 @@ class Twython(EndpointsMixin, object):
         :param app_secret: (optional) If forced_login is set OR user is not currently logged in, Prefills the username input box of the OAuth login screen with the given value
         :rtype: dict
         """
+        if self.oauth_version != 1:
+            raise TwythonError('This method can only be called when your OAuth version is 1.0.')
+
         callback_url = callback_url or self.callback_url
         request_args = {}
         if callback_url:
@@ -247,6 +272,9 @@ class Twython(EndpointsMixin, object):
         :rtype: dict
 
         """
+        if self.oauth_version != 1:
+            raise TwythonError('This method can only be called when your OAuth version is 1.0.')
+
         response = self.client.get(self.access_token_url, params={'oauth_verifier': oauth_verifier})
         authorized_tokens = dict(parse_qsl(response.content.decode('utf-8')))
         if not authorized_tokens:
@@ -254,11 +282,29 @@ class Twython(EndpointsMixin, object):
 
         return authorized_tokens
 
-    # ------------------------------------------------------------------------------------------------------------------------
-    # The following methods are all different in some manner or require special attention with regards to the Twitter API.
-    # Because of this, we keep them separate from all the other endpoint definitions - ideally this should be change-able,
-    # but it's not high on the priority list at the moment.
-    # ------------------------------------------------------------------------------------------------------------------------
+    def obtain_access_token(self):
+        """Returns an OAuth 2 access token to make OAuth 2 authenticated read-only calls.
+
+        :rtype: string
+        """
+        if self.oauth_version != 2:
+            raise TwythonError('This method can only be called when your OAuth version is 2.0.')
+
+        data = {'grant_type': 'client_credentials'}
+        basic_auth = HTTPBasicAuth(self.app_key, self.app_secret)
+        try:
+            response = self.client.post(self.request_token_url,
+                                        data=data, auth=basic_auth)
+            content = response.content.decode('utf-8')
+            try:
+                content = content.json()
+            except AttributeError:
+                content = json.loads(content)
+                access_token = content['access_token']
+        except (ValueError, requests.exceptions.RequestException):
+            raise TwythonAuthError('Unable to obtain OAuth 2 access token.')
+        else:
+            return access_token
 
     @staticmethod
     def construct_api_url(api_url, **params):

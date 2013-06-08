@@ -16,6 +16,7 @@ History
 - Removed ``get_list_memberships``, method is Twitter API 1.0 deprecated
 - Developers can now pass an array as a parameter to Twitter API methods and they will be automatically joined by a comma and converted to a string
 - ``endpoints.py`` now contains ``EndpointsMixin`` (rather than the previous ``api_table`` dict) for Twython, which enables Twython to use functions declared in the Mixin.
+- Added OAuth 2 authentication (Application Only) for when you want to make read-only calls to Twitter without having to go through the whole user authentication ritual (see docs for usage)
 
 2.10.1 (2013-05-29)
 ++++++++++++++++++
