@@ -34,14 +34,14 @@ class EndpointsMixin(object):
         """
         return self.get('statuses/user_timeline', params=params)
 
-    def get_home_timline(self, **params):
+    def get_home_timeline(self, **params):
         """Returns a collection of the most recent Tweets and retweets
         posted by the authenticating user and the users they follow.
 
         Docs: https://dev.twitter.com/docs/api/1.1/get/statuses/home_timeline
 
         """
-        return self.get('statuses/home_timline', params=params)
+        return self.get('statuses/home_timeline', params=params)
 
     def retweeted_of_me(self, **params):
         """Returns the most recent tweets authored by the authenticating user
@@ -89,7 +89,7 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/post/statuses/update
 
         """
-        return self.post('statuses/update_status', params=params)
+        return self.post('statuses/update', params=params)
 
     def retweet(self, **params):
         """Retweets a tweet specified by the id parameter
@@ -119,7 +119,7 @@ class EndpointsMixin(object):
         """
         return self.get('statuses/oembed', params=params)
 
-    def get_retweeters_id(self, **params):
+    def get_retweeters_ids(self, **params):
         """Returns a collection of up to 100 user IDs belonging to users who
         have retweeted the tweet specified by the id parameter.
 
@@ -479,7 +479,7 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/get/users/suggestions/%3Aslug/members
 
         """
-        return self.get('users/suggestions/%s/members' % param['slug'], params=params)
+        return self.get('users/suggestions/%s/members' % params['slug'], params=params)
 
     # Favorites
     def get_favorites(self, **params):
@@ -531,7 +531,6 @@ class EndpointsMixin(object):
         """
         return self.post('lists/members/destroy', params=params)
 
-
     def get_list_subscribers(self, **params):
         """Returns the subscribers of the specified list.
 
@@ -562,11 +561,11 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/post/lists/subscribers/destroy
 
         """
-        return self.get('lists/subscribers/destroy', params=params)
+        return self.post('lists/subscribers/destroy', params=params)
 
     def create_list_members(self, **params):
         """Adds multiple members to a list, by specifying a comma-separated
-        list of member ids or screen names. 
+        list of member ids or screen names.
 
         Docs: https://dev.twitter.com/docs/api/1.1/post/lists/members/create_all
 

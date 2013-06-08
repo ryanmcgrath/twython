@@ -57,17 +57,8 @@ class TwythonAPITestCase(unittest.TestCase):
     def test_construct_api_url(self):
         """Test constructing a Twitter API url works as we expect"""
         url = 'https://api.twitter.com/1.1/search/tweets.json'
-        constructed_url = self.api.construct_api_url(url, {'q': '#twitter'})
+        constructed_url = self.api.construct_api_url(url, q='#twitter')
         self.assertEqual(constructed_url, 'https://api.twitter.com/1.1/search/tweets.json?q=%23twitter')
-
-    def test_shorten_url(self):
-        """Test shortening a url works"""
-        self.api.shorten_url('http://google.com')
-
-    def test_shorten_url_no_shortner(self):
-        """Test shortening a url with no shortener provided raises TwythonError"""
-        self.assertRaises(TwythonError, self.api.shorten_url,
-                          'http://google.com', '')
 
     def test_get(self):
         """Test Twython generic GET request works"""
@@ -385,10 +376,6 @@ class TwythonAPITestCase(unittest.TestCase):
         self.api.delete_list_member(list_id=list_id, screen_name='justinbieber')
 
         self.api.delete_list(list_id=list_id)
-
-    def test_get_list_memberships(self):
-        """Test list of lists the authenticated user is a member of succeeds"""
-        self.api.get_list_memberships()
 
     def test_get_list_subscribers(self):
         """Test list of subscribers of a specific list succeeds"""

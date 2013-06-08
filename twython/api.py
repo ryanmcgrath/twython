@@ -59,6 +59,8 @@ class Twython(EndpointsMixin, object):
         if self.access_token:  # If they pass an access token, force OAuth 2
             oauth_version = 2
 
+        self.oauth_version = oauth_version
+
         # OAuth 2
         if oauth_version == 2:
             self.request_token_url = self.api_url % 'oauth2/token'
