@@ -30,3 +30,5 @@ script: nosetests -v test_twython:TwythonAPITestCase test_twython:TwythonAuthTes
 install: pip install -r requirements.txt
 notifications:
   email: false
+after_success:
+  - coveralls
