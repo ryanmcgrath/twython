@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+"""
+twython.exceptions
+~~~~~~~~~~~~~~~~~~
+
+This module contains Twython specific Exception classes.
+"""
+
 from .endpoints import TWITTER_HTTP_STATUS_CODE
 
 

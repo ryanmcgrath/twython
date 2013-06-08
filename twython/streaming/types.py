@@ -4,7 +4,7 @@
 twython.streaming.types
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This module contains classes and methods for :class:`TwythonStreamer` to mak
+This module contains classes and methods for :class:`TwythonStreamer` to use.
 """
 
 

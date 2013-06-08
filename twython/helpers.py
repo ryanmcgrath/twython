@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+
+"""
+twython.helpers
+~~~~~~~~~~~~~~~
+
+This module contains functions that are repeatedly used throughout
+the Twython library.
+"""
+
 from .compat import basestring, numeric_types
 
 

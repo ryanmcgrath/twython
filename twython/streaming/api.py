@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+
+"""
+twython.streaming.api
+~~~~~~~~~~~~~~~~~~~~~
+
+This module contains functionality for interfacing with streaming
+Twitter API calls.
+"""
+
 from .. import __version__
 from ..compat import json, is_py3
 from .types import TwythonStreamerTypes

@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+
+"""
+twython.compat
+~~~~~~~~~~~~~~
+
+This module contains imports and declarations for seamless Python 2 and
+Python 3 compatibility.
+"""
+
 import sys
 
 _ver = sys.version_info
