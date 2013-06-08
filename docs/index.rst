@@ -17,7 +17,7 @@ Features
    - Timelines
    - Direct Messages
    - and anything found in `the Twitter API docs <https://dev.twitter.com/docs/api/1.1>`_.
-- Image Uploading!
+- Image Uploading:
    - Update user status with an image
    - Change user avatar
    - Change user background image

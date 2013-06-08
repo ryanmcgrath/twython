@@ -21,8 +21,6 @@ Core Interface
 
 .. _streaming_interface:
 
-.. module:: twython.streaming
-
 Streaming Interface
 -------------------
 
