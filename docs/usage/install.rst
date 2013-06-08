@@ -5,6 +5,7 @@ Installation
 
 Information on how to properly install Twython
 
+*******************************************************************************
 
 Pip or Easy Install
 -------------------
@@ -40,3 +41,7 @@ Feel free to clone the repository::
 Now that you have the source code, install it into your site-packages directory::
 
     $ python setup.py install
+
+*******************************************************************************
+
+So Twython is installed! Now, head over to the :ref:`starting out <starting-out>` section.

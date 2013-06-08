@@ -18,10 +18,11 @@ Features
    - Direct Messages
    - and anything found in `the Twitter API docs <https://dev.twitter.com/docs/api/1.1>`_.
 - Image Uploading!
-   - **Update user status with an image**
+   - Update user status with an image
    - Change user avatar
    - Change user background image
    - Change user banner image
+- OAuth 2 Application Only (read-only) Support
 - Support for Twitter's Streaming API
 - Seamless Python 3 support!
 
@@ -29,11 +30,13 @@ Usage
 -----
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    usage/install
    usage/starting_out
    usage/basic_usage
+   usage/advanced_usage
+   usage/streaming_api
 
 Twython API Documentation
 -------------------------

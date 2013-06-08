@@ -19,6 +19,8 @@ Core Interface
    :special-members: __init__
    :inherited-members:
 
+.. _streaming_interface:
+
 Streaming Interface
 -------------------
 
