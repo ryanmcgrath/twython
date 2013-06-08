@@ -6,6 +6,8 @@ Twython
         :target: https://travis-ci.org/ryanmcgrath/twython
 .. image:: https://pypip.in/d/twython/badge.png
         :target: https://crate.io/packages/twython/
+.. image:: https://coveralls.io/repos/ryanmcgrath/twython/badge.png?branch=3.0.0
+        :target: https://coveralls.io/r/ryanmcgrath/twython?branch=3.0.0
 
 ``Twython`` is a library providing an easy (and up-to-date) way to access Twitter data in Python. Actively maintained and featuring support for both Python 2.6+ and Python 3, it's been battle tested by companies, educational institutions and individuals alike. Try it today!
 
@@ -18,11 +20,12 @@ Features
     - Timelines
     - Direct Messages
     - and anything found in `the docs <https://dev.twitter.com/docs/api/1.1>`_
-* Image Uploading!
-    - **Update user status with an image**
+* Image Uploading:
+    - Update user status with an image
     - Change user avatar
     - Change user background image
     - Change user banner image
+* OAuth 2 Application Only (read-only) Support
 * Support for Twitter's Streaming API
 * Seamless Python 3 support!
 
@@ -229,8 +232,7 @@ Streaming API
 Notes
 -----
 
-* Twython (as of 2.7.0) now supports ONLY Twitter v1.1 endpoints! Please see the **[Twitter v1.1 API Documentation](https://dev.twitter.com/docs/api/1.1)** to help migrate your API calls!
-* As of Twython 2.9.1, all method names conform to PEP8 standards. For backwards compatibility, we internally check and catch any calls made using the old (pre 2.9.1) camelCase method syntax. We will continue to support this for the foreseeable future for all old methods (raising a DeprecationWarning where appropriate), but you should update your code if you have the time.
+* Twython 3.0.0 has been injected with 1000mgs of pure awesomeness! OAuth 2 application authentication is now supported. And a *whole lot* more! See the `CHANGELOG<https://github.com/ryanmcgrath/twython/blob/master/HISTORY.rst#300-2013-xx-xx>`_ for more details!
 
 Questions, Comments, etc?
 -------------------------
