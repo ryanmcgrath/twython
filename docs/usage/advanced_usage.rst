@@ -27,4 +27,18 @@ Documentation: https://dev.twitter.com/docs/api/1.1/get/account/verify_credentia
     photo = open('/path/to/file/image.jpg', 'rb')
     twitter.update_status_with_media(status='Checkout this cool image!', media=photo)
 
+Search Generator
+----------------
+
+So, if you're pretty into Python, you probably know about `generators <http://docs.python.org/2/tutorial/classes.html#generators>`_
+
+That being said, Twython offers a generator for search results and can be accessed by using the following code:
+
+::
+
+    search = twitter.search_gen('python')
+    for result in search:
+        print result
+
+
 So now you can authenticate, update your status (with or without an image), search Twitter, and a few other things! Good luck!

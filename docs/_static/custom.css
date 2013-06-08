@@ -2,6 +2,12 @@
     margin-bottom: 30px !important;
 }
 
-div.tip {
+.tip {
     color: #3a87ad; /* Basicstrap CSS was messed up so override it */
+}
+
+@media (min-width: 1200px) {
+    .collapse .pull-right{
+        margin-right: 115px !important;
+    }
 }

@@ -94,8 +94,8 @@ First, you'll want to import Twython::
 
     from twython import Twython
 
-Don't have an OAuth 2 `access_token`?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Obtain an OAuth 2 Access Token
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -107,8 +107,8 @@ Don't have an OAuth 2 `access_token`?
 
     # Save ACCESS_TOKEN in a database or something for later use!
 
-Already have one?
-^^^^^^^^^^^^^^^^^
+Use the Access Token
+^^^^^^^^^^^^^^^^^^^^
 
 ::
 

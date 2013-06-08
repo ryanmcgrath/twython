@@ -21,6 +21,8 @@ Core Interface
 
 .. _streaming_interface:
 
+.. module:: twython.streaming
+
 Streaming Interface
 -------------------
 
@@ -40,6 +42,6 @@ Streaming Types
 Exceptions
 ----------
 
-.. autoexception:: TwythonError
-.. autoexception:: TwythonAuthError
-.. autoexception:: TwythonRateLimitError
+.. autoexception:: twython.TwythonError
+.. autoexception:: twython.TwythonAuthError
+.. autoexception:: twython.TwythonRateLimitError

@@ -30,7 +30,7 @@ Usage
 -----
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 4
 
    usage/install
    usage/starting_out
