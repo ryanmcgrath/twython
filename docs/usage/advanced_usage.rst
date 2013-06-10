@@ -40,5 +40,66 @@ That being said, Twython offers a generator for search results and can be access
     for result in search:
         print result
 
+Manipulate the Request (headers, proxies, etc.)
+-----------------------------------------------
+
+There are times when you may want to turn SSL verification off, send custom headers, or add proxies for the request to go through.
+
+Twython uses the `requests <http://python-requests.org>`_ library to make API calls to Twitter. ``requests`` accepts a few parameters to allow developers to manipulate the acutal HTTP request.
+
+Here is an example of sending custom headers to a Twitter API request:
+
+::
+
+    from twython import Twython
+
+    client_args = {
+        'headers': {
+            'User-Agent': 'My App Name'
+        }
+    }
+
+    twitter = Twython(APP_KEY, APP_SECRET
+                      OAUTH_TOKEN, OAUTH_TOKEN_SECRET
+                      client_args=client_args)
+
+Here is an example of sending the request through proxies:
+
+::
+
+    from twython import Twython
+
+    client_args = {
+        'proxies': {
+            'http': '10.0.10.1:8000',
+            'https': '10.0.10.1:8001',
+        }
+    }
+
+    twitter = Twython(APP_KEY, APP_SECRET
+                      OAUTH_TOKEN, OAUTH_TOKEN_SECRET
+                      client_args=client_args)
+
+or both (and set a timeout variable):
+
+::
+
+    from twython import Twython
+
+    client_args = {
+        'headers': {
+            'User-Agent': 'My App Name'
+        },
+        'proxies': {
+            'http': '10.0.10.1:8000',
+            'https': '10.0.10.1:8001',
+        }
+        'timeout': 300,
+    }
+
+    twitter = Twython(APP_KEY, APP_SECRET
+                      OAUTH_TOKEN, OAUTH_TOKEN_SECRET
+                      client_args=client_args)
+
 
 So now you can authenticate, update your status (with or without an image), search Twitter, and a few other things! Good luck!
