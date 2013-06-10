@@ -23,8 +23,7 @@ from .helpers import _transparent_params
 class Twython(EndpointsMixin, object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None,
                  oauth_token_secret=None, access_token=None, token_type='bearer',
-                 oauth_version=1, headers=None, proxies=None, api_version='1.1',
-                 ssl_verify=True):
+                 oauth_version=1, api_version='1.1', client_args=None):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
         :param app_key: (optional) Your applications key
@@ -34,10 +33,11 @@ class Twython(EndpointsMixin, object):
         :param access_token: (optional) When using **OAuth 2**, provide a valid access token if you have one
         :param token_type: (optional) When using **OAuth 2**, provide your token type. Default: bearer
         :param oauth_version: (optional) Choose which OAuth version to use. Default: 1
+        :param api_version: (optional) Choose which Twitter API version to use. Default: 1.1
 
-        :param headers: (optional) Custom headers to send along with the request
-        :param proxies: (optional) A dictionary of proxies, for example {"http":"proxy.example.org:8080", "https":"proxy.example.org:8081"}.
-        :param ssl_verify: (optional) Turns off ssl verification when False. Useful if you have development server issues.
+        :param client_args: (optional) Accepts some requests Session parameters and some requests Request parameters.
+                            See http://docs.python-requests.org/en/latest/api/#sessionapi and requests section below it for details.
+                            [ex. headers, proxies, verify(SSL verification)]
 
         """
 
@@ -65,9 +65,14 @@ class Twython(EndpointsMixin, object):
         if oauth_version == 2:
             self.request_token_url = self.api_url % 'oauth2/token'
 
-        req_headers = {'User-Agent': 'Twython v' + __version__}
-        if headers:
-            req_headers.update(headers)
+        self.client_args = client_args
+        default_headers = {'User-Agent': 'Twython v' + __version__}
+        if not 'headers' in self.client_args:
+            # If they didn't set any headers, set our defaults for them
+            self.client_args['headers'] = default_headers
+        elif 'User-Agent' not in self.client_args['headers']:
+            # If they set headers, but didn't include User-Agent.. set it for them
+            self.client_args['headers'].update(default_headers)
 
         # Generate OAuth authentication object for the request
         # If no keys/tokens are passed to __init__, auth=None allows for
@@ -89,10 +94,12 @@ class Twython(EndpointsMixin, object):
             auth = OAuth2(self.app_key, token=token)
 
         self.client = requests.Session()
-        self.client.headers = req_headers
-        self.client.proxies = proxies
         self.client.auth = auth
-        self.client.verify = ssl_verify
+
+        for k, v in self.client_args:
+            if k in ('cert', 'headers', 'hooks', 'max_redirects', 'proxies'):
+                setattr(self.client, k, v)
+                client_args.pop(k)
 
         self._last_call = None
 
@@ -106,10 +113,21 @@ class Twython(EndpointsMixin, object):
 
         func = getattr(self.client, method)
         params, files = _transparent_params(params)
+
+        requests_args = {}
+        for k, v in self.client_args:
+            if k in ('timeout', 'allow_redirects', 'stream', 'verify'):
+                requests_args[k] = v
+                self.client_args.pop(k)
+
         if method == 'get':
-            response = func(url, params=params)
+            requests_args['params'] = params
         else:
-            response = func(url, data=params, files=files)
+            requests_args.update({
+                'data': params,
+                'files': files,
+            })
+        response = func(url, **requests_args)
         content = response.content.decode('utf-8')
 
         # create stash for last function intel
