@@ -50,9 +50,16 @@ class TwythonAuthTestCase(unittest.TestCase):
 
 class TwythonAPITestCase(unittest.TestCase):
     def setUp(self):
+
+        client_args = {
+            'headers': {
+                'User-Agent': '__twython__ Test'
+            }
+        }
+
         self.api = Twython(app_key, app_secret,
                            oauth_token, oauth_token_secret,
-                           headers={'User-Agent': '__twython__ Test'})
+                           client_args=client_args)
 
     def test_construct_api_url(self):
         """Test constructing a Twitter API url works as we expect"""
