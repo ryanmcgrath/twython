@@ -96,10 +96,14 @@ class Twython(EndpointsMixin, object):
         self.client = requests.Session()
         self.client.auth = auth
 
-        for k, v in self.client_args:
+        # Make a copy of the client args and iterate over them
+        # Pop out all the acceptable args at this point because they will
+        # Never be used again.
+        client_args_copy = self.client_args.copy()
+        for k, v in client_args_copy.items():
             if k in ('cert', 'headers', 'hooks', 'max_redirects', 'proxies'):
                 setattr(self.client, k, v)
-                client_args.pop(k)
+                self.client_args.pop(k)  # Pop, pop!
 
         self._last_call = None
 
@@ -115,10 +119,10 @@ class Twython(EndpointsMixin, object):
         params, files = _transparent_params(params)
 
         requests_args = {}
-        for k, v in self.client_args:
+        for k, v in self.client_args.items():
+            # Maybe this should be set as a class variable and only done once?
             if k in ('timeout', 'allow_redirects', 'stream', 'verify'):
                 requests_args[k] = v
-                self.client_args.pop(k)
 
         if method == 'get':
             requests_args['params'] = params
