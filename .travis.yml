@@ -31,7 +31,7 @@ env:
   - TEST_TWEET_ID=332992304010899457
   - TEST_LIST_ID=574
 install: pip install -r requirements.txt
-script: nosetests -v -w tests/ --logging-filter="twython" --with-cov --cov twython --cov-report term-missing
+script: nosetests -v -w tests/ --logging-filter="twython" --with-cov --cov twython --cov-config .coveragerc --cov-report term-missing
 notifications:
   email: false
 branches:
