@@ -65,7 +65,7 @@ class Twython(EndpointsMixin, object):
         if oauth_version == 2:
             self.request_token_url = self.api_url % 'oauth2/token'
 
-        self.client_args = client_args
+        self.client_args = client_args or {}
         default_headers = {'User-Agent': 'Twython v' + __version__}
         if not 'headers' in self.client_args:
             # If they didn't set any headers, set our defaults for them
