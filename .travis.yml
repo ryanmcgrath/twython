@@ -34,5 +34,4 @@ branches:
   only:
     - master
 after_success:
-  - coverage run --source=twython setup.py -q nosetests
   - coveralls
