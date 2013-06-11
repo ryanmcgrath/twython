@@ -25,10 +25,7 @@ except ImportError:
 
 if is_py2:
     from urllib import urlencode, quote_plus
-    try:
-        from urlparse import parse_qsl
-    except ImportError:
-        from cgi import parse_qsl
+    from urlparse import parse_qsl
 
     str = unicode
     basestring = basestring
