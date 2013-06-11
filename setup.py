@@ -31,6 +31,9 @@ setup(
                      open('HISTORY.rst').read(),
     include_package_data=True,
     packages=packages,
+    test_suite='nose.collector',
+    tests_require=['nose'],
+    extras_require={'test': ['nose']},
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

@@ -27,7 +27,7 @@ env:
   - TEST_TWEET_ID=332992304010899457
   - TEST_LIST_ID=574
 install: pip install -r requirements.txt
-script: nosetests -v test_twython:TwythonAPITestCase test_twython:TwythonAuthTestCase test_twython:TwythonStreamTestCase --logging-filter="twython" --cover-erase --cover-package="twython" --with-coverage
+script: coverage run --source=twython setup.py -q nosetests -v --logging-filter="twython" --cover-package="twython" --with-coverage
 notifications:
   email: false
 branches:
