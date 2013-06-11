@@ -1,51 +1,13 @@
-from twython import(
-    Twython, TwythonStreamer, TwythonError,
-    TwythonAuthError, TwythonStreamError
+from twython import Twython, TwythonError, TwythonAuthError
+
+from .config import (
+    app_key, app_secret, oauth_token, oauth_token_secret,
+    protected_twitter_1, protected_twitter_2, screen_name,
+    test_tweet_id, test_list_id
 )
 
-import os
 import time
 import unittest
-
-app_key = os.environ.get('APP_KEY')
-app_secret = os.environ.get('APP_SECRET')
-oauth_token = os.environ.get('OAUTH_TOKEN')
-oauth_token_secret = os.environ.get('OAUTH_TOKEN_SECRET')
-
-screen_name = os.environ.get('SCREEN_NAME', '__twython__')
-
-# Protected Account you ARE following and they ARE following you
-protected_twitter_1 = os.environ.get('PROTECTED_TWITTER_1', 'TwythonSecure1')
-
-# Protected Account you ARE NOT following
-protected_twitter_2 = os.environ.get('PROTECTED_TWITTER_2', 'TwythonSecure2')
-
-# Test Ids
-test_tweet_id = os.environ.get('TEST_TWEET_ID', '318577428610031617')
-test_list_id = os.environ.get('TEST_LIST_ID', '574')  # 574 is @twitter/team
-
-
-class TwythonAuthTestCase(unittest.TestCase):
-    def setUp(self):
-        self.api = Twython(app_key, app_secret)
-        self.bad_api = Twython('BAD_APP_KEY', 'BAD_APP_SECRET')
-
-    def test_get_authentication_tokens(self):
-        """Test getting authentication tokens works"""
-        self.api.get_authentication_tokens(callback_url='http://google.com/',
-                                           force_login=True,
-                                           screen_name=screen_name)
-
-    def test_get_authentication_tokens_bad_tokens(self):
-        """Test getting authentication tokens with bad tokens
-        raises TwythonAuthError"""
-        self.assertRaises(TwythonAuthError, self.bad_api.get_authentication_tokens,
-                          callback_url='http://google.com/')
-
-    def test_get_authorized_tokens_bad_tokens(self):
-        """Test getting final tokens fails with wrong tokens"""
-        self.assertRaises(TwythonError, self.bad_api.get_authorized_tokens,
-                          'BAD_OAUTH_VERIFIER')
 
 
 class TwythonAPITestCase(unittest.TestCase):
@@ -467,49 +429,3 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test getting the locations that Twitter has trending topic
         information for, closest to a specified location succeeds"""
         self.api.get_closest_trends(lat='37', long='-122')
-
-
-class TwythonStreamTestCase(unittest.TestCase):
-    def setUp(self):
-        class MyStreamer(TwythonStreamer):
-            def on_success(self, data):
-                self.disconnect()
-
-            def on_error(self, status_code, data):
-                raise TwythonStreamError(data)
-
-            def on_delete(self, data):
-                return
-
-            def on_limit(self, data):
-                return
-
-            def on_disconnect(self, data):
-                return
-
-            def on_timeout(self, data):
-                return
-
-        self.api = MyStreamer(app_key, app_secret,
-                              oauth_token, oauth_token_secret)
-
-    def test_stream_status_filter(self):
-        self.api.statuses.filter(track='twitter')
-
-    def test_stream_status_sample(self):
-        self.api.statuses.sample()
-
-    def test_stream_status_firehose(self):
-        self.assertRaises(TwythonStreamError, self.api.statuses.firehose,
-                          track='twitter')
-
-    def test_stream_site(self):
-        self.assertRaises(TwythonStreamError, self.api.site,
-                          follow='twitter')
-
-    def test_stream_user(self):
-        self.api.user(track='twitter')
-
-
-if __name__ == '__main__':
-    unittest.main()
