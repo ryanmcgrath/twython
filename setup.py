@@ -20,7 +20,7 @@ if sys.argv[-1] == 'publish':
 setup(
     name='twython',
     version=__version__,
-    install_requires=['requests==1.2.2', 'requests_oauthlib==0.3.2'],
+    install_requires=['requests==1.2.3', 'requests_oauthlib==0.3.2'],
     author='Ryan McGrath',
     author_email='ryan@venodesigns.net',
     license=open('LICENSE').read(),

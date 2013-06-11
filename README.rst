@@ -6,8 +6,8 @@ Twython
         :target: https://travis-ci.org/ryanmcgrath/twython
 .. image:: https://pypip.in/d/twython/badge.png
         :target: https://crate.io/packages/twython/
-.. image:: https://coveralls.io/repos/ryanmcgrath/twython/badge.png?branch=3.0.0
-        :target: https://coveralls.io/r/ryanmcgrath/twython?branch=3.0.0
+.. image:: https://coveralls.io/repos/ryanmcgrath/twython/badge.png?branch=master
+        :target: https://coveralls.io/r/ryanmcgrath/twython?branch=master
 
 ``Twython`` is a library providing an easy (and up-to-date) way to access Twitter data in Python. Actively maintained and featuring support for both Python 2.6+ and Python 3, it's been battle tested by companies, educational institutions and individuals alike. Try it today!
 
