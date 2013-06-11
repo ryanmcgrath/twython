@@ -4,6 +4,7 @@ app_key = os.environ.get('APP_KEY')
 app_secret = os.environ.get('APP_SECRET')
 oauth_token = os.environ.get('OAUTH_TOKEN')
 oauth_token_secret = os.environ.get('OAUTH_TOKEN_SECRET')
+access_token = os.environ.get('ACCESS_TOKEN')
 
 screen_name = os.environ.get('SCREEN_NAME', '__twython__')
 

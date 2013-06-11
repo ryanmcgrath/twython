@@ -17,8 +17,11 @@ History
 - Developers can now pass an array as a parameter to Twitter API methods and they will be automatically joined by a comma and converted to a string
 - ``endpoints.py`` now contains ``EndpointsMixin`` (rather than the previous ``api_table`` dict) for Twython, which enables Twython to use functions declared in the Mixin.
 - Added OAuth 2 authentication (Application Only) for when you want to make read-only calls to Twitter without having to go through the whole user authentication ritual (see docs for usage)
+- Added ``obtain_access_token`` to obtain an OAuth 2 Application Only read-only access token
 - ``construct_api_url`` now accepts keyword arguments like other Twython methods (e.g. instead of passing ``{'q': 'twitter', 'result_type': 'recent'}``, pass ``q='twitter', result_type='recent'``)
 - Pass ``client_args`` to the Twython ``__init__`` to manipulate request variables. ``client_args`` accepts a dictionary of keywords and values that accepted by ``requests`` (`Session API <http://docs.python-requests.org/en/latest/api/#sessionapi>`_) [ex. headers, proxies, verify(SSL verification)] and the "request" section directly below it.
+- Added ``get_application_rate_limit_status`` API method for returning the current rate limits for the specified source
+- Added ``invalidate_token`` API method which allows registed apps to revoke an access token presenting its client credentials
 
 2.10.1 (2013-05-29)
 ++++++++++++++++++

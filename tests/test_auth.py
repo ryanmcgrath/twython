@@ -43,3 +43,8 @@ class TwythonAuthTestCase(unittest.TestCase):
     def test_obtain_access_token(self):
         """Test obtaining an Application Only OAuth 2 access token succeeds"""
         self.oauth2_api.obtain_access_token()
+
+    def test_obtain_access_token_raises_error_when_oauth1(self):
+        """Test when API is set for OAuth 1, obtain_access_token raises a
+        TwythonError"""
+        self.assertRaises(TwythonError, self.api.obtain_access_token)

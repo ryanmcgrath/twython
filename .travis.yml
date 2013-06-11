@@ -21,6 +21,10 @@ env:
       Y0M90wCpDWmSdBmgPCV2N9mMSaRMdEOis5r5sfUq/5aFTB/KDaSR9scM1g+L
       21OtvUBvaG1bdSzn0T+I5Fs/MkfbtTmuahogy83nsNDRpIZJmRIsHFmJw1fz
       nEHD2Kbm4iLMYzrKto77KpxYSQMnc3sQKZjreaI31NLu+7raCAk=
+  - secure: |-
+      j1gePLSZF8SRcpF1AU+cBK5MSih5MrM1iGE6N7VWI0wrl+xh7wr3QLtVkAar
+      AeMFgwkz6QalfrKLsoUPFuNMv7vn+2CthC9pRv+NRk+4xV+37NysHFPR7JRo
+      xK2EC+DCiw2eJECnk9IPGQTgkVnFAQ3GLnsBSzzJ+UAkG2NjZ88=
   - SCREEN_NAME=__twython__
   - PROTECTED_TWITTER_1=TwythonSecure1
   - PROTECTED_TWITTER_2=TwythonSecure2

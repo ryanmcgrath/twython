@@ -3,7 +3,7 @@ from twython import Twython, TwythonError, TwythonAuthError
 from .config import (
     app_key, app_secret, oauth_token, oauth_token_secret,
     protected_twitter_1, protected_twitter_2, screen_name,
-    test_tweet_id, test_list_id
+    test_tweet_id, test_list_id, access_token
 )
 
 import time
@@ -20,9 +20,16 @@ class TwythonAPITestCase(unittest.TestCase):
             'allow_redirects': False
         }
 
+        oauth2_client_args = {
+            'headers': {}  # This is so we can hit coverage that Twython sets User-Agent for us if none is supplied
+        }
+
         self.api = Twython(app_key, app_secret,
                            oauth_token, oauth_token_secret,
                            client_args=client_args)
+
+        self.oauth2_api = Twython(app_key, access_token=access_token,
+                                  client_args=oauth2_client_args)
 
     def test_construct_api_url(self):
         """Test constructing a Twitter API url works as we expect"""
@@ -198,7 +205,7 @@ class TwythonAPITestCase(unittest.TestCase):
                                    retweets='true')
 
         self.api.update_friendship(screen_name=protected_twitter_1,
-                                   retweets='false')
+                                   retweets=False)
 
     def test_show_friendships(self):
         """Test showing specific friendship succeeds"""
@@ -335,11 +342,12 @@ class TwythonAPITestCase(unittest.TestCase):
 
         self.api.update_list(list_id=list_id, name='Stuff Renamed')
 
+        screen_names = ['johncena', 'xbox']
         # Multi add/delete members
         self.api.create_list_members(list_id=list_id,
-                                     screen_name='johncena,xbox')
+                                     screen_name=screen_names)
         self.api.delete_list_members(list_id=list_id,
-                                     screen_name='johncena,xbox')
+                                     screen_name=screen_names)
 
         # Single add/delete member
         self.api.add_list_member(list_id=list_id, screen_name='justinbieber')
@@ -430,3 +438,8 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test getting the locations that Twitter has trending topic
         information for, closest to a specified location succeeds"""
         self.api.get_closest_trends(lat='37', long='-122')
+
+    # Help
+    def test_get_application_rate_limit_status(self):
+        """Test getting application rate limit status succeeds"""
+        self.oauth2_api.get_application_rate_limit_status()

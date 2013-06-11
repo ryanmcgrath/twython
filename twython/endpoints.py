@@ -756,6 +756,26 @@ class EndpointsMixin(object):
         """
         return self.post('users/report_spam', params=params)
 
+    # OAuth
+    def invalidate_token(self, **params):
+        """Allows a registered application to revoke an issued OAuth 2 Bearer
+        Token by presenting its client credentials.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/oauth2/invalidate_token
+
+        """
+        return self.post('oauth2/invalidate_token', params=params)
+
+    # Help
+    def get_application_rate_limit_status(self, **params):
+        """Returns the current rate limits for methods belonging to the
+        specified resource families.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/application/rate_limit_status
+
+        """
+        return self.get('application/rate_limit_status', params=params)
+
 
 # from https://dev.twitter.com/docs/error-codes-responses
 TWITTER_HTTP_STATUS_CODE = {
