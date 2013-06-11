@@ -16,7 +16,8 @@ class TwythonAPITestCase(unittest.TestCase):
         client_args = {
             'headers': {
                 'User-Agent': '__twython__ Test'
-            }
+            },
+            'allow_redirects': False
         }
 
         self.api = Twython(app_key, app_secret,

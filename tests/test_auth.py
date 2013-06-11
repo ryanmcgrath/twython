@@ -35,7 +35,11 @@ class TwythonAuthTestCase(unittest.TestCase):
         self.assertRaises(TwythonError, self.oauth2_api.get_authentication_tokens)
 
     def test_get_authorization_tokens_raises_error_when_oauth2(self):
-        """Test when API is set for OAuth 2, get_authentication_tokens raises
+        """Test when API is set for OAuth 2, get_authorized_tokens raises
         a TwythonError"""
         self.assertRaises(TwythonError, self.oauth2_api.get_authorized_tokens,
                           'BAD_OAUTH_VERIFIER')
+
+    def test_obtain_access_token(self):
+        """Test obtaining an Application Only OAuth 2 access token succeeds"""
+        self.oauth2_api.obtain_access_token()

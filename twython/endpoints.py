@@ -59,9 +59,7 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/get/statuses/retweets/%3Aid
 
         """
-        if not 'id' in params:
-            raise TwythonError('Parameter "id" is required')
-        return self.get('statuses/retweets/%s' % params['id'], params=params)
+        return self.get('statuses/retweets/%s' % params.get('id'), params=params)
 
     def show_status(self, **params):
         """Returns a single Tweet, specified by the id parameter
@@ -69,9 +67,7 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/get/statuses/show/%3Aid
 
         """
-        if not 'id' in params:
-            raise TwythonError('Parameter "id" is required')
-        return self.get('statuses/show/%s' % params['id'], params=params)
+        return self.get('statuses/show/%s' % params.get('id'), params=params)
 
     def destroy_status(self, **params):
         """Destroys the status specified by the required ID parameter
@@ -79,9 +75,7 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/post/statuses/destroy/%3Aid
 
         """
-        if not 'id' in params:
-            raise TwythonError('Parameter "id" is required')
-        return self.post('statuses/destroy/%s' % params['id'])
+        return self.post('statuses/destroy/%s' % params.get('id'))
 
     def update_status(self, **params):
         """Updates the authenticating user's current status, also known as tweeting
@@ -97,9 +91,7 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/post/statuses/retweet/%3Aid
 
         """
-        if not 'id' in params:
-            raise TwythonError('Parameter "id" is required')
-        return self.post('statuses/retweet/%s' % params['id'])
+        return self.post('statuses/retweet/%s' % params.get('id'))
 
     def update_status_with_media(self, **params):
         """Updates the authenticating user's current status and attaches media
@@ -462,7 +454,7 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/get/users/suggestions/%3Aslug
 
         """
-        return self.get('users/suggestions/%s' % params['slug'], params=params)
+        return self.get('users/suggestions/%s' % params.get('slug'), params=params)
 
     def get_user_suggestions(self, **params):
         """Access to Twitter's suggested user list.
@@ -479,7 +471,7 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/get/users/suggestions/%3Aslug/members
 
         """
-        return self.get('users/suggestions/%s/members' % params['slug'], params=params)
+        return self.get('users/suggestions/%s/members' % params.get('slug'), params=params)
 
     # Favorites
     def get_favorites(self, **params):
@@ -668,7 +660,7 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/get/saved_searches/show/%3Aid
 
         """
-        return self.get('saved_searches/show/%s' % params['id'], params=params)
+        return self.get('saved_searches/show/%s' % params.get('id'), params=params)
 
     def create_saved_search(self, **params):
         """Create a new saved search for the authenticated user.
@@ -684,7 +676,7 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/post/saved_searches/destroy/%3Aid
 
         """
-        return self.post('saved_searches/destroy/%s' % params['id'], params=params)
+        return self.post('saved_searches/destroy/%s' % params.get('id'), params=params)
 
     # Places & Geo
     def get_geo_info(self, **params):
@@ -693,7 +685,7 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/get/geo/id/%3Aplace_id
 
         """
-        return self.get('geo/id/%s' % params['place_id'], params=params)
+        return self.get('geo/id/%s' % params.get('place_id'), params=params)
 
     def reverse_geocode(self, **params):
         """Given a latitude and a longitude, searches for up to 20 places
