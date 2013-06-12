@@ -226,12 +226,17 @@ class Twython(object):
 
     # End Dynamic Request Methods
 
-    def get_lastfunction_header(self, header):
+    def get_lastfunction_header(self, header, default_return_value = None):
         """Returns the header in the last function
             This must be called after an API call, as it returns header based
             information.
 
             This will return None if the header is not present
+            
+            If default_return_value is set, that will be returned versus throwing
+            a TwythonError exception.
+            
+            
 
             Most useful for the following header information:
                 x-rate-limit-limit
@@ -240,12 +245,13 @@ class Twython(object):
                 x-rate-limit-reset
         """
         if self._last_call is None:
-            raise TwythonError('This function must be called after an API call.  It delivers header information.')
-
-        if header in self._last_call['headers']:
-            return self._last_call['headers'][header]
-        else:
-            return None
+            if default_return_value is None:
+                raise TwythonError('This function must be called after an API call.  It delivers header information.')
+            else:
+                return default_return_value
+        
+        return self._last_call['headers'].get(header, default_return_value)
+        
 
     def get_authentication_tokens(self, callback_url=None, force_login=False, screen_name=''):
         """Returns a dict including an authorization URL (auth_url) to direct a user to
