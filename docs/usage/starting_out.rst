@@ -37,7 +37,10 @@ First, you'll want to import Twython::
 
     from twython import Twython
 
-Now, you'll want to create a Twython instance with your ``Consumer Key`` and ``Consumer Secert``
+Now, you'll want to create a Twython instance with your ``Consumer Key`` and ``Consumer Secret``
+
+Obtain Authorization URL
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 

@@ -27,6 +27,35 @@ Documentation: https://dev.twitter.com/docs/api/1.1/get/account/verify_credentia
     photo = open('/path/to/file/image.jpg', 'rb')
     twitter.update_status_with_media(status='Checkout this cool image!', media=photo)
 
+Posting a Status with an Editing Image
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    This example resizes an image
+
+::
+
+    # Assume you are working with a JPEG
+
+    from PIL import Image
+    from StringIO import StringIO
+
+    photo = Image.open('/path/to/file/image.jpg')
+
+    basewidth = 320
+    wpercent = (basewidth / float(photo.size[0]))
+    height = int((float(photo.size[1]) * float(wpercent)))
+    photo = photo.resize((basewidth, height), Image.ANTIALIAS)
+
+    image_io = StringIO.StringIO()
+    photo.save(image_io, format='JPEG')
+
+    # If you do not seek(0), the image will be at the end of the file and
+    # unable to be read
+    image_io.seek(0)
+
+    twitter.update_status_with_media(media=photo, status='Check out my edited image!')
+
+
 Search Generator
 ----------------
 
