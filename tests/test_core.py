@@ -104,6 +104,11 @@ class TwythonAPITestCase(unittest.TestCase):
         self.assertRaises(TwythonAuthError, self.api.get_user_timeline,
                           screen_name=protected_twitter_2)
 
+    def test_retweeted_of_me(self):
+        """Test that getting recent tweets by authenticated user that have
+        been retweeted by others succeeds"""
+        self.api.retweeted_of_me()
+
     def test_get_home_timeline(self):
         """Test returning home timeline for authenticated user succeeds"""
         self.api.get_home_timeline()

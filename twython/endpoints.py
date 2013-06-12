@@ -93,7 +93,7 @@ class EndpointsMixin(object):
         """
         return self.post('statuses/retweet/%s' % params.get('id'))
 
-    def update_status_with_media(self, **params):
+    def update_status_with_media(self, **params):  # pragma: no cover
         """Updates the authenticating user's current status and attaches media
         for upload. In other words, it creates a Tweet with a picture attached.
 
@@ -323,7 +323,7 @@ class EndpointsMixin(object):
         """
         return self.post('account/update_profile', params=params)
 
-    def update_profile_background_image(self, **params):
+    def update_profile_banner_image(self, **params):  # pragma: no cover
         """Updates the authenticating user's profile background image.
 
         Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_profile_background_image
@@ -340,7 +340,7 @@ class EndpointsMixin(object):
         """
         return self.post('account/update_profile_colors', params=params)
 
-    def update_profile_image(self, **params):
+    def update_profile_image(self, **params):  # pragma: no cover
         """Updates the authenticating user's profile image.
 
         Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_profile_image
@@ -431,13 +431,13 @@ class EndpointsMixin(object):
         """
         return self.post('account/remove_profile_banner', params=params)
 
-    def update_profile_Background_image(self, **params):
+    def update_profile_background_image(self, **params):
         """Uploads a profile banner on behalf of the authenticating user.
 
         Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_profile_banner
 
         """
-        return self.post('ccount/update_profile_background_image', params=params)
+        return self.post('account/update_profile_background_image', params=params)
 
     def get_profile_banner_sizes(self, **params):
         """Returns a map of the available size variations of the specified user's profile banner.
@@ -712,7 +712,7 @@ class EndpointsMixin(object):
         """
         return self.get('geo/similar_places', params=params)
 
-    def create_place(self, **params):
+    def create_place(self, **params):  # pragma: no cover
         """Creates a new place object at the given latitude and longitude.
 
         Docs: https://dev.twitter.com/docs/api/1.1/post/geo/place

@@ -29,7 +29,7 @@ class TwythonError(Exception):
         super(TwythonError, self).__init__(msg)
 
     @property
-    def msg(self):
+    def msg(self):  # pragma: no cover
         return self.args[0]
 
 
@@ -41,7 +41,7 @@ class TwythonAuthError(TwythonError):
     pass
 
 
-class TwythonRateLimitError(TwythonError):
+class TwythonRateLimitError(TwythonError):  # pragma: no cover
     """Raised when you've hit a rate limit.
 
     The amount of seconds to retry your request in will be appended

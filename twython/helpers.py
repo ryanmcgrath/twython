@@ -16,7 +16,7 @@ def _transparent_params(_params):
     files = {}
     for k, v in _params.items():
         if hasattr(v, 'read') and callable(v.read):
-            files[k] = v
+            files[k] = v  # pragma: no cover
         elif isinstance(v, bool):
             if v:
                 params[k] = 'true'
@@ -27,5 +27,5 @@ def _transparent_params(_params):
         elif isinstance(v, list):
             params[k] = ','.join(v)
         else:
-            continue
+            continue  # pragma: no cover
     return params, files

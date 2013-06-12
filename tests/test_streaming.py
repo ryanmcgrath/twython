@@ -16,18 +16,6 @@ class TwythonStreamTestCase(unittest.TestCase):
             def on_error(self, status_code, data):
                 raise TwythonStreamError(data)
 
-            def on_delete(self, data):
-                return
-
-            def on_limit(self, data):
-                return
-
-            def on_disconnect(self, data):
-                return
-
-            def on_timeout(self, data):
-                return
-
         self.api = MyStreamer(app_key, app_secret,
                               oauth_token, oauth_token_secret)
 
