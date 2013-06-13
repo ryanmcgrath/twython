@@ -44,6 +44,10 @@ Now, you'll want to create a Twython instance with your ``Consumer Key`` and ``C
 Obtain Authorization URL
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. note:: Only pass *callback_url* to *get_authentication_tokens* if your application is a Web Application
+
+          Desktop and Mobile Applications **do not** require a callback_url
+
 .. code-block:: python
 
     APP_KEY = 'YOUR_APP_KEY'
@@ -52,10 +56,11 @@ Obtain Authorization URL
     twitter = Twython(APP_KEY, APP_SECRET)
     auth = twitter.get_authentication_tokens(callback_url='http://mysite.com/callback')
 
-From the ``auth`` variable, save the ``oauth_token_secret`` for later use. In Django or other web frameworks, you might want to store it to a session variable
+From the ``auth`` variable, save the ``oauth_token_secret`` for later use  (these are not the final auth tokens). In Django or other web frameworks, you might want to store it to a session variable
 
 .. code-block:: python
 
+    OAUTH_TOKEN = auth['oauth_token']
     OAUTH_TOKEN_SECRET = auth['oauth_token_secret']
 
 Send the user to the authentication url, you can obtain it by accessing
@@ -67,18 +72,18 @@ Send the user to the authentication url, you can obtain it by accessing
 Handling the Callback
 ^^^^^^^^^^^^^^^^^^^^^
 
+.. note:: If your application is a Desktop or Mobile Application *oauth_verifier* will be the PIN code
+
 After they authorize your application to access some of their account details, they'll be redirected to the callback url you specified in ``get_autentication_tokens``
 
-You'll want to extract the ``oauth_token`` and ``oauth_verifier`` from the url.
+You'll want to extract the ``oauth_verifier`` from the url.
 
 Django example:
 
 .. code-block:: python
-
-    OAUTH_TOKEN = request.GET['oauth_token']
     oauth_verifier = request.GET['oauth_verifier']
 
-Now that you have the ``oauth_token`` and ``oauth_verifier`` stored to variables, you'll want to create a new instance of Twython and grab the final user tokens
+Now that you have the ``oauth_verifier`` stored to a variable, you'll want to create a new instance of Twython and grab the final user tokens
 
 .. code-block:: python
 

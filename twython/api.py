@@ -251,7 +251,6 @@ class Twython(EndpointsMixin, object):
         if self.oauth_version != 1:
             raise TwythonError('This method can only be called when your OAuth version is 1.0.')
 
-        callback_url = callback_url or self.callback_url
         request_args = {}
         if callback_url:
             request_args['oauth_callback'] = callback_url

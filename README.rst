@@ -32,21 +32,32 @@ Features
 Installation
 ------------
 
-Install Twython via `pip <http://www.pip-installer.org/>`_::
+Install Twython via `pip <http://www.pip-installer.org/>`_
+
+.. code-block:: bash
 
     $ pip install twython
 
-or, with `easy_install <http://pypi.python.org/pypi/setuptools>`_::
+or, with `easy_install <http://pypi.python.org/pypi/setuptools>`_
+
+.. code-block:: bash
 
     $ easy_install twython
 
 But, hey... `that's up to you <http://www.pip-installer.org/en/latest/other-tools.html#pip-compared-to-easy-install>`_.
 
-Or, if you want the code that is currently on GitHub::
+Or, if you want the code that is currently on GitHub
+
+.. code-block:: bash
 
     git clone git://github.com/ryanmcgrath/twython.git
     cd twython
     python setup.py install
+
+Documentation
+-------------
+
+Documentation is available at https://twython.readthedocs.org/en/latest/
 
 Starting Out
 ------------
@@ -57,7 +68,9 @@ After you register, grab your applications ``Consumer Key`` and ``Consumer Secre
 
 The most common type of authentication is Twitter user authentication using OAuth 1. If you're a web app planning to have users sign up with their Twitter account and interact with their timelines, updating their status, and stuff like that this **is** the authentication for you!
 
-First, you'll want to import Twython::
+First, you'll want to import Twython
+
+.. code-block:: python
 
     from twython import Twython
 
@@ -69,28 +82,50 @@ Obtain Authorization URL
 
 Now, you'll want to create a Twython instance with your ``Consumer Key`` and ``Consumer Secret``
 
-::
+    Only pass *callback_url* to *get_authentication_tokens* if your application is a Web Application
+
+    Desktop and Mobile Applications **do not** require a callback_url
+
+.. code-block:: python
 
     APP_KEY = 'YOUR_APP_KEY'
     APP_SECET = 'YOUR_APP_SECRET'
 
     twitter = Twython(APP_KEY, APP_SECRET)
+
     auth = twitter.get_authentication_tokens(callback_url='http://mysite.com/callback')
+
+From the ``auth`` variable, save the ``oauth_token`` and ``oauth_token_secret`` for later use (these are not the final auth tokens). In Django or other web frameworks, you might want to store it to a session variable
+
+.. code-block:: python
+
+    OAUTH_TOKEN = auth['oauth_token']
+    OAUTH_TOKEN_SECRET = auth['oauth_token_secret']
+
+Send the user to the authentication url, you can obtain it by accessing
+
+.. code-block:: python
+
+    auth['auth_url']
 
 Handling the Callback
 ^^^^^^^^^^^^^^^^^^^^^
 
+    If your application is a Desktop or Mobile Application *oauth_verifier* will be the PIN code
+
 After they authorize your application to access some of their account details, they'll be redirected to the callback url you specified in ``get_autentication_tokens``
 
-You'll want to extract the ``oauth_token`` and ``oauth_verifier`` from the url.
+You'll want to extract the ``oauth_verifier`` from the url.
 
 Django example:
-::
 
-    OAUTH_TOKEN = request.GET['oauth_token']
+.. code-block:: python
+
     oauth_verifier = request.GET['oauth_verifier']
 
-Now that you have the ``oauth_token`` and ``oauth_verifier`` stored to variables, you'll want to create a new instance of Twython and grab the final user tokens::
+Now that you have the ``oauth_verifier`` stored to a variable, you'll want to create a new instance of Twython and grab the final user tokens
+
+.. code-block:: python
 
     twitter = Twython(APP_KEY, APP_SECRET,
                       OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
@@ -102,7 +137,7 @@ Once you have the final user tokens, store them in a database for later use!::
     OAUTH_TOKEN = final_step['oauth_token']
     OAUTH_TOKEN_SECERT = final_step['oauth_token_secret']
 
-For OAuth 2 (Application Only, read-only) authentication, see `our documentation <http://google.com>`_
+For OAuth 2 (Application Only, read-only) authentication, see `our documentation <https://twython.readthedocs.org/en/latest/usage/starting_out.html#oauth-2>`_
 
 Dynamic Function Arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -114,7 +149,9 @@ Basic Usage
 
 **Function definitions (i.e. get_home_timeline()) can be found by reading over twython/endpoints.py**
 
-Create a Twython instance with your application keys and the users OAuth tokens::
+Create a Twython instance with your application keys and the users OAuth tokens
+
+.. code-block:: python
 
     from twython import Twython
     twitter = Twython(APP_KEY, APP_SECRET
@@ -125,18 +162,18 @@ Authenticated Users Home Timeline
 
 Documentation: https://dev.twitter.com/docs/api/1.1/get/statuses/home_timeline
 
-::
+.. code-block:: python
 
     twitter.get_home_timeline()
 
 Updating Status
 ~~~~~~~~~~~~~~~
 
-This method makes use of dynamic arguments, `read more about them <http://google.com>`_
+This method makes use of dynamic arguments, `read more about them <https://twython.readthedocs.org/en/latest/usage/starting_out.html#dynamic-function-arguments>`_
 
 Documentation: https://dev.twitter.com/docs/api/1/post/statuses/update
 
-::
+.. code-block:: python
 
     twitter.update_status(status='See how easy using Twython is!')
 
@@ -145,7 +182,7 @@ Searching
 
     https://dev.twitter.com/docs/api/1.1/get/search/tweets says it takes "q" and "result_type" amongst other arguments
 
-::
+.. code-block:: python
 
     twitter.search(q='twitter')
     twitter.search(q='twitter', result_type='popular')
@@ -153,8 +190,8 @@ Searching
 Advanced Usage
 --------------
 
-- `Advanced Twython Usage <http://google.com>`_
-- `Streaming with Twython <http://google.com>`_
+- `Advanced Twython Usage <https://twython.readthedocs.org/en/latest/usage/advanced_usage.html>`_
+- `Streaming with Twython <https://twython.readthedocs.org/en/latest/usage/streaming_api.html>`_
 
 
 Notes
