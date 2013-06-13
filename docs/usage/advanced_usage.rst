@@ -132,5 +132,21 @@ or both (and set a timeout variable):
                       OAUTH_TOKEN, OAUTH_TOKEN_SECRET
                       client_args=client_args)
 
+Access Headers of Previous Call
+-------------------------------
+
+There are times when you may want to check headers from the previous call.
+If you wish to access headers (ex. x-rate-limit-remaining, x-rate-limit-reset, content-type), you'll use the ``get_lastfunction_header`` method.
+
+.. code-block:: python
+
+    from twython import Twython
+
+    twitter = Twython(APP_KEY, APP_SECRET
+                      OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+
+    twitter.get_home_timeline()
+    twitter.get_lastfunction_header('x-rate-limit-remaining')
+
 
 So now you can authenticate, update your status (with or without an image), search Twitter, and a few other things! Good luck!

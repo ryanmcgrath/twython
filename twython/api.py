@@ -222,7 +222,7 @@ class Twython(EndpointsMixin, object):
         """Shortcut for POST requests via :class:`request`"""
         return self.request(endpoint, 'POST', params=params, version=version)
 
-    def get_lastfunction_header(self, header):
+    def get_lastfunction_header(self, header, default_return_value=None):
         """Returns a specific header from the last API call
         This will return None if the header is not present
 
@@ -238,10 +238,7 @@ class Twython(EndpointsMixin, object):
         if self._last_call is None:
             raise TwythonError('This function must be called after an API call.  It delivers header information.')
 
-        if header in self._last_call['headers']:
-            return self._last_call['headers'][header]
-        else:
-            return None
+        return self._last_call['headers'].get(header, default_return_value)
 
     def get_authentication_tokens(self, callback_url=None, force_login=False, screen_name=''):
         """Returns a dict including an authorization URL, ``auth_url``, to direct a user to

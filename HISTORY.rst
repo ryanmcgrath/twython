@@ -22,6 +22,7 @@ History
 - Pass ``client_args`` to the Twython ``__init__`` to manipulate request variables. ``client_args`` accepts a dictionary of keywords and values that accepted by ``requests`` (`Session API <http://docs.python-requests.org/en/latest/api/#sessionapi>`_) [ex. headers, proxies, verify(SSL verification)] and the "request" section directly below it.
 - Added ``get_application_rate_limit_status`` API method for returning the current rate limits for the specified source
 - Added ``invalidate_token`` API method which allows registed apps to revoke an access token presenting its client credentials
+- ``get_lastfunction_header`` now accepts a ``default_return_value`` parameter. This means that if you pass a second value (ex. ``Twython.get_lastfunction_header('x-rate-limit-remaining', 0)``) and the value is not found, it returns your default value
 
 2.10.1 (2013-05-29)
 ++++++++++++++++++
