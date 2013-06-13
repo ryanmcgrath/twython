@@ -245,11 +245,9 @@ class Twython(object):
                 x-rate-limit-reset
         """
         if self._last_call is None:
-            if default_return_value is None:
-                raise TwythonError('This function must be called after an API call.  It delivers header information.')
-            else:
-                return default_return_value
+            raise TwythonError('This function must be called after an API call.  It delivers header information.')
         
+                
         return self._last_call['headers'].get(header, default_return_value)
         
 
