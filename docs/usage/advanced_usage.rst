@@ -3,15 +3,17 @@
 Advanced Usage
 ==============
 
-This section will cover how to use Twython and interact with some a little more advanced API calls
+This section will cover how to use Twython and interact with some more advanced API calls
 
-Before you make any API calls, make sure you :ref:`authenticated <starting-out>` the user!
+Before you make any API calls, make sure you :ref:`authenticated the user <starting-out>` (or :ref:`app <oauth2>`)!
 
 .. note:: All sections on this page will assume you're using a Twython instance
 
 *******************************************************************************
 
-Create a Twython instance with your application keys and the users OAuth tokens::
+Create a Twython instance with your application keys and the users OAuth tokens
+
+.. code-block:: python
 
     from twython import Twython
     twitter = Twython(APP_KEY, APP_SECRET
@@ -22,17 +24,17 @@ Updating Status with Image
 
 Documentation: https://dev.twitter.com/docs/api/1.1/get/account/verify_credentials
 
-::
+.. code-block:: python
 
     photo = open('/path/to/file/image.jpg', 'rb')
     twitter.update_status_with_media(status='Checkout this cool image!', media=photo)
 
 Posting a Status with an Editing Image
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
 
     This example resizes an image
 
-::
+.. code-block:: python
 
     # Assume you are working with a JPEG
 
@@ -63,7 +65,7 @@ So, if you're pretty into Python, you probably know about `generators <http://do
 
 That being said, Twython offers a generator for search results and can be accessed by using the following code:
 
-::
+.. code-block:: python
 
     search = twitter.search_gen('python')
     for result in search:
@@ -78,7 +80,7 @@ Twython uses the `requests <http://python-requests.org>`_ library to make API ca
 
 Here is an example of sending custom headers to a Twitter API request:
 
-::
+.. code-block:: python
 
     from twython import Twython
 
@@ -94,7 +96,7 @@ Here is an example of sending custom headers to a Twitter API request:
 
 Here is an example of sending the request through proxies:
 
-::
+.. code-block:: python
 
     from twython import Twython
 
@@ -111,7 +113,7 @@ Here is an example of sending the request through proxies:
 
 or both (and set a timeout variable):
 
-::
+.. code-block:: python
 
     from twython import Twython
 

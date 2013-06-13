@@ -23,7 +23,7 @@ Twython offers support for both OAuth 1 and OAuth 2 authentication.
 
 The difference:
 
-- :ref:`OAuth 1 <oauth1>` is for user authenticated calls (tweeting, following people, sneding DMs, etc.)
+- :ref:`OAuth 1 <oauth1>` is for user authenticated calls (tweeting, following people, sending DMs, etc.)
 - :ref:`OAuth 2 <oauth2>` is for application authenticated calls (when you don't want to authenticate a user and make read-only calls to Twitter, i.e. searching, reading a public users timeline)
 
 .. _oauth1:
@@ -33,7 +33,9 @@ OAuth 1 (User Authentication)
 
 .. important:: Again, if your web app is planning on using interacting with users, this **IS** the authentication type for you. If you're not interested in authenticating a user and plan on making read-only calls, check out the :ref:`OAuth 2 <oauth2>` section.
 
-First, you'll want to import Twython::
+First, you'll want to import Twython
+
+.. code-block:: python
 
     from twython import Twython
 
@@ -42,7 +44,7 @@ Now, you'll want to create a Twython instance with your ``Consumer Key`` and ``C
 Obtain Authorization URL
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-::
+.. code-block:: python
 
     APP_KEY = 'YOUR_APP_KEY'
     APP_SECET = 'YOUR_APP_SECRET'
@@ -50,11 +52,15 @@ Obtain Authorization URL
     twitter = Twython(APP_KEY, APP_SECRET)
     auth = twitter.get_authentication_tokens(callback_url='http://mysite.com/callback')
 
-From the ``auth`` variable, save the ``oauth_token_secret`` for later use. In Django or other web frameworks, you might want to store it to a session variable::
+From the ``auth`` variable, save the ``oauth_token_secret`` for later use. In Django or other web frameworks, you might want to store it to a session variable
+
+.. code-block:: python
 
     OAUTH_TOKEN_SECRET = auth['oauth_token_secret']
 
-Send the user to the authentication url, you can obtain it by accessing::
+Send the user to the authentication url, you can obtain it by accessing
+
+.. code-block:: python
 
     auth['auth_url']
 
@@ -66,19 +72,24 @@ After they authorize your application to access some of their account details, t
 You'll want to extract the ``oauth_token`` and ``oauth_verifier`` from the url.
 
 Django example:
-::
+
+.. code-block:: python
 
     OAUTH_TOKEN = request.GET['oauth_token']
     oauth_verifier = request.GET['oauth_verifier']
 
-Now that you have the ``oauth_token`` and ``oauth_verifier`` stored to variables, you'll want to create a new instance of Twython and grab the final user tokens::
+Now that you have the ``oauth_token`` and ``oauth_verifier`` stored to variables, you'll want to create a new instance of Twython and grab the final user tokens
+
+.. code-block:: python
 
     twitter = Twython(APP_KEY, APP_SECRET,
                       OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
     final_step = twitter.get_authorized_tokens(oauth_verifier)
 
-Once you have the final user tokens, store them in a database for later use!::
+Once you have the final user tokens, store them in a database for later use!
+
+.. code-block:: python
 
     OAUTH_TOKEN = final_step['oauth_token']
     OAUTH_TOKEN_SECERT = final_step['oauth_token_secret']
@@ -93,14 +104,16 @@ OAuth 2 (Application Authentication)
 OAuth 2 authentication is 100x easier than OAuth 1.
 Let's say you *just* made your application and have your ``Consumer Key`` and ``Consumer Secret``
 
-First, you'll want to import Twython::
+First, you'll want to import Twython
+
+.. code-block:: python
 
     from twython import Twython
 
 Obtain an OAuth 2 Access Token
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-::
+.. code-block:: python
 
     APP_KEY = 'YOUR_APP_KEY'
     APP_SECET = 'YOUR_APP_SECRET'
@@ -108,12 +121,12 @@ Obtain an OAuth 2 Access Token
     twitter = Twython(APP_KEY, APP_SECRET, oauth_version=2)
     ACCESS_TOKEN = twitter.obtain_access_token()
 
-    # Save ACCESS_TOKEN in a database or something for later use!
+Save ``ACCESS_TOKEN`` in a database or something for later use!
 
 Use the Access Token
 ^^^^^^^^^^^^^^^^^^^^
 
-::
+.. code-block:: python
 
     APP_KEY = 'YOUR_APP_KEY'
     ACCESS_TOKEN = 'YOUR_ACCESS_TOKEN'

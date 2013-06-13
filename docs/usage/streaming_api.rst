@@ -16,13 +16,13 @@ Setting Up Your Streamer
 
 Make sure you import ``TwythonStreamer``
 
-::
+.. code-block:: python
 
     from twython import TwythonStreamer
 
 Now set up how you want to handle the signals.
 
-::
+.. code-block:: python
 
     class MyStreamer(TwythonStreamer):
         def on_success(self, data):
@@ -41,7 +41,7 @@ More signals that you can extend on can be found in the Developer Interface sect
 Filtering Public Statuses
 -------------------------
 
-::
+.. code-block:: python
 
     stream = MyStreamer(APP_KEY, APP_SECRET,
                         OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
