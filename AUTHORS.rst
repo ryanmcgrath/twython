@@ -41,4 +41,3 @@ Patches and Suggestions
 - `Jonathan Vanasco <https://github.com/jvanasco>`_, Debugging support, error_code tracking, Twitter error API tracking, other fixes
 - `DevDave <https://github.com/devdave>`_, quick fix for longs with helper._transparent_params
 - `Ruben Varela Rosa <https://github.com/rubenvarela>`_, Fixed search example
->>>>>>> Update stream example, update AUTHORS for future example fix
