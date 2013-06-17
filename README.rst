@@ -137,7 +137,7 @@ Once you have the final user tokens, store them in a database for later use!::
     OAUTH_TOKEN = final_step['oauth_token']
     OAUTH_TOKEN_SECERT = final_step['oauth_token_secret']
 
-For OAuth 2 (Application Only, read-only) authentication, see `our documentation <https://twython.readthedocs.org/en/latest/usage/starting_out.html#oauth-2>`_
+For OAuth 2 (Application Only, read-only) authentication, see `our documentation <https://twython.readthedocs.org/en/latest/usage/starting_out.html#oauth-2-application-authentication>`_
 
 Dynamic Function Arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
