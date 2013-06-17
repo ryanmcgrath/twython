@@ -3,6 +3,27 @@
 History
 -------
 
+3.0.0 (2013-06-18)
+++++++++++++++++++
+
+- Changed ``twython/twython.py`` to ``twython/api.py`` in attempt to make structure look a little neater
+- Removed all camelCase function access (anything like ``getHomeTimeline`` is now ``get_home_timeline``)
+- Removed ``shorten_url``. With the ``requests`` library, shortening a URL on your own is simple enough
+- ``twitter_token``, ``twitter_secret`` and ``callback_url`` are no longer passed to ``Twython.__init__``
+    - ``twitter_token`` and ``twitter_secret`` have been replaced with ``app_key`` and ``app_secret`` respectively
+    - ``callback_url`` is now passed through ``Twython.get_authentication_tokens``
+- Update ``test_twython.py`` docstrings per http://www.python.org/dev/peps/pep-0257/
+- Removed ``get_list_memberships``, method is Twitter API 1.0 deprecated
+- Developers can now pass an array as a parameter to Twitter API methods and they will be automatically joined by a comma and converted to a string
+- ``endpoints.py`` now contains ``EndpointsMixin`` (rather than the previous ``api_table`` dict) for Twython, which enables Twython to use functions declared in the Mixin.
+- Added OAuth 2 authentication (Application Only) for when you want to make read-only calls to Twitter without having to go through the whole user authentication ritual (see docs for usage)
+- Added ``obtain_access_token`` to obtain an OAuth 2 Application Only read-only access token
+- ``construct_api_url`` now accepts keyword arguments like other Twython methods (e.g. instead of passing ``{'q': 'twitter', 'result_type': 'recent'}``, pass ``q='twitter', result_type='recent'``)
+- Pass ``client_args`` to the Twython ``__init__`` to manipulate request variables. ``client_args`` accepts a dictionary of keywords and values that accepted by ``requests`` (`Session API <http://docs.python-requests.org/en/latest/api/#sessionapi>`_) [ex. headers, proxies, verify(SSL verification)] and the "request" section directly below it.
+- Added ``get_application_rate_limit_status`` API method for returning the current rate limits for the specified source
+- Added ``invalidate_token`` API method which allows registed apps to revoke an access token presenting its client credentials
+- ``get_lastfunction_header`` now accepts a ``default_return_value`` parameter. This means that if you pass a second value (ex. ``Twython.get_lastfunction_header('x-rate-limit-remaining', 0)``) and the value is not found, it returns your default value
+
 2.10.1 (2013-05-29)
 ++++++++++++++++++
 

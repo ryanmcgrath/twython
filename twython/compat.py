@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+
+"""
+twython.compat
+~~~~~~~~~~~~~~
+
+This module contains imports and declarations for seamless Python 2 and
+Python 3 compatibility.
+"""
+
 import sys
 
 _ver = sys.version_info
@@ -15,10 +25,7 @@ except ImportError:
 
 if is_py2:
     from urllib import urlencode, quote_plus
-    try:
-        from urlparse import parse_qsl
-    except ImportError:
-        from cgi import parse_qsl
+    from urlparse import parse_qsl
 
     str = unicode
     basestring = basestring

@@ -1,6 +1,15 @@
+# -*- coding: utf-8 -*-
+
+"""
+twython.streaming.api
+~~~~~~~~~~~~~~~~~~~~~
+
+This module contains functionality for interfacing with streaming
+Twitter API calls.
+"""
+
 from .. import __version__
 from ..compat import json, is_py3
-from ..exceptions import TwythonStreamError
 from .types import TwythonStreamerTypes
 
 import requests
@@ -104,7 +113,7 @@ class TwythonStreamer(object):
 
         response.close()
 
-    def on_success(self, data):
+    def on_success(self, data):  # pragma: no cover
         """Called when data has been successfull received from the stream
 
         Feel free to override this to handle your streaming data how you
@@ -112,7 +121,8 @@ class TwythonStreamer(object):
         See https://dev.twitter.com/docs/streaming-apis/messages for messages
         sent along in stream responses.
 
-        :param data: dict of data recieved from the stream
+        :param data: data recieved from the stream
+        :type data: dict
         """
 
         if 'delete' in data:
@@ -122,18 +132,21 @@ class TwythonStreamer(object):
         elif 'disconnect' in data:
             self.on_disconnect(data.get('disconnect'))
 
-    def on_error(self, status_code, data):
+    def on_error(self, status_code, data):  # pragma: no cover
         """Called when stream returns non-200 status code
 
         Feel free to override this to handle your streaming data how you
         want it handled.
 
         :param status_code: Non-200 status code sent from stream
+        :type status_code: int
+
         :param data: Error message sent from stream
+        :type data: dict
         """
         return
 
-    def on_delete(self, data):
+    def on_delete(self, data):  # pragma: no cover
         """Called when a deletion notice is received
 
         Feel free to override this to handle your streaming data how you
@@ -141,12 +154,12 @@ class TwythonStreamer(object):
 
         Twitter docs for deletion notices: http://spen.se/8qujd
 
-        :param data: dict of data from the 'delete' key recieved from
-                     the stream
+        :param data: data from the 'delete' key recieved from the stream
+        :type data: dict
         """
         return
 
-    def on_limit(self, data):
+    def on_limit(self, data):  # pragma: no cover
         """Called when a limit notice is received
 
         Feel free to override this to handle your streaming data how you
@@ -154,12 +167,12 @@ class TwythonStreamer(object):
 
         Twitter docs for limit notices: http://spen.se/hzt0b
 
-        :param data: dict of data from the 'limit' key recieved from
-                     the stream
+        :param data: data from the 'limit' key recieved from the stream
+        :type data: dict
         """
         return
 
-    def on_disconnect(self, data):
+    def on_disconnect(self, data):  # pragma: no cover
         """Called when a disconnect notice is received
 
         Feel free to override this to handle your streaming data how you
@@ -167,13 +180,15 @@ class TwythonStreamer(object):
 
         Twitter docs for disconnect notices: http://spen.se/xb6mm
 
-        :param data: dict of data from the 'disconnect' key recieved from
-                     the stream
+        :param data: data from the 'disconnect' key recieved from the stream
+        :type data: dict
         """
         return
 
-    def on_timeout(self):
+    def on_timeout(self):  # pragma: no cover
+        """ Called when the request has timed out """
         return
 
     def disconnect(self):
+        """Used to disconnect the streaming client manually"""
         self.connected = False

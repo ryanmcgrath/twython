@@ -1,0 +1,533 @@
+/*  Bootstrap
+    ------------------------------------------------------- */
+
+/*  apply font awesome
+    ------------------------------------------------------- */
+
+div.danger p.admonition-title:before,
+div.error p.admonition-title:before,
+div.warning p.admonition-title:before,
+div.caution p.admonition-title:before,
+div.attention p.admonition-title:before,
+div.important p.admonition-title:before,
+div.note p.admonition-title:before,
+div.hint p.admonition-title:before,
+div.tip p.admonition-title:before
+{
+  font-family: FontAwesome;
+  font-weight: normal;
+  font-style: normal;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+  margin-right: 5px;
+}
+
+div.danger p.admonition-title:before,
+div.error p.admonition-title:before {
+  content: "\f06a";
+}
+div.warning p.admonition-title:before,
+div.caution p.admonition-title:before,
+div.attention p.admonition-title:before {
+  content: "\f071";
+}
+div.important p.admonition-title:before,
+div.note p.admonition-title:before {
+  content: "\f05a";
+}
+div.hint p.admonition-title:before,
+div.tip p.admonition-title:before {
+  content: "\f0eb";
+}
+
+
+{%- if (theme_googlewebfont|tobool) %}
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input,
+button,
+select,
+textarea,
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small,
+.navbar,
+.navbar-search .search-query,
+.navbar .navbar-search .search-query,
+.navbar .search-query::-moz-placeholder,
+.navbar .search-query::-webkit-input-placeholder,
+.navbar .brand,
+.navbar .nav>li>a,
+.navbar .navbar-text,
+.navbar .dropdown-menu li>a,
+.nav li>a,
+div.subnav,
+div.subnav .nav>li>a,
+div.subnav .nav>li:first-child>a,
+div.subnav .nav>li.active>a,
+legend,
+.btn,
+.alert-heading
+{
+  {{ theme_googlewebfont_style }}
+}
+{%- endif %}
+
+{%- if (theme_inner_theme|tobool) %}
+
+{%- if theme_inner_theme_name == 'bootswatch-amelia' %}
+
+    {% set table_border_color = "#1cafbd" %}
+    {% set table_oddrow_color = "#1ebccb" %}
+    {% set table_hover_color  = "rgba(255, 255, 255, 0.4)" %}
+
+    {% set danger_color = "rgba(255, 255, 255, 0.9)" %}
+    {% set danger_background_color = "#d5b321" %}
+    {% set danger_border_color  = "#d5b321" %}
+
+    {% set warning_color = "rgba(255, 255, 255, 0.9)" %}
+    {% set warning_background_color = "#df6e1e" %}
+    {% set warning_border_color  = "#df6e1e" %}
+
+    {% set note_color = "rgba(255, 255, 255, 0.9)" %}
+    {% set note_background_color = "#48ca3b" %}
+    {% set note_border_color  = "#48ca3b" %}
+
+    {% set hint_color = "rgba(255, 255, 255, 0.9)" %}
+    {% set hint_background_color = "#4d3a7d" %}
+    {% set hint_border_color  = "#4d3a7d" %}
+
+{%- elif theme_inner_theme_name == 'bootswatch-cerulean' %}
+
+    {% set table_border_color = "#dddddd" %}
+    {% set table_oddrow_color = "#f9f9f9" %}
+    {% set table_hover_color  = "#f5f5f5" %}
+
+    {% set danger_color = "#bd4247" %}
+    {% set danger_background_color = "#f2bdb1" %}
+    {% set danger_border_color  = "#f0a5a4" %}
+
+    {% set warning_color = "#dd5600" %}
+    {% set warning_background_color = "#f1ceab" %}
+    {% set warning_border_color  = "#efb99e" %}
+
+    {% set note_color = "#669533" %}
+    {% set note_background_color = "#d5ecbf" %}
+    {% set note_border_color  = "#d2e6ab" %}
+
+    {% set hint_color = "#817b58" %}
+    {% set hint_background_color = "#a7dff1" %}
+    {% set hint_border_color  = "#88e4ec" %}
+
+{%- elif theme_inner_theme_name == 'bootswatch-cosmo' %}
+
+    {% set table_border_color = "#dddddd" %}
+    {% set table_oddrow_color = "#f9f9f9" %}
+    {% set table_hover_color  = "#e8f8fd" %}
+
+    {% set danger_color = "#ffffff" %}
+    {% set danger_background_color = "#ff0039" %}
+    {% set danger_border_color  = "transparent" %}
+
+    {% set warning_color = "#ffffff" %}
+    {% set warning_background_color = "#ff7518" %}
+    {% set warning_border_color  = "transparent" %}
+
+    {% set note_color = "#ffffff" %}
+    {% set note_background_color = "#3fb618" %}
+    {% set note_border_color  = "#transparent" %}
+
+    {% set hint_color = "#ffffff" %}
+    {% set hint_background_color = "#9954bb" %}
+    {% set hint_border_color  = "transparent" %}
+
+{%- elif theme_inner_theme_name == 'bootswatch-cyborg' %}
+
+    {% set table_border_color = "#222222" %}
+    {% set table_oddrow_color = "rgba(100, 100, 100, 0.1)" %}
+    {% set table_hover_color  = "#222222" %}
+
+    {% set danger_color = "#eeeeee" %}
+    {% set danger_background_color = "#cc0000" %}
+    {% set danger_border_color  = "transparent" %}
+
+    {% set warning_color = "#eeeeee" %}
+    {% set warning_background_color = "#666666" %}
+    {% set warning_border_color  = "transparent" %}
+
+    {% set note_color = "#eeeeee" %}
+    {% set note_background_color = "#5c8a00" %}
+    {% set note_border_color  = "#transparent" %}
+
+    {% set hint_color = "#ffffff" %}
+    {% set hint_background_color = "#007399" %}
+    {% set hint_border_color  = "transparent" %}
+
+{%- elif theme_inner_theme_name == 'bootswatch-journal' %}
+
+div.navbar-inner ul.pull-right li a{
+    font-size: 15px;
+}
+
+    {% set table_border_color = "#dddddd" %}
+    {% set table_oddrow_color = "#f5f5f5" %}
+    {% set table_hover_color  = "#eeeeee" %}
+
+    {% set danger_color = "#b94a48" %}
+    {% set danger_background_color = "#f2dede" %}
+    {% set danger_border_color  = "#eed3d7" %}
+
+    {% set warning_color = "#c09853" %}
+    {% set warning_background_color = "#fcf8e3" %}
+    {% set warning_border_color  = "#fbeed5" %}
+
+    {% set note_color = "#468847" %}
+    {% set note_background_color = "#dff0d8" %}
+    {% set note_border_color  = "#d6e9c6" %}
+
+    {% set hint_color = "#3a87ad" %}
+    {% set hint_background_color = "#d9edf7" %}
+    {% set hint_border_color  = "#bce8f1" %}
+
+{%- elif theme_inner_theme_name == 'bootswatch-readable' %}
+
+div.navbar-inner ul.pull-right li a{
+    font-size: 15px;
+}
+
+    {% set table_border_color = "#dddddd" %}
+    {% set table_oddrow_color = "#f9f9f9" %}
+    {% set table_hover_color  = "#f5f5f5" %}
+
+    {% set danger_color = "#b94a48" %}
+    {% set danger_background_color = "#f2dede" %}
+    {% set danger_border_color  = "#eed3d7" %}
+
+    {% set warning_color = "#c09853" %}
+    {% set warning_background_color = "#fcf8e3" %}
+    {% set warning_border_color  = "#fbeed5" %}
+
+    {% set note_color = "#468847" %}
+    {% set note_background_color = "#dff0d8" %}
+    {% set note_border_color  = "#d6e9c6" %}
+
+    {% set hint_color = "#3a87ad" %}
+    {% set hint_background_color = "#d9edf7" %}
+    {% set hint_border_color  = "#bce8f1" %}
+
+{%- elif theme_inner_theme_name == 'bootswatch-simplex' %}
+
+    {% set table_border_color = "#dddddd" %}
+    {% set table_oddrow_color = "#f9f9f9" %}
+    {% set table_hover_color  = "#f5f5f5" %}
+
+    {% set danger_color = "#d9230f" %}
+    {% set danger_background_color = "#f2dede" %}
+    {% set danger_border_color  = "#eed3d7" %}
+
+    {% set warning_color = "#d9831f" %}
+    {% set warning_background_color = "#fcf8e3" %}
+    {% set warning_border_color  = "#fbeed5" %}
+
+    {% set note_color = "#3d9400" %}
+    {% set note_background_color = "#dff0d8" %}
+    {% set note_border_color  = "#d6e9c6" %}
+
+    {% set hint_color = "#029acf" %}
+    {% set hint_background_color = "#d9edf7" %}
+    {% set hint_border_color  = "#bce8f1" %}
+
+{%- elif theme_inner_theme_name == 'bootswatch-slate' %}
+
+    {% set table_border_color = "#1c1e22" %}
+    {% set table_oddrow_color = "#2e3236" %}
+    {% set table_hover_color  = "#3a3f44" %}
+
+    {% set danger_color = "rgba(255, 255, 255, 0.9)" %}
+    {% set danger_background_color = "#b94a48" %}
+    {% set danger_border_color  = "#b94a48" %}
+
+    {% set warning_color = "rgba(255, 255, 255, 0.9)" %}
+    {% set warning_background_color = "#f89406" %}
+    {% set warning_border_color  = "#f89406" %}
+
+    {% set note_color = "rgba(255, 255, 255, 0.9)" %}
+    {% set note_background_color = "#468847" %}
+    {% set note_border_color  = "#468847" %}
+
+    {% set hint_color = "rgba(255, 255, 255, 0.9)" %}
+    {% set hint_background_color = "#3a87ad" %}
+    {% set hint_border_color  = "#3a87ad" %}
+
+{%- elif theme_inner_theme_name == 'bootswatch-spacelab' %}
+
+div.navbar-inner ul.pull-right li a{
+    font-size: 12px;
+}
+
+    {% set table_border_color = "#dddddd" %}
+    {% set table_oddrow_color = "#f9f9f9" %}
+    {% set table_hover_color  = "#f5f5f5" %}
+
+    {% set danger_color = "#ffffff" %}
+    {% set danger_background_color = "#cd0200" %}
+    {% set danger_border_color  = "#be001e" %}
+
+    {% set warning_color = "#ffffff" %}
+    {% set warning_background_color = "#d47500" %}
+    {% set warning_border_color  = "#c54c00" %}
+
+    {% set note_color = "#ffffff" %}
+    {% set note_background_color = "#3cb521" %}
+    {% set note_border_color  = "#4b9f1d" %}
+
+    {% set hint_color = "#ffffff" %}
+    {% set hint_background_color = "#3399f3" %}
+    {% set hint_border_color  = "#11adf1" %}
+
+{%- elif theme_inner_theme_name == 'bootswatch-spruce' %}
+
+div.navbar-inner ul.pull-right li a{
+    font-size: 15px;
+}
+
+@media (max-width: 480px) {
+  a.brand {
+      line-height: 25px;
+  }
+}
+
+table.docutils th.head {
+  background-color: #015b4e;
+  color: #fff;
+}
+
+    {% set table_border_color = "#999999" %}
+    {% set table_oddrow_color = "#eaeaea;" %}
+    {% set table_hover_color  = "#dddddd" %}
+
+    {% set danger_color = "#ffffff" %}
+    {% set danger_background_color = "#d14432" %}
+    {% set danger_border_color  = "#c72d35" %}
+
+    {% set warning_color = "#ffffff" %}
+    {% set warning_background_color = "#f26522" %}
+    {% set warning_border_color  = "#f13614" %}
+
+    {% set note_color = "#ffffff" %}
+    {% set note_background_color = "#24c00b" %}
+    {% set note_border_color  = "#3aa80a" %}
+
+    {% set hint_color = "#ffffff" %}
+    {% set hint_background_color = "#185af9" %}
+    {% set hint_border_color  = "#066ee7" %}
+
+{%- elif theme_inner_theme_name == 'bootswatch-superhero' %}
+
+code, pre {
+    padding:0 3px 2px;
+    font-family:Menlo,Monaco,Consolas,"Courier New",monospace;
+    font-size:12px;
+    color:#3a3f44;
+    -webkit-border-radius:3px;
+    -moz-border-radius:3px;
+    border-radius:3px;
+}
+code{
+    padding:2px 4px;
+    color:#d14;
+    background-color:#f7f7f9;
+    border:1px solid #e1e1e8;
+    white-space:nowrap;
+}
+pre{
+    display:block;
+    padding:10px;
+    margin:0 0 10.5px;
+    font-size:13px;
+    line-height:21px;
+    word-break:break-all;
+    word-wrap:break-word;
+    white-space:pre;
+    white-space:pre-wrap;
+    background-color:#f5f5f5;
+    border:1px solid #ccc;
+    border:1px solid rgba(0, 0, 0, 0.15);
+    -webkit-border-radius:4px;
+    -moz-border-radius:4px;
+    border-radius:4px;
+}
+pre.prettyprint{
+    margin-bottom:21px;
+}
+pre code{
+    padding:0;
+    color:inherit;
+    white-space:pre;
+    white-space:pre-wrap;
+    background-color:transparent;
+    border:0;
+}
+
+div.navbar-inner ul.pull-right li a{
+    font-size: 15px;
+}
+
+@media (max-width: 480px) {
+  a.brand {
+      line-height: 30px;
+  }
+}
+
+    {% set table_border_color = "transparent" %}
+    {% set table_oddrow_color = "#45515f" %}
+    {% set table_hover_color  = "#505e6e" %}
+
+    {% set danger_color = "#ece9d7" %}
+    {% set danger_background_color = "#b94a48" %}
+    {% set danger_border_color  = "#b94a48" %}
+
+    {% set warning_color = "#ece9d7" %}
+    {% set warning_background_color = "#45515f" %}
+    {% set warning_border_color  = "#45515f" %}
+
+    {% set note_color = "#ece9d7" %}
+    {% set note_background_color = "#468847" %}
+    {% set note_border_color  = "#468847" %}
+
+    {% set hint_color = "#ece9d7" %}
+    {% set hint_background_color = "#3a87ad" %}
+    {% set hint_border_color  = "#3a87ad" %}
+
+{%- elif theme_inner_theme_name == 'bootswatch-united' %}
+
+    {% set table_border_color = "#dddddd" %}
+    {% set table_oddrow_color = "#f9f9f9" %}
+    {% set table_hover_color  = "#f5f5f5" %}
+
+    {% set danger_color = "#df382c" %}
+    {% set danger_background_color = "#fadfdd" %}
+    {% set danger_border_color  = "#f8d0d4" %}
+
+    {% set warning_color = "#eca918" %}
+    {% set warning_background_color = "#fcefd4" %}
+    {% set warning_border_color  = "#fae1c6" %}
+
+    {% set note_color = "#38b44a" %}
+    {% set note_background_color = "#caeecf" %}
+    {% set note_border_color  = "#b7e8b6" %}
+
+    {% set hint_color = "#772953" %}
+    {% set hint_background_color = "#e7b8d1" %}
+    {% set hint_border_color  = "#de9ecb" %}
+
+{%- endif %}
+
+
+table.docutils th,
+table.docutils td {
+  border-top: 1px solid {{ table_border_color }};
+}
+table.docutils tbody + tbody {
+  border-top: 2px solid {{ table_border_color }};
+}
+table.docutils {
+  border: none;
+  border-top: 1px solid {{ table_border_color }};
+  border-right: 1px solid {{ table_border_color }};
+  border-bottom: 1px solid {{ table_border_color }};
+}
+table.docutils th,
+table.docutils td {
+  border-left: 1px solid {{ table_border_color }};
+}
+
+table.docutils tbody tr:nth-child(odd) td,
+table.docutils tbody tr:nth-child(odd) th {
+  background-color: {{ table_oddrow_color }};
+}
+
+table.docutils tbody tr:hover td,
+table.docutils tbody tr:hover th {
+  background-color: {{ table_hover_color }};
+}
+
+
+/* -- admonition -- */
+div.admonition {
+  color: {{ warning_color }};
+  background-color: {{ warning_background_color }};
+  border-color: {{ warning_border_color }};
+}
+
+/* -- danger, error -- */
+div.danger,
+div.error {
+  color: {{ danger_color }};
+  background-color: {{ danger_background_color }};
+  border-color: {{ danger_border_color }};
+}
+
+/* -- warning, caution, attention -- */
+div.warning,
+div.caution,
+div.attention {
+  color: {{ warning_color }};
+  background-color: {{ warning_background_color }};
+  border-color: {{ warning_border_color }};
+}
+
+/* -- note, important -- */
+div.note,
+div.important {
+  color: {{ note_color }};
+  background-color: {{ note_background_color }};
+  border-color: {{ note_border_color }};
+}
+
+/* -- hint, tip -- */
+div.hint,
+div.tip {
+  color: {{ hint_color }};
+  background-color: {{ hint_background_color }};
+  border-color: {{ hint_border_color }};
+}
+
+div.topic {
+  background-color: {{ table_oddrow_color }};
+  border-color: {{ table_border_color }};
+}
+
+{% endif %}
+
+/* for mobile */
+@media (max-width: 480px) {
+  a.brand {
+    width: 80%;
+  }
+  searchbox .search-query {
+    width: 60%;
+  }
+}
+
+/* for desktop */
+@media (min-width: 768px) {
+  {% if theme_nav_fixed %}
+  .navbar-inner div.container {
+    width: {{ theme_nav_width }};
+  }
+  {% endif %}
+  {% if theme_content_fixed %}
+  div.container {
+    width: {{ theme_content_width }};
+  }
+  {% endif %}
+}
