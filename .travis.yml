@@ -6,13 +6,13 @@ python:
 env: 
   global: 
   - secure: |-
-      bLlM8JPXiqKIryMwExTEFoEo5op3FqvQQu0yn0xv1okrcH/MEvJAsm4zDd7p
-      yt0riXRpp9aOkU/SkL/1TVkq5E75uXYhaLuT/BgjDmLcw/Sp7Tgsk8b5KLDM
-      RqSrsGXKu7GQCI3MhhWJEAWyU2WVyhZERh5wOY+ic9JCiZloqMw=
+      ICEoq4tQdOCGzpQAgLHunOflhLqs7hb1xYuD6mXZCbO/L+hDI4+pImA9mZZd
+      doyfyFMuNprWfgdUdcAL3axliRR2TyQIt51FLf7bD01jJEPa0GOKlKE/s/+3
+      7oDs+kkSr81w9rvIqpx55nE8+DYzkh+TwDp5oAT+m/EE+lFItfk=
   - secure: |-
-      JlQjabb2tADza5cEmyWuwi5pECjknkiWXj4elTl/UrSYPLeTruTBYBlvtrOl
-      4XF3RWcPwxcBr1JD/Ze1JxMVebYUpvZSTXZXFq6jbjcQTBa7QuH6rraxnj6W
-      /Abx+NYxSBcEex/RsZtSqshzCZGAOI0mdaSdQMd3k0Gxhsg+eRo=
+      LNowlSsXwgbFT0g8B4fDlBmOhycAfSxUNFiYBDn70H93WDLr9drEbE7Wl2Mv
+      AlGJw0kXey4K4oTV4+Bsy6gacsvCINpFk7f4ulTDHCH4MTONtG1n51RlkLW0
+      SAH8di1DiXR3PqRv+NKixVsgI0ZCY1B78NuvaoDL68bfu0KEdHs=
   - secure: |-
       kC9hGpdJJesmZZGMXEoPWK/lzIU6vUeguV/yI2jLgRin0EKPsgds0qR4737x
       2Z2q1+CFUlvHkl+povGcm0/A1rkNqU0KKBcxRBu/XXRxJ3DWp7gIGsmoyWUW
@@ -21,12 +21,21 @@ env:
       Y0M90wCpDWmSdBmgPCV2N9mMSaRMdEOis5r5sfUq/5aFTB/KDaSR9scM1g+L
       21OtvUBvaG1bdSzn0T+I5Fs/MkfbtTmuahogy83nsNDRpIZJmRIsHFmJw1fz
       nEHD2Kbm4iLMYzrKto77KpxYSQMnc3sQKZjreaI31NLu+7raCAk=
+  - secure: |-
+      j1gePLSZF8SRcpF1AU+cBK5MSih5MrM1iGE6N7VWI0wrl+xh7wr3QLtVkAar
+      AeMFgwkz6QalfrKLsoUPFuNMv7vn+2CthC9pRv+NRk+4xV+37NysHFPR7JRo
+      xK2EC+DCiw2eJECnk9IPGQTgkVnFAQ3GLnsBSzzJ+UAkG2NjZ88=
   - SCREEN_NAME=__twython__
   - PROTECTED_TWITTER_1=TwythonSecure1
   - PROTECTED_TWITTER_2=TwythonSecure2
   - TEST_TWEET_ID=332992304010899457
   - TEST_LIST_ID=574
-script: nosetests -v test_twython:TwythonAPITestCase test_twython:TwythonAuthTestCase test_twython:TwythonStreamTestCase --logging-filter="twython" --cover-package="twython" --with-coverage
 install: pip install -r requirements.txt
+script: nosetests -v -w tests/ --logging-filter="twython" --with-cov --cov twython --cov-config .coveragerc --cov-report term-missing
 notifications:
   email: false
+branches:
+  only:
+    - master
+after_success:
+  - coveralls

@@ -1,1 +1,1 @@
-include README.rst HISTORY.rst LICENSE
+include README.rst HISTORY.rst LICENSE test_twython.py requirements.txt

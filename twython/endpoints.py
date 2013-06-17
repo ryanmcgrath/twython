@@ -1,415 +1,784 @@
+# -*- coding: utf-8 -*-
+
 """
-A huge map of every Twitter API endpoint to a function definition in Twython.
+twython.endpoints
+~~~~~~~~~~~~~~~~~
 
-Parameters that need to be embedded in the URL are treated with mustaches, e.g:
+This module provides a mixin for a :class:`Twython <Twython>` instance.
+Parameters that need to be embedded in the API url just need to be passed as a keyword argument.
 
-{{version}}, etc
-
-When creating new endpoint definitions, keep in mind that the name of the mustache
-will be replaced with the keyword that gets passed in to the function at call time.
-
-i.e, in this case, if I pass version = 47 to any function, {{version}} will be replaced
-with 47, instead of defaulting to 1.1 (said defaulting takes place at conversion time).
+e.g. Twython.retweet(id=12345)
 
 This map is organized the order functions are documented at:
 https://dev.twitter.com/docs/api/1.1
 """
 
-api_table = {
-    # Timelines
-    'get_mentions_timeline': {
-        'url': '/statuses/mentions_timeline.json',
-        'method': 'GET',
-    },
-    'get_user_timeline': {
-        'url': '/statuses/user_timeline.json',
-        'method': 'GET',
-    },
-    'get_home_timeline': {
-        'url': '/statuses/home_timeline.json',
-        'method': 'GET',
-    },
-    'retweeted_of_me': {
-        'url': '/statuses/retweets_of_me.json',
-        'method': 'GET',
-    },
 
+class EndpointsMixin(object):
+    # Timelines
+    def get_mentions_timeline(self, **params):
+        """Returns the 20 most recent mentions (tweets containing a users's
+        @screen_name) for the authenticating user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/statuses/mentions_timeline
+
+        """
+        return self.get('statuses/mentions_timeline', params=params)
+
+    def get_user_timeline(self, **params):
+        """Returns a collection of the most recent Tweets posted by the user
+        indicated by the screen_name or user_id parameters.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/statuses/user_timeline
+
+        """
+        return self.get('statuses/user_timeline', params=params)
+
+    def get_home_timeline(self, **params):
+        """Returns a collection of the most recent Tweets and retweets
+        posted by the authenticating user and the users they follow.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/statuses/home_timeline
+
+        """
+        return self.get('statuses/home_timeline', params=params)
+
+    def retweeted_of_me(self, **params):
+        """Returns the most recent tweets authored by the authenticating user
+        that have been retweeted by others.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/statuses/retweets_of_me
+
+        """
+        return self.get('statuses/retweets_of_me', params=params)
 
     # Tweets
-    'get_retweets': {
-        'url': '/statuses/retweets/{{id}}.json',
-        'method': 'GET',
-    },
-    'show_status': {
-        'url': '/statuses/show/{{id}}.json',
-        'method': 'GET',
-    },
-    'destroy_status': {
-        'url': '/statuses/destroy/{{id}}.json',
-        'method': 'POST',
-    },
-    'update_status': {
-        'url': '/statuses/update.json',
-        'method': 'POST',
-    },
-    'retweet': {
-        'url': '/statuses/retweet/{{id}}.json',
-        'method': 'POST',
-    },
-    'update_status_with_media': {
-        'url': '/statuses/update_with_media.json',
-        'method': 'POST',
-    },
-    'get_oembed_tweet': {
-        'url': '/statuses/oembed.json',
-        'method': 'GET',
-    },
-    'get_retweeters_ids': {
-        'url': '/statuses/retweeters/ids.json',
-        'method': 'GET',
-    },
+    def get_retweets(self, **params):
+        """Returns up to 100 of the first retweets of a given tweet.
 
+        Docs: https://dev.twitter.com/docs/api/1.1/get/statuses/retweets/%3Aid
+
+        """
+        return self.get('statuses/retweets/%s' % params.get('id'), params=params)
+
+    def show_status(self, **params):
+        """Returns a single Tweet, specified by the id parameter
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/statuses/show/%3Aid
+
+        """
+        return self.get('statuses/show/%s' % params.get('id'), params=params)
+
+    def destroy_status(self, **params):
+        """Destroys the status specified by the required ID parameter
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/statuses/destroy/%3Aid
+
+        """
+        return self.post('statuses/destroy/%s' % params.get('id'))
+
+    def update_status(self, **params):
+        """Updates the authenticating user's current status, also known as tweeting
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/statuses/update
+
+        """
+        return self.post('statuses/update', params=params)
+
+    def retweet(self, **params):
+        """Retweets a tweet specified by the id parameter
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/statuses/retweet/%3Aid
+
+        """
+        return self.post('statuses/retweet/%s' % params.get('id'))
+
+    def update_status_with_media(self, **params):  # pragma: no cover
+        """Updates the authenticating user's current status and attaches media
+        for upload. In other words, it creates a Tweet with a picture attached.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/statuses/update_with_media
+
+        """
+        return self.post('statuses/update_with_media', params=params)
+
+    def get_oembed_tweet(self, **params):
+        """Returns information allowing the creation of an embedded
+        representation of a Tweet on third party sites.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/statuses/oembed
+
+        """
+        return self.get('statuses/oembed', params=params)
+
+    def get_retweeters_ids(self, **params):
+        """Returns a collection of up to 100 user IDs belonging to users who
+        have retweeted the tweet specified by the id parameter.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/statuses/retweeters/ids
+
+        """
+        return self.get('statuses/retweeters/ids', params=params)
 
     # Search
-    'search': {
-        'url': '/search/tweets.json',
-        'method': 'GET',
-    },
+    def search(self, **params):
+        """Returns a collection of relevant Tweets matching a specified query.
 
+        Docs: https://dev.twitter.com/docs/api/1.1/get/search/tweets
+
+        """
+        return self.get('search/tweets', params=params)
 
     # Direct Messages
-    'get_direct_messages': {
-        'url': '/direct_messages.json',
-        'method': 'GET',
-    },
-    'get_sent_messages': {
-        'url': '/direct_messages/sent.json',
-        'method': 'GET',
-    },
-    'get_direct_message': {
-        'url': '/direct_messages/show.json',
-        'method': 'GET',
-    },
-    'destroy_direct_message': {
-        'url': '/direct_messages/destroy.json',
-        'method': 'POST',
-    },
-    'send_direct_message': {
-        'url': '/direct_messages/new.json',
-        'method': 'POST',
-    },
+    def get_direct_messages(self, **params):
+        """Returns the 20 most recent direct messages sent to the authenticating user.
 
+        Docs: https://dev.twitter.com/docs/api/1.1/get/direct_messages
+
+        """
+        return self.get('direct_messages', params=params)
+
+    def get_sent_messages(self, **params):
+        """Returns the 20 most recent direct messages sent by the authenticating user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/direct_messages/sent
+
+        """
+        return self.get('direct_messages/sent', params=params)
+
+    def get_direct_message(self, **params):
+        """Returns a single direct message, specified by an id parameter.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/direct_messages/show
+
+        """
+        return self.get('direct_messages/show', params=params)
+
+    def destroy_direct_message(self, **params):
+        """Destroys the direct message specified in the required id parameter
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/direct_messages/destroy
+
+        """
+        return self.post('direct_messages/destroy', params=params)
+
+    def send_direct_message(self, **params):
+        """Sends a new direct message to the specified user from the authenticating user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/direct_messages/new
+
+        """
+        return self.post('direct_messages/new', params=params)
 
     # Friends & Followers
-    'get_user_ids_of_blocked_retweets': {
-        'url': '/friendships/no_retweets/ids.json',
-        'method': 'GET',
-    },
-    'get_friends_ids': {
-        'url': '/friends/ids.json',
-        'method': 'GET',
-    },
-    'get_followers_ids': {
-        'url': '/followers/ids.json',
-        'method': 'GET',
-    },
-    'lookup_friendships': {
-        'url': '/friendships/lookup.json',
-        'method': 'GET',
-    },
-    'get_incoming_friendship_ids': {
-        'url': '/friendships/incoming.json',
-        'method': 'GET',
-    },
-    'get_outgoing_friendship_ids': {
-        'url': '/friendships/outgoing.json',
-        'method': 'GET',
-    },
-    'create_friendship': {
-        'url': '/friendships/create.json',
-        'method': 'POST',
-    },
-    'destroy_friendship': {
-        'url': '/friendships/destroy.json',
-        'method': 'POST',
-    },
-    'update_friendship': {
-        'url': '/friendships/update.json',
-        'method': 'POST',
-    },
-    'show_friendship': {
-        'url': '/friendships/show.json',
-        'method': 'GET',
-    },
-    'get_friends_list': {
-        'url': '/friends/list.json',
-        'method': 'GET',
-    },
-    'get_followers_list': {
-        'url': '/followers/list.json',
-        'method': 'GET',
-    },
+    def get_user_ids_of_blocked_retweets(self, **params):
+        """Returns a collection of user_ids that the currently authenticated
+        user does not want to receive retweets from.
 
+        Docs: https://dev.twitter.com/docs/api/1.1/get/friendships/no_retweets/ids
+
+        """
+        return self.get('friendships/no_retweets/ids', params=params)
+
+    def get_friends_ids(self, **params):
+        """Returns a cursored collection of user IDs for every user the
+        specified user is following (otherwise known as their "friends").
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/friends/ids
+
+        """
+        return self.get('friends/ids', params=params)
+
+    def get_followers_ids(self, **params):
+        """Returns a cursored collection of user IDs for every user
+        following the specified user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/followers/ids
+
+        """
+        return self.get('followers/ids', params=params)
+
+    def lookup_friendships(self, **params):
+        """Returns the relationships of the authenticating user to the
+        comma-separated list of up to 100 screen_names or user_ids provided.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/friendships/lookup
+
+        """
+        return self.get('friendships/lookup', params=params)
+
+    def get_incoming_friendship_ids(self, **params):
+        """Returns a collection of numeric IDs for every user who has a
+        pending request to follow the authenticating user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/friendships/incoming
+
+        """
+        return self.get('friendships/incoming', params=params)
+
+    def get_outgoing_friendship_ids(self, **params):
+        """Returns a collection of numeric IDs for every protected user for
+        whom the authenticating user has a pending follow request.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/friendships/outgoing
+
+        """
+        return self.get('friendships/outgoing', params=params)
+
+    def create_friendship(self, **params):
+        """Allows the authenticating users to follow the user specified
+        in the ID parameter.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/friendships/create
+
+        """
+        return self.post('friendships/create', params=params)
+
+    def destroy_friendship(self, **params):
+        """Allows the authenticating user to unfollow the user specified
+        in the ID parameter.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/friendships/destroy
+
+        """
+        return self.post('friendships/destroy', params=params)
+
+    def update_friendship(self, **params):
+        """Allows one to enable or disable retweets and device notifications
+        from the specified user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/friendships/update
+
+        """
+        return self.post('friendships/update', params=params)
+
+    def show_friendship(self, **params):
+        """Returns detailed information about the relationship between two
+        arbitrary users.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/friendships/show
+
+        """
+        return self.get('friendships/show', params=params)
+
+    def get_friends_list(self, **params):
+        """Returns a cursored collection of user objects for every user the
+        specified user is following (otherwise known as their "friends").
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/friends/list
+
+        """
+        return self.get('friends/list', params=params)
+
+    def get_followers_list(self, **params):
+        """Returns a cursored collection of user objects for users
+        following the specified user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/followers/list
+
+        """
+        return self.get('followers/list', params=params)
 
     # Users
-    'get_account_settings': {
-        'url': '/account/settings.json',
-        'method': 'GET',
-    },
-    'verify_credentials': {
-        'url': '/account/verify_credentials.json',
-        'method': 'GET',
-    },
-    'update_account_settings': {
-        'url': '/account/settings.json',
-        'method': 'POST',
-    },
-    'update_delivery_service': {
-        'url': '/account/update_delivery_device.json',
-        'method': 'POST',
-    },
-    'update_profile': {
-        'url': '/account/update_profile.json',
-        'method': 'POST',
-    },
-    'update_profile_background_image': {
-        'url': '/account/update_profile_banner.json',
-        'method': 'POST',
-    },
-    'update_profile_colors': {
-        'url': '/account/update_profile_colors.json',
-        'method': 'POST',
-    },
-    'update_profile_image': {
-        'url': '/account/update_profile_image.json',
-        'method': 'POST',
-    },
-    'list_blocks': {
-        'url': '/blocks/list.json',
-        'method': 'GET',
-    },
-    'list_block_ids': {
-        'url': '/blocks/ids.json',
-        'method': 'GET',
-    },
-    'create_block': {
-        'url': '/blocks/create.json',
-        'method': 'POST',
-    },
-    'destroy_block': {
-        'url': '/blocks/destroy.json',
-        'method': 'POST',
-    },
-    'lookup_user': {
-        'url': '/users/lookup.json',
-        'method': 'GET',
-    },
-    'show_user': {
-        'url': '/users/show.json',
-        'method': 'GET',
-    },
-    'search_users': {
-        'url': '/users/search.json',
-        'method': 'GET',
-    },
-    'get_contributees': {
-        'url': '/users/contributees.json',
-        'method': 'GET',
-    },
-    'get_contributors': {
-        'url': '/users/contributors.json',
-        'method': 'GET',
-    },
-    'remove_profile_banner': {
-        'url': '/account/remove_profile_banner.json',
-        'method': 'POST',
-    },
-    'update_profile_background_image': {
-        'url': '/account/update_profile_background_image.json',
-        'method': 'POST',
-    },
-    'get_profile_banner_sizes': {
-        'url': '/users/profile_banner.json',
-        'method': 'GET',
-    },
+    def get_account_settings(self, **params):
+        """Returns settings (including current trend, geo and sleep time
+        information) for the authenticating user.
 
+        Docs: https://dev.twitter.com/docs/api/1.1/get/account/settings
+
+        """
+        return self.get('account/settings', params=params)
+
+    def verify_credentials(self, **params):
+        """Returns an HTTP 200 OK response code and a representation of the
+        requesting user if authentication was successful; returns a 401 status
+        code and an error message if not.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/account/verify_credentials
+
+        """
+        return self.get('account/verify_credentials', params=params)
+
+    def update_account_settings(self, **params):
+        """Updates the authenticating user's settings.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/account/settings
+
+        """
+        return self.post('account/settings', params=params)
+
+    def update_delivery_service(self, **params):
+        """Sets which device Twitter delivers updates to for the authenticating user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_delivery_device
+
+        """
+        return self.post('account/update_delivery_device', params=params)
+
+    def update_profile(self, **params):
+        """Sets values that users are able to set under the "Account" tab of their settings page.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_profile
+
+        """
+        return self.post('account/update_profile', params=params)
+
+    def update_profile_banner_image(self, **params):  # pragma: no cover
+        """Updates the authenticating user's profile background image.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_profile_background_image
+
+        """
+        return self.post('account/update_profile_banner', params=params)
+
+    def update_profile_colors(self, **params):
+        """Sets one or more hex values that control the color scheme of the
+        authenticating user's profile page on twitter.com.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_profile_colors
+
+        """
+        return self.post('account/update_profile_colors', params=params)
+
+    def update_profile_image(self, **params):  # pragma: no cover
+        """Updates the authenticating user's profile image.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_profile_image
+
+        """
+        return self.post('account/update_profile_image', params=params)
+
+    def list_blocks(self, **params):
+        """Returns a collection of user objects that the authenticating user is blocking.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/blocks/list
+
+        """
+        return self.get('blocks/list', params=params)
+
+    def list_block_ids(self, **params):
+        """Returns an array of numeric user ids the authenticating user is blocking.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/blocks/ids
+
+        """
+        return self.get('blocks/ids', params=params)
+
+    def create_block(self, **params):
+        """Blocks the specified user from following the authenticating user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/blocks/create
+
+        """
+        return self.post('blocks/create', params=params)
+
+    def destroy_block(self, **params):
+        """Un-blocks the user specified in the ID parameter for the authenticating user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/blocks/destroy
+
+        """
+        return self.post('blocks/destroy', params=params)
+
+    def lookup_user(self, **params):
+        """Returns fully-hydrated user objects for up to 100 users per request,
+        as specified by comma-separated values passed to the user_id and/or screen_name parameters.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/users/lookup
+
+        """
+        return self.get('users/lookup', params=params)
+
+    def show_user(self, **params):
+        """Returns a variety of information about the user specified by the
+        required user_id or screen_name parameter.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/users/show
+
+        """
+        return self.get('users/show', params=params)
+
+    def search_users(self, **params):
+        """Provides a simple, relevance-based search interface to public user accounts on Twitter.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/users/search
+
+        """
+        return self.get('users/search', params=params)
+
+    def get_contributees(self, **params):
+        """Returns a collection of users that the specified user can "contribute" to.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/users/contributees
+
+        """
+        return self.get('users/contributees', params=params)
+
+    def get_contributors(self, **params):
+        """Returns a collection of users who can contribute to the specified account.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/users/contributors
+
+        """
+        return self.get('users/contributors', params=params)
+
+    def remove_profile_banner(self, **params):
+        """Removes the uploaded profile banner for the authenticating user.
+        Returns HTTP 200 upon success.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/account/remove_profile_banner
+
+        """
+        return self.post('account/remove_profile_banner', params=params)
+
+    def update_profile_background_image(self, **params):
+        """Uploads a profile banner on behalf of the authenticating user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_profile_banner
+
+        """
+        return self.post('account/update_profile_background_image', params=params)
+
+    def get_profile_banner_sizes(self, **params):
+        """Returns a map of the available size variations of the specified user's profile banner.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/users/profile_banner
+
+        """
+        return self.get('users/profile_banner', params=params)
 
     # Suggested Users
-    'get_user_suggestions_by_slug': {
-        'url': '/users/suggestions/{{slug}}.json',
-        'method': 'GET',
-    },
-    'get_user_suggestions': {
-        'url': '/users/suggestions.json',
-        'method': 'GET',
-    },
-    'get_user_suggestions_statuses_by_slug': {
-        'url': '/users/suggestions/{{slug}}/members.json',
-        'method': 'GET',
-    },
+    def get_user_suggestions_by_slug(self, **params):
+        """Access the users in a given category of the Twitter suggested user list.
 
+        Docs: https://dev.twitter.com/docs/api/1.1/get/users/suggestions/%3Aslug
+
+        """
+        return self.get('users/suggestions/%s' % params.get('slug'), params=params)
+
+    def get_user_suggestions(self, **params):
+        """Access to Twitter's suggested user list.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/users/suggestions
+
+        """
+        return self.get('users/suggestions', params=params)
+
+    def get_user_suggestions_statuses_by_slug(self, **params):
+        """Access the users in a given category of the Twitter suggested user
+        list and return their most recent status if they are not a protected user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/users/suggestions/%3Aslug/members
+
+        """
+        return self.get('users/suggestions/%s/members' % params.get('slug'), params=params)
 
     # Favorites
-    'get_favorites': {
-        'url': '/favorites/list.json',
-        'method': 'GET',
-    },
-    'destroy_favorite': {
-        'url': '/favorites/destroy.json',
-        'method': 'POST',
-    },
-    'create_favorite': {
-        'url': '/favorites/create.json',
-        'method': 'POST',
-    },
+    def get_favorites(self, **params):
+        """Returns the 20 most recent Tweets favorited by the authenticating or specified user.
 
+        Docs: https://dev.twitter.com/docs/api/1.1/get/favorites/list
+
+        """
+        return self.get('favorites/list', params=params)
+
+    def destroy_favorite(self, **params):
+        """Un-favorites the status specified in the ID parameter as the authenticating user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/favorites/destroy
+
+        """
+        return self.post('favorites/destroy', params=params)
+
+    def create_favorite(self, **params):
+        """Favorites the status specified in the ID parameter as the authenticating user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/favorites/create
+
+        """
+        return self.post('favorites/create', params=params)
 
     # Lists
-    'show_lists': {
-        'url': '/lists/list.json',
-        'method': 'GET',
-    },
-    'get_list_statuses': {
-        'url': '/lists/statuses.json',
-        'method': 'GET'
-    },
-    'delete_list_member': {
-        'url': '/lists/members/destroy.json',
-        'method': 'POST',
-    },
-    'get_list_memberships': {
-        'url': '/lists/memberships.json',
-        'method': 'GET',
-    },
-    'get_list_subscribers': {
-        'url': '/lists/subscribers.json',
-        'method': 'GET',
-    },
-    'subscribe_to_list': {
-        'url': '/lists/subscribers/create.json',
-        'method': 'POST',
-    },
-    'is_list_subscriber': {
-        'url': '/lists/subscribers/show.json',
-        'method': 'GET',
-    },
-    'unsubscribe_from_list': {
-        'url': '/lists/subscribers/destroy.json',
-        'method': 'POST',
-    },
-    'create_list_members': {
-        'url': '/lists/members/create_all.json',
-        'method': 'POST'
-    },
-    'is_list_member': {
-        'url': '/lists/members/show.json',
-        'method': 'GET',
-    },
-    'get_list_members': {
-        'url': '/lists/members.json',
-        'method': 'GET',
-    },
-    'add_list_member': {
-        'url': '/lists/members/create.json',
-        'method': 'POST',
-    },
-    'delete_list': {
-        'url': '/lists/destroy.json',
-        'method': 'POST',
-    },
-    'update_list': {
-        'url': '/lists/update.json',
-        'method': 'POST',
-    },
-    'create_list': {
-        'url': '/lists/create.json',
-        'method': 'POST',
-    },
-    'get_specific_list': {
-        'url': '/lists/show.json',
-        'method': 'GET',
-    },
-    'get_list_subscriptions': {
-        'url': '/lists/subscriptions.json',
-        'method': 'GET',
-    },
-    'delete_list_members': {
-        'url': '/lists/members/destroy_all.json',
-        'method': 'POST'
-    },
-    'show_owned_lists': {
-        'url': '/lists/ownerships.json',
-        'method': 'GET'
-    },
+    def show_lists(self, **params):
+        """Returns all lists the authenticating or specified user subscribes to, including their own.
 
+        Docs: https://dev.twitter.com/docs/api/1.1/get/lists/list
+
+        """
+        return self.get('lists/list', params=params)
+
+    def get_list_statuses(self, **params):
+        """Returns a timeline of tweets authored by members of the specified list.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/lists/statuses
+
+        """
+        return self.get('lists/statuses', params=params)
+
+    def delete_list_member(self, **params):
+        """Removes the specified member from the list.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/lists/members/destroy
+
+        """
+        return self.post('lists/members/destroy', params=params)
+
+    def get_list_subscribers(self, **params):
+        """Returns the subscribers of the specified list.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/lists/subscribers
+
+        """
+        return self.get('lists/subscribers', params=params)
+
+    def subscribe_to_list(self, **params):
+        """Subscribes the authenticated user to the specified list.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/lists/subscribers/create
+
+        """
+        return self.post('lists/subscribers/create', params=params)
+
+    def is_list_subscriber(self, **params):
+        """Check if the specified user is a subscriber of the specified list.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/lists/subscribers/show
+
+        """
+        return self.get('lists/subscribers/show', params=params)
+
+    def unsubscribe_from_list(self, **params):
+        """Unsubscribes the authenticated user from the specified list.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/lists/subscribers/destroy
+
+        """
+        return self.post('lists/subscribers/destroy', params=params)
+
+    def create_list_members(self, **params):
+        """Adds multiple members to a list, by specifying a comma-separated
+        list of member ids or screen names.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/lists/members/create_all
+
+        """
+        return self.post('lists/members/create_all', params=params)
+
+    def is_list_member(self, **params):
+        """Check if the specified user is a member of the specified list.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/lists/members/show
+
+        """
+        return self.get('lists/members/show', params=params)
+
+    def get_list_members(self, **params):
+        """Returns the members of the specified list.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/lists/members
+
+        """
+        return self.get('lists/members', params=params)
+
+    def add_list_member(self, **params):
+        """Add a member to a list.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/lists/members/create
+
+        """
+        return self.post('lists/members/create', params=params)
+
+    def delete_list(self, **params):
+        """Deletes the specified list.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/lists/destroy
+
+        """
+        return self.post('lists/destroy', params=params)
+
+    def update_list(self, **params):
+        """Updates the specified list.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/lists/update
+
+        """
+        return self.post('lists/update', params=params)
+
+    def create_list(self, **params):
+        """Creates a new list for the authenticated user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/lists/create
+
+        """
+        return self.post('lists/create', params=params)
+
+    def get_specific_list(self, **params):
+        """Returns the specified list.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/lists/show
+
+        """
+        return self.get('lists/show', params=params)
+
+    def get_list_subscriptions(self, **params):
+        """Obtain a collection of the lists the specified user is subscribed to.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/lists/subscriptions
+
+        """
+        return self.get('lists/subscriptions', params=params)
+
+    def delete_list_members(self, **params):
+        """Removes multiple members from a list, by specifying a
+        comma-separated list of member ids or screen names.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/lists/members/destroy_all
+
+        """
+        return self.post('lists/members/destroy_all', params=params)
+
+    def show_owned_lists(self, **params):
+        """Returns the lists owned by the specified Twitter user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/lists/ownerships
+
+        """
+        return self.get('lists/ownerships', params=params)
 
     # Saved Searches
-    'get_saved_searches': {
-        'url': '/saved_searches/list.json',
-        'method': 'GET',
-    },
-    'show_saved_search': {
-        'url': '/saved_searches/show/{{id}}.json',
-        'method': 'GET',
-    },
-    'create_saved_search': {
-        'url': '/saved_searches/create.json',
-        'method': 'POST',
-    },
-    'destroy_saved_search': {
-        'url': '/saved_searches/destroy/{{id}}.json',
-        'method': 'POST',
-    },
+    def get_saved_searches(self, **params):
+        """Returns the authenticated user's saved search queries.
 
+        Docs: https://dev.twitter.com/docs/api/1.1/get/saved_searches/list
+
+        """
+        return self.get('saved_searches/list', params=params)
+
+    def show_saved_search(self, **params):
+        """Retrieve the information for the saved search represented by the given id.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/saved_searches/show/%3Aid
+
+        """
+        return self.get('saved_searches/show/%s' % params.get('id'), params=params)
+
+    def create_saved_search(self, **params):
+        """Create a new saved search for the authenticated user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/saved_searches/create
+
+        """
+        return self.post('saved_searches/create', params=params)
+
+    def destroy_saved_search(self, **params):
+        """Destroys a saved search for the authenticating user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/saved_searches/destroy/%3Aid
+
+        """
+        return self.post('saved_searches/destroy/%s' % params.get('id'), params=params)
 
     # Places & Geo
-    'get_geo_info': {
-        'url': '/geo/id/{{place_id}}.json',
-        'method': 'GET',
-    },
-    'reverse_geocode': {
-        'url': '/geo/reverse_geocode.json',
-        'method': 'GET',
-    },
-    'search_geo': {
-        'url': '/geo/search.json',
-        'method': 'GET',
-    },
-    'get_similar_places': {
-        'url': '/geo/similar_places.json',
-        'method': 'GET',
-    },
-    'create_place': {
-        'url': '/geo/place.json',
-        'method': 'POST',
-    },
+    def get_geo_info(self, **params):
+        """Returns all the information about a known place.
 
+        Docs: https://dev.twitter.com/docs/api/1.1/get/geo/id/%3Aplace_id
+
+        """
+        return self.get('geo/id/%s' % params.get('place_id'), params=params)
+
+    def reverse_geocode(self, **params):
+        """Given a latitude and a longitude, searches for up to 20 places
+        that can be used as a place_id when updating a status.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/geo/reverse_geocode
+
+        """
+        return self.get('geo/reverse_geocode', params=params)
+
+    def search_geo(self, **params):
+        """Search for places that can be attached to a statuses/update.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/geo/search
+
+        """
+        return self.get('geo/search', params=params)
+
+    def get_similar_places(self, **params):
+        """Locates places near the given coordinates which are similar in name.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/geo/similar_places
+
+        """
+        return self.get('geo/similar_places', params=params)
+
+    def create_place(self, **params):  # pragma: no cover
+        """Creates a new place object at the given latitude and longitude.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/geo/place
+
+        """
+        return self.post('geo/place', params=params)
 
     # Trends
-    'get_place_trends': {
-        'url': '/trends/place.json',
-        'method': 'GET',
-    },
-    'get_available_trends': {
-        'url': '/trends/available.json',
-        'method': 'GET',
-    },
-    'get_closest_trends': {
-        'url': '/trends/closest.json',
-        'method': 'GET',
-    },
+    def get_place_trends(self, **params):
+        """Returns the top 10 trending topics for a specific WOEID, if
+        trending information is available for it.
 
+        Docs: https://dev.twitter.com/docs/api/1.1/get/trends/place
+
+        """
+        return self.get('trends/place', params=params)
+
+    def get_available_trends(self, **params):
+        """Returns the locations that Twitter has trending topic information for.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/trends/available
+
+        """
+        return self.get('trends/available', params=params)
+
+    def get_closest_trends(self, **params):
+        """Returns the locations that Twitter has trending topic information
+        for, closest to a specified location.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/trends/closest
+
+        """
+        return self.get('trends/closest', params=params)
 
     # Spam Reporting
-    'report_spam': {
-        'url': '/users/report_spam.json',
-        'method': 'POST',
-    },
-}
+    def report_spam(self, **params):
+        """Report the specified user as a spam account to Twitter.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/users/report_spam
+
+        """
+        return self.post('users/report_spam', params=params)
+
+    # OAuth
+    def invalidate_token(self, **params):
+        """Allows a registered application to revoke an issued OAuth 2 Bearer
+        Token by presenting its client credentials.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/oauth2/invalidate_token
+
+        """
+        return self.post('oauth2/invalidate_token', params=params)
+
+    # Help
+    def get_application_rate_limit_status(self, **params):
+        """Returns the current rate limits for methods belonging to the
+        specified resource families.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/application/rate_limit_status
+
+        """
+        return self.get('application/rate_limit_status', params=params)
 
 
 # from https://dev.twitter.com/docs/error-codes-responses
-twitter_http_status_codes = {
+TWITTER_HTTP_STATUS_CODE = {
     200: ('OK', 'Success!'),
     304: ('Not Modified', 'There was no new data to return.'),
     400: ('Bad Request', 'The request was invalid. An accompanying error message will explain why. This is the status code will be returned during rate limiting.'),

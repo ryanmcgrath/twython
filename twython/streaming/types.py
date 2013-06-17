@@ -1,9 +1,20 @@
+# -*- coding: utf-8 -*-
+
+"""
+twython.streaming.types
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This module contains classes and methods for :class:`TwythonStreamer` to use.
+"""
+
+
 class TwythonStreamerTypes(object):
     """Class for different stream endpoints
 
     Not all streaming endpoints have nested endpoints.
     User Streams and Site Streams are single streams with no nested endpoints
     Status Streams include filter, sample and firehose endpoints
+
     """
     def __init__(self, streamer):
         self.streamer = streamer
@@ -36,12 +47,15 @@ class TwythonStreamerTypesStatuses(object):
     Available so TwythonStreamer.statuses.filter() is available.
     Just a bit cleaner than TwythonStreamer.statuses_filter(),
     statuses_sample(), etc. all being single methods in TwythonStreamer
+
     """
     def __init__(self, streamer):
         self.streamer = streamer
 
     def filter(self, **params):
         """Stream statuses/filter
+
+        :param \*\*params: Paramters to send with your stream request
 
         Accepted params found at:
         https://dev.twitter.com/docs/api/1.1/post/statuses/filter
@@ -53,6 +67,8 @@ class TwythonStreamerTypesStatuses(object):
     def sample(self, **params):
         """Stream statuses/sample
 
+        :param \*\*params: Paramters to send with your stream request
+
         Accepted params found at:
         https://dev.twitter.com/docs/api/1.1/get/statuses/sample
         """
@@ -62,6 +78,8 @@ class TwythonStreamerTypesStatuses(object):
 
     def firehose(self, **params):
         """Stream statuses/firehose
+
+        :param \*\*params: Paramters to send with your stream request
 
         Accepted params found at:
         https://dev.twitter.com/docs/api/1.1/get/statuses/firehose
