@@ -197,7 +197,7 @@ Advanced Usage
 Notes
 -----
 
-- Twython 3.0.0 has been injected with 1000mgs of pure awesomeness! OAuth 2 application authentication is now supported. And a *whole lot* more! See the `CHANGELOG <https://github.com/ryanmcgrath/twython/blob/master/HISTORY.rst#300-2013-xx-xx>`_ for more details!
+- Twython 3.0.0 has been injected with 1000mgs of pure awesomeness! OAuth 2 application authentication is now supported. And a *whole lot* more! See the `CHANGELOG <https://github.com/ryanmcgrath/twython/blob/master/HISTORY.rst#300-2013-06-18>`_ for more details!
 
 Questions, Comments, etc?
 -------------------------

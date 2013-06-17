@@ -3,7 +3,7 @@
 History
 -------
 
-3.0.0 (2013-xx-xx)
+3.0.0 (2013-06-18)
 ++++++++++++++++++
 
 - Changed ``twython/twython.py`` to ``twython/api.py`` in attempt to make structure look a little neater
