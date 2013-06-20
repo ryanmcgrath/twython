@@ -114,9 +114,8 @@ class TwythonStreamer(object):
                             for message_type in self.handlers:
                                 if message_type in data:
                                     handler = getattr(self, 'on_' + message_type, None)
-                                    if handler and callable(handler):
-                                        if not handler(data.get(message_type)):
-                                            break
+                                    if handler and callable(handler) and not handler(data.get(message_type)):
+                                        break
                     except ValueError:
                         self.on_error(response.status_code, 'Unable to decode response, not valid JSON.')
 
