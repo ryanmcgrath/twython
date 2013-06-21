@@ -20,7 +20,8 @@ import time
 
 class TwythonStreamer(object):
     def __init__(self, app_key, app_secret, oauth_token, oauth_token_secret,
-                 timeout=300, retry_count=None, retry_in=10, headers=None, handlers=None):
+                 timeout=300, retry_count=None, retry_in=10, client_args=None,
+                 handlers=None):
         """Streaming class for a friendly streaming user experience
         Authentication IS required to use the Twitter Streaming API
 
@@ -36,8 +37,9 @@ class TwythonStreamer(object):
                             retired
         :param retry_in: (optional) Amount of time (in secs) the previous
                          API call should be tried again
-        :param headers: (optional) Custom headers to send along with the
-                        request
+        :param client_args: (optional) Accepts some requests Session parameters and some requests Request parameters.
+                            See http://docs.python-requests.org/en/latest/api/#sessionapi and requests section below it for details.
+                            [ex. headers, proxies, verify(SSL verification)]
         :param handlers: (optional) Array of message types for which
                          corresponding handlers will be called
         """
@@ -45,16 +47,28 @@ class TwythonStreamer(object):
         self.auth = OAuth1(app_key, app_secret,
                            oauth_token, oauth_token_secret)
 
-        self.headers = {'User-Agent': 'Twython Streaming v' + __version__}
-        if headers:
-            self.headers.update(headers)
+        self.client_args = client_args or {}
+        default_headers = {'User-Agent': 'Twython Streaming v' + __version__}
+        if not 'headers' in self.client_args:
+            # If they didn't set any headers, set our defaults for them
+            self.client_args['headers'] = default_headers
+        elif 'User-Agent' not in self.client_args['headers']:
+            # If they set headers, but didn't include User-Agent.. set it for them
+            self.client_args['headers'].update(default_headers)
+        self.client_args['timeout'] = timeout
 
         self.client = requests.Session()
         self.client.auth = self.auth
-        self.client.headers = self.headers
         self.client.stream = True
 
-        self.timeout = timeout
+        # Make a copy of the client args and iterate over them
+        # Pop out all the acceptable args at this point because they will
+        # Never be used again.
+        client_args_copy = self.client_args.copy()
+        for k, v in client_args_copy.items():
+            if k in ('cert', 'headers', 'hooks', 'max_redirects', 'proxies'):
+                setattr(self.client, k, v)
+                self.client_args.pop(k)  # Pop, pop!
 
         self.api_version = '1.1'
 
@@ -80,12 +94,20 @@ class TwythonStreamer(object):
         func = getattr(self.client, method)
 
         def _send(retry_counter):
+            requests_args = {}
+            for k, v in self.client_args.items():
+            # Maybe this should be set as a class variable and only done once?
+                if k in ('timeout', 'allow_redirects', 'verify'):
+                    requests_args[k] = v
+
             while self.connected:
                 try:
                     if method == 'get':
-                        response = func(url, params=params, timeout=self.timeout)
+                        requests_args['params'] = params
                     else:
-                        response = func(url, data=params, timeout=self.timeout)
+                        requests_args['data'] = params
+
+                    response = func(url, **requests_args)
                 except requests.exceptions.Timeout:
                     self.on_timeout()
                 else:
