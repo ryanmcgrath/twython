@@ -9,6 +9,8 @@ Twitter Authentication, and miscellaneous methods that are useful when
 dealing with the Twitter API
 """
 
+import sys
+
 import requests
 from requests.auth import HTTPBasicAuth
 from requests_oauthlib import OAuth1, OAuth2
@@ -131,7 +133,10 @@ class Twython(EndpointsMixin, object):
                 'data': params,
                 'files': files,
             })
-        response = func(url, **requests_args)
+        try:
+            response = func(url, **requests_args)
+        except requests.RequestException as e:
+            raise TwythonError, str(e), sys.exc_info()[2]
         content = response.content.decode('utf-8')
 
         # create stash for last function intel
