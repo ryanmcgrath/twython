@@ -407,3 +407,41 @@ class Twython(EndpointsMixin, object):
         if is_py2 and isinstance(text, (str)):
             return Twython.unicode2utf8(text)
         return str(text)
+
+    @staticmethod
+    def html_for_tweet(tweet, use_display_url=True, use_expanded_url=False):
+        if 'retweeted_status' in tweet:
+            tweet = tweet['retweeted_status']
+
+        if 'entities' in tweet:
+            text = tweet['text']
+            entities = tweet['entities']
+
+            # Mentions
+            for entity in entities['user_mentions']:
+                start, end = entity['indices'][0], entity['indices'][1]
+
+                mention_html = '<a href="https://twitter.com/%(screen_name)s" class="twython-mention">@%(screen_name)s</a>'
+                text = text.replace(tweet['text'][start:end], mention_html % {'url': entity['screen_name']})
+
+            # Hashtags
+            for entity in entities['hashtags']:
+                start, end = entity['indices'][0], entity['indices'][1]
+
+                hashtag_html = '<a href="https://twitter.com/search?q=%%23%(hashtag)s" class="twython-hashtag">#%(hashtag)s</a>'
+                text = text.replace(tweet['text'][start:end], hashtag_html % {'hashtag': entity['text']})
+
+            # Urls
+            for entity in entities['urls']:
+                start, end = entity['indices'][0], entity['indices'][1]
+                if use_display_url and entity.get('display_url'):
+                    shown_url = entity['display_url']
+                elif use_expanded_url and entity.get('expanded_url'):
+                    shown_url = entity['expanded_url']
+                else:
+                    shown_url = entity['url']
+
+                url_html = '<a href="%s" class="twython-url">%s</a>'
+                text = text.replace(tweet['text'][start:end], url_html % (entity['url'], shown_url))
+
+        return text
