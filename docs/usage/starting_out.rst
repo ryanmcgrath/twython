@@ -81,6 +81,7 @@ You'll want to extract the ``oauth_verifier`` from the url.
 Django example:
 
 .. code-block:: python
+
     oauth_verifier = request.GET['oauth_verifier']
 
 Now that you have the ``oauth_verifier`` stored to a variable, you'll want to create a new instance of Twython and grab the final user tokens

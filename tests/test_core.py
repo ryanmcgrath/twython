@@ -3,7 +3,8 @@ from twython import Twython, TwythonError, TwythonAuthError
 from .config import (
     app_key, app_secret, oauth_token, oauth_token_secret,
     protected_twitter_1, protected_twitter_2, screen_name,
-    test_tweet_id, test_list_id, access_token
+    test_tweet_id, test_list_id, access_token, test_tweet_object,
+    test_tweet_html
 )
 
 import time
@@ -81,6 +82,11 @@ class TwythonAPITestCase(unittest.TestCase):
     def test_encode(self):
         """Test encoding UTF-8 works"""
         self.api.encode('Twython is awesome!')
+
+    def test_html_for_tweet(self):
+        """Test HTML for Twitter returns what we want"""
+        tweet_text = self.api.html_for_tweet(test_tweet_object)
+        self.assertEqual(test_tweet_html, tweet_text)
 
     # Timelines
     def test_get_mentions_timeline(self):
