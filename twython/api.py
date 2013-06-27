@@ -410,6 +410,16 @@ class Twython(EndpointsMixin, object):
 
     @staticmethod
     def html_for_tweet(tweet, use_display_url=True, use_expanded_url=False):
+        """Return HTML for a tweet (urls, mentions, hashtags replaced with links)
+
+        :param tweet: Tweet object from received from Twitter API
+        :param use_display_url: Use display URL to represent link (ex. google.com, github.com). Default: True
+        :param use_expanded_url: Use expanded URL to represent link (e.g. http://google.com). Default False
+
+        If use_expanded_url is True, it overrides use_display_url.
+        If use_display_url and use_expanded_url is False, short url will be used (t.co/xxxxx)
+
+        """
         if 'retweeted_status' in tweet:
             tweet = tweet['retweeted_status']
 
@@ -422,7 +432,7 @@ class Twython(EndpointsMixin, object):
                 start, end = entity['indices'][0], entity['indices'][1]
 
                 mention_html = '<a href="https://twitter.com/%(screen_name)s" class="twython-mention">@%(screen_name)s</a>'
-                text = text.replace(tweet['text'][start:end], mention_html % {'url': entity['screen_name']})
+                text = text.replace(tweet['text'][start:end], mention_html % {'screen_name': entity['screen_name']})
 
             # Hashtags
             for entity in entities['hashtags']:
@@ -434,7 +444,7 @@ class Twython(EndpointsMixin, object):
             # Urls
             for entity in entities['urls']:
                 start, end = entity['indices'][0], entity['indices'][1]
-                if use_display_url and entity.get('display_url'):
+                if use_display_url and entity.get('display_url') and not use_expanded_url:
                     shown_url = entity['display_url']
                 elif use_expanded_url and entity.get('expanded_url'):
                     shown_url = entity['expanded_url']

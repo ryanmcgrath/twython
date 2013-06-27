@@ -37,6 +37,7 @@ Usage
    usage/basic_usage
    usage/advanced_usage
    usage/streaming_api
+   usage/special_functions
 
 Twython API Documentation
 -------------------------
