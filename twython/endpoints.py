@@ -748,7 +748,7 @@ class EndpointsMixin(object):
         return self.get('trends/closest', params=params)
 
     # Spam Reporting
-    def report_spam(self, **params):
+    def report_spam(self, **params):  # pragma: no cover
         """Report the specified user as a spam account to Twitter.
 
         Docs: https://dev.twitter.com/docs/api/1.1/post/users/report_spam
@@ -757,7 +757,7 @@ class EndpointsMixin(object):
         return self.post('users/report_spam', params=params)
 
     # OAuth
-    def invalidate_token(self, **params):
+    def invalidate_token(self, **params):  # pragma: no cover
         """Allows a registered application to revoke an issued OAuth 2 Bearer
         Token by presenting its client credentials.
 

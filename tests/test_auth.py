@@ -11,6 +11,8 @@ class TwythonAuthTestCase(unittest.TestCase):
         self.bad_api = Twython('BAD_APP_KEY', 'BAD_APP_SECRET')
 
         self.oauth2_api = Twython(app_key, app_secret, oauth_version=2)
+        self.oauth2_bad_api = Twython('BAD_APP_KEY', 'BAD_APP_SECRET',
+                                      oauth_version=2)
 
     def test_get_authentication_tokens(self):
         """Test getting authentication tokens works"""
@@ -43,6 +45,11 @@ class TwythonAuthTestCase(unittest.TestCase):
     def test_obtain_access_token(self):
         """Test obtaining an Application Only OAuth 2 access token succeeds"""
         self.oauth2_api.obtain_access_token()
+
+    def test_obtain_access_token_bad_tokens(self):
+        """Test obtaining an Application Only OAuth 2 access token using bad app tokens fails"""
+        self.assertRaises(TwythonAuthError,
+                          self.oauth2_bad_api.obtain_access_token)
 
     def test_obtain_access_token_raises_error_when_oauth1(self):
         """Test when API is set for OAuth 1, obtain_access_token raises a

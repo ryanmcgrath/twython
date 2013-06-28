@@ -19,6 +19,16 @@ class TwythonStreamTestCase(unittest.TestCase):
         self.api = MyStreamer(app_key, app_secret,
                               oauth_token, oauth_token_secret)
 
+        client_args = {
+            'headers': {
+                'User-Agent': '__twython__ Stream Test'
+            }
+        }
+        # Initialize with header for coverage checking for User-Agent
+        self.api_with_header = MyStreamer(app_key, app_secret,
+                                          oauth_token, oauth_token_secret,
+                                          client_args=client_args)
+
     def test_stream_status_filter(self):
         self.api.statuses.filter(track='twitter')
 

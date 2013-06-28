@@ -132,13 +132,13 @@ class TwythonStreamer(object):
                         if is_py3:
                             line = line.decode('utf-8')
                         data = json.loads(line)
-                        if self.on_success(data):
+                        if self.on_success(data):  # pragma: no cover
                             for message_type in self.handlers:
                                 if message_type in data:
                                     handler = getattr(self, 'on_' + message_type, None)
                                     if handler and callable(handler) and not handler(data.get(message_type)):
                                         break
-                    except ValueError:
+                    except ValueError:  # pragma: no cover
                         self.on_error(response.status_code, 'Unable to decode response, not valid JSON.')
 
         response.close()

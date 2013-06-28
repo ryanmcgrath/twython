@@ -84,9 +84,27 @@ class TwythonAPITestCase(unittest.TestCase):
         self.api.encode('Twython is awesome!')
 
     def test_html_for_tweet(self):
-        """Test HTML for Twitter returns what we want"""
+        """Test HTML for Tweet returns what we want"""
         tweet_text = self.api.html_for_tweet(test_tweet_object)
         self.assertEqual(test_tweet_html, tweet_text)
+
+    def test_html_for_tweet_expanded_url(self):
+        """Test using expanded url in HTML for Tweet displays full urls"""
+        tweet_text = self.api.html_for_tweet(test_tweet_object,
+                                             use_expanded_url=True)
+        # Make sure full url is in HTML
+        self.assertTrue('http://google.com' in tweet_text)
+
+    def test_html_for_tweet_short_url(self):
+        """Test using expanded url in HTML for Tweet displays full urls"""
+        tweet_text = self.api.html_for_tweet(test_tweet_object, False)
+        # Make sure HTML doesn't contain the display OR exapanded url
+        self.assertTrue(not 'http://google.com' in tweet_text)
+        self.assertTrue(not 'google.com' in tweet_text)
+
+    def test_raise_error_on_bad_ssl_cert(self):
+        """Test TwythonError is raised by a RequestException when an actual HTTP happens"""
+        self.assertRaises(TwythonError, self.api.get, 'https://example.com')
 
     # Timelines
     def test_get_mentions_timeline(self):

@@ -169,13 +169,13 @@ class Twython(EndpointsMixin, object):
             if errors and isinstance(errors, list):
                 error_message = errors[0]['message']
             else:
-                error_message = errors
+                error_message = errors  # pragma: no cover
             self._last_call['api_error'] = error_message
 
             ExceptionType = TwythonError
             if response.status_code == 429:
                 # Twitter API 1.1, always return 429 when rate limit is exceeded
-                ExceptionType = TwythonRateLimitError
+                ExceptionType = TwythonRateLimitError  # pragma: no cover
             elif response.status_code == 401 or 'Bad Authentication data' in error_message:
                 # Twitter API 1.1, returns a 401 Unauthorized or
                 # a 400 "Bad Authentication data" for invalid/expired app keys/user tokens
@@ -186,7 +186,7 @@ class Twython(EndpointsMixin, object):
                                 retry_after=response.headers.get('retry-after'))
 
         # if we have a json error here, then it's not an official Twitter API error
-        if json_error and not response.status_code in (200, 201, 202):
+        if json_error and not response.status_code in (200, 201, 202):  # pragma: no cover
             raise TwythonError('Response was not valid JSON, unable to decode.')
 
         return content
@@ -303,7 +303,7 @@ class Twython(EndpointsMixin, object):
         if not authorized_tokens:
             raise TwythonError('Unable to decode authorized tokens.')
 
-        return authorized_tokens
+        return authorized_tokens  # pragma: no cover
 
     def obtain_access_token(self):
         """Returns an OAuth 2 access token to make OAuth 2 authenticated read-only calls.
@@ -387,7 +387,7 @@ class Twython(EndpointsMixin, object):
         try:
             if not 'since_id' in params:
                 params['since_id'] = (int(content['statuses'][0]['id_str']) + 1)
-        except (TypeError, ValueError):
+        except (TypeError, ValueError):  # pragma: no cover
             raise TwythonError('Unable to generate next page of search results, `page` is not a number.')
 
         for tweet in self.search_gen(search_query, **params):
