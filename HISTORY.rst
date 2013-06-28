@@ -3,6 +3,14 @@
 History
 -------
 
+3.1.0 (2013-xx-xx)
+++++++++++++++++++
+
+- Added ``html_for_tweet`` static method. This method accepts a tweet object returned from a Twitter API call and will return a string with urls, mentions and hashtags in the tweet replaced with HTML.
+- Pass ``client_args`` to the streaming ``__init__``, much like in core Twython (you can pass headers, timeout, hooks, proxies, etc.).
+- Streamer has new parameter ``handlers`` which accepts a list of strings related to functions that are apart of the Streaming class and start with "on\_". i.e. ['delete'] is passed, when 'delete' is received from a stream response; ``on_delete`` will be called.
+- When an actual request error happens and a ``RequestException`` is raised, it is caught and a ``TwythonError`` is raised instead for convenience.
+
 3.0.0 (2013-06-18)
 ++++++++++++++++++
 
