@@ -324,7 +324,7 @@ class Twython(EndpointsMixin, object):
             except AttributeError:
                 content = json.loads(content)
                 access_token = content['access_token']
-        except (ValueError, requests.exceptions.RequestException):
+        except (KeyError, ValueError, requests.exceptions.RequestException):
             raise TwythonAuthError('Unable to obtain OAuth 2 access token.')
         else:
             return access_token
