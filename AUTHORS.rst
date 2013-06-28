@@ -18,7 +18,7 @@ Patches and Suggestions
 - `Erik Scheffers <https://github.com/eriks5>`_, various fixes regarding OAuth callback URLs.
 - `Jordan Bouvier <https://github.com/jbouvier>`_, various fixes regarding OAuth callback URLs.
 - `Dick Brouwer <https://github.com/dikbrouwer>`_, fixes for OAuth Verifier in ``get_authorized_tokens``.
-- `hades <https://github.com/hades>`_, Fixes to various initial OAuth issues and keeping ``Twython3k`` up-to-date.
+- `hades <https://github.com/hades>`_, Fixes to various initial OAuth issues, raise TwythonError on request error.
 - `Alex Sutton <https://github.com/alexsdutton/twython/>`_, fix for parameter substitution regular expression (catch underscores!).
 - `Levgen Pyvovarov <https://github.com/bsn>`_, Various argument fixes, cyrillic text support.
 - `Mark Liu <https://github.com/mliu7>`_, Missing parameter fix for ``addListMember``.
@@ -41,3 +41,4 @@ Patches and Suggestions
 - `Jonathan Vanasco <https://github.com/jvanasco>`_, Debugging support, error_code tracking, Twitter error API tracking, other fixes
 - `DevDave <https://github.com/devdave>`_, quick fix for longs with helper._transparent_params
 - `Ruben Varela Rosa <https://github.com/rubenvarela>`_, Fixed search example
+- `Oleg Anashkin <https://github.com/extesy>`_, streaming ``handlers`` functionality
