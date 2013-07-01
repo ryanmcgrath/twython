@@ -51,7 +51,7 @@ Obtain Authorization URL
 .. code-block:: python
 
     APP_KEY = 'YOUR_APP_KEY'
-    APP_SECET = 'YOUR_APP_SECRET'
+    APP_SECRET = 'YOUR_APP_SECRET'
 
     twitter = Twython(APP_KEY, APP_SECRET)
     auth = twitter.get_authentication_tokens(callback_url='http://mysite.com/callback')
