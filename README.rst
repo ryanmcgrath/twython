@@ -89,7 +89,7 @@ Now, you'll want to create a Twython instance with your ``Consumer Key`` and ``C
 .. code-block:: python
 
     APP_KEY = 'YOUR_APP_KEY'
-    APP_SECET = 'YOUR_APP_SECRET'
+    APP_SECRET = 'YOUR_APP_SECRET'
 
     twitter = Twython(APP_KEY, APP_SECRET)
 
