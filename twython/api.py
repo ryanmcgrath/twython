@@ -23,7 +23,7 @@ from .helpers import _transparent_params
 class Twython(EndpointsMixin, object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None,
                  oauth_token_secret=None, access_token=None, token_type='bearer',
-                 oauth_version=1, api_version='1.1', client_args=None):
+                 oauth_version=1, api_version='1.1', client_args=None, auth_endpoint='authenticate'):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
         :param app_key: (optional) Your applications key
@@ -38,6 +38,9 @@ class Twython(EndpointsMixin, object):
         :param client_args: (optional) Accepts some requests Session parameters and some requests Request parameters.
                             See http://docs.python-requests.org/en/latest/api/#sessionapi and requests section below it for details.
                             [ex. headers, proxies, verify(SSL verification)]
+        :param auth_endpoint: (optional) Lets you select which authentication endpoint will use your application.
+                              This will allow the application to have DM access if the endpoint is 'authorize'.
+                              Default: authenticate.
 
         """
 
@@ -54,7 +57,7 @@ class Twython(EndpointsMixin, object):
         # OAuth 1
         self.request_token_url = self.api_url % 'oauth/request_token'
         self.access_token_url = self.api_url % 'oauth/access_token'
-        self.authenticate_url = self.api_url % 'oauth/authenticate'
+        self.authenticate_url = self.api_url % ('oauth/%s' % auth_endpoint)
 
         if self.access_token:  # If they pass an access token, force OAuth 2
             oauth_version = 2
