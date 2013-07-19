@@ -46,7 +46,7 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test Twython generic POST request works, with a full url and
         with just an endpoint"""
         update_url = 'https://api.twitter.com/1.1/statuses/update.json'
-        status = self.api.post(update_url, params={'status': 'I love Twython!'})
+        status = self.api.post(update_url, params={'status': 'I love Twython! %s' % int(time.time())})
         self.api.post('statuses/destroy/%s' % status['id_str'])
 
     def test_get_lastfunction_header(self):
@@ -148,7 +148,7 @@ class TwythonAPITestCase(unittest.TestCase):
 
     def test_update_and_destroy_status(self):
         """Test updating and deleting a status succeeds"""
-        status = self.api.update_status(status='Test post just to get deleted :(')
+        status = self.api.update_status(status='Test post just to get deleted :( %s' % int(time.time()))
         self.api.destroy_status(id=status['id_str'])
 
     def test_get_oembed_tweet(self):
@@ -186,7 +186,7 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test sending a direct message to someone who doesn't follow you
         fails"""
         self.assertRaises(TwythonError, self.api.send_direct_message,
-                          screen_name=protected_twitter_2, text='Yo, man!')
+                          screen_name=protected_twitter_2, text='Yo, man! %s' % int(time.time()))
 
     # Friends & Followers
     def test_get_user_ids_of_blocked_retweets(self):
