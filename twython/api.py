@@ -14,10 +14,15 @@ from requests.auth import HTTPBasicAuth
 from requests_oauthlib import OAuth1, OAuth2
 
 from . import __version__
+from .advisory import TwythonDeprecationWarning
 from .compat import json, urlencode, parse_qsl, quote_plus, str, is_py2
 from .endpoints import EndpointsMixin
 from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
 from .helpers import _transparent_params
+
+import warnings
+
+warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
 
 
 class Twython(EndpointsMixin, object):
@@ -376,22 +381,65 @@ class Twython(EndpointsMixin, object):
           >>>   print result
 
         """
-        content = self.search(q=search_query, **params)
+        warnings.warn(
+            'This method is deprecated. You should use Twython.cursor instead. [eg. Twython.cursor(Twython.search, q=\'your_query\')]',
+            TwythonDeprecationWarning,
+            stacklevel=2
+        )
+        return self.cursor(self.search, q=search_query, **params)
 
-        if not content.get('statuses'):
+    def cursor(self, function, **params):
+        """Returns a generator for results that match a specified query.
+
+        :param function: Instance of a Twython function (Twython.get_home_timeline, Twython.search)
+        :param \*\*params: Extra parameters to send with your request (usually parameters excepted by the Twitter API endpoint)
+        :rtype: generator
+
+        Usage::
+
+          >>> from twython import Twython
+          >>> twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+
+          >>> results = twitter.cursor(twitter.search, q='python')
+          >>> for result in results:
+          >>>   print result
+
+        """
+        if not hasattr(function, 'iter_mode'):
+            raise TwythonError('Unable to create generator for Twython method "%s"' % function.__name__)
+
+        content = function(**params)
+
+        if not content:
             raise StopIteration
 
-        for tweet in content['statuses']:
-            yield tweet
+        if function.iter_mode == 'cursor' and content['next_cursor_str'] == '0':
+            raise StopIteration
+
+        if hasattr(function, 'iter_key'):
+            results = content.get(function.iter_key)
+        else:
+            results = content
+
+        for result in results:
+            yield result
 
         try:
-            if not 'since_id' in params:
-                params['since_id'] = (int(content['statuses'][0]['id_str']) + 1)
+            if function.iter_mode == 'id':
+                if not 'max_id' in params:
+                    # Add 1 to the id because since_id and max_id are inclusive
+                    if hasattr(function, 'iter_metadata'):
+                        since_id = content[function.iter_metadata].get('since_id_str')
+                    else:
+                        since_id = content[0]['id_str']
+                    params['since_id'] = (int(since_id) - 1)
+            elif function.iter_mode == 'cursor':
+                params['cursor'] = content['next_cursor_str']
         except (TypeError, ValueError):  # pragma: no cover
             raise TwythonError('Unable to generate next page of search results, `page` is not a number.')
 
-        for tweet in self.search_gen(search_query, **params):
-            yield tweet
+        for result in self.cursor(function, **params):
+            yield result
 
     @staticmethod
     def unicode2utf8(text):
