@@ -44,4 +44,4 @@ will be replaced with:
 This function excepts two parameters: ``use_display_url`` and ``use_expanded_url``
 By default, ``use_display_url`` is ``True``. Meaning the link displayed in the tweet text will appear as (ex. google.com, github.com)
 If ``use_expanded_url`` is ``True``, it overrides ``use_display_url``. The urls will then be displayed as (ex. http://google.com, https://github.com)
-If ``use_display_url`` and ``use_expanded_url`` is ``False``, short url will be used (t.co/xxxxx)
+If ``use_display_url`` and ``use_expanded_url`` are ``False``, short url will be used (t.co/xxxxx)
