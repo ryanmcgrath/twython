@@ -366,10 +366,10 @@ class TwythonAPITestCase(unittest.TestCase):
     def test_create_update_destroy_list_add_remove_list_members(self):
         """Test create a list, adding and removing members then
         deleting the list succeeds"""
-        the_list = self.api.create_list(name='Stuff')
+        the_list = self.api.create_list(name='Stuff %s' % int(time.time()))
         list_id = the_list['id_str']
 
-        self.api.update_list(list_id=list_id, name='Stuff Renamed')
+        self.api.update_list(list_id=list_id, name='Stuff Renamed %s' % int(time.time()))
 
         screen_names = ['johncena', 'xbox']
         # Multi add/delete members
