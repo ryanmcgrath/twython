@@ -3,8 +3,8 @@ from twython import Twython, TwythonError, TwythonAuthError
 from .config import (
     app_key, app_secret, oauth_token, oauth_token_secret,
     protected_twitter_1, protected_twitter_2, screen_name,
-    test_tweet_id, test_list_id, access_token, test_tweet_object,
-    test_tweet_html
+    test_tweet_id, test_list_slug, test_list_owner_screen_name,
+    access_token, test_tweet_object, test_tweet_html
 )
 
 import time
@@ -361,7 +361,8 @@ class TwythonAPITestCase(unittest.TestCase):
     def test_get_list_statuses(self):
         """Test timeline of tweets authored by members of the
         specified list succeeds"""
-        self.api.get_list_statuses(list_id=test_list_id)
+        self.api.get_list_statuses(slug=test_list_slug,
+                                   owner_screen_name=test_list_owner_screen_name)
 
     def test_create_update_destroy_list_add_remove_list_members(self):
         """Test create a list, adding and removing members then
@@ -386,28 +387,36 @@ class TwythonAPITestCase(unittest.TestCase):
 
     def test_get_list_subscribers(self):
         """Test list of subscribers of a specific list succeeds"""
-        self.api.get_list_subscribers(list_id=test_list_id)
+        self.api.get_list_subscribers(slug=test_list_slug,
+                                      owner_screen_name=test_list_owner_screen_name)
 
     def test_subscribe_is_subbed_and_unsubscribe_to_list(self):
         """Test subscribing, is a list sub and unsubbing to list succeeds"""
-        self.api.subscribe_to_list(list_id=test_list_id)
+        self.api.subscribe_to_list(slug=test_list_slug,
+                                   owner_screen_name=test_list_owner_screen_name)
         # Returns 404 if user is not a subscriber
-        self.api.is_list_subscriber(list_id=test_list_id,
+        self.api.is_list_subscriber(slug=test_list_slug,
+                                    owner_screen_name=test_list_owner_screen_name,
                                     screen_name=screen_name)
-        self.api.unsubscribe_from_list(list_id=test_list_id)
+        self.api.unsubscribe_from_list(slug=test_list_slug,
+                                       owner_screen_name=test_list_owner_screen_name)
 
     def test_is_list_member(self):
         """Test returning if specified user is member of a list succeeds"""
         # Returns 404 if not list member
-        self.api.is_list_member(list_id=test_list_id, screen_name='jack')
+        self.api.is_list_member(slug=test_list_slug,
+                                owner_screen_name=test_list_owner_screen_name,
+                                screen_name='themattharris')
 
     def test_get_list_members(self):
         """Test listing members of the specified list succeeds"""
-        self.api.get_list_members(list_id=test_list_id)
+        self.api.get_list_members(slug=test_list_slug,
+                                  owner_screen_name=test_list_owner_screen_name)
 
     def test_get_specific_list(self):
         """Test getting specific list succeeds"""
-        self.api.get_specific_list(list_id=test_list_id)
+        self.api.get_specific_list(slug=test_list_slug,
+                                   owner_screen_name=test_list_owner_screen_name)
 
     def test_get_list_subscriptions(self):
         """Test collection of the lists the specified user is
