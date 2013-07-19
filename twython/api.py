@@ -362,7 +362,7 @@ class Twython(EndpointsMixin, object):
             )
         return '%s?%s' % (api_url, '&'.join(querystring))
 
-    def search_gen(self, search_query, **params):
+    def search_gen(self, search_query, **params):  # pragma: no cover
         """Returns a generator of tweets that match a specified query.
 
         Documentation: https://dev.twitter.com/docs/api/1.1/get/search/tweets

@@ -65,9 +65,9 @@ class TwythonAPITestCase(unittest.TestCase):
         self.assertRaises(TwythonError, self.api.get_lastfunction_header,
                           'no-api-call-was-made')
 
-    def test_search_gen(self):
+    def test_cursor(self):
         """Test looping through the generator results works, at least once that is"""
-        search = self.api.search_gen('twitter', count=1)
+        search = self.api.cursor(self.api.search, q='twitter', count=1)
         counter = 0
         while counter < 2:
             counter += 1
