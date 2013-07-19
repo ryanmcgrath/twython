@@ -55,7 +55,7 @@ class TwythonStreamerTypesStatuses(object):
     def filter(self, **params):
         """Stream statuses/filter
 
-        :param \*\*params: Paramters to send with your stream request
+        :param \*\*params: Parameters to send with your stream request
 
         Accepted params found at:
         https://dev.twitter.com/docs/api/1.1/post/statuses/filter
@@ -67,7 +67,7 @@ class TwythonStreamerTypesStatuses(object):
     def sample(self, **params):
         """Stream statuses/sample
 
-        :param \*\*params: Paramters to send with your stream request
+        :param \*\*params: Parameters to send with your stream request
 
         Accepted params found at:
         https://dev.twitter.com/docs/api/1.1/get/statuses/sample
@@ -79,7 +79,7 @@ class TwythonStreamerTypesStatuses(object):
     def firehose(self, **params):
         """Stream statuses/firehose
 
-        :param \*\*params: Paramters to send with your stream request
+        :param \*\*params: Parameters to send with your stream request
 
         Accepted params found at:
         https://dev.twitter.com/docs/api/1.1/get/statuses/firehose
