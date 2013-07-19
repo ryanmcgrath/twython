@@ -275,7 +275,6 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/get/friends/list
 
         """
-        print 'here 1'
         return self.get('friends/list', params=params)
     get_friends_list.iterator_mode = 'cursor'
 
