@@ -2,6 +2,8 @@ Twython
 =======
 
 
+.. image:: https://badge.fury.io/py/twython.png
+        :target: http://badge.fury.io/py/twython
 .. image:: https://travis-ci.org/ryanmcgrath/twython.png?branch=master
         :target: https://travis-ci.org/ryanmcgrath/twython
 .. image:: https://pypip.in/d/twython/badge.png
