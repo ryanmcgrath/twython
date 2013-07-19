@@ -7,6 +7,49 @@ This section covers methods to are part of Twython but not necessarily connected
 
 *******************************************************************************
 
+Cursor
+------
+
+This function returns a generator for Twitter API endpoints that are able to be pagintated in some way (either by cursor or since_id parameter)
+
+The Old Way
+^^^^^^^^^^^
+
+.. code-block:: python
+
+    from twython import Twython
+
+    twitter = Twython(APP_KEY, APP_SECRET,
+                      OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+
+    results = twitter.search(q='twitter')
+    if results.get('statuses'):
+        for result in results['statuses']:
+            print result['id_str']
+
+The New Way
+^^^^^^^^^^^
+
+.. code-block:: python
+
+    from twython import Twython
+
+    twitter = Twython(APP_KEY, APP_SECRET,
+                      OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+
+    results = twitter.cursor(t.search, q='twitter')
+    for result in results:
+        print result['id_str']
+
+Another example:
+
+.. code-block:: python
+
+    results = twitter.cursor(t.get_mentions_timeline)
+    for result in results:
+        print result['id_str']
+
+
 HTML for Tweet
 --------------
 

@@ -363,24 +363,6 @@ class Twython(EndpointsMixin, object):
         return '%s?%s' % (api_url, '&'.join(querystring))
 
     def search_gen(self, search_query, **params):  # pragma: no cover
-        """Returns a generator of tweets that match a specified query.
-
-        Documentation: https://dev.twitter.com/docs/api/1.1/get/search/tweets
-
-        :param search_query: Query you intend to search Twitter for
-        :param \*\*params: Extra parameters to send with your search request
-        :rtype: generator
-
-        Usage::
-
-          >>> from twython import Twython
-          >>> twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-
-          >>> search = twitter.search_gen('python')
-          >>> for result in search:
-          >>>   print result
-
-        """
         warnings.warn(
             'This method is deprecated. You should use Twython.cursor instead. [eg. Twython.cursor(Twython.search, q=\'your_query\')]',
             TwythonDeprecationWarning,
