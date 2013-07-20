@@ -24,6 +24,7 @@ class EndpointsMixin(object):
 
         """
         return self.get('statuses/mentions_timeline', params=params)
+    get_mentions_timeline.iter_mode = 'id'
 
     def get_user_timeline(self, **params):
         """Returns a collection of the most recent Tweets posted by the user
@@ -33,6 +34,7 @@ class EndpointsMixin(object):
 
         """
         return self.get('statuses/user_timeline', params=params)
+    get_user_timeline.iter_mode = 'id'
 
     def get_home_timeline(self, **params):
         """Returns a collection of the most recent Tweets and retweets
@@ -42,6 +44,7 @@ class EndpointsMixin(object):
 
         """
         return self.get('statuses/home_timeline', params=params)
+    get_home_timeline.iter_mode = 'id'
 
     def retweeted_of_me(self, **params):
         """Returns the most recent tweets authored by the authenticating user
@@ -51,6 +54,7 @@ class EndpointsMixin(object):
 
         """
         return self.get('statuses/retweets_of_me', params=params)
+    retweeted_of_me.iter_mode = 'id'
 
     # Tweets
     def get_retweets(self, **params):
@@ -119,6 +123,8 @@ class EndpointsMixin(object):
 
         """
         return self.get('statuses/retweeters/ids', params=params)
+    get_retweeters_ids.iter_mode = 'cursor'
+    get_retweeters_ids.iter_key = 'ids'
 
     # Search
     def search(self, **params):
@@ -128,6 +134,9 @@ class EndpointsMixin(object):
 
         """
         return self.get('search/tweets', params=params)
+    search.iter_mode = 'id'
+    search.iter_key = 'statuses'
+    search.iter_metadata = 'search_metadata'
 
     # Direct Messages
     def get_direct_messages(self, **params):
@@ -137,6 +146,7 @@ class EndpointsMixin(object):
 
         """
         return self.get('direct_messages', params=params)
+    get_direct_messages.iter_mode = 'id'
 
     def get_sent_messages(self, **params):
         """Returns the 20 most recent direct messages sent by the authenticating user.
@@ -145,6 +155,7 @@ class EndpointsMixin(object):
 
         """
         return self.get('direct_messages/sent', params=params)
+    get_sent_messages.iter_mode = 'id'
 
     def get_direct_message(self, **params):
         """Returns a single direct message, specified by an id parameter.
@@ -188,6 +199,8 @@ class EndpointsMixin(object):
 
         """
         return self.get('friends/ids', params=params)
+    get_friends_ids.iter_mode = 'cursor'
+    get_friends_ids.iter_key = 'ids'
 
     def get_followers_ids(self, **params):
         """Returns a cursored collection of user IDs for every user
@@ -197,6 +210,8 @@ class EndpointsMixin(object):
 
         """
         return self.get('followers/ids', params=params)
+    get_followers_ids.iter_mode = 'cursor'
+    get_followers_ids.iter_key = 'ids'
 
     def lookup_friendships(self, **params):
         """Returns the relationships of the authenticating user to the
@@ -215,6 +230,8 @@ class EndpointsMixin(object):
 
         """
         return self.get('friendships/incoming', params=params)
+    get_incoming_friendship_ids.iter_mode = 'cursor'
+    get_incoming_friendship_ids.iter_key = 'ids'
 
     def get_outgoing_friendship_ids(self, **params):
         """Returns a collection of numeric IDs for every protected user for
@@ -224,6 +241,8 @@ class EndpointsMixin(object):
 
         """
         return self.get('friendships/outgoing', params=params)
+    get_outgoing_friendship_ids.iter_mode = 'cursor'
+    get_outgoing_friendship_ids.iter_key = 'ids'
 
     def create_friendship(self, **params):
         """Allows the authenticating users to follow the user specified
@@ -269,6 +288,8 @@ class EndpointsMixin(object):
 
         """
         return self.get('friends/list', params=params)
+    get_friends_list.iter_mode = 'cursor'
+    get_friends_list.iter_key = 'users'
 
     def get_followers_list(self, **params):
         """Returns a cursored collection of user objects for users
@@ -278,6 +299,8 @@ class EndpointsMixin(object):
 
         """
         return self.get('followers/list', params=params)
+    get_followers_list.iter_mode = 'cursor'
+    get_followers_list.iter_key = 'users'
 
     # Users
     def get_account_settings(self, **params):
@@ -355,6 +378,8 @@ class EndpointsMixin(object):
 
         """
         return self.get('blocks/list', params=params)
+    list_blocks.iter_mode = 'cursor'
+    list_blocks.iter_key = 'users'
 
     def list_block_ids(self, **params):
         """Returns an array of numeric user ids the authenticating user is blocking.
@@ -363,6 +388,8 @@ class EndpointsMixin(object):
 
         """
         return self.get('blocks/ids', params=params)
+    list_block_ids.iter_mode = 'cursor'
+    list_block_ids.iter_key = 'ids'
 
     def create_block(self, **params):
         """Blocks the specified user from following the authenticating user.
@@ -481,6 +508,7 @@ class EndpointsMixin(object):
 
         """
         return self.get('favorites/list', params=params)
+    get_favorites.iter_mode = 'id'
 
     def destroy_favorite(self, **params):
         """Un-favorites the status specified in the ID parameter as the authenticating user.
@@ -514,6 +542,7 @@ class EndpointsMixin(object):
 
         """
         return self.get('lists/statuses', params=params)
+    get_list_statuses.iter_mode = 'id'
 
     def delete_list_member(self, **params):
         """Removes the specified member from the list.
@@ -530,6 +559,8 @@ class EndpointsMixin(object):
 
         """
         return self.get('lists/subscribers', params=params)
+    get_list_subscribers.iter_mode = 'cursor'
+    get_list_subscribers.iter_key = 'users'
 
     def subscribe_to_list(self, **params):
         """Subscribes the authenticated user to the specified list.
@@ -579,6 +610,8 @@ class EndpointsMixin(object):
 
         """
         return self.get('lists/members', params=params)
+    get_list_members.iter_mode = 'cursor'
+    get_list_members.iter_key = 'users'
 
     def add_list_member(self, **params):
         """Add a member to a list.
@@ -627,6 +660,8 @@ class EndpointsMixin(object):
 
         """
         return self.get('lists/subscriptions', params=params)
+    get_list_subscriptions.iter_mode = 'cursor'
+    get_list_subscriptions.iter_key = 'lists'
 
     def delete_list_members(self, **params):
         """Removes multiple members from a list, by specifying a
@@ -644,6 +679,8 @@ class EndpointsMixin(object):
 
         """
         return self.get('lists/ownerships', params=params)
+    show_owned_lists.iter_mode = 'cursor'
+    show_owned_lists.iter_key = 'lists'
 
     # Saved Searches
     def get_saved_searches(self, **params):

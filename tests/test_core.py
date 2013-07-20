@@ -3,8 +3,8 @@ from twython import Twython, TwythonError, TwythonAuthError
 from .config import (
     app_key, app_secret, oauth_token, oauth_token_secret,
     protected_twitter_1, protected_twitter_2, screen_name,
-    test_tweet_id, test_list_id, access_token, test_tweet_object,
-    test_tweet_html
+    test_tweet_id, test_list_slug, test_list_owner_screen_name,
+    access_token, test_tweet_object, test_tweet_html
 )
 
 import time
@@ -46,7 +46,7 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test Twython generic POST request works, with a full url and
         with just an endpoint"""
         update_url = 'https://api.twitter.com/1.1/statuses/update.json'
-        status = self.api.post(update_url, params={'status': 'I love Twython!'})
+        status = self.api.post(update_url, params={'status': 'I love Twython! %s' % int(time.time())})
         self.api.post('statuses/destroy/%s' % status['id_str'])
 
     def test_get_lastfunction_header(self):
@@ -65,9 +65,9 @@ class TwythonAPITestCase(unittest.TestCase):
         self.assertRaises(TwythonError, self.api.get_lastfunction_header,
                           'no-api-call-was-made')
 
-    def test_search_gen(self):
+    def test_cursor(self):
         """Test looping through the generator results works, at least once that is"""
-        search = self.api.search_gen('twitter', count=1)
+        search = self.api.cursor(self.api.search, q='twitter', count=1)
         counter = 0
         while counter < 2:
             counter += 1
@@ -148,7 +148,7 @@ class TwythonAPITestCase(unittest.TestCase):
 
     def test_update_and_destroy_status(self):
         """Test updating and deleting a status succeeds"""
-        status = self.api.update_status(status='Test post just to get deleted :(')
+        status = self.api.update_status(status='Test post just to get deleted :( %s' % int(time.time()))
         self.api.destroy_status(id=status['id_str'])
 
     def test_get_oembed_tweet(self):
@@ -186,7 +186,7 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test sending a direct message to someone who doesn't follow you
         fails"""
         self.assertRaises(TwythonError, self.api.send_direct_message,
-                          screen_name=protected_twitter_2, text='Yo, man!')
+                          screen_name=protected_twitter_2, text='Yo, man! %s' % int(time.time()))
 
     # Friends & Followers
     def test_get_user_ids_of_blocked_retweets(self):
@@ -361,15 +361,16 @@ class TwythonAPITestCase(unittest.TestCase):
     def test_get_list_statuses(self):
         """Test timeline of tweets authored by members of the
         specified list succeeds"""
-        self.api.get_list_statuses(list_id=test_list_id)
+        self.api.get_list_statuses(slug=test_list_slug,
+                                   owner_screen_name=test_list_owner_screen_name)
 
     def test_create_update_destroy_list_add_remove_list_members(self):
         """Test create a list, adding and removing members then
         deleting the list succeeds"""
-        the_list = self.api.create_list(name='Stuff')
+        the_list = self.api.create_list(name='Stuff %s' % int(time.time()))
         list_id = the_list['id_str']
 
-        self.api.update_list(list_id=list_id, name='Stuff Renamed')
+        self.api.update_list(list_id=list_id, name='Stuff Renamed %s' % int(time.time()))
 
         screen_names = ['johncena', 'xbox']
         # Multi add/delete members
@@ -386,28 +387,36 @@ class TwythonAPITestCase(unittest.TestCase):
 
     def test_get_list_subscribers(self):
         """Test list of subscribers of a specific list succeeds"""
-        self.api.get_list_subscribers(list_id=test_list_id)
+        self.api.get_list_subscribers(slug=test_list_slug,
+                                      owner_screen_name=test_list_owner_screen_name)
 
     def test_subscribe_is_subbed_and_unsubscribe_to_list(self):
         """Test subscribing, is a list sub and unsubbing to list succeeds"""
-        self.api.subscribe_to_list(list_id=test_list_id)
+        self.api.subscribe_to_list(slug=test_list_slug,
+                                   owner_screen_name=test_list_owner_screen_name)
         # Returns 404 if user is not a subscriber
-        self.api.is_list_subscriber(list_id=test_list_id,
+        self.api.is_list_subscriber(slug=test_list_slug,
+                                    owner_screen_name=test_list_owner_screen_name,
                                     screen_name=screen_name)
-        self.api.unsubscribe_from_list(list_id=test_list_id)
+        self.api.unsubscribe_from_list(slug=test_list_slug,
+                                       owner_screen_name=test_list_owner_screen_name)
 
     def test_is_list_member(self):
         """Test returning if specified user is member of a list succeeds"""
         # Returns 404 if not list member
-        self.api.is_list_member(list_id=test_list_id, screen_name='jack')
+        self.api.is_list_member(slug=test_list_slug,
+                                owner_screen_name=test_list_owner_screen_name,
+                                screen_name='themattharris')
 
     def test_get_list_members(self):
         """Test listing members of the specified list succeeds"""
-        self.api.get_list_members(list_id=test_list_id)
+        self.api.get_list_members(slug=test_list_slug,
+                                  owner_screen_name=test_list_owner_screen_name)
 
     def test_get_specific_list(self):
         """Test getting specific list succeeds"""
-        self.api.get_specific_list(list_id=test_list_id)
+        self.api.get_specific_list(slug=test_list_slug,
+                                   owner_screen_name=test_list_owner_screen_name)
 
     def test_get_list_subscriptions(self):
         """Test collection of the lists the specified user is

@@ -29,7 +29,8 @@ env:
   - PROTECTED_TWITTER_1=TwythonSecure1
   - PROTECTED_TWITTER_2=TwythonSecure2
   - TEST_TWEET_ID=332992304010899457
-  - TEST_LIST_ID=574
+  - TEST_LIST_SLUG=team
+  - TEST_LIST_OWNER_SCREEN_NAME=twitterapi
 install: pip install -r requirements.txt
 script: nosetests -v -w tests/ --logging-filter="twython" --with-cov --cov twython --cov-config .coveragerc --cov-report term-missing
 notifications:
