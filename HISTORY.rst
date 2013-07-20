@@ -12,6 +12,7 @@ History
 - When an actual request error happens and a ``RequestException`` is raised, it is caught and a ``TwythonError`` is raised instead for convenience.
 - Added "cursor"-like functionality. Endpoints with the attribute ``iter_mode`` will be able to be passed to ``Twython.cursor`` and returned as a generator.
 - ``Twython.search_gen`` has been deprecated. Please use ``twitter.cursor(twitter.search, q='your_query')`` instead, where ``twitter`` is your ``Twython`` instance.
+- Added method ``get_list_memberships``
 
 3.0.0 (2013-06-18)
 ++++++++++++++++++

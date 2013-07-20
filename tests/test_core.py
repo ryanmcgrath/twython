@@ -385,6 +385,10 @@ class TwythonAPITestCase(unittest.TestCase):
 
         self.api.delete_list(list_id=list_id)
 
+    def test_get_list_memberships(self):
+        """Test list of memberhips the authenticated user succeeds"""
+        self.api.get_list_memberships()
+
     def test_get_list_subscribers(self):
         """Test list of subscribers of a specific list succeeds"""
         self.api.get_list_subscribers(slug=test_list_slug,

@@ -552,6 +552,16 @@ class EndpointsMixin(object):
         """
         return self.post('lists/members/destroy', params=params)
 
+    def get_list_memberships(self, **params):
+        """Returns the lists the specified user has been added to.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/lists/memberships
+
+        """
+        return self.get('lists/memberships', params=params)
+    get_list_memberships.iter_mode = 'cursor'
+    get_list_memberships.iter_key = 'lists'
+
     def get_list_subscribers(self, **params):
         """Returns the subscribers of the specified list.
 
