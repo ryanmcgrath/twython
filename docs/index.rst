@@ -29,14 +29,38 @@ Features
 Usage
 -----
 
+..
+   I know it isn't necessary to start a new tree for every section,
+   but I think it looks a bit cleaner that way!
+
 .. toctree::
    :maxdepth: 4
 
    usage/install
+
+.. toctree::
+   :maxdepth: 4
+
    usage/starting_out
+
+.. toctree::
+   :maxdepth: 4
+
    usage/basic_usage
+
+.. toctree::
+   :maxdepth: 4
+
    usage/advanced_usage
+
+.. toctree::
+   :maxdepth: 4
+
    usage/streaming_api
+
+.. toctree::
+   :maxdepth: 2
+
    usage/special_functions
 
 Twython API Documentation

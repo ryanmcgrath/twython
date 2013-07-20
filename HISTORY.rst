@@ -10,6 +10,8 @@ History
 - Pass ``client_args`` to the streaming ``__init__``, much like in core Twython (you can pass headers, timeout, hooks, proxies, etc.).
 - Streamer has new parameter ``handlers`` which accepts a list of strings related to functions that are apart of the Streaming class and start with "on\_". i.e. ['delete'] is passed, when 'delete' is received from a stream response; ``on_delete`` will be called.
 - When an actual request error happens and a ``RequestException`` is raised, it is caught and a ``TwythonError`` is raised instead for convenience.
+- Added "cursor"-like functionality. Endpoints with the attribute ``iter_mode`` will be able to be passed to ``Twython.cursor`` and returned as a generator.
+- ``Twython.search_gen`` has been deprecated. Please use ``twitter.cursor(twitter.search, q='your_query')`` instead, where ``twitter`` is your ``Twython`` instance.
 
 3.0.0 (2013-06-18)
 ++++++++++++++++++
