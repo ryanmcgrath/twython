@@ -385,6 +385,10 @@ class TwythonAPITestCase(unittest.TestCase):
 
         self.api.delete_list(list_id=list_id)
 
+    def test_get_list_memberships(self):
+        """Test list of memberhips the authenticated user succeeds"""
+        self.api.get_list_memberships()
+
     def test_get_list_subscribers(self):
         """Test list of subscribers of a specific list succeeds"""
         self.api.get_list_subscribers(slug=test_list_slug,
@@ -478,6 +482,22 @@ class TwythonAPITestCase(unittest.TestCase):
         self.api.get_closest_trends(lat='37', long='-122')
 
     # Help
+    def test_get_twitter_configuration(self):
+        """Test getting Twitter's configuration succeeds"""
+        self.api.get_twitter_configuration()
+
+    def test_get_supported_languages(self):
+        """Test getting languages supported by Twitter succeeds"""
+        self.api.get_supported_languages()
+
+    def test_privacy_policy(self):
+        """Test getting Twitter's Privacy Policy succeeds"""
+        self.api.get_privacy_policy()
+
+    def test_get_tos(self):
+        """Test getting the Twitter Terms of Service succeeds"""
+        self.api.get_tos()
+
     def test_get_application_rate_limit_status(self):
         """Test getting application rate limit status succeeds"""
         self.oauth2_api.get_application_rate_limit_status()
