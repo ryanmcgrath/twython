@@ -814,6 +814,39 @@ class EndpointsMixin(object):
         return self.post('oauth2/invalidate_token', params=params)
 
     # Help
+    def get_twitter_configuration(self, **params):
+        """Returns the current configuration used by Twitter
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/help/configuration
+
+        """
+        return self.get('help/configuration', params=params)
+
+    def get_supported_languages(self, **params):
+        """Returns the list of languages supported by Twitter along with
+        their ISO 639-1 code.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/help/languages
+
+        """
+        return self.get('help/languages', params=params)
+
+    def get_privacy_policy(self, **params):
+        """Returns Twitter's Privacy Policy
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/help/privacy
+
+        """
+        return self.get('help/privacy', params=params)
+
+    def get_tos(self, **params):
+        """Return the Twitter Terms of Service
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/help/tos
+
+        """
+        return self.get('help/tos', params=params)
+
     def get_application_rate_limit_status(self, **params):
         """Returns the current rate limits for methods belonging to the
         specified resource families.
