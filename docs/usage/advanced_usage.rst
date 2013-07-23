@@ -22,7 +22,7 @@ Create a Twython instance with your application keys and the users OAuth tokens
 Updating Status with Image
 --------------------------
 
-Documentation: https://dev.twitter.com/docs/api/1.1/get/account/verify_credentials
+Documentation: https://dev.twitter.com/docs/api/1.1/post/statuses/update_with_media
 
 .. code-block:: python
 
