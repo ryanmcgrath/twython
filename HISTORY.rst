@@ -13,6 +13,7 @@ History
 - Added "cursor"-like functionality. Endpoints with the attribute ``iter_mode`` will be able to be passed to ``Twython.cursor`` and returned as a generator.
 - ``Twython.search_gen`` has been deprecated. Please use ``twitter.cursor(twitter.search, q='your_query')`` instead, where ``twitter`` is your ``Twython`` instance.
 - Added methods ``get_list_memberships``, ``get_twitter_configuration``, ``get_supported_languages``, ``get_privacy_policy``, ``get_tos``
+- Added ``auth_endpoint`` parameter to ``Twython.__init__`` for cases when the right parameters weren't being shown during the authentication step.
 
 3.0.0 (2013-06-18)
 ++++++++++++++++++
