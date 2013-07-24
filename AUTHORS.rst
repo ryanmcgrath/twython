@@ -42,3 +42,4 @@ Patches and Suggestions
 - `DevDave <https://github.com/devdave>`_, quick fix for longs with helper._transparent_params
 - `Ruben Varela Rosa <https://github.com/rubenvarela>`_, Fixed search example
 - `Oleg Anashkin <https://github.com/extesy>`_, streaming ``handlers`` functionality
+- `Luis Alberto Santana <https://github.com/jackboot7`_, Added auth_endpoint parameter for cases when the right permissions weren't being shown on authenticate step
