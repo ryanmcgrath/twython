@@ -1,5 +1,7 @@
 [run]
-omit = twython/advisory.py
+omit =
+    ../twython/advisory.py
+    ../twython/compat.py
 
 [report]
 exclude_lines = 
