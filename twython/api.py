@@ -398,9 +398,6 @@ class Twython(EndpointsMixin, object):
         if not content:
             raise StopIteration
 
-        if function.iter_mode == 'cursor' and content['next_cursor_str'] == '0':
-            raise StopIteration
-
         if hasattr(function, 'iter_key'):
             results = content.get(function.iter_key)
         else:
@@ -408,6 +405,9 @@ class Twython(EndpointsMixin, object):
 
         for result in results:
             yield result
+
+        if function.iter_mode == 'cursor' and content['next_cursor_str'] == '0':
+            raise StopIteration
 
         try:
             if function.iter_mode == 'id':
