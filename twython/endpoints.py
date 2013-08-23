@@ -414,7 +414,7 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/get/users/lookup
 
         """
-        return self.get('users/lookup', params=params)
+        return self.post('users/lookup', params=params)
 
     def show_user(self, **params):
         """Returns a variety of information about the user specified by the
