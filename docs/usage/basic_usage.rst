@@ -48,7 +48,7 @@ Updating Status
 
 This method makes use of dynamic arguments, :ref:`read more about them <dynamicargexplaination>`
 
-Documentation: https://dev.twitter.com/docs/api/1/post/statuses/update
+Documentation: https://dev.twitter.com/docs/api/1.1/post/statuses/update
 
 .. code-block:: python
 
