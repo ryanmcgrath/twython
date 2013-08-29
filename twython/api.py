@@ -256,7 +256,8 @@ class Twython(EndpointsMixin, object):
 
         :param callback_url: (optional) Url the user is returned to after they authorize your app (web clients only)
         :param force_login: (optional) Forces the user to enter their credentials to ensure the correct users account is authorized.
-        :param app_secret: (optional) If forced_login is set OR user is not currently logged in, Prefills the username input box of the OAuth login screen with the given value
+        :param screen_name: (optional) If forced_login is set OR user is not currently logged in, Prefills the username input box of the OAuth login screen with the given value
+
         :rtype: dict
         """
         if self.oauth_version != 1:
