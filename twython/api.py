@@ -9,6 +9,7 @@ Twitter Authentication, and miscellaneous methods that are useful when
 dealing with the Twitter API
 """
 
+import time
 import requests
 from requests.auth import HTTPBasicAuth
 from requests_oauthlib import OAuth1, OAuth2
@@ -374,11 +375,12 @@ class Twython(EndpointsMixin, object):
         )
         return self.cursor(self.search, q=search_query, **params)
 
-    def cursor(self, function, **params):
+    def cursor(self, function, sleep_seconds=0, **params):
         """Returns a generator for results that match a specified query.
 
         :param function: Instance of a Twython function (Twython.get_home_timeline, Twython.search)
-        :param \*\*params: Extra parameters to send with your request (usually parameters excepted by the Twitter API endpoint)
+        :param sleep_seconds: Number of seconds to sleep between each API call (useful for heavily rate-limited endpoints)
+        :param \*\*params: Extra parameters to send with your request (usually parameters accepted by the Twitter API endpoint)
         :rtype: generator
 
         Usage::
@@ -389,8 +391,8 @@ class Twython(EndpointsMixin, object):
           >>> results = twitter.cursor(twitter.search, q='python')
           >>> for result in results:
           >>>   print result
-
         """
+
         if not hasattr(function, 'iter_mode'):
             raise TwythonError('Unable to create generator for Twython method "%s"' % function.__name__)
 
@@ -424,7 +426,9 @@ class Twython(EndpointsMixin, object):
         except (TypeError, ValueError):  # pragma: no cover
             raise TwythonError('Unable to generate next page of search results, `page` is not a number.')
 
-        for result in self.cursor(function, **params):
+        time.sleep(sleep_seconds)
+
+        for result in self.cursor(function, sleep_seconds, **params):
             yield result
 
     @staticmethod
