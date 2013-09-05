@@ -400,7 +400,7 @@ class Twython(EndpointsMixin, object):
 
         if not content:
             raise StopIteration
-
+        
         if hasattr(function, 'iter_key'):
             results = content.get(function.iter_key)
         else:
