@@ -25,7 +25,10 @@ def _transparent_params(_params):
         elif isinstance(v, basestring) or isinstance(v, numeric_types):
             params[k] = v
         elif isinstance(v, list):
-            params[k] = ','.join(v)
+            try:
+                params[k] = ','.join(v)
+            except TypeError:
+                params[k] = ','.join(map(str,v))
         else:
             continue  # pragma: no cover
     return params, files
