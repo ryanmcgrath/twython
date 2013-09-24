@@ -9,6 +9,7 @@ env:
   - secure: HFTL8UN1GkY6/GqygpgzWpYdWvhXRN8uTO//AgGzSg0FkHuDFcxRJigwCNI3PRImFkkRRVmUJDw18dolkx2h60w0wqD9K09DFpPTYfwmF9Bql+O3hjG9Ep9iu+CREwQTm2u66f36Q+pjaDiHWmr0kgi0zUTD7w0UvlN7gdFCMxk=
   - secure: L3nD/BEOAqGTmd8Va9bQ8MZL5gbiNWuy9TvIxCmQ5bfdlAAdq371oqXpuy90JftaloapktjjmuSrsiszWgMMB/TGDO45h1LrYQEMEmA/4JN/uly3lUk8th9Rig+blKTG0q6X6GsX8UWA0xVeLtXzkddpNAOBgpeqb33pWmFkdcM=
   - secure: OdVG7LVqQ13RQxxEUPEMHZb0seoZUNzq+oy/K1qe4ubcupqiMh47pxnDcei6vkVpMn8QIvbG9lcV0oOREqJ+m+g3wUA5JX95liFqLNsmLMMVgP3yjYDf7KoNHckA5H5BwIYO/AFCBdwyNN0h439kwSciCbIr70UModVkvdWoFLI=
+  - secure: RJgKNXCxQZxjkxqinv6x96hGZvfJpjOIaRpH9YUJrCZeqLbS1FUOvTWkze5nZQw4DL14zBmpGZXYC9twSYvscEGNnaEhxDKygiFfLosERRa65N57kphD0AsGNe9YAhWUGDbCxnZ0PYHc48DYxX+jPxqsQ/2bxZbXVoJg4pZFP3o=
   - SCREEN_NAME=__twython__
   - PROTECTED_TWITTER_1=TwythonSecure1
   - PROTECTED_TWITTER_2=TwythonSecure2
@@ -24,3 +25,9 @@ branches:
     - master
 after_success:
   - coveralls
+before_script:
+  - |-
+    ACCESS_TOKEN_B64=U2FsdGVkX1+OsKZdDqnhWy1jwIUKKqjp2eeTeIS2S2Z9xfwzg2XPavn01lV9Ml7j
+    LULxl/l4021YZ3DdYpudm7vQHr+lJGMM1TNPdf0QIusxWYZp7pGayl6uourm8iEY
+    WIEpMtCNL3l6Ntluw077oVP9TW0kiGQ8JROemIHLTOY=
+  - ACCESS_TOKEN=`openssl enc -d -aes-256-cbc -a $ACCESS_TOKEN_B64 -pass env:$ACCESS_TOKEN_SECRET`
