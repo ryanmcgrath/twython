@@ -3,28 +3,12 @@ python:
   - 2.6
   - 2.7
   - 3.3
-env: 
-  global: 
-  - secure: |-
-      ICEoq4tQdOCGzpQAgLHunOflhLqs7hb1xYuD6mXZCbO/L+hDI4+pImA9mZZd
-      doyfyFMuNprWfgdUdcAL3axliRR2TyQIt51FLf7bD01jJEPa0GOKlKE/s/+3
-      7oDs+kkSr81w9rvIqpx55nE8+DYzkh+TwDp5oAT+m/EE+lFItfk=
-  - secure: |-
-      LNowlSsXwgbFT0g8B4fDlBmOhycAfSxUNFiYBDn70H93WDLr9drEbE7Wl2Mv
-      AlGJw0kXey4K4oTV4+Bsy6gacsvCINpFk7f4ulTDHCH4MTONtG1n51RlkLW0
-      SAH8di1DiXR3PqRv+NKixVsgI0ZCY1B78NuvaoDL68bfu0KEdHs=
-  - secure: |-
-      kC9hGpdJJesmZZGMXEoPWK/lzIU6vUeguV/yI2jLgRin0EKPsgds0qR4737x
-      2Z2q1+CFUlvHkl+povGcm0/A1rkNqU0KKBcxRBu/XXRxJ3DWp7gIGsmoyWUW
-      68kdPOwxywZ+tj6BCD7zmStKn4I3mSzTmGKaWj8ZT0wQ91tl0Y8=
-  - secure: |-
-      Y0M90wCpDWmSdBmgPCV2N9mMSaRMdEOis5r5sfUq/5aFTB/KDaSR9scM1g+L
-      21OtvUBvaG1bdSzn0T+I5Fs/MkfbtTmuahogy83nsNDRpIZJmRIsHFmJw1fz
-      nEHD2Kbm4iLMYzrKto77KpxYSQMnc3sQKZjreaI31NLu+7raCAk=
-  - secure: |-
-      j1gePLSZF8SRcpF1AU+cBK5MSih5MrM1iGE6N7VWI0wrl+xh7wr3QLtVkAar
-      AeMFgwkz6QalfrKLsoUPFuNMv7vn+2CthC9pRv+NRk+4xV+37NysHFPR7JRo
-      xK2EC+DCiw2eJECnk9IPGQTgkVnFAQ3GLnsBSzzJ+UAkG2NjZ88=
+env:
+  global:
+  - secure: USjLDneiXlVvEjkUVqTt+LBi0XJ4QhkRcJzqVXA9gEau1NTjAkNTPmHjUbOygp0dkfoV0uWrZKCw6fL1g+HJgWl0vHeHzcNl4mUkA+OwkGFHgaeIhvUfnyyJA8P3Zm21XHC+ehzMpEFN5fVNNhREjnRj+CXMc0FgA6knwBRobu4=
+  - secure: HFTL8UN1GkY6/GqygpgzWpYdWvhXRN8uTO//AgGzSg0FkHuDFcxRJigwCNI3PRImFkkRRVmUJDw18dolkx2h60w0wqD9K09DFpPTYfwmF9Bql+O3hjG9Ep9iu+CREwQTm2u66f36Q+pjaDiHWmr0kgi0zUTD7w0UvlN7gdFCMxk=
+  - secure: L3nD/BEOAqGTmd8Va9bQ8MZL5gbiNWuy9TvIxCmQ5bfdlAAdq371oqXpuy90JftaloapktjjmuSrsiszWgMMB/TGDO45h1LrYQEMEmA/4JN/uly3lUk8th9Rig+blKTG0q6X6GsX8UWA0xVeLtXzkddpNAOBgpeqb33pWmFkdcM=
+  - secure: OdVG7LVqQ13RQxxEUPEMHZb0seoZUNzq+oy/K1qe4ubcupqiMh47pxnDcei6vkVpMn8QIvbG9lcV0oOREqJ+m+g3wUA5JX95liFqLNsmLMMVgP3yjYDf7KoNHckA5H5BwIYO/AFCBdwyNN0h439kwSciCbIr70UModVkvdWoFLI=
   - SCREEN_NAME=__twython__
   - PROTECTED_TWITTER_1=TwythonSecure1
   - PROTECTED_TWITTER_2=TwythonSecure2
