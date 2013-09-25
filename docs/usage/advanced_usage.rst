@@ -102,8 +102,8 @@ Here is an example of sending the request through proxies:
 
     client_args = {
         'proxies': {
-            'http': '10.0.10.1:8000',
-            'https': '10.0.10.1:8001',
+            'http': 'http://10.0.10.1:8000',
+            'https': 'https://10.0.10.1:8001',
         }
     }
 
@@ -122,8 +122,8 @@ or both (and set a timeout variable):
             'User-Agent': 'My App Name'
         },
         'proxies': {
-            'http': '10.0.10.1:8000',
-            'https': '10.0.10.1:8001',
+            'http': 'http://10.0.10.1:8000',
+            'https': 'https://10.0.10.1:8001',
         }
         'timeout': 300,
     }
