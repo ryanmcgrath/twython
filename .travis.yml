@@ -27,4 +27,4 @@ branches:
 after_success:
   - coveralls
 before_script:
-  - export ACCESS_TOKEN=$(echo $ACCESS_TOKEN_B64 | openssl enc -d -aes-256-cbc -a -pass env:ACCESS_TOKEN_SECRET)
+  - export ACCESS_TOKEN=$(echo $ACCESS_TOKEN_B64 | openssl enc -d -aes-256-cbc -A -a -pass env:ACCESS_TOKEN_SECRET)
