@@ -10,6 +10,7 @@ Twitter API calls.
 
 from .. import __version__
 from ..compat import json, is_py3
+from ..helpers import _transparent_params
 from .types import TwythonStreamerTypes
 
 import requests
@@ -88,6 +89,8 @@ class TwythonStreamer(object):
 
         self.handlers = handlers if handlers else ['delete', 'limit', 'disconnect']
 
+        self.chunk_size = chunk_size
+
     def _request(self, url, method='GET', params=None):
         """Internal stream request handling"""
         self.connected = True
@@ -95,6 +98,7 @@ class TwythonStreamer(object):
 
         method = method.lower()
         func = getattr(self.client, method)
+        params, _ = _transparent_params(params)
 
         def _send(retry_counter):
             requests_args = {}
