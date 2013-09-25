@@ -16,10 +16,7 @@ env:
   - TEST_TWEET_ID=332992304010899457
   - TEST_LIST_SLUG=team
   - TEST_LIST_OWNER_SCREEN_NAME=twitterapi
-  - |-
-    ACCESS_TOKEN_B64=U2FsdGVkX1+OsKZdDqnhWy1jwIUKKqjp2eeTeIS2S2Z9xfwzg2XPavn01lV9Ml7j
-    LULxl/l4021YZ3DdYpudm7vQHr+lJGMM1TNPdf0QIusxWYZp7pGayl6uourm8iEY
-    WIEpMtCNL3l6Ntluw077oVP9TW0kiGQ8JROemIHLTOY=
+  - ACCESS_TOKEN_B64=U2FsdGVkX18QdBhvMNshM4PGy04tU3HLwKP+nNSoNZHKsvGLjELcWEXN2LIu/T+yngX1vGONf9lo14ElnfS4k7sfhiru8phR4+rZuBVP3bDvC2A6fXJuhuLqNhBrWqg32WQewvxLWDWBoKmnvRHg5b74GHh+IN/12tU0cBF2HK8=
 install: pip install -r requirements.txt
 script: nosetests -v -w tests/ --logging-filter="twython" --with-cov --cov twython --cov-config .coveragerc --cov-report term-missing
 notifications:
