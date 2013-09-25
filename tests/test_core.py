@@ -29,7 +29,6 @@ class TwythonAPITestCase(unittest.TestCase):
                            oauth_token, oauth_token_secret,
                            client_args=client_args)
 
-        print 'access token is', access_token
         self.oauth2_api = Twython(app_key, access_token=access_token,
                                   client_args=oauth2_client_args)
 
