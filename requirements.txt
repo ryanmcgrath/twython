@@ -1,5 +1,5 @@
 coverage==3.6.0
-requests==1.2.2
+requests==2.0.0
 requests_oauthlib==0.3.2
 python-coveralls==2.1.0
 nose-cov==1.6

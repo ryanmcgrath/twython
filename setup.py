@@ -6,7 +6,7 @@ import sys
 from setuptools import setup
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '3.0.0'
+__version__ = '3.1.0'
 
 packages = [
     'twython',
@@ -20,7 +20,7 @@ if sys.argv[-1] == 'publish':
 setup(
     name='twython',
     version=__version__,
-    install_requires=['requests==1.2.3', 'requests_oauthlib==0.3.2'],
+    install_requires=['requests==2.0.0', 'requests_oauthlib==0.3.2'],
     author='Ryan McGrath',
     author_email='ryan@venodesigns.net',
     license=open('LICENSE').read(),
