@@ -3,7 +3,7 @@
 History
 -------
 
-3.1.0 (2013-xx-xx)
+3.1.0 (2013-09-25)
 ++++++++++++++++++
 
 - Added ``html_for_tweet`` static method. This method accepts a tweet object returned from a Twitter API call and will return a string with urls, mentions and hashtags in the tweet replaced with HTML.
@@ -14,6 +14,8 @@ History
 - ``Twython.search_gen`` has been deprecated. Please use ``twitter.cursor(twitter.search, q='your_query')`` instead, where ``twitter`` is your ``Twython`` instance.
 - Added methods ``get_list_memberships``, ``get_twitter_configuration``, ``get_supported_languages``, ``get_privacy_policy``, ``get_tos``
 - Added ``auth_endpoint`` parameter to ``Twython.__init__`` for cases when the right parameters weren't being shown during the authentication step.
+- Fixed streaming issue where results wouldn't be returned for streams that weren't so active (See https://github.com/ryanmcgrath/twython/issues/202#issuecomment-19915708)
+- Streaming API now uses ``_transparent_params`` so when passed ``True`` or ``False`` or an array, etc. Twython formats it to meet Twitter parameter standards (i.e. ['ryanmcgrath', 'mikehelmick', 'twitterapi'] would convert to string 'ryanmcgrath,mikehelmick,twitterapi')
 
 3.0.0 (2013-06-18)
 ++++++++++++++++++
