@@ -21,7 +21,7 @@ import time
 class TwythonStreamer(object):
     def __init__(self, app_key, app_secret, oauth_token, oauth_token_secret,
                  timeout=300, retry_count=None, retry_in=10, client_args=None,
-                 handlers=None):
+                 handlers=None, chunk_size=1):
         """Streaming class for a friendly streaming user experience
         Authentication IS required to use the Twitter Streaming API
 
@@ -42,6 +42,9 @@ class TwythonStreamer(object):
                             [ex. headers, proxies, verify(SSL verification)]
         :param handlers: (optional) Array of message types for which
                          corresponding handlers will be called
+
+        :param chunk_size: (optional) Define the buffer size before data is
+                           actually returned from the Streaming API. Default: 1
         """
 
         self.auth = OAuth1(app_key, app_secret,
@@ -124,7 +127,7 @@ class TwythonStreamer(object):
         while self.connected:
             response = _send(retry_counter)
 
-            for line in response.iter_lines():
+            for line in response.iter_lines(self.chunk_size):
                 if not self.connected:
                     break
                 if line:
