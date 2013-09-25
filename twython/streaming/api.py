@@ -124,7 +124,8 @@ class TwythonStreamer(object):
         while self.connected:
             response = _send(retry_counter)
 
-            for line in response.iter_lines():
+            # So that first tweets get picked-up.
+            for line in response.iter_lines(chunk_size=1):
                 if not self.connected:
                     break
                 if line:
