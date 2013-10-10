@@ -156,7 +156,7 @@ Create a Twython instance with your application keys and the users OAuth tokens
 .. code-block:: python
 
     from twython import Twython
-    twitter = Twython(APP_KEY, APP_SECRET
+    twitter = Twython(APP_KEY, APP_SECRET,
                       OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
 Authenticated Users Home Timeline
