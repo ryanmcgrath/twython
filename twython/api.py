@@ -307,7 +307,21 @@ class Twython(EndpointsMixin, object):
         if self.oauth_version != 1:
             raise TwythonError('This method can only be called when your OAuth version is 1.0.')
 
-        response = self.client.get(self.access_token_url, params={'oauth_verifier': oauth_verifier})
+        response = self.client.get(self.access_token_url, params={'oauth_verifier': oauth_verifier}, headers={'Content-Type': 'application/json'})
+
+        if response.status_code == 401:
+            try:
+                try:
+                    # try to get json
+                    content = response.json()
+                except AttributeError:  # pragma: no cover
+                    # if unicode detected
+                    content = json.loads(response.content)
+            except ValueError:
+                content = {}
+
+            raise TwythonError(content.get('error', 'Invalid / expired Token'), error_code=response.status_code)
+
         authorized_tokens = dict(parse_qsl(response.content.decode('utf-8')))
         if not authorized_tokens:
             raise TwythonError('Unable to decode authorized tokens.')

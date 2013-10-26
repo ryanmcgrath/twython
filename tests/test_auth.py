@@ -9,6 +9,8 @@ class TwythonAuthTestCase(unittest.TestCase):
     def setUp(self):
         self.api = Twython(app_key, app_secret)
         self.bad_api = Twython('BAD_APP_KEY', 'BAD_APP_SECRET')
+        self.bad_api_invalid_tokens = Twython('BAD_APP_KEY', 'BAD_APP_SECRET',
+                                              'BAD_OT', 'BAD_OTS')
 
         self.oauth2_api = Twython(app_key, app_secret, oauth_version=2)
         self.oauth2_bad_api = Twython('BAD_APP_KEY', 'BAD_APP_SECRET',
@@ -30,6 +32,11 @@ class TwythonAuthTestCase(unittest.TestCase):
         """Test getting final tokens fails with wrong tokens"""
         self.assertRaises(TwythonError, self.bad_api.get_authorized_tokens,
                           'BAD_OAUTH_VERIFIER')
+
+    def test_get_authorized_tokens_invalid_or_expired_tokens(self):
+        """Test getting final token fails when invalid or expired tokens have been passed"""
+        self.assertRaises(TwythonError, self.bad_api_invalid_tokens.get_authorized_tokens,
+                         'BAD_OAUTH_VERIFIER')
 
     def test_get_authentication_tokens_raises_error_when_oauth2(self):
         """Test when API is set for OAuth 2, get_authentication_tokens raises
