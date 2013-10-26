@@ -39,3 +39,5 @@ nosetests.xml
 docs/_build
 
 test.py
+
+.venv
