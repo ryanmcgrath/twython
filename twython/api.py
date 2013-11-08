@@ -388,7 +388,7 @@ class Twython(EndpointsMixin, object):
         )
         return self.cursor(self.search, q=search_query, **params)
 
-    def cursor(self, function, **params, returnPages = False):
+    def cursor(self, function, returnPages = False, **params):
         """Returns a generator for results that match a specified query.
 
         :param function: Instance of a Twython function (Twython.get_home_timeline, Twython.search)
@@ -441,11 +441,8 @@ class Twython(EndpointsMixin, object):
         except (TypeError, ValueError):  # pragma: no cover
             raise TwythonError('Unable to generate next page of search results, `page` is not a number.')
 
-        if returnPages:
-            yield self.cursor(function, **params)
-        else:
-            for result in self.cursor(function, **params):
-                yield result
+        for result in self.cursor(function, returnPages = returnPages, **params):
+            yield result
 
     @staticmethod
     def unicode2utf8(text):
