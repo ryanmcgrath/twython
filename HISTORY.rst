@@ -7,9 +7,7 @@ History
 ++++++++++++++++++
 
 - Update `requests` version to 2.1.0.
-- Fixed: Streaming issue where `Exceptions` in handlers or `on_success` which subclass `ValueError` would
-previously be caught and reported as a JSON decoding problem, and
-`on_error()` would be called (with status_code=200)
+- Fixed: Streaming issue where `Exceptions` in handlers or `on_success` which subclass `ValueError` would previously be caught and reported as a JSON decoding problem, and `on_error()` would be called (with status_code=200)
 - Fixed issue where XML was returned when bad tokens were passed to `get_authorized_tokens`
 - Fixed import for `setup` causing installation to fail on some devices (eg. Nokia N9/MeeGo)
 
