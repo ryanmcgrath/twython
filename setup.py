@@ -9,7 +9,7 @@ except ImportError:
     from distutils.core import setup
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '3.1.1'
+__version__ = '3.1.2'
 
 packages = [
     'twython',
