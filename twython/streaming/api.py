@@ -148,6 +148,7 @@ class TwythonStreamer(object):
                                     handler = getattr(self, 'on_' + message_type, None)
                                     if handler and callable(handler) and not handler(data.get(message_type)):
                                         break
+                        yield data
 
         response.close()
 
@@ -177,7 +178,9 @@ class TwythonStreamer(object):
         :param data: Error message sent from stream
         :type data: dict
         """
-        return
+        # Include the content
+        raise requests.exceptions.HTTPError(
+            response.status_code, response.content)
 
     def on_timeout(self):  # pragma: no cover
         """ Called when the request has timed out """

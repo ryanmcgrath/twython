@@ -28,7 +28,7 @@ class TwythonStreamerTypes(object):
         """
         url = 'https://userstream.twitter.com/%s/user.json' \
               % self.streamer.api_version
-        self.streamer._request(url, params=params)
+        return self.streamer._request(url, params=params)
 
     def site(self, **params):
         """Stream site
@@ -38,7 +38,7 @@ class TwythonStreamerTypes(object):
         """
         url = 'https://sitestream.twitter.com/%s/site.json' \
               % self.streamer.api_version
-        self.streamer._request(url, params=params)
+        return self.streamer._request(url, params=params)
 
 
 class TwythonStreamerTypesStatuses(object):
@@ -62,7 +62,7 @@ class TwythonStreamerTypesStatuses(object):
         """
         url = 'https://stream.twitter.com/%s/statuses/filter.json' \
               % self.streamer.api_version
-        self.streamer._request(url, 'POST', params=params)
+        return self.streamer._request(url, 'POST', params=params)
 
     def sample(self, **params):
         """Stream statuses/sample
@@ -74,7 +74,7 @@ class TwythonStreamerTypesStatuses(object):
         """
         url = 'https://stream.twitter.com/%s/statuses/sample.json' \
               % self.streamer.api_version
-        self.streamer._request(url, params=params)
+        return self.streamer._request(url, params=params)
 
     def firehose(self, **params):
         """Stream statuses/firehose
@@ -86,4 +86,4 @@ class TwythonStreamerTypesStatuses(object):
         """
         url = 'https://stream.twitter.com/%s/statuses/firehose.json' \
               % self.streamer.api_version
-        self.streamer._request(url, params=params)
+        return self.streamer._request(url, params=params)
