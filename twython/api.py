@@ -392,7 +392,7 @@ class Twython(EndpointsMixin, object):
         """Returns a generator for results that match a specified query.
 
         :param function: Instance of a Twython function (Twython.get_home_timeline, Twython.search)
-        :param \*\*params: Extra parameters to send with your request (usually parameters excepted by the Twitter API endpoint)
+        :param \*\*params: Extra parameters to send with your request (usually parameters accepted by the Twitter API endpoint)
         :rtype: generator
 
         Usage::
