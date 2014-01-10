@@ -3,3 +3,4 @@ requests==2.1.0
 requests_oauthlib==0.4.0
 python-coveralls==2.1.0
 nose-cov==1.6
+responses==0.2.0

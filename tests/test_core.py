@@ -9,6 +9,7 @@ from .config import (
 
 import time
 import unittest
+import responses
 
 
 class TwythonAPITestCase(unittest.TestCase):
@@ -31,6 +32,94 @@ class TwythonAPITestCase(unittest.TestCase):
 
         self.oauth2_api = Twython(app_key, access_token=access_token,
                                   client_args=oauth2_client_args)
+
+    @responses.activate
+    def test_request_should_handle_full_endpoint(self):
+        url = 'https://api.twitter.com/1.1/search/tweets.json'
+        responses.add(responses.GET, url)
+
+        self.api.request(url)
+
+        self.assertEqual(1, len(responses.calls))
+        self.assertEqual(url, responses.calls[0].request.url)
+
+    @responses.activate
+    def test_request_should_handle_relative_endpoint(self):
+        url = 'https://api.twitter.com/1.1/search/tweets.json'
+        responses.add(responses.GET, url)
+
+        self.api.request('search/tweets', version='1.1')
+
+        self.assertEqual(1, len(responses.calls))
+        self.assertEqual(url, responses.calls[0].request.url)
+
+    @responses.activate
+    def test_request_should_post_request_regardless_of_case(self):
+        url = 'https://api.twitter.com/1.1/statuses/update.json'
+        responses.add(responses.POST, url)
+
+        self.api.request(url, method='POST')
+        self.api.request(url, method='post')
+
+        self.assertEqual(2, len(responses.calls))
+        self.assertEqual(url, responses.calls[0].request.url)
+        self.assertEqual(url, responses.calls[1].request.url)
+
+    @responses.activate
+    def test_request_should_throw_exception_with_invalid_http_method(self):
+        #TODO(cash): should Twython catch the AttributeError and throw a TwythonError
+        self.assertRaises(AttributeError, self.api.request, endpoint='search/tweets', method='INVALID')
+
+    @responses.activate
+    def test_request_should_encode_boolean_as_lowercase_string(self):
+        url = 'https://api.twitter.com/1.1/search/tweets.json'
+        responses.add(responses.GET, url)
+
+        self.api.request('search/tweets', params={'include_entities': True})
+        self.api.request('search/tweets', params={'include_entities': False})
+
+        self.assertEqual(url + '?include_entities=true', responses.calls[0].request.url)
+        self.assertEqual(url + '?include_entities=false', responses.calls[1].request.url)
+
+    @responses.activate
+    def test_request_should_handle_string_or_number_parameter(self):
+        url = 'https://api.twitter.com/1.1/search/tweets.json'
+        responses.add(responses.GET, url)
+
+        self.api.request('search/tweets', params={'lang': 'es'})
+        self.api.request('search/tweets', params={'count': 50})
+
+        self.assertEqual(url + '?lang=es', responses.calls[0].request.url)
+        self.assertEqual(url + '?count=50', responses.calls[1].request.url)
+
+    @responses.activate
+    def test_request_should_encode_string_list_as_string(self):
+        url = 'https://api.twitter.com/1.1/search/tweets.json'
+        location = ['37.781157', '-122.39872', '1mi']
+        responses.add(responses.GET, url)
+
+        self.api.request('search/tweets', params={'geocode': location})
+
+        self.assertEqual(url + '?geocode=37.781157%2C-122.39872%2C1mi', responses.calls[0].request.url)
+
+    @responses.activate
+    def test_request_should_encode_number_list_as_string(self):
+        url = 'https://api.twitter.com/1.1/search/tweets.json'
+        location = [37.781157, -122.39872, '1mi']
+        responses.add(responses.GET, url)
+
+        self.api.request('search/tweets', params={'geocode': location})
+
+        self.assertEqual(url + '?geocode=37.781157%2C-122.39872%2C1mi', responses.calls[0].request.url)
+
+    @responses.activate
+    def test_request_should_ignore_bad_parameter(self):
+        url = 'https://api.twitter.com/1.1/search/tweets.json'
+        responses.add(responses.GET, url)
+
+        self.api.request('search/tweets', params={'geocode': self})
+
+        self.assertEqual(url, responses.calls[0].request.url)
 
     def test_construct_api_url(self):
         """Test constructing a Twitter API url works as we expect"""
