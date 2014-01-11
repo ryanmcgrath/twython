@@ -1,10 +1,8 @@
 from twython import TwythonStreamer, TwythonStreamError
 
 from .config import (
-    app_key, app_secret, oauth_token, oauth_token_secret
+    app_key, app_secret, oauth_token, oauth_token_secret, unittest
 )
-
-import unittest
 
 
 class TwythonStreamTestCase(unittest.TestCase):

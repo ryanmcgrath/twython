@@ -4,11 +4,10 @@ from .config import (
     app_key, app_secret, oauth_token, oauth_token_secret,
     protected_twitter_1, protected_twitter_2, screen_name,
     test_tweet_id, test_list_slug, test_list_owner_screen_name,
-    access_token, test_tweet_object, test_tweet_html
+    access_token, test_tweet_object, test_tweet_html, unittest
 )
 
 import time
-import unittest
 
 
 class TwythonEndpointsTestCase(unittest.TestCase):

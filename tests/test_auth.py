@@ -1,8 +1,6 @@
 from twython import Twython, TwythonError, TwythonAuthError
 
-from .config import app_key, app_secret, screen_name
-
-import unittest
+from .config import app_key, app_secret, screen_name, unittest
 
 
 class TwythonAuthTestCase(unittest.TestCase):

@@ -1,21 +1,17 @@
 from twython import Twython, TwythonError, TwythonAuthError
 
 from .config import (
-    test_tweet_object, test_tweet_html
+    test_tweet_object, test_tweet_html, unittest
 )
-
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
 
 import responses
 import requests
 
-try:
-    import io.StringIO as StringIO
-except ImportError:
-    import StringIO
+from twython.compat import is_py2
+if is_py2:
+    from StringIO import StringIO
+else:
+    from io import StringIO
 
 try:
     import unittest.mock as mock
@@ -141,7 +137,7 @@ class TwythonAPITestCase(unittest.TestCase):
         url = self.get_url(endpoint)
         responses.add(responses.POST, url)
 
-        mock_file = StringIO.StringIO("Twython test image")
+        mock_file = StringIO("Twython test image")
         self.api.request(endpoint, method='POST', params={'image': mock_file})
 
         self.assertIn('filename="image"', responses.calls[0].request.body)
