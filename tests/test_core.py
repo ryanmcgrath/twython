@@ -4,7 +4,11 @@ from .config import (
     test_tweet_object, test_tweet_html
 )
 
-import unittest
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
+
 import responses
 import requests
 
