@@ -27,11 +27,22 @@ class TwythonAPITestCase(unittest.TestCase):
         """Convenience function for mapping from endpoint to URL"""
         return '%s/%s.json' % (self.api.api_url % self.api.api_version, endpoint)
 
+    def register_response(self, method, url, body='', match_querystring=False,
+            status=200, adding_headers=None, stream=False,
+            content_type='text/plain'):
+        """Temporary function to work around python 3.3 issue with responses"""
+        # responses uses BytesIO to hold the body so it needs to be in bytes
+        if not is_py2:
+            body = bytes(body, 'UTF-8')
+
+        responses.add(method, url, body, match_querystring,
+            status, adding_headers, stream, content_type)
+
     @responses.activate
     def test_request_should_handle_full_endpoint(self):
         """Test that request() accepts a full URL for the endpoint argument"""
         url = 'https://api.twitter.com/1.1/search/tweets.json'
-        responses.add(responses.GET, url)
+        self.register_response(responses.GET, url)
 
         self.api.request(url)
 
@@ -42,7 +53,7 @@ class TwythonAPITestCase(unittest.TestCase):
     def test_request_should_handle_relative_endpoint(self):
         """Test that request() accepts a twitter endpoint name for the endpoint argument"""
         url = 'https://api.twitter.com/2.0/search/tweets.json'
-        responses.add(responses.GET, url)
+        self.register_response(responses.GET, url)
 
         self.api.request('search/tweets', version='2.0')
 
@@ -53,7 +64,7 @@ class TwythonAPITestCase(unittest.TestCase):
     def test_request_should_post_request_regardless_of_case(self):
         """Test that request() accepts the HTTP method name regardless of case"""
         url = 'https://api.twitter.com/1.1/statuses/update.json'
-        responses.add(responses.POST, url)
+        self.register_response(responses.POST, url)
 
         self.api.request(url, method='POST')
         self.api.request(url, method='post')
@@ -73,7 +84,7 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test that request() encodes a boolean parameter as a lowercase string"""
         endpoint = 'search/tweets'
         url = self.get_url(endpoint)
-        responses.add(responses.GET, url)
+        self.register_response(responses.GET, url)
 
         self.api.request(endpoint, params={'include_entities': True})
         self.api.request(endpoint, params={'include_entities': False})
@@ -86,7 +97,7 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test that request() encodes a numeric or string parameter correctly"""
         endpoint = 'search/tweets'
         url = self.get_url(endpoint)
-        responses.add(responses.GET, url)
+        self.register_response(responses.GET, url)
 
         self.api.request(endpoint, params={'lang': 'es'})
         self.api.request(endpoint, params={'count': 50})
@@ -100,7 +111,7 @@ class TwythonAPITestCase(unittest.TestCase):
         endpoint = 'search/tweets'
         url = self.get_url(endpoint)
         location = ['37.781157', '-122.39872', '1mi']
-        responses.add(responses.GET, url)
+        self.register_response(responses.GET, url)
 
         self.api.request(endpoint, params={'geocode': location})
 
@@ -113,7 +124,7 @@ class TwythonAPITestCase(unittest.TestCase):
         endpoint = 'search/tweets'
         url = self.get_url(endpoint)
         location = [37.781157, -122.39872, '1mi']
-        responses.add(responses.GET, url)
+        self.register_response(responses.GET, url)
 
         self.api.request(endpoint, params={'geocode': location})
 
@@ -124,7 +135,7 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test that request() ignores unexpected parameter types"""
         endpoint = 'search/tweets'
         url = self.get_url(endpoint)
-        responses.add(responses.GET, url)
+        self.register_response(responses.GET, url)
 
         self.api.request(endpoint, params={'geocode': self})
 
@@ -135,10 +146,13 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test that request() pulls a file out of params for requests lib"""
         endpoint = 'account/update_profile_image'
         url = self.get_url(endpoint)
-        responses.add(responses.POST, url)
+        self.register_response(responses.POST, url)
 
         mock_file = StringIO("Twython test image")
         self.api.request(endpoint, method='POST', params={'image': mock_file})
+
+        if not is_py2:
+            responses.calls[0].request.body = responses.calls[0].request.body.decode("utf-8")
 
         self.assertIn('filename="image"', responses.calls[0].request.body)
         self.assertIn("Twython test image", responses.calls[0].request.body)
@@ -148,9 +162,12 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test that request() passes params as data when the request is a POST"""
         endpoint = 'statuses/update'
         url = self.get_url(endpoint)
-        responses.add(responses.POST, url)
+        self.register_response(responses.POST, url)
 
         self.api.request(endpoint, method='POST', params={'status': 'this is a test'})
+
+        if not is_py2:
+            responses.calls[0].request.body = responses.calls[0].request.body.decode("utf-8")
 
         self.assertIn('status=this+is+a+test', responses.calls[0].request.body)
         self.assertNotIn('status=this+is+a+test', responses.calls[0].request.url)
@@ -160,7 +177,7 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test Twython generic GET request works"""
         endpoint = 'account/verify_credentials'
         url = self.get_url(endpoint)
-        responses.add(responses.GET, url)
+        self.register_response(responses.GET, url)
 
         self.api.get(endpoint)
 
@@ -172,7 +189,7 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test Twython generic POST request works"""
         endpoint = 'statuses/update'
         url = self.get_url(endpoint)
-        responses.add(responses.POST, url)
+        self.register_response(responses.POST, url)
 
         self.api.post(endpoint, params={'status': 'I love Twython!'})
 
@@ -191,7 +208,7 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test getting last specific header of the last API call works"""
         endpoint = 'statuses/home_timeline'
         url = self.get_url(endpoint)
-        responses.add(responses.GET, url, adding_headers={'x-rate-limit-remaining': 37})
+        self.register_response(responses.GET, url, adding_headers={'x-rate-limit-remaining': 37})
 
         self.api.get(endpoint)
 
