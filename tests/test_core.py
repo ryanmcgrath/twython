@@ -1,42 +1,27 @@
 from twython import Twython, TwythonError, TwythonAuthError
 
 from .config import (
-    app_key, app_secret, oauth_token, oauth_token_secret,
-    protected_twitter_1, protected_twitter_2, screen_name,
-    test_tweet_id, test_list_slug, test_list_owner_screen_name,
-    access_token, test_tweet_object, test_tweet_html
+    test_tweet_object, test_tweet_html
 )
 
-import time
 import unittest
 import responses
+import requests
 
 try:
     import io.StringIO as StringIO
 except ImportError:
     import StringIO
 
+try:
+    import unittest.mock as mock
+except ImportError:
+    import mock
+
 
 class TwythonAPITestCase(unittest.TestCase):
     def setUp(self):
-
-        client_args = {
-            'headers': {
-                'User-Agent': '__twython__ Test'
-            },
-            'allow_redirects': False
-        }
-
-        oauth2_client_args = {
-            'headers': {}  # This is so we can hit coverage that Twython sets User-Agent for us if none is supplied
-        }
-
-        self.api = Twython(app_key, app_secret,
-                           oauth_token, oauth_token_secret,
-                           client_args=client_args)
-
-        self.oauth2_api = Twython(app_key, access_token=access_token,
-                                  client_args=oauth2_client_args)
+        self.api = Twython('', '', '', '')
 
     def get_url(self, endpoint):
         """Convenience function for mapping from endpoint to URL"""
@@ -170,52 +155,63 @@ class TwythonAPITestCase(unittest.TestCase):
         self.assertIn('status=this+is+a+test', responses.calls[0].request.body)
         self.assertNotIn('status=this+is+a+test', responses.calls[0].request.url)
 
-    def test_get(self):
+    @responses.activate
+    def test_get_uses_get_method(self):
         """Test Twython generic GET request works"""
-        self.api.get('account/verify_credentials')
+        endpoint = 'account/verify_credentials'
+        url = self.get_url(endpoint)
+        responses.add(responses.GET, url)
 
-    def test_post(self):
-        """Test Twython generic POST request works, with a full url and
-        with just an endpoint"""
-        update_url = 'https://api.twitter.com/1.1/statuses/update.json'
-        status = self.api.post(update_url, params={'status': 'I love Twython! %s' % int(time.time())})
-        self.api.post('statuses/destroy/%s' % status['id_str'])
+        self.api.get(endpoint)
 
+        self.assertEqual(1, len(responses.calls))
+        self.assertEqual(url, responses.calls[0].request.url)
+
+    @responses.activate
+    def test_post_uses_post_method(self):
+        """Test Twython generic POST request works"""
+        endpoint = 'statuses/update'
+        url = self.get_url(endpoint)
+        responses.add(responses.POST, url)
+
+        self.api.post(endpoint, params={'status': 'I love Twython!'})
+
+        self.assertEqual(1, len(responses.calls))
+        self.assertEqual(url, responses.calls[0].request.url)
+
+    def test_raise_twython_error_on_request_exception(self):
+        """Test if TwythonError is raised by a RequestException"""
+        with mock.patch.object(requests.Session, 'get') as get_mock:
+            # mocking an ssl cert error
+            get_mock.side_effect = requests.RequestException("hostname 'example.com' doesn't match ...")
+            self.assertRaises(TwythonError, self.api.get, 'https://example.com')
+
+    @responses.activate
+    def test_get_lastfunction_header_should_return_header(self):
+        """Test getting last specific header of the last API call works"""
+        endpoint = 'statuses/home_timeline'
+        url = self.get_url(endpoint)
+        responses.add(responses.GET, url, adding_headers={'x-rate-limit-remaining': 37})
+
+        self.api.get(endpoint)
+
+        value = self.api.get_lastfunction_header('x-rate-limit-remaining')
+        self.assertEqual(37, value)
+        value2 = self.api.get_lastfunction_header('does-not-exist')
+        self.assertIsNone(value2)
+        value3 = self.api.get_lastfunction_header('not-there-either', 96)
+        self.assertEqual(96, value3)
+
+    def test_get_lastfunction_header_should_raise_error_when_no_previous_call(self):
+        """Test attempting to get a header when no API call was made raises a TwythonError"""
+        self.assertRaises(TwythonError, self.api.get_lastfunction_header, 'no-api-call-was-made')
+
+    # Static methods
     def test_construct_api_url(self):
         """Test constructing a Twitter API url works as we expect"""
         url = 'https://api.twitter.com/1.1/search/tweets.json'
         constructed_url = self.api.construct_api_url(url, q='#twitter')
         self.assertEqual(constructed_url, 'https://api.twitter.com/1.1/search/tweets.json?q=%23twitter')
-
-    def test_get_lastfunction_header(self):
-        """Test getting last specific header of the last API call works"""
-        self.api.get('statuses/home_timeline')
-        self.api.get_lastfunction_header('x-rate-limit-remaining')
-
-    def test_get_lastfunction_header_not_present(self):
-        """Test getting specific header that does not exist from the last call returns None"""
-        self.api.get('statuses/home_timeline')
-        header = self.api.get_lastfunction_header('does-not-exist')
-        self.assertEqual(header, None)
-
-    def test_get_lastfunction_header_no_last_api_call(self):
-        """Test attempting to get a header when no API call was made raises a TwythonError"""
-        self.assertRaises(TwythonError, self.api.get_lastfunction_header,
-                          'no-api-call-was-made')
-
-    def test_cursor(self):
-        """Test looping through the generator results works, at least once that is"""
-        search = self.api.cursor(self.api.search, q='twitter', count=1)
-        counter = 0
-        while counter < 2:
-            counter += 1
-            result = next(search)
-            new_id_str = int(result['id_str'])
-            if counter == 1:
-                prev_id_str = new_id_str
-                time.sleep(1)  # Give time for another tweet to come into search
-            if counter == 2:
-                self.assertTrue(new_id_str > prev_id_str)
 
     def test_encode(self):
         """Test encoding UTF-8 works"""
@@ -236,10 +232,6 @@ class TwythonAPITestCase(unittest.TestCase):
     def test_html_for_tweet_short_url(self):
         """Test using expanded url in HTML for Tweet displays full urls"""
         tweet_text = self.api.html_for_tweet(test_tweet_object, False)
-        # Make sure HTML doesn't contain the display OR exapanded url
+        # Make sure HTML doesn't contain the display OR expanded url
         self.assertTrue(not 'http://google.com' in tweet_text)
         self.assertTrue(not 'google.com' in tweet_text)
-
-    def test_raise_error_on_bad_ssl_cert(self):
-        """Test TwythonError is raised by a RequestException when an actual HTTP happens"""
-        self.assertRaises(TwythonError, self.api.get, 'https://example.com')
