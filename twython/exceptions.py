@@ -53,6 +53,8 @@ class TwythonRateLimitError(TwythonError):  # pragma: no cover
             msg = '%s (Retry after %d seconds)' % (msg, retry_after)
         TwythonError.__init__(self, msg, error_code=error_code)
 
+        self.retry_after = retry_after
+
 
 class TwythonStreamError(TwythonError):
     """Raised when an invalid response from the Stream API is received"""
