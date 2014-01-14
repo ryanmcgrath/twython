@@ -52,10 +52,10 @@ class TwythonAPITestCase(unittest.TestCase):
     @responses.activate
     def test_request_should_handle_relative_endpoint(self):
         """Test that request() accepts a twitter endpoint name for the endpoint argument"""
-        url = 'https://api.twitter.com/2.0/search/tweets.json'
+        url = 'https://api.twitter.com/1.1/search/tweets.json'
         self.register_response(responses.GET, url)
 
-        self.api.request('search/tweets', version='2.0')
+        self.api.request('search/tweets', version='1.1')
 
         self.assertEqual(1, len(responses.calls))
         self.assertEqual(url, responses.calls[0].request.url)
@@ -151,11 +151,8 @@ class TwythonAPITestCase(unittest.TestCase):
         mock_file = StringIO("Twython test image")
         self.api.request(endpoint, method='POST', params={'image': mock_file})
 
-        if not is_py2:
-            responses.calls[0].request.body = responses.calls[0].request.body.decode("utf-8")
-
-        self.assertIn('filename="image"', responses.calls[0].request.body)
-        self.assertIn("Twython test image", responses.calls[0].request.body)
+        self.assertIn(b'filename="image"', responses.calls[0].request.body)
+        self.assertIn(b"Twython test image", responses.calls[0].request.body)
 
     @responses.activate
     def test_request_should_put_params_in_body_when_post(self):
@@ -166,10 +163,7 @@ class TwythonAPITestCase(unittest.TestCase):
 
         self.api.request(endpoint, method='POST', params={'status': 'this is a test'})
 
-        if not is_py2:
-            responses.calls[0].request.body = responses.calls[0].request.body.decode("utf-8")
-
-        self.assertIn('status=this+is+a+test', responses.calls[0].request.body)
+        self.assertIn(b'status=this+is+a+test', responses.calls[0].request.body)
         self.assertNotIn('status=this+is+a+test', responses.calls[0].request.url)
 
     @responses.activate
