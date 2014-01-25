@@ -143,7 +143,6 @@ class Twython(EndpointsMixin, object):
             response = func(url, **requests_args)
         except requests.RequestException as e:
             raise TwythonError(str(e))
-        content = response.content.decode('utf-8')
 
         # create stash for last function intel
         self._last_call = {
@@ -153,37 +152,18 @@ class Twython(EndpointsMixin, object):
             'headers': response.headers,
             'status_code': response.status_code,
             'url': response.url,
-            'content': content,
+            'content': response.text,
         }
 
-        #  Wrap the json loads in a try, and defer an error
-        #  Twitter will return invalid json with an error code in the headers
-        json_error = False
-        try:
-            try:
-                # try to get json
-                content = content.json()
-            except AttributeError:
-                # if unicode detected
-                content = json.loads(content)
-        except ValueError:
-            json_error = True
-            content = {}
-
+        # greater than 304 (not modified) is an error
         if response.status_code > 304:
-            # If there is no error message, use a default.
-            errors = content.get('errors',
-                                 [{'message': 'An error occurred processing your request.'}])
-            if errors and isinstance(errors, list):
-                error_message = errors[0]['message']
-            else:
-                error_message = errors  # pragma: no cover
+            error_message = self._get_error_message(response)
             self._last_call['api_error'] = error_message
 
             ExceptionType = TwythonError
             if response.status_code == 429:
                 # Twitter API 1.1, always return 429 when rate limit is exceeded
-                ExceptionType = TwythonRateLimitError  # pragma: no cover
+                ExceptionType = TwythonRateLimitError
             elif response.status_code == 401 or 'Bad Authentication data' in error_message:
                 # Twitter API 1.1, returns a 401 Unauthorized or
                 # a 400 "Bad Authentication data" for invalid/expired app keys/user tokens
@@ -193,11 +173,29 @@ class Twython(EndpointsMixin, object):
                                 error_code=response.status_code,
                                 retry_after=response.headers.get('retry-after'))
 
-        # if we have a json error here, then it's not an official Twitter API error
-        if json_error and not response.status_code in (200, 201, 202):  # pragma: no cover
-            raise TwythonError('Response was not valid JSON, unable to decode.')
+        try:
+            content = response.json()
+        except json.JSONDecodeError:
+            raise TwythonError('Response was not valid JSON. Unable to decode.')
 
         return content
+
+    def _get_error_message(self, response):
+        """Parse and return the first error message"""
+
+        error_message = 'An error occurred processing your request.'
+        try:
+            content = response.json()
+            # {"errors":[{"code":34,"message":"Sorry, that page does not exist"}]}
+            error_message = content['errors'][0]['message']
+        except json.JSONDecodeError:
+            # bad json data from Twitter for an error
+            pass
+        except (KeyError, IndexError):
+            # missing data so fallback to default message
+            pass
+
+        return error_message
 
     def request(self, endpoint, method='GET', params=None, version='1.1'):
         """Return dict of response received from Twitter's API
