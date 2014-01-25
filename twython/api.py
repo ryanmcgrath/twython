@@ -175,7 +175,7 @@ class Twython(EndpointsMixin, object):
 
         try:
             content = response.json()
-        except json.JSONDecodeError:
+        except ValueError:
             raise TwythonError('Response was not valid JSON. Unable to decode.')
 
         return content
@@ -188,7 +188,7 @@ class Twython(EndpointsMixin, object):
             content = response.json()
             # {"errors":[{"code":34,"message":"Sorry, that page does not exist"}]}
             error_message = content['errors'][0]['message']
-        except json.JSONDecodeError:
+        except ValueError:
             # bad json data from Twitter for an error
             pass
         except (KeyError, IndexError):
