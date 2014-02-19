@@ -1,4 +1,4 @@
-from twython import Twython, TwythonError, TwythonAuthError
+from twython import Twython, TwythonError, TwythonAuthError, TwythonRateLimitError
 
 from .config import (
     test_tweet_object, test_tweet_html, unittest
@@ -27,10 +27,11 @@ class TwythonAPITestCase(unittest.TestCase):
         """Convenience function for mapping from endpoint to URL"""
         return '%s/%s.json' % (self.api.api_url % self.api.api_version, endpoint)
 
-    def register_response(self, method, url, body='', match_querystring=False,
+    def register_response(self, method, url, body='{}', match_querystring=False,
             status=200, adding_headers=None, stream=False,
-            content_type='text/plain'):
-        """Temporary function to work around python 3.3 issue with responses"""
+            content_type='application/json; charset=utf-8'):
+        """Wrapper function for responses for simpler unit tests"""
+
         # responses uses BytesIO to hold the body so it needs to be in bytes
         if not is_py2:
             body = bytes(body, 'UTF-8')
@@ -196,6 +197,65 @@ class TwythonAPITestCase(unittest.TestCase):
             # mocking an ssl cert error
             get_mock.side_effect = requests.RequestException("hostname 'example.com' doesn't match ...")
             self.assertRaises(TwythonError, self.api.get, 'https://example.com')
+
+    @responses.activate
+    def test_request_should_get_convert_json_to_data(self):
+        """Test that Twython converts JSON data to a Python object"""
+        endpoint = 'statuses/show'
+        url = self.get_url(endpoint)
+        self.register_response(responses.GET, url, body='{"id": 210462857140252672}')
+
+        data = self.api.request(endpoint, params={'id': 210462857140252672})
+
+        self.assertEqual({'id': 210462857140252672}, data)
+
+    @responses.activate
+    def test_request_should_raise_exception_with_invalid_json(self):
+        """Test that Twython handles invalid JSON (though Twitter should not return it)"""
+        endpoint = 'statuses/show'
+        url = self.get_url(endpoint)
+        self.register_response(responses.GET, url, body='{"id: 210462857140252672}')
+
+        self.assertRaises(TwythonError, self.api.request, endpoint, params={'id': 210462857140252672})
+
+    @responses.activate
+    def test_request_should_handle_401(self):
+        """Test that Twython raises an auth error on 401 error"""
+        endpoint = 'statuses/home_timeline'
+        url = self.get_url(endpoint)
+        self.register_response(responses.GET, url, body='{"errors":[{"message":"Error"}]}', status=401)
+
+        self.assertRaises(TwythonAuthError, self.api.request, endpoint)
+
+    @responses.activate
+    def test_request_should_handle_400_for_missing_auth_data(self):
+        """Test that Twython raises an auth error on 400 error when no oauth data sent"""
+        endpoint = 'statuses/home_timeline'
+        url = self.get_url(endpoint)
+        self.register_response(responses.GET, url,
+                               body='{"errors":[{"message":"Bad Authentication data"}]}', status=400)
+
+        self.assertRaises(TwythonAuthError, self.api.request, endpoint)
+
+    @responses.activate
+    def test_request_should_handle_400_that_is_not_auth_related(self):
+        """Test that Twython raises a normal error on 400 error when unrelated to authorization"""
+        endpoint = 'statuses/home_timeline'
+        url = self.get_url(endpoint)
+        self.register_response(responses.GET, url,
+                               body='{"errors":[{"message":"Bad request"}]}', status=400)
+
+        self.assertRaises(TwythonError, self.api.request, endpoint)
+
+    @responses.activate
+    def test_request_should_handle_rate_limit(self):
+        """Test that Twython raises an rate limit error on 429"""
+        endpoint = 'statuses/home_timeline'
+        url = self.get_url(endpoint)
+        self.register_response(responses.GET, url,
+                               body='{"errors":[{"message":"Rate Limit"}]}', status=429)
+
+        self.assertRaises(TwythonRateLimitError, self.api.request, endpoint)
 
     @responses.activate
     def test_get_lastfunction_header_should_return_header(self):
