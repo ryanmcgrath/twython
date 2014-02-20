@@ -98,7 +98,7 @@ Once you have the final user tokens, store them in a database for later use!
 .. code-block:: python
 
     OAUTH_TOKEN = final_step['oauth_token']
-    OAUTH_TOKEN_SECERT = final_step['oauth_token_secret']
+    OAUTH_TOKEN_SECRET = final_step['oauth_token_secret']
 
 .. _oauth2:
 

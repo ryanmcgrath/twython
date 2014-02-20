@@ -3,6 +3,19 @@
 History
 -------
 
+3.1.2 (2013-12-05)
+++++++++++++++++++
+
+- Fixed Changelog (HISTORY.rst)
+
+3.1.1 (2013-12-05)
+++++++++++++++++++
+
+- Update `requests` version to 2.1.0.
+- Fixed: Streaming issue where `Exceptions` in handlers or `on_success` which subclass `ValueError` would previously be caught and reported as a JSON decoding problem, and `on_error()` would be called (with status_code=200)
+- Fixed issue where XML was returned when bad tokens were passed to `get_authorized_tokens`
+- Fixed import for `setup` causing installation to fail on some devices (eg. Nokia N9/MeeGo)
+
 3.1.0 (2013-09-25)
 ++++++++++++++++++
 
