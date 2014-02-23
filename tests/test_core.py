@@ -286,7 +286,7 @@ class TwythonAPITestCase(unittest.TestCase):
 
         self.api.get(endpoint)
 
-        self.assertEqual('gzip, deflate, compress', responses.calls[0].request.headers['Accept-Encoding'])
+        self.assertEqual(b'gzip, deflate, compress', responses.calls[0].request.headers['Accept-Encoding'])
 
     # Static methods
     def test_construct_api_url(self):
