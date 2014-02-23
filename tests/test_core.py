@@ -277,6 +277,17 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test attempting to get a header when no API call was made raises a TwythonError"""
         self.assertRaises(TwythonError, self.api.get_lastfunction_header, 'no-api-call-was-made')
 
+    @responses.activate
+    def test_sends_correct_accept_encoding_header(self):
+        """Test that Twython accepts compressed data."""
+        endpoint = 'statuses/home_timeline'
+        url = self.get_url(endpoint)
+        self.register_response(responses.GET, url)
+
+        self.api.get(endpoint)
+
+        self.assertEqual('gzip, deflate, compress', responses.calls[0].request.headers['Accept-Encoding'])
+
     # Static methods
     def test_construct_api_url(self):
         """Test constructing a Twitter API url works as we expect"""
