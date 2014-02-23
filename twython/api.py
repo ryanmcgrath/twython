@@ -109,9 +109,13 @@ class Twython(EndpointsMixin, object):
         # Never be used again.
         client_args_copy = self.client_args.copy()
         for k, v in client_args_copy.items():
-            if k in ('cert', 'headers', 'hooks', 'max_redirects', 'proxies'):
+            if k in ('cert', 'hooks', 'max_redirects', 'proxies'):
                 setattr(self.client, k, v)
                 self.client_args.pop(k)  # Pop, pop!
+
+        # Headers are always present, so we unconditionally pop them and merge
+        # them into the session headers.
+        self.client.headers.update(self.client_args.pop('headers'))
 
         self._last_call = None
 
