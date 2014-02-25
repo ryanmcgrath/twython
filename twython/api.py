@@ -253,12 +253,13 @@ class Twython(EndpointsMixin, object):
 
         return self._last_call['headers'].get(header, default_return_value)
 
-    def get_authentication_tokens(self, callback_url=None, force_login=False, screen_name=''):
+    def get_authentication_tokens(self, callback_url=None, force_login=False, screen_name='', access_type=None):
         """Returns a dict including an authorization URL, ``auth_url``, to direct a user to
 
         :param callback_url: (optional) Url the user is returned to after they authorize your app (web clients only)
         :param force_login: (optional) Forces the user to enter their credentials to ensure the correct users account is authorized.
         :param screen_name: (optional) If forced_login is set OR user is not currently logged in, Prefills the username input box of the OAuth login screen with the given value
+        :param access_type: (optional) Overrides the access level an application requests to a users account. Supported values are read or write.
 
         :rtype: dict
         """
@@ -268,6 +269,8 @@ class Twython(EndpointsMixin, object):
         request_args = {}
         if callback_url:
             request_args['oauth_callback'] = callback_url
+        if access_type:
+            request_args['x_auth_access_type'] = access_type
         response = self.client.get(self.request_token_url, params=request_args)
 
         if response.status_code == 401:
