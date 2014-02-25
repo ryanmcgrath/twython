@@ -410,38 +410,36 @@ class Twython(EndpointsMixin, object):
         if not hasattr(function, 'iter_mode'):
             raise TwythonError('Unable to create generator for Twython method "%s"' % function.__name__)
 
-        content = function(**params)
+        while True:
+            content = function(**params)
 
-        if not content:
-            raise StopIteration
+            if not content:
+                raise StopIteration
 
-        if hasattr(function, 'iter_key'):
-            results = content.get(function.iter_key)
-        else:
-            results = content
+            if hasattr(function, 'iter_key'):
+                results = content.get(function.iter_key)
+            else:
+                results = content
 
-        for result in results:
-            yield result
+            for result in results:
+                yield result
 
-        if function.iter_mode == 'cursor' and content['next_cursor_str'] == '0':
-            raise StopIteration
+            if function.iter_mode == 'cursor' and content['next_cursor_str'] == '0':
+                raise StopIteration
 
-        try:
-            if function.iter_mode == 'id':
-                if not 'max_id' in params:
-                    # Add 1 to the id because since_id and max_id are inclusive
-                    if hasattr(function, 'iter_metadata'):
-                        since_id = content[function.iter_metadata].get('since_id_str')
-                    else:
-                        since_id = content[0]['id_str']
-                    params['since_id'] = (int(since_id) - 1)
-            elif function.iter_mode == 'cursor':
-                params['cursor'] = content['next_cursor_str']
-        except (TypeError, ValueError):  # pragma: no cover
-            raise TwythonError('Unable to generate next page of search results, `page` is not a number.')
-
-        for result in self.cursor(function, **params):
-            yield result
+            try:
+                if function.iter_mode == 'id':
+                    if not 'max_id' in params:
+                        # Add 1 to the id because since_id and max_id are inclusive
+                        if hasattr(function, 'iter_metadata'):
+                            since_id = content[function.iter_metadata].get('since_id_str')
+                        else:
+                            since_id = content[0]['id_str']
+                        params['since_id'] = (int(since_id) - 1)
+                elif function.iter_mode == 'cursor':
+                    params['cursor'] = content['next_cursor_str']
+            except (TypeError, ValueError):  # pragma: no cover
+                raise TwythonError('Unable to generate next page of search results, `page` is not a number.')
 
     @staticmethod
     def unicode2utf8(text):
