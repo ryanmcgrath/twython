@@ -206,6 +206,9 @@ class TwythonAPITestCase(unittest.TestCase):
         self.register_response(responses.GET, url, body='{"id": 210462857140252672}')
 
         data = self.api.request(endpoint, params={'id': 210462857140252672})
+        
+        if 'headers' in data:
+            del data['headers']
 
         self.assertEqual({'id': 210462857140252672}, data)
 
