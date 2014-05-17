@@ -2,7 +2,7 @@ from twython import Twython, TwythonError
 
 # Optionally accept user data from the command line (or elsewhere).
 #
-# Usage: follow_user.py ryanmcgrath
+# Usage: block_spammer.py SomeoneAnnoying
 
 import sys
 
