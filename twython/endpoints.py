@@ -73,6 +73,16 @@ class EndpointsMixin(object):
         """
         return self.get('statuses/show/%s' % params.get('id'), params=params)
 
+    def lookup_status(self, **params):
+        """Returns fully-hydrated tweet objects for up to 100 tweets per
+        request, as specified by comma-separated values passed to the id
+        parameter.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/statuses/lookup
+
+        """
+        return self.post('statuses/lookup', params=params)
+
     def destroy_status(self, **params):
         """Destroys the status specified by the required ID parameter
 
