@@ -15,6 +15,6 @@ else:
 twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
 try:
-    twitter.destroy_friendship(screen_name=target, follow="true")
+    twitter.destroy_friendship(screen_name=target)
 except TwythonError as e:
     print(e)
