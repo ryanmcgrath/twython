@@ -12,6 +12,7 @@ dealing with the Twitter API
 import requests
 from requests.auth import HTTPBasicAuth
 from requests_oauthlib import OAuth1, OAuth2
+import time
 
 from . import __version__
 from .advisory import TwythonDeprecationWarning
@@ -28,7 +29,8 @@ warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
 class Twython(EndpointsMixin, object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None,
                  oauth_token_secret=None, access_token=None, token_type='bearer',
-                 oauth_version=1, api_version='1.1', client_args=None, auth_endpoint='authenticate'):
+                 oauth_version=1, api_version='1.1', client_args=None, auth_endpoint='authenticate',
+                 sleep_on_cursor=0):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
         :param app_key: (optional) Your applications key
@@ -58,6 +60,7 @@ class Twython(EndpointsMixin, object):
         self.oauth_token = oauth_token
         self.oauth_token_secret = oauth_token_secret
         self.access_token = access_token
+        self.sleep_on_cursor = sleep_on_cursor
 
         # OAuth 1
         self.request_token_url = self.api_url % 'oauth/request_token'
@@ -430,19 +433,17 @@ class Twython(EndpointsMixin, object):
             if function.iter_mode == 'cursor' and content['next_cursor_str'] == '0':
                 raise StopIteration
 
-            try:
-                if function.iter_mode == 'id':
-                    if not 'max_id' in params:
-                        # Add 1 to the id because since_id and max_id are inclusive
-                        if hasattr(function, 'iter_metadata'):
-                            since_id = content[function.iter_metadata].get('since_id_str')
-                        else:
-                            since_id = content[0]['id_str']
-                        params['since_id'] = (int(since_id) - 1)
-                elif function.iter_mode == 'cursor':
-                    params['cursor'] = content['next_cursor_str']
-            except (TypeError, ValueError):  # pragma: no cover
-                raise TwythonError('Unable to generate next page of search results, `page` is not a number.')
+            if function.iter_mode == 'id':
+                if hasattr(function, 'iter_key') and len(content[function.iter_key]) > 0:
+                    params['max_id'] = min(content[function.iter_key], key=lambda i: i['id'])['id'] - 1
+                elif not hasattr(function, 'iter_key') and len(content) > 0:
+                    params['max_id'] = min(content, key=lambda i: i['id'])['id'] - 1
+                else:
+                    raise StopIteration
+            elif function.iter_mode == 'cursor':
+                params['cursor'] = content['next_cursor_str']
+
+            time.sleep(self.sleep_on_cursor)
 
     @staticmethod
     def unicode2utf8(text):
