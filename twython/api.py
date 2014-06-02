@@ -12,6 +12,7 @@ dealing with the Twitter API
 import requests
 from requests.auth import HTTPBasicAuth
 from requests_oauthlib import OAuth1, OAuth2
+import time
 
 from . import __version__
 from .advisory import TwythonDeprecationWarning
@@ -28,7 +29,8 @@ warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
 class Twython(EndpointsMixin, object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None,
                  oauth_token_secret=None, access_token=None, token_type='bearer',
-                 oauth_version=1, api_version='1.1', client_args=None, auth_endpoint='authenticate'):
+                 oauth_version=1, api_version='1.1', client_args=None, auth_endpoint='authenticate',
+                 sleep_on_cursor=0):
         """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
 
         :param app_key: (optional) Your applications key
@@ -58,6 +60,7 @@ class Twython(EndpointsMixin, object):
         self.oauth_token = oauth_token
         self.oauth_token_secret = oauth_token_secret
         self.access_token = access_token
+        self.sleep_on_cursor = sleep_on_cursor
 
         # OAuth 1
         self.request_token_url = self.api_url % 'oauth/request_token'
@@ -439,6 +442,8 @@ class Twython(EndpointsMixin, object):
                     raise StopIteration
             elif function.iter_mode == 'cursor':
                 params['cursor'] = content['next_cursor_str']
+
+            time.sleep(self.sleep_on_cursor)
 
     @staticmethod
     def unicode2utf8(text):
