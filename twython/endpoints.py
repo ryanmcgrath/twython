@@ -5,7 +5,8 @@ twython.endpoints
 ~~~~~~~~~~~~~~~~~
 
 This module provides a mixin for a :class:`Twython <Twython>` instance.
-Parameters that need to be embedded in the API url just need to be passed as a keyword argument.
+Parameters that need to be embedded in the API url just need to be passed
+as a keyword argument.
 
 e.g. Twython.retweet(id=12345)
 
@@ -20,7 +21,8 @@ class EndpointsMixin(object):
         """Returns the 20 most recent mentions (tweets containing a users's
         @screen_name) for the authenticating user.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/get/statuses/mentions_timeline
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/get/statuses/mentions_timeline
 
         """
         return self.get('statuses/mentions_timeline', params=params)
@@ -63,7 +65,8 @@ class EndpointsMixin(object):
         Docs: https://dev.twitter.com/docs/api/1.1/get/statuses/retweets/%3Aid
 
         """
-        return self.get('statuses/retweets/%s' % params.get('id'), params=params)
+        return self.get('statuses/retweets/%s' % params.get('id'),
+                        params=params)
 
     def show_status(self, **params):
         """Returns a single Tweet, specified by the id parameter
@@ -111,7 +114,8 @@ class EndpointsMixin(object):
         """Updates the authenticating user's current status and attaches media
         for upload. In other words, it creates a Tweet with a picture attached.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/post/statuses/update_with_media
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/post/statuses/update_with_media
 
         """
         return self.post('statuses/update_with_media', params=params)
@@ -184,7 +188,8 @@ class EndpointsMixin(object):
         return self.post('direct_messages/destroy', params=params)
 
     def send_direct_message(self, **params):
-        """Sends a new direct message to the specified user from the authenticating user.
+        """Sends a new direct message to the specified user from the
+        authenticating user.
 
         Docs: https://dev.twitter.com/docs/api/1.1/post/direct_messages/new
 
@@ -196,7 +201,8 @@ class EndpointsMixin(object):
         """Returns a collection of user_ids that the currently authenticated
         user does not want to receive retweets from.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/get/friendships/no_retweets/ids
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/get/friendships/no_retweets/ids
 
         """
         return self.get('friendships/no_retweets/ids', params=params)
@@ -327,7 +333,8 @@ class EndpointsMixin(object):
         requesting user if authentication was successful; returns a 401 status
         code and an error message if not.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/get/account/verify_credentials
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/get/account/verify_credentials
 
         """
         return self.get('account/verify_credentials', params=params)
@@ -343,13 +350,15 @@ class EndpointsMixin(object):
     def update_delivery_service(self, **params):
         """Sets which device Twitter delivers updates to for the authenticating user.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_delivery_device
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/post/account/update_delivery_device
 
         """
         return self.post('account/update_delivery_device', params=params)
 
     def update_profile(self, **params):
-        """Sets values that users are able to set under the "Account" tab of their settings page.
+        """Sets values that users are able to set under the "Account" tab of their
+        settings page.
 
         Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_profile
 
@@ -359,7 +368,8 @@ class EndpointsMixin(object):
     def update_profile_banner_image(self, **params):  # pragma: no cover
         """Updates the authenticating user's profile background image.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_profile_background_image
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/post/account/update_profile_background_image
 
         """
         return self.post('account/update_profile_banner', params=params)
@@ -368,7 +378,8 @@ class EndpointsMixin(object):
         """Sets one or more hex values that control the color scheme of the
         authenticating user's profile page on twitter.com.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_profile_colors
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/post/account/update_profile_colors
 
         """
         return self.post('account/update_profile_colors', params=params)
@@ -376,13 +387,15 @@ class EndpointsMixin(object):
     def update_profile_image(self, **params):  # pragma: no cover
         """Updates the authenticating user's profile image.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_profile_image
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/post/account/update_profile_image
 
         """
         return self.post('account/update_profile_image', params=params)
 
     def list_blocks(self, **params):
-        """Returns a collection of user objects that the authenticating user is blocking.
+        """Returns a collection of user objects that the authenticating user
+        is blocking.
 
         Docs: https://dev.twitter.com/docs/api/1.1/get/blocks/list
 
@@ -410,7 +423,8 @@ class EndpointsMixin(object):
         return self.post('blocks/create', params=params)
 
     def destroy_block(self, **params):
-        """Un-blocks the user specified in the ID parameter for the authenticating user.
+        """Un-blocks the user specified in the ID parameter for the
+        authenticating user.
 
         Docs: https://dev.twitter.com/docs/api/1.1/post/blocks/destroy
 
@@ -419,7 +433,8 @@ class EndpointsMixin(object):
 
     def lookup_user(self, **params):
         """Returns fully-hydrated user objects for up to 100 users per request,
-        as specified by comma-separated values passed to the user_id and/or screen_name parameters.
+        as specified by comma-separated values passed to the user_id and/or
+        screen_name parameters.
 
         Docs: https://dev.twitter.com/docs/api/1.1/get/users/lookup
 
@@ -436,7 +451,8 @@ class EndpointsMixin(object):
         return self.get('users/show', params=params)
 
     def search_users(self, **params):
-        """Provides a simple, relevance-based search interface to public user accounts on Twitter.
+        """Provides a simple, relevance-based search interface to public user
+        accounts on Twitter.
 
         Docs: https://dev.twitter.com/docs/api/1.1/get/users/search
 
@@ -463,7 +479,8 @@ class EndpointsMixin(object):
         """Removes the uploaded profile banner for the authenticating user.
         Returns HTTP 200 upon success.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/post/account/remove_profile_banner
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/post/account/remove_profile_banner
 
         """
         return self.post('account/remove_profile_banner', params=params)
@@ -471,13 +488,16 @@ class EndpointsMixin(object):
     def update_profile_background_image(self, **params):
         """Uploads a profile banner on behalf of the authenticating user.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/post/account/update_profile_banner
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/post/account/update_profile_banner
 
         """
-        return self.post('account/update_profile_background_image', params=params)
+        return self.post('account/update_profile_background_image',
+                         params=params)
 
     def get_profile_banner_sizes(self, **params):
-        """Returns a map of the available size variations of the specified user's profile banner.
+        """Returns a map of the available size variations of the specified
+        user's profile banner.
 
         Docs: https://dev.twitter.com/docs/api/1.1/get/users/profile_banner
 
@@ -488,10 +508,12 @@ class EndpointsMixin(object):
     def get_user_suggestions_by_slug(self, **params):
         """Access the users in a given category of the Twitter suggested user list.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/get/users/suggestions/%3Aslug
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/get/users/suggestions/%3Aslug
 
         """
-        return self.get('users/suggestions/%s' % params.get('slug'), params=params)
+        return self.get('users/suggestions/%s' % params.get('slug'),
+                        params=params)
 
     def get_user_suggestions(self, **params):
         """Access to Twitter's suggested user list.
@@ -503,16 +525,20 @@ class EndpointsMixin(object):
 
     def get_user_suggestions_statuses_by_slug(self, **params):
         """Access the users in a given category of the Twitter suggested user
-        list and return their most recent status if they are not a protected user.
+        list and return their most recent status if they are not a protected
+        user.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/get/users/suggestions/%3Aslug/members
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/get/users/suggestions/%3Aslug/members
 
         """
-        return self.get('users/suggestions/%s/members' % params.get('slug'), params=params)
+        return self.get('users/suggestions/%s/members' % params.get('slug'),
+                        params=params)
 
     # Favorites
     def get_favorites(self, **params):
-        """Returns the 20 most recent Tweets favorited by the authenticating or specified user.
+        """Returns the 20 most recent Tweets favorited by the authenticating
+        or specified user.
 
         Docs: https://dev.twitter.com/docs/api/1.1/get/favorites/list
 
@@ -521,7 +547,8 @@ class EndpointsMixin(object):
     get_favorites.iter_mode = 'id'
 
     def destroy_favorite(self, **params):
-        """Un-favorites the status specified in the ID parameter as the authenticating user.
+        """Un-favorites the status specified in the ID parameter as the
+        authenticating user.
 
         Docs: https://dev.twitter.com/docs/api/1.1/post/favorites/destroy
 
@@ -529,7 +556,8 @@ class EndpointsMixin(object):
         return self.post('favorites/destroy', params=params)
 
     def create_favorite(self, **params):
-        """Favorites the status specified in the ID parameter as the authenticating user.
+        """Favorites the status specified in the ID parameter as the
+        authenticating user.
 
         Docs: https://dev.twitter.com/docs/api/1.1/post/favorites/create
 
@@ -538,7 +566,8 @@ class EndpointsMixin(object):
 
     # Lists
     def show_lists(self, **params):
-        """Returns all lists the authenticating or specified user subscribes to, including their own.
+        """Returns all lists the authenticating or specified user subscribes to,
+        including their own.
 
         Docs: https://dev.twitter.com/docs/api/1.1/get/lists/list
 
@@ -585,7 +614,8 @@ class EndpointsMixin(object):
     def subscribe_to_list(self, **params):
         """Subscribes the authenticated user to the specified list.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/post/lists/subscribers/create
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/post/lists/subscribers/create
 
         """
         return self.post('lists/subscribers/create', params=params)
@@ -601,7 +631,8 @@ class EndpointsMixin(object):
     def unsubscribe_from_list(self, **params):
         """Unsubscribes the authenticated user from the specified list.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/post/lists/subscribers/destroy
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/post/lists/subscribers/destroy
 
         """
         return self.post('lists/subscribers/destroy', params=params)
@@ -610,7 +641,8 @@ class EndpointsMixin(object):
         """Adds multiple members to a list, by specifying a comma-separated
         list of member ids or screen names.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/post/lists/members/create_all
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/post/lists/members/create_all
 
         """
         return self.post('lists/members/create_all', params=params)
@@ -687,7 +719,8 @@ class EndpointsMixin(object):
         """Removes multiple members from a list, by specifying a
         comma-separated list of member ids or screen names.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/post/lists/members/destroy_all
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/post/lists/members/destroy_all
 
         """
         return self.post('lists/members/destroy_all', params=params)
@@ -714,10 +747,12 @@ class EndpointsMixin(object):
     def show_saved_search(self, **params):
         """Retrieve the information for the saved search represented by the given id.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/get/saved_searches/show/%3Aid
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/get/saved_searches/show/%3Aid
 
         """
-        return self.get('saved_searches/show/%s' % params.get('id'), params=params)
+        return self.get('saved_searches/show/%s' % params.get('id'),
+                        params=params)
 
     def create_saved_search(self, **params):
         """Create a new saved search for the authenticated user.
@@ -730,10 +765,12 @@ class EndpointsMixin(object):
     def destroy_saved_search(self, **params):
         """Destroys a saved search for the authenticating user.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/post/saved_searches/destroy/%3Aid
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/post/saved_searches/destroy/%3Aid
 
         """
-        return self.post('saved_searches/destroy/%s' % params.get('id'), params=params)
+        return self.post('saved_searches/destroy/%s' % params.get('id'),
+                         params=params)
 
     # Places & Geo
     def get_geo_info(self, **params):
@@ -861,7 +898,8 @@ class EndpointsMixin(object):
         """Returns the current rate limits for methods belonging to the
         specified resource families.
 
-        Docs: https://dev.twitter.com/docs/api/1.1/get/application/rate_limit_status
+        Docs:
+        https://dev.twitter.com/docs/api/1.1/get/application/rate_limit_status
 
         """
         return self.get('application/rate_limit_status', params=params)
@@ -871,9 +909,15 @@ class EndpointsMixin(object):
 TWITTER_HTTP_STATUS_CODE = {
     200: ('OK', 'Success!'),
     304: ('Not Modified', 'There was no new data to return.'),
-    400: ('Bad Request', 'The request was invalid. An accompanying error message will explain why. This is the status code will be returned during rate limiting.'),
-    401: ('Unauthorized', 'Authentication credentials were missing or incorrect.'),
-    403: ('Forbidden', 'The request is understood, but it has been refused. An accompanying error message will explain why. This code is used when requests are being denied due to update limits.'),
+    400: ('Bad Request', 'The request was invalid. An accompanying \
+          error message will explain why. This is the status code \
+          will be returned during rate limiting.'),
+    401: ('Unauthorized', 'Authentication credentials were missing \
+          or incorrect.'),
+    403: ('Forbidden', 'The request is understood, but it has been \
+          refused. An accompanying error message will explain why. \
+          This code is used when requests are being denied due to \
+          update limits.'),
     404: ('Not Found', 'The URI requested is invalid or the resource requested, such as a user, does not exists.'),
     406: ('Not Acceptable', 'Returned by the Search API when an invalid format is specified in the request.'),
     410: ('Gone', 'This resource is gone. Used to indicate that an API endpoint has been turned off.'),
