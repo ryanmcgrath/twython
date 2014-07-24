@@ -27,29 +27,41 @@ warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
 
 class Twython(EndpointsMixin, object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None,
-                 oauth_token_secret=None, access_token=None, token_type='bearer',
-                 oauth_version=1, api_version='1.1', client_args=None, auth_endpoint='authenticate'):
-        """Instantiates an instance of Twython. Takes optional parameters for authentication and such (see below).
+                 oauth_token_secret=None, access_token=None,
+                 token_type='bearer', oauth_version=1, api_version='1.1',
+                 client_args=None, auth_endpoint='authenticate'):
+        """Instantiates an instance of Twython. Takes optional parameters for
+        authentication and such (see below).
 
         :param app_key: (optional) Your applications key
         :param app_secret: (optional) Your applications secret key
-        :param oauth_token: (optional) When using **OAuth 1**, combined with oauth_token_secret to make authenticated calls
-        :param oauth_token_secret: (optional) When using **OAuth 1** combined with oauth_token to make authenticated calls
-        :param access_token: (optional) When using **OAuth 2**, provide a valid access token if you have one
-        :param token_type: (optional) When using **OAuth 2**, provide your token type. Default: bearer
-        :param oauth_version: (optional) Choose which OAuth version to use. Default: 1
-        :param api_version: (optional) Choose which Twitter API version to use. Default: 1.1
+        :param oauth_token: (optional) When using **OAuth 1**, combined with
+        oauth_token_secret to make authenticated calls
+        :param oauth_token_secret: (optional) When using **OAuth 1** combined
+        with oauth_token to make authenticated calls
+        :param access_token: (optional) When using **OAuth 2**, provide a
+        valid access token if you have one
+        :param token_type: (optional) When using **OAuth 2**, provide your
+        token type. Default: bearer
+        :param oauth_version: (optional) Choose which OAuth version to use.
+        Default: 1
+        :param api_version: (optional) Choose which Twitter API version to
+        use. Default: 1.1
 
-        :param client_args: (optional) Accepts some requests Session parameters and some requests Request parameters.
-                            See http://docs.python-requests.org/en/latest/api/#sessionapi and requests section below it for details.
-                            [ex. headers, proxies, verify(SSL verification)]
-        :param auth_endpoint: (optional) Lets you select which authentication endpoint will use your application.
-                              This will allow the application to have DM access if the endpoint is 'authorize'.
-                              Default: authenticate.
-
+        :param client_args: (optional) Accepts some requests Session parameters
+        and some requests Request parameters.
+              See http://docs.python-requests.org/en/latest/api/#sessionapi
+              and requests section below it for details.
+              [ex. headers, proxies, verify(SSL verification)]
+        :param auth_endpoint: (optional) Lets you select which authentication
+        endpoint will use your application.
+              This will allow the application to have DM access
+              if the endpoint is 'authorize'.
+                Default: authenticate.
         """
 
-        # API urls, OAuth urls and API version; needed for hitting that there API.
+        # API urls, OAuth urls and API version; needed for hitting that there
+        # API.
         self.api_version = api_version
         self.api_url = 'https://api.twitter.com/%s'
 
@@ -75,16 +87,18 @@ class Twython(EndpointsMixin, object):
 
         self.client_args = client_args or {}
         default_headers = {'User-Agent': 'Twython v' + __version__}
-        if not 'headers' in self.client_args:
+        if 'headers' not in self.client_args:
             # If they didn't set any headers, set our defaults for them
             self.client_args['headers'] = default_headers
         elif 'User-Agent' not in self.client_args['headers']:
-            # If they set headers, but didn't include User-Agent.. set it for them
+            # If they set headers, but didn't include User-Agent.. set
+            # it for them
             self.client_args['headers'].update(default_headers)
 
         # Generate OAuth authentication object for the request
         # If no keys/tokens are passed to __init__, auth=None allows for
-        # unauthenticated requests, although I think all v1.1 requests need auth
+        # unauthenticated requests, although I think all v1.1 requests
+        # need auth
         auth = None
         if oauth_version == 1:
             # User Authentication is through OAuth 1
@@ -93,12 +107,14 @@ class Twython(EndpointsMixin, object):
                 auth = OAuth1(self.app_key, self.app_secret)
 
             if self.app_key is not None and self.app_secret is not None and \
-               self.oauth_token is not None and self.oauth_token_secret is not None:
+               self.oauth_token is not None and self.oauth_token_secret is \
+               not None:
                 auth = OAuth1(self.app_key, self.app_secret,
                               self.oauth_token, self.oauth_token_secret)
         elif oauth_version == 2 and self.access_token:
             # Application Authentication is through OAuth 2
-            token = {'token_type': token_type, 'access_token': self.access_token}
+            token = {'token_type': token_type,
+                     'access_token': self.access_token}
             auth = OAuth2(self.app_key, token=token)
 
         self.client = requests.Session()
@@ -166,11 +182,14 @@ class Twython(EndpointsMixin, object):
 
             ExceptionType = TwythonError
             if response.status_code == 429:
-                # Twitter API 1.1, always return 429 when rate limit is exceeded
+                # Twitter API 1.1, always return 429 when
+                # rate limit is exceeded
                 ExceptionType = TwythonRateLimitError
-            elif response.status_code == 401 or 'Bad Authentication data' in error_message:
+            elif response.status_code == 401 or 'Bad Authentication data' \
+                    in error_message:
                 # Twitter API 1.1, returns a 401 Unauthorized or
-                # a 400 "Bad Authentication data" for invalid/expired app keys/user tokens
+                # a 400 "Bad Authentication data" for invalid/expired
+                # app keys/user tokens
                 ExceptionType = TwythonAuthError
 
             raise ExceptionType(error_message,
