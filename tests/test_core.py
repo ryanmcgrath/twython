@@ -28,8 +28,8 @@ class TwythonAPITestCase(unittest.TestCase):
         return '%s/%s.json' % (self.api.api_url % self.api.api_version, endpoint)
 
     def register_response(self, method, url, body='{}', match_querystring=False,
-            status=200, adding_headers=None, stream=False,
-            content_type='application/json; charset=utf-8'):
+                          status=200, adding_headers=None, stream=False,
+                          content_type='application/json; charset=utf-8'):
         """Wrapper function for responses for simpler unit tests"""
 
         # responses uses BytesIO to hold the body so it needs to be in bytes
@@ -37,7 +37,7 @@ class TwythonAPITestCase(unittest.TestCase):
             body = bytes(body, 'UTF-8')
 
         responses.add(method, url, body, match_querystring,
-            status, adding_headers, stream, content_type)
+                      status, adding_headers, stream, content_type)
 
     @responses.activate
     def test_request_should_handle_full_endpoint(self):
@@ -77,7 +77,7 @@ class TwythonAPITestCase(unittest.TestCase):
     @responses.activate
     def test_request_should_throw_exception_with_invalid_http_method(self):
         """Test that request() throws an exception when an invalid HTTP method is passed"""
-        #TODO(cash): should Twython catch the AttributeError and throw a TwythonError
+        # TODO(cash): should Twython catch the AttributeError and throw a TwythonError
         self.assertRaises(AttributeError, self.api.request, endpoint='search/tweets', method='INVALID')
 
     @responses.activate
@@ -315,5 +315,5 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test using expanded url in HTML for Tweet displays full urls"""
         tweet_text = self.api.html_for_tweet(test_tweet_object, False)
         # Make sure HTML doesn't contain the display OR expanded url
-        self.assertTrue(not 'http://google.com' in tweet_text)
-        self.assertTrue(not 'google.com' in tweet_text)
+        self.assertTrue('http://google.com' not in tweet_text)
+        self.assertTrue('google.com' not in tweet_text)
