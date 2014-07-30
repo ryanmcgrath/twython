@@ -11,8 +11,9 @@ Twython
 
 Twython is a library for Python that wraps the Twitter API.
 
-It aims to abstract away all the API endpoints, so that additions to the library
-and/or the Twitter API won't cause any overall problems.
+It aims to abstract away all the API endpoints, so that
+additions to the library and/or the Twitter API won't
+cause any overall problems.
 
 Questions, comments? ryan@venodesigns.net
 """

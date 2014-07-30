@@ -20,8 +20,10 @@ class TwythonEndpointsTestCase(unittest.TestCase):
             'allow_redirects': False
         }
 
+        # This is so we can hit coverage that Twython sets
+        # User-Agent for us if none is supplied
         oauth2_client_args = {
-            'headers': {}  # This is so we can hit coverage that Twython sets User-Agent for us if none is supplied
+            'headers': {}
         }
 
         self.api = Twython(app_key, app_secret,
@@ -42,7 +44,8 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         """Test returning timeline for authenticated user and random user
         succeeds"""
         self.api.get_user_timeline()  # Authenticated User Timeline
-        self.api.get_user_timeline(screen_name='twitter')  # Random User Timeline
+        self.api.get_user_timeline(screen_name='twitter')
+        # Random User Timeline
 
     @unittest.skip('skipping non-updated test')
     def test_get_protected_user_timeline_following(self):
@@ -82,7 +85,8 @@ class TwythonEndpointsTestCase(unittest.TestCase):
     @unittest.skip('skipping non-updated test')
     def test_update_and_destroy_status(self):
         """Test updating and deleting a status succeeds"""
-        status = self.api.update_status(status='Test post just to get deleted :( %s' % int(time.time()))
+        status = self.api.update_status(status='Test post just to get \
+                    deleted :( %s' % int(time.time()))
         self.api.destroy_status(id=status['id_str'])
 
     @unittest.skip('skipping non-updated test')
@@ -117,7 +121,8 @@ class TwythonEndpointsTestCase(unittest.TestCase):
     def test_send_get_and_destroy_direct_message(self):
         """Test sending, getting, then destory a direct message succeeds"""
         message = self.api.send_direct_message(screen_name=protected_twitter_1,
-                                               text='Hey d00d! %s' % int(time.time()))
+                                               text='Hey d00d! %s\
+                                               ' % int(time.time()))
 
         self.api.get_direct_message(id=message['id_str'])
         self.api.destroy_direct_message(id=message['id_str'])
@@ -127,7 +132,8 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         """Test sending a direct message to someone who doesn't follow you
         fails"""
         self.assertRaises(TwythonError, self.api.send_direct_message,
-                          screen_name=protected_twitter_2, text='Yo, man! %s' % int(time.time()))
+                          screen_name=protected_twitter_2, text='Yo, man! \
+                          %s' % int(time.time()))
 
     # Friends & Followers
     @unittest.skip('skipping non-updated test')
@@ -348,7 +354,8 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         the_list = self.api.create_list(name='Stuff %s' % int(time.time()))
         list_id = the_list['id_str']
 
-        self.api.update_list(list_id=list_id, name='Stuff Renamed %s' % int(time.time()))
+        self.api.update_list(list_id=list_id, name='Stuff Renamed \
+                             %s' % int(time.time()))
 
         screen_names = ['johncena', 'xbox']
         # Multi add/delete members
@@ -359,7 +366,8 @@ class TwythonEndpointsTestCase(unittest.TestCase):
 
         # Single add/delete member
         self.api.add_list_member(list_id=list_id, screen_name='justinbieber')
-        self.api.delete_list_member(list_id=list_id, screen_name='justinbieber')
+        self.api.delete_list_member(list_id=list_id,
+                                    screen_name='justinbieber')
 
         self.api.delete_list(list_id=list_id)
 
