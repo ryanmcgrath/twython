@@ -16,5 +16,7 @@ stream = MyStreamer(APP_KEY, APP_SECRET,
                     OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
 stream.statuses.filter(track='twitter')
-#stream.user()  # Read the authenticated users home timeline (what they see on Twitter) in real-time
-#stream.site(follow='twitter')
+# stream.user()
+# Read the authenticated users home timeline
+# (what they see on Twitter) in real-time
+# stream.site(follow='twitter')

@@ -38,8 +38,11 @@ class TwythonStreamer(object):
                             retired
         :param retry_in: (optional) Amount of time (in secs) the previous
                          API call should be tried again
-        :param client_args: (optional) Accepts some requests Session parameters and some requests Request parameters.
-                            See http://docs.python-requests.org/en/latest/api/#sessionapi and requests section below it for details.
+        :param client_args: (optional) Accepts some requests Session
+                            parameters and some requests Request parameters.
+                            See
+                            http://docs.python-requests.org/en/latest/api/#sessionapi
+                            and requests section below it for details.
                             [ex. headers, proxies, verify(SSL verification)]
         :param handlers: (optional) Array of message types for which
                          corresponding handlers will be called
@@ -53,11 +56,12 @@ class TwythonStreamer(object):
 
         self.client_args = client_args or {}
         default_headers = {'User-Agent': 'Twython Streaming v' + __version__}
-        if not 'headers' in self.client_args:
+        if 'headers' not in self.client_args:
             # If they didn't set any headers, set our defaults for them
             self.client_args['headers'] = default_headers
         elif 'User-Agent' not in self.client_args['headers']:
-            # If they set headers, but didn't include User-Agent.. set it for them
+            # If they set headers, but didn't include User-Agent..
+            # set it for them
             self.client_args['headers'].update(default_headers)
         self.client_args['timeout'] = timeout
 
@@ -87,7 +91,8 @@ class TwythonStreamer(object):
 
         self.connected = False
 
-        self.handlers = handlers if handlers else ['delete', 'limit', 'disconnect']
+        self.handlers = handlers if handlers else \
+            ['delete', 'limit', 'disconnect']
 
         self.chunk_size = chunk_size
 
@@ -103,7 +108,8 @@ class TwythonStreamer(object):
         def _send(retry_counter):
             requests_args = {}
             for k, v in self.client_args.items():
-            # Maybe this should be set as a class variable and only done once?
+                # Maybe this should be set as a class
+                # variable and only done once?
                 if k in ('timeout', 'allow_redirects', 'verify'):
                     requests_args[k] = v
 
@@ -121,7 +127,8 @@ class TwythonStreamer(object):
                     if response.status_code != 200:
                         self.on_error(response.status_code, response.content)
 
-                    if self.retry_count and (self.retry_count - retry_counter) > 0:
+                    if self.retry_count and \
+                       (self.retry_count - retry_counter) > 0:
                         time.sleep(self.retry_in)
                         retry_counter += 1
                         _send(retry_counter)
@@ -140,13 +147,19 @@ class TwythonStreamer(object):
                             line = line.decode('utf-8')
                         data = json.loads(line)
                     except ValueError:  # pragma: no cover
-                        self.on_error(response.status_code, 'Unable to decode response, not valid JSON.')
+                        self.on_error(response.status_code,
+                                      'Unable to decode response, \
+                                      not valid JSON.')
                     else:
                         if self.on_success(data):  # pragma: no cover
                             for message_type in self.handlers:
                                 if message_type in data:
-                                    handler = getattr(self, 'on_' + message_type, None)
-                                    if handler and callable(handler) and not handler(data.get(message_type)):
+                                    handler = getattr(self,
+                                                      'on_' + message_type,
+                                                      None)
+                                    if handler \
+                                       and callable(handler) \
+                                       and not handler(data.get(message_type)):
                                         break
 
         response.close()
