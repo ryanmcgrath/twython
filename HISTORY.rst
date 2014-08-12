@@ -3,6 +3,18 @@
 History
 -------
 
+3.2.0 (2014-08-xx)
+++++++++++++++++++
+- PEP8'd some code
+- Added `lookup_status` function to `endpoints.py`
+- Added keyword argument to `cursor` to return full pages rather than individual results
+- `cursor` now uses while loop rather than recursion
+- Fixed issue where Twython was unnecessarily disabling compression
+- Using `responses` to mock API calls in tests
+- Fixed some typos in documentation
+- Added retry_after attribute to TwythonRateLimitError
+
+
 3.1.2 (2013-12-05)
 ++++++++++++++++++
 

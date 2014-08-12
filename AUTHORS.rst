@@ -27,7 +27,7 @@ Patches and Suggestions
 - `Jonathan Elsas <https://github.com/jelsas>`_, Fix for original Streaming API stub causing import errors.
 - `LuqueDaniel <https://github.com/LuqueDaniel>`_, Extended example code where necessary.
 - `Mesar Hameed <https://github.com/mhameed>`_, Commit to swap ``__getattr__`` trick for a more debuggable solution.
-- `Remy DeCausemaker <https://github.com/decause>`_, PEP-8 contributions.
+- `Remy DeCausemaker <https://github.com/decause>`_, PEP 8 contributions.
 - `mckellister <https://github.com/mckellister>`_ Twitter Spring 2012 Clean Up fixes to ``Exception`` raised by Twython (Rate Limits, etc).
 - `Tatz Tsuchiya <http://d.hatena.ne.jp/tatz_tsuchiya/20120115/1326623451>`_, Fix for ``lambda`` scoping in key injection phase.
 - `Mohammed ALDOUB <https://github.com/Voulnet>`_, Fixes for ``http/https`` access endpoints.
@@ -35,7 +35,7 @@ Patches and Suggestions
 - `Terry Jones <https://github.com/terrycojones>`_, Error cleanup and Exception processing in 2.3.0.
 - `Leandro Ferreira <https://github.com/leandroferreira>`_, Fix for double-encoding of search queries in 2.3.0.
 - `Chris Brown <https://github.com/chbrown>`_, Updated to use v1.1 endpoints over v1
-- `Virendra Rajput <https://github.com/bkvirendra>`_, Fixed unicode (json) encoding in twython.py 2.7.2.  
+- `Virendra Rajput <https://github.com/bkvirendra>`_, Fixed unicode (json) encoding in twython.py 2.7.2.
 - `Paul Solbach <https://github.com/hansenrum>`_, fixed requirement for oauth_verifier
 - `Greg Nofi <https://github.com/nofeet>`_, fixed using built-in Exception attributes for storing & retrieving error message
 - `Jonathan Vanasco <https://github.com/jvanasco>`_, Debugging support, error_code tracking, Twitter error API tracking, other fixes
@@ -43,3 +43,10 @@ Patches and Suggestions
 - `Ruben Varela Rosa <https://github.com/rubenvarela>`_, Fixed search example
 - `Oleg Anashkin <https://github.com/extesy>`_, streaming ``handlers`` functionality
 - `Luis Alberto Santana <https://github.com/jackboot7`_, Added auth_endpoint parameter for cases when the right permissions weren't being shown on authenticate step
+- `Cory Benfield <https://github.com/Lukasa>`_, Fixed issue where Twython was unnecessarily disabling compression
+- `Cory Dolphin <https://github.com/wcdolphin>`_, Added retry_after attribute to TwythonRateLimitError
+- `Natan L <https://github.com/kuyan>`_, Fixed typo in documentation
+- `Cash Costello <https://github.com/cash>`_, Moved tests to use `responsoes`, fixed typos in documentation
+- `Joe Cabrera <https://github.com/greedo>`_, PEP 8 contributions
+- `bsbkeven <https://github.com/bsbkeven>`_, Added `lookup_status` function to `endpoints.py`
+- `drevicko <https://github.com/drevicko>`_, Added option to yield full page vs individual results in `cursor`
