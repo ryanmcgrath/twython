@@ -28,7 +28,7 @@ def _transparent_params(_params):
             try:
                 params[k] = ','.join(v)
             except TypeError:
-                params[k] = ','.join(map(str,v))
+                params[k] = ','.join(map(str, v))
         else:
             continue  # pragma: no cover
     return params, files
