@@ -194,8 +194,7 @@ class Twython(EndpointsMixin, object):
 
             raise ExceptionType(error_message,
                                 error_code=response.status_code,
-                                retry_after=response.headers.get('retry-\
-                                after'))
+                                retry_after=response.headers.get('X-Rate-Limit-Reset'))
 
         try:
             content = response.json()
@@ -497,8 +496,7 @@ class Twython(EndpointsMixin, object):
                         # Add 1 to the id because since_id and
                         # max_id are inclusive
                         if hasattr(function, 'iter_metadata'):
-                            since_id = content[function.iter_metadata]\
-                                .get('since_id_str')
+                            since_id = content[function.iter_metadata].get('since_id_str')
                         else:
                             since_id = content[0]['id_str']
                         params['since_id'] = (int(since_id) - 1)
