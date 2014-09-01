@@ -192,9 +192,10 @@ class Twython(EndpointsMixin, object):
                 # app keys/user tokens
                 ExceptionType = TwythonAuthError
 
-            raise ExceptionType(error_message,
-                                error_code=response.status_code,
-                                retry_after=response.headers.get('X-Rate-Limit-Reset'))
+            raise ExceptionType(
+                error_message,
+                error_code=response.status_code,
+                retry_after=response.headers.get('X-Rate-Limit-Reset'))
 
         try:
             content = response.json()
