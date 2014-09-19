@@ -115,7 +115,7 @@ Handling the Callback
 
     If your application is a Desktop or Mobile Application *oauth_verifier* will be the PIN code
 
-After they authorize your application to access some of their account details, they'll be redirected to the callback url you specified in ``get_autentication_tokens``
+After they authorize your application to access some of their account details, they'll be redirected to the callback url you specified in ``get_authentication_tokens``
 
 You'll want to extract the ``oauth_verifier`` from the url.
 
@@ -134,10 +134,10 @@ Now that you have the ``oauth_verifier`` stored to a variable, you'll want to cr
 
     final_step = twitter.get_authorized_tokens(oauth_verifier)
 
-Once you have the final user tokens, store them in a database for later use!::
+Once you have the final user tokens, store them in a database for later use::
 
     OAUTH_TOKEN = final_step['oauth_token']
-    OAUTH_TOKEN_SECERT = final_step['oauth_token_secret']
+    OAUTH_TOKEN_SECRET = final_step['oauth_token_secret']
 
 For OAuth 2 (Application Only, read-only) authentication, see `our documentation <https://twython.readthedocs.org/en/latest/usage/starting_out.html#oauth-2-application-authentication>`_
 
