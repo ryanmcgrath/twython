@@ -120,6 +120,16 @@ class EndpointsMixin(object):
         """
         return self.post('statuses/update_with_media', params=params)
 
+    def upload_media(self, **params):
+        """Uploads media file to Twitter servers. The file will be available to be attached
+        to a status for 60 minutes. To attach to a update, pass a list of returned media ids
+        to the 'update_status' method using the 'media_ids' param.
+
+        Docs:
+        https://dev.twitter.com/rest/public/uploading-media-multiple-photos
+        """
+        return self.post('https://upload.twitter.com/1.1/media/upload.json', params=params)
+
     def get_oembed_tweet(self, **params):
         """Returns information allowing the creation of an embedded
         representation of a Tweet on third party sites.
