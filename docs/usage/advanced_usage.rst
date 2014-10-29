@@ -55,7 +55,7 @@ Posting a Status with an Editing Image
     # unable to be read
     image_io.seek(0)
 
-    twitter.update_status_with_media(media=photo, status='Check out my edited image!')
+    twitter.update_status_with_media(media=image_io, status='Check out my edited image!')
 
 
 Search Generator
