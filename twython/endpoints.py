@@ -14,6 +14,10 @@ This map is organized the order functions are documented at:
 https://dev.twitter.com/docs/api/1.1
 """
 
+import warnings
+
+from .advisory import TwythonDeprecationWarning
+
 
 class EndpointsMixin(object):
     # Timelines
@@ -118,6 +122,11 @@ class EndpointsMixin(object):
         https://dev.twitter.com/docs/api/1.1/post/statuses/update_with_media
 
         """
+        warnings.warn(
+            'This method is deprecated. You should use Twython.upload_media instead.',
+            TwythonDeprecationWarning,
+            stacklevel=2
+        )
         return self.post('statuses/update_with_media', params=params)
 
     def upload_media(self, **params):

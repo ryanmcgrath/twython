@@ -50,3 +50,7 @@ Patches and Suggestions
 - `Joe Cabrera <https://github.com/greedo>`_, PEP 8 contributions
 - `bsbkeven <https://github.com/bsbkeven>`_, Added `lookup_status` function to `endpoints.py`
 - `drevicko <https://github.com/drevicko>`_, Added option to yield full page vs individual results in `cursor`
+- `Filipe A Ximenes <https://github.com/filipeximenes>`_, Added `upload_media` function to `endpoints.py`
+- `Mertcan Mermerkaya <https://github.com/mmermerkaya>`_, Fixed code example in documentation
+- `Donne Martin <https://github.com/donnemartin>`_, Fixed typos in `README.rst`
+- `Diego Allen <https://github.com/dalleng>`_, Add missing comma in documentation code snippet
