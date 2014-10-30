@@ -262,16 +262,16 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test getting last specific header of the last API call works"""
         endpoint = 'statuses/home_timeline'
         url = self.get_url(endpoint)
-        self.register_response(responses.GET, url, adding_headers={'x-rate-limit-remaining': 37})
+        self.register_response(responses.GET, url, adding_headers={'x-rate-limit-remaining': '37'})
 
         self.api.get(endpoint)
 
         value = self.api.get_lastfunction_header('x-rate-limit-remaining')
-        self.assertEqual(37, value)
+        self.assertEqual('37', value)
         value2 = self.api.get_lastfunction_header('does-not-exist')
         self.assertIsNone(value2)
-        value3 = self.api.get_lastfunction_header('not-there-either', 96)
-        self.assertEqual(96, value3)
+        value3 = self.api.get_lastfunction_header('not-there-either', '96')
+        self.assertEqual('96', value3)
 
     def test_get_lastfunction_header_should_raise_error_when_no_previous_call(self):
         """Test attempting to get a header when no API call was made raises a TwythonError"""
@@ -286,7 +286,7 @@ class TwythonAPITestCase(unittest.TestCase):
 
         self.api.get(endpoint)
 
-        self.assertEqual(b'gzip, deflate, compress', responses.calls[0].request.headers['Accept-Encoding'])
+        self.assertEqual(b'gzip, deflate', responses.calls[0].request.headers['Accept-Encoding'])
 
     # Static methods
     def test_construct_api_url(self):
