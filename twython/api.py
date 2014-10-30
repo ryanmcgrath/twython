@@ -9,6 +9,8 @@ Twitter Authentication, and miscellaneous methods that are useful when
 dealing with the Twitter API
 """
 
+import warnings
+
 import requests
 from requests.auth import HTTPBasicAuth
 from requests_oauthlib import OAuth1, OAuth2
@@ -19,8 +21,6 @@ from .compat import json, urlencode, parse_qsl, quote_plus, str, is_py2
 from .endpoints import EndpointsMixin
 from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
 from .helpers import _transparent_params
-
-import warnings
 
 warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
 
@@ -243,9 +243,12 @@ class Twython(EndpointsMixin, object):
         :rtype: dict
         """
 
+        if endpoint.startswith('http://'):
+            raise TwythonError('api.twitter.com is restricted to SSL/TLS traffic.')
+
         # In case they want to pass a full Twitter URL
         # i.e. https://api.twitter.com/1.1/search/tweets.json
-        if endpoint.startswith('http://') or endpoint.startswith('https://'):
+        if endpoint.startswith('https://'):
             url = endpoint
         else:
             url = '%s/%s.json' % (self.api_url % version, endpoint)
