@@ -3,7 +3,7 @@
 History
 -------
 
-3.2.0 (2014-08-xx)
+3.2.0 (2014-10-30)
 ++++++++++++++++++
 - PEP8'd some code
 - Added `lookup_status` function to `endpoints.py`
