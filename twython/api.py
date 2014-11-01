@@ -9,6 +9,8 @@ Twitter Authentication, and miscellaneous methods that are useful when
 dealing with the Twitter API
 """
 
+import warnings
+
 import requests
 from requests.auth import HTTPBasicAuth
 from requests_oauthlib import OAuth1, OAuth2
@@ -19,8 +21,6 @@ from .compat import json, urlencode, parse_qsl, quote_plus, str, is_py2
 from .endpoints import EndpointsMixin
 from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
 from .helpers import _transparent_params
-
-import warnings
 
 warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
 
@@ -192,10 +192,10 @@ class Twython(EndpointsMixin, object):
                 # app keys/user tokens
                 ExceptionType = TwythonAuthError
 
-            raise ExceptionType(error_message,
-                                error_code=response.status_code,
-                                retry_after=response.headers.get('retry-\
-                                after'))
+            raise ExceptionType(
+                error_message,
+                error_code=response.status_code,
+                retry_after=response.headers.get('X-Rate-Limit-Reset'))
 
         try:
             content = response.json()
@@ -243,9 +243,12 @@ class Twython(EndpointsMixin, object):
         :rtype: dict
         """
 
+        if endpoint.startswith('http://'):
+            raise TwythonError('api.twitter.com is restricted to SSL/TLS traffic.')
+
         # In case they want to pass a full Twitter URL
         # i.e. https://api.twitter.com/1.1/search/tweets.json
-        if endpoint.startswith('http://') or endpoint.startswith('https://'):
+        if endpoint.startswith('https://'):
             url = endpoint
         else:
             url = '%s/%s.json' % (self.api_url % version, endpoint)
@@ -497,8 +500,7 @@ class Twython(EndpointsMixin, object):
                         # Add 1 to the id because since_id and
                         # max_id are inclusive
                         if hasattr(function, 'iter_metadata'):
-                            since_id = content[function.iter_metadata]\
-                                .get('since_id_str')
+                            since_id = content[function.iter_metadata].get('since_id_str')
                         else:
                             since_id = content[0]['id_str']
                         params['since_id'] = (int(since_id) - 1)

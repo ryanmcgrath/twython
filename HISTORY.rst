@@ -3,6 +3,21 @@
 History
 -------
 
+3.2.0 (2014-10-30)
+++++++++++++++++++
+- PEP8'd some code
+- Added `lookup_status` function to `endpoints.py`
+- Added keyword argument to `cursor` to return full pages rather than individual results
+- `cursor` now uses while loop rather than recursion
+- Fixed issue where Twython was unnecessarily disabling compression
+- Using `responses` to mock API calls in tests
+- Fixed some typos in  documentation
+- Added `retry_after` attribute to `TwythonRateLimitError`
+- Added `upload_media` method to `Twython` in favor of `update_with_media`
+- Deprecating `update_with_media` per Twitter API 1.1 (https://dev.twitter.com/rest/reference/post/statuses/update_with_media)
+- Unpin `requests` and `requests-oauthlib` in `requirements.txt`
+
+
 3.1.2 (2013-12-05)
 ++++++++++++++++++
 
