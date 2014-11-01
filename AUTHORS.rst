@@ -54,3 +54,4 @@ Patches and Suggestions
 - `Mertcan Mermerkaya <https://github.com/mmermerkaya>`_, Fixed code example in documentation
 - `Donne Martin <https://github.com/donnemartin>`_, Fixed typos in `README.rst`
 - `Diego Allen <https://github.com/dalleng>`_, Add missing comma in documentation code snippet
+- `Ben McGinnes <https://github.com/Hasimir>`_, Added mute API endpoints, a couple of examples, random bits.
