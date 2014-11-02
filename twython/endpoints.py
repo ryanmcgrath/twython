@@ -542,8 +542,8 @@ class EndpointsMixin(object):
 
         """
         return self.get('mutes/users/ids', params=params)
-    list_mutes_ids.iter_mode = 'cursor'
-    list_mutes_ids.iter_key = 'ids'
+    list_mute_ids.iter_mode = 'cursor'
+    list_mute_ids.iter_key = 'ids'
 
     def create_mute(self, **params):
         """Mutes the specified user, preventing their tweets appearing 
