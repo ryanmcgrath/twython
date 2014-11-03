@@ -523,6 +523,46 @@ class EndpointsMixin(object):
         """
         return self.get('users/profile_banner', params=params)
 
+    def list_mutes(self, **params):
+        """Returns a collection of user objects that the authenticating user
+        is muting.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/mutes/users/list
+
+        """
+        return self.get('mutes/users/list', params=params)
+    list_mutes.iter_mode = 'cursor'
+    list_mutes.iter_key = 'users'
+
+    def list_mute_ids(self, **params):
+        """Returns an array of numeric user ids the authenticating user
+        is muting.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/get/mutes/users/ids
+
+        """
+        return self.get('mutes/users/ids', params=params)
+    list_mute_ids.iter_mode = 'cursor'
+    list_mute_ids.iter_key = 'ids'
+
+    def create_mute(self, **params):
+        """Mutes the specified user, preventing their tweets appearing 
+        in the authenticating user's timeline.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/mutes/users/create
+
+        """
+        return self.post('mutes/users/create', params=params)
+
+    def destroy_mute(self, **params):
+        """Un-mutes the user specified in the user or ID parameter for 
+        the authenticating user.
+
+        Docs: https://dev.twitter.com/docs/api/1.1/post/mutes/users/destroy
+
+        """
+        return self.post('mutes/users/destroy', params=params)
+
     # Suggested Users
     def get_user_suggestions_by_slug(self, **params):
         """Access the users in a given category of the Twitter suggested user list.

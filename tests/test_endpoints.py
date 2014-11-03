@@ -305,6 +305,28 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         we have not uploaded a profile banner"""
         self.assertRaises(TwythonError, self.api.get_profile_banner_sizes)
 
+    @unittest.skip('skipping non-updated test')
+    def test_list_mutes(self):
+        """Test listing users who are muted by the authenticated user
+        succeeds"""
+        self.api.list_mutes()
+
+    @unittest.skip('skipping non-updated test')
+    def test_list_mute_ids(self):
+        """Test listing user ids who are muted by the authenticated user
+        succeeds"""
+        self.api.list_mute_ids()
+
+    @unittest.skip('skipping non-updated test')
+    def test_create_mute(self):
+        """Test muting a user succeeds"""
+        self.api.create_mute(screen_name='justinbieber')
+
+    @unittest.skip('skipping non-updated test')
+    def test_destroy_mute(self):
+        """Test muting a user succeeds"""
+        self.api.destroy_mute(screen_name='justinbieber')
+
     # Suggested Users
     @unittest.skip('skipping non-updated test')
     def test_get_user_suggestions_by_slug(self):
