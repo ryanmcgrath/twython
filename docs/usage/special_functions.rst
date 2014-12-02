@@ -72,15 +72,16 @@ The above code takes all the tweets from a specific users timeline, loops over t
 
 So:
 
-    http://t.co/FCmXyI6VHd is a #cool site, lol! @mikehelmick should #checkitout. If you can! #thanks Love, @__twython__ https://t.co/67pwRvY6z9
+    http://t.co/FCmXyI6VHd is a #cool site, lol! @mikehelmick shd #checkitout. Love, @__twython__ https://t.co/67pwRvY6z9 http://t.co/N6InAO4B71
 
 will be replaced with:
 
-    <a href="http://t.co/FCmXyI6VHd" class="twython-url">google.com</a> is a <a href="https://twitter.com/search?q=%23cool" class="twython-hashtag">#cool</a> site, lol! <a href="https://twitter.com/mikehelmick" class="twython-mention">@mikehelmick</a> should <a href="https://twitter.com/search?q=%23checkitout" class="twython-hashtag">#checkitout</a>. If you can! <a href="https://twitter.com/search?q=%23thanks" class="twython-hashtag">#thanks</a> Love, <a href="https://twitter.com/__twython__" class="twython-mention">@__twython__</a> <a href="https://t.co/67pwRvY6z9" class="twython-url">github.com</a>
+    <a href="http://t.co/FCmXyI6VHd" class="twython-url">google.com</a> is a <a href="https://twitter.com/search?q=%23cool" class="twython-hashtag">#cool</a> site, lol! <a href="https://twitter.com/mikehelmick" class="twython-mention">@mikehelmick</a> shd <a href="https://twitter.com/search?q=%23checkitout" class="twython-hashtag">#checkitout</a>. Love, <a href="https://twitter.com/__twython__" class="twython-mention">@__twython__</a> <a href="https://t.co/67pwRvY6z9" class="twython-url">github.com</a> <a href="http://t.co/N6InAO4B71" class="twython-media">pic.twitter.com/N6InAO4B71</a>
 
 .. note:: When converting the string to HTML we add a class to each HTML tag so that you can maninpulate the DOM later on.
 
 - For urls that are replaced we add ``class="twython-url"`` to the anchor tag
+- For media urls that are replaced we add ``class="twython-media"`` to the anchor tag
 - For user mentions that are replaced we add ``class="twython-mention"`` to the anchor tag
 - For hashtags that are replaced we add ``class="twython-hashtag"`` to the anchor tag
 
