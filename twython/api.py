@@ -577,4 +577,20 @@ class Twython(EndpointsMixin, object):
                 text = text.replace(tweet['text'][start:end],
                                     url_html % (entity['url'], shown_url))
 
+             # Media
+            if 'media' in entities:
+                for entity in entities['media']:
+                    start, end = entity['indices'][0], entity['indices'][1]
+                    if use_display_url and entity.get('display_url') \
+                       and not use_expanded_url:
+                        shown_url = entity['display_url']
+                    elif use_expanded_url and entity.get('expanded_url'):
+                        shown_url = entity['expanded_url']
+                    else:
+                        shown_url = entity['url']
+
+                    url_html = '<a href="%s" class="twython-media">%s</a>'
+                    text = text.replace(tweet['text'][start:end],
+                                        url_html % (entity['url'], shown_url))
+
         return text
