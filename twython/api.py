@@ -214,6 +214,8 @@ class Twython(EndpointsMixin, object):
             # {"errors":[{"code":34,"message":"Sorry,
             # that page does not exist"}]}
             error_message = content['errors'][0]['message']
+        except TypeError:
+            error_message = content['errors']
         except ValueError:
             # bad json data from Twitter for an error
             pass
