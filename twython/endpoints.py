@@ -135,7 +135,7 @@ class EndpointsMixin(object):
         to the 'update_status' method using the 'media_ids' param.
 
         Docs:
-        https://dev.twitter.com/rest/public/uploading-media-multiple-photos
+        https://dev.twitter.com/rest/public/uploading-media
         """
         return self.post('https://upload.twitter.com/1.1/media/upload.json', params=params)
 
