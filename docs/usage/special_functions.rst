@@ -37,7 +37,7 @@ The New Way
     twitter = Twython(APP_KEY, APP_SECRET,
                       OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
-    results = twitter.cursor(t.search, q='twitter')
+    results = twitter.cursor(twitter.search, q='twitter')
     for result in results:
         print result['id_str']
 
