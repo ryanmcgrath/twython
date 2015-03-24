@@ -51,7 +51,7 @@ class TwythonStreamerTypesStatuses(object):
     """
     def __init__(self, streamer):
         self.streamer = streamer
-	self.params = None
+        self.params = None
 
     def filter(self, **params):
         """Stream statuses/filter
@@ -97,7 +97,7 @@ class TwythonStreamerTypesStatuses(object):
         Accepted params found at:
         https://dev.twitter.com/docs/api/1.1/post/statuses/filter
         """
-	self.params = params
+        self.params = params
 
     def dynamic_filter(self):
         """Stream statuses/filter with dynamic parameters"""
