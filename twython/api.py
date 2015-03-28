@@ -385,6 +385,36 @@ class Twython(EndpointsMixin, object):
 
         return authorized_tokens  # pragma: no cover
 
+    def obtain_request_tokens(self, oauth_callback, x_auth_access_type='read'):
+        """Allows a Consumer application to obtain an OAuth Request Token to
+        request user authorization.
+
+        :param oauth_callback: The value you specify here will be used as the
+        URL a user is redirected to should they approve your application’s
+        access to their account. Set this to oob for out-of-band pin mode.
+        This is also how you specify custom callbacks for use in desktop/mobile
+        applications.
+        :param x_auth_access_type: Overrides the access level an application
+        requests to a users account. Supported values are read or write.
+        This parameter is intended to allow a developer to register a
+        read/write application but also request read only access when
+        appropriate.
+
+        :rtype: dict
+        """
+        data = {
+            'oauth_callback': oauth_callback,
+            'x_auth_access_type': x_auth_access_type,
+        }
+
+        response = self.client.post(self.request_token_url, data=data)
+        request_tokens = dict(parse_qsl(response.content.decode('utf-8')))
+
+        if not request_tokens:
+            raise TwythonError('Unable to decode request tokens.')
+
+        return request_tokens  # pragma: no cover
+
     def obtain_access_token(self):
         """Returns an OAuth 2 access token to make OAuth 2 authenticated
         read-only calls.
@@ -406,10 +436,12 @@ class Twython(EndpointsMixin, object):
             except AttributeError:
                 content = json.loads(content)
                 access_token = content['access_token']
+
+            return access_token
         except (KeyError, ValueError, requests.exceptions.RequestException):
             raise TwythonAuthError('Unable to obtain OAuth 2 access token.')
-        else:
-            return access_token
+
+        return ''
 
     @staticmethod
     def construct_api_url(api_url, **params):
