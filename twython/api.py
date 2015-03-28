@@ -385,7 +385,7 @@ class Twython(EndpointsMixin, object):
 
         return authorized_tokens  # pragma: no cover
 
-    def obtain_request_tokens(self, oauth_callback, x_auth_access_type='read'):
+    def obtain_request_tokens(self, oauth_callback, x_auth_access_type=''):
         """Allows a Consumer application to obtain an OAuth Request Token to
         request user authorization.
 
@@ -404,8 +404,10 @@ class Twython(EndpointsMixin, object):
         """
         data = {
             'oauth_callback': oauth_callback,
-            'x_auth_access_type': x_auth_access_type,
         }
+
+        if x_auth_access_type:
+            data['x_auth_access_type'] = x_auth_access_type
 
         response = self.client.post(self.request_token_url, data=data)
         request_tokens = dict(parse_qsl(response.content.decode('utf-8')))
