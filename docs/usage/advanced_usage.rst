@@ -67,9 +67,13 @@ That being said, Twython offers a generator for search results and can be access
 
 .. code-block:: python
 
-    search = twitter.search_gen('python')
-    for result in search:
-        print result
+    from twython import Twython
+	twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN,
+		OAUTH_TOKEN_SECRET)
+
+	results = twitter.cursor(twitter.search, q='python')
+	for result in results:
+	    print result
 
 Manipulate the Request (headers, proxies, etc.)
 -----------------------------------------------
