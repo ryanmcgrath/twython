@@ -51,6 +51,7 @@ class TwythonStreamerTypesStatuses(object):
     """
     def __init__(self, streamer):
         self.streamer = streamer
+        self.params = None
 
     def filter(self, **params):
         """Stream statuses/filter
@@ -87,3 +88,20 @@ class TwythonStreamerTypesStatuses(object):
         url = 'https://stream.twitter.com/%s/statuses/firehose.json' \
               % self.streamer.api_version
         self.streamer._request(url, params=params)
+
+    def set_dynamic_filter(self, **params):
+        """Set/update statuses/filter
+
+        :param \*\*params: Parameters to send with your stream request
+
+        Accepted params found at:
+        https://dev.twitter.com/docs/api/1.1/post/statuses/filter
+        """
+        self.params = params
+
+    def dynamic_filter(self):
+        """Stream statuses/filter with dynamic parameters"""
+
+        url = 'https://stream.twitter.com/%s/statuses/filter.json' \
+              % self.streamer.api_version
+        self.streamer._request(url, 'POST', params=self.params)	
