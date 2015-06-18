@@ -85,7 +85,7 @@ will be replaced with:
 - For user mentions that are replaced we add ``class="twython-mention"`` to the anchor tag
 - For hashtags that are replaced we add ``class="twython-hashtag"`` to the anchor tag
 
-This function excepts two parameters: ``use_display_url`` and ``use_expanded_url``
+This function accepts two parameters: ``use_display_url`` and ``use_expanded_url``
 By default, ``use_display_url`` is ``True``. Meaning the link displayed in the tweet text will appear as (ex. google.com, github.com)
 If ``use_expanded_url`` is ``True``, it overrides ``use_display_url``. The urls will then be displayed as (ex. http://google.com, https://github.com)
 If ``use_display_url`` and ``use_expanded_url`` are ``False``, short url will be used (t.co/xxxxx)
