@@ -22,17 +22,24 @@ Create a Twython instance with your application keys and the users OAuth tokens
 Updating Status with Image
 --------------------------
 
-Documentation: https://dev.twitter.com/docs/api/1.1/post/statuses/update_with_media
+This uploads an image as a media object and associates it with a status update.
 
 .. code-block:: python
 
     photo = open('/path/to/file/image.jpg', 'rb')
-    twitter.update_status_with_media(status='Checkout this cool image!', media=photo)
+    response = twitter.upload_media(media=photo)
+    twitter.update_status(status='Checkout this cool image!', media_ids=[response['media_id']])
+    
+Documentation:
+
+* https://dev.twitter.com/rest/reference/post/statuses/update
+* https://dev.twitter.com/rest/reference/post/media/upload
 
 Posting a Status with an Editing Image
 --------------------------------------
 
-    This example resizes an image
+This example resizes an image, then uploads it as a media object and associates it
+with a status update.
 
 .. code-block:: python
 
@@ -55,7 +62,9 @@ Posting a Status with an Editing Image
     # unable to be read
     image_io.seek(0)
 
-    twitter.update_status_with_media(media=image_io, status='Check out my edited image!')
+
+    response = twitter.upload_media(media=image_io)
+    twitter.update_status(status='Checkout this cool image!', media_ids=[response['media_id']])
 
 
 Search Generator
