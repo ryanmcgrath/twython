@@ -16,7 +16,7 @@ Create a Twython instance with your application keys and the users OAuth tokens
 .. code-block:: python
 
     from twython import Twython
-    twitter = Twython(APP_KEY, APP_SECRET
+    twitter = Twython(APP_KEY, APP_SECRET,
                       OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
 Updating Status with Image
@@ -77,12 +77,12 @@ That being said, Twython offers a generator for search results and can be access
 .. code-block:: python
 
     from twython import Twython
-	twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN,
-		OAUTH_TOKEN_SECRET)
+    twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN,
+        OAUTH_TOKEN_SECRET)
 
-	results = twitter.cursor(twitter.search, q='python')
-	for result in results:
-	    print result
+    results = twitter.cursor(twitter.search, q='python')
+    for result in results:
+        print result
 
 Manipulate the Request (headers, proxies, etc.)
 -----------------------------------------------
@@ -103,8 +103,8 @@ Here is an example of sending custom headers to a Twitter API request:
         }
     }
 
-    twitter = Twython(APP_KEY, APP_SECRET
-                      OAUTH_TOKEN, OAUTH_TOKEN_SECRET
+    twitter = Twython(APP_KEY, APP_SECRET,
+                      OAUTH_TOKEN, OAUTH_TOKEN_SECRET,
                       client_args=client_args)
 
 Here is an example of sending the request through proxies:
@@ -120,8 +120,8 @@ Here is an example of sending the request through proxies:
         }
     }
 
-    twitter = Twython(APP_KEY, APP_SECRET
-                      OAUTH_TOKEN, OAUTH_TOKEN_SECRET
+    twitter = Twython(APP_KEY, APP_SECRET,
+                      OAUTH_TOKEN, OAUTH_TOKEN_SECRET,
                       client_args=client_args)
 
 or both (and set a timeout variable):
@@ -141,8 +141,8 @@ or both (and set a timeout variable):
         'timeout': 300,
     }
 
-    twitter = Twython(APP_KEY, APP_SECRET
-                      OAUTH_TOKEN, OAUTH_TOKEN_SECRET
+    twitter = Twython(APP_KEY, APP_SECRET,
+                      OAUTH_TOKEN, OAUTH_TOKEN_SECRET,
                       client_args=client_args)
 
 Access Headers of Previous Call
@@ -155,7 +155,7 @@ If you wish to access headers (ex. x-rate-limit-remaining, x-rate-limit-reset, c
 
     from twython import Twython
 
-    twitter = Twython(APP_KEY, APP_SECRET
+    twitter = Twython(APP_KEY, APP_SECRET,
                       OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
     twitter.get_home_timeline()
