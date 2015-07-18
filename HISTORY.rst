@@ -3,9 +3,12 @@
 History
 -------
 
-3.3.0 (2014-xx-xx)
+3.3.0 (2015-18-07)
 ++++++++++++++++++
 - Added support for muting users
+- Fix typos in documentation
+- Updated documentation examples
+- Added dynamic filtering to streamer
 
 3.2.0 (2014-10-30)
 ++++++++++++++++++

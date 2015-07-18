@@ -55,3 +55,11 @@ Patches and Suggestions
 - `Donne Martin <https://github.com/donnemartin>`_, Fixed typos in `README.rst`
 - `Diego Allen <https://github.com/dalleng>`_, Add missing comma in documentation code snippet
 - `Ben McGinnes <https://github.com/Hasimir>`_, Added mute API endpoints, a couple of examples, random bits.
+- `Davis Silverman <https://github.com/sinistersnare>`_, Fixed endpoint HTTP method
+- `David Beitey <https://github.com/sinistersnare>`_, Fixed documentation typos
+- `7kfpun <https://github.com/7kfpun>`_, Fixed documentation typos
+- `Will Thompson <https://github.com/wjt>`_, Fixed documentation typos
+- `Andre Polykanine <https://github.com/Oire>`_, Fixed documentation typos
+- `Ben Bertka <https://github.com/bbertka>`_, Added dynamic filtering in streamer
+- `Takahashi Shuuji <https://github.com/shuuji3>`_, Fixed documentation typos
+- `Jeremy Keen <https://github.com/jkeenest>`_, Updated documentation example
