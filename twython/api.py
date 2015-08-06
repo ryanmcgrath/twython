@@ -8,8 +8,8 @@ This module contains functionality for access to core Twitter API calls,
 Twitter Authentication, and miscellaneous methods that are useful when
 dealing with the Twitter API
 """
-
 import warnings
+import logging
 
 import requests
 from requests.auth import HTTPBasicAuth
@@ -24,7 +24,6 @@ from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
 from .helpers import _transparent_params
 
 warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
-
 
 class Twython(EndpointsMixin, object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None,
@@ -163,7 +162,23 @@ class Twython(EndpointsMixin, object):
         try:
             response = func(url, **requests_args)
         except requests.RequestException as e:
-            raise TwythonError(str(e))
+            logging.exception('RequestException encountered - refreshing...')
+            # Rebuild Session and retry
+            s2 = requests.Session()
+            s2.auth = self.client.auth
+            s2.headers = self.client.headers
+            s2.cert = self.client.cert
+            s2.hooks = self.client.hooks
+            s2.proxies = self.client.proxies
+            s2.max_redirects = self.client.max_redirects
+            self.client.close()
+
+            self.client = s2
+            try:
+                response = func(url, **requests_args)
+            except requests.RequestException as e:
+                logging.exception('RequestException encountered after refresh!')
+                raise TwythonError(str(e))
 
         # create stash for last function intel
         self._last_call = {
