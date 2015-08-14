@@ -44,7 +44,7 @@ Patches and Suggestions
 - `Oleg Anashkin <https://github.com/extesy>`_, streaming ``handlers`` functionality
 - `Luis Alberto Santana <https://github.com/jackboot7`_, Added auth_endpoint parameter for cases when the right permissions weren't being shown on authenticate step
 - `Cory Benfield <https://github.com/Lukasa>`_, Fixed issue where Twython was unnecessarily disabling compression
-- `Cory Dolphin <https://github.com/wcdolphin>`_, Added retry_after attribute to TwythonRateLimitError
+- `Cory Dolphin <https://github.com/corydolphin>`_, Added retry_after attribute to TwythonRateLimitError
 - `Natan L <https://github.com/kuyan>`_, Fixed typo in documentation
 - `Cash Costello <https://github.com/cash>`_, Moved tests to use `responsoes`, fixed typos in documentation
 - `Joe Cabrera <https://github.com/greedo>`_, PEP 8 contributions
