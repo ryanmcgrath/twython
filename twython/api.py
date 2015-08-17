@@ -528,7 +528,7 @@ class Twython(EndpointsMixin, object):
         return str(text)
 
     @staticmethod
-    def html_for_tweet(tweet, use_display_url=True, use_expanded_url=False):
+    def html_for_tweet(tweet, use_display_url=True, use_expanded_url=False, expand_quoted_status=False):
         """Return HTML for a tweet (urls, mentions, hashtags replaced with links)
 
         :param tweet: Tweet object from received from Twitter API
@@ -594,5 +594,17 @@ class Twython(EndpointsMixin, object):
                     url_html = '<a href="%s" class="twython-media">%s</a>'
                     text = text.replace(tweet['text'][start:end],
                                         url_html % (entity['url'], shown_url))
+
+        if expand_quoted_status and tweet['is_quote_status']:
+            quoted_status = tweet['quoted_status']
+            text += '<blockquote class="twython-quote">%(quote)s<cite><a href="%(quote_tweet_link)s">' \
+                    '<span class="twython-quote-user-name">%(quote_user_name)s</span>' \
+                    '<span class="twython-quote-user-screenname">@%(quote_user_screen_name)s</span></a>' \
+                    '</cite></blockquote>' % \
+                    {'quote': Twython.html_for_tweet(quoted_status, use_display_url, use_expanded_url, False),
+                     'quote_tweet_link': 'https://twitter.com/%s/status/%s' %
+                                         (quoted_status['user']['screen_name'], quoted_status['id_str']),
+                     'quote_user_name': quoted_status['user']['name'],
+                     'quote_user_screen_name': quoted_status['user']['screen_name']}
 
         return text
