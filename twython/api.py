@@ -10,6 +10,7 @@ dealing with the Twitter API
 """
 
 import warnings
+import re
 
 import requests
 from requests.auth import HTTPBasicAuth
@@ -550,19 +551,22 @@ class Twython(EndpointsMixin, object):
             entities = tweet['entities']
 
             # Mentions
-            for entity in entities['user_mentions']:
+            for entity in sorted(entities['user_mentions'],
+                                 key=lambda mention: len(mention['screen_name']), reverse=True):
                 start, end = entity['indices'][0], entity['indices'][1]
 
                 mention_html = '<a href="https://twitter.com/%(screen_name)s" class="twython-mention">@%(screen_name)s</a>'
-                text = text.replace(tweet['text'][start:end],
-                        mention_html % {'screen_name': entity['screen_name']})
+                text = re.sub(r'(?<!>)' + tweet['text'][start:end] + '(?!</a>)',
+                              mention_html % {'screen_name': entity['screen_name']}, text)
 
             # Hashtags
-            for entity in entities['hashtags']:
+            for entity in sorted(entities['hashtags'],
+                                 key=lambda hashtag: len(hashtag['text']), reverse=True):
                 start, end = entity['indices'][0], entity['indices'][1]
 
                 hashtag_html = '<a href="https://twitter.com/search?q=%%23%(hashtag)s" class="twython-hashtag">#%(hashtag)s</a>'
-                text = text.replace(tweet['text'][start:end], hashtag_html % {'hashtag': entity['text']})
+                text = re.sub(r'(?<!>)' + tweet['text'][start:end] + '(?!</a>)',
+                              hashtag_html % {'hashtag': entity['text']}, text)
 
             # Urls
             for entity in entities['urls']:
