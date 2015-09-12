@@ -103,15 +103,10 @@ class Twython(EndpointsMixin, object):
         auth = None
         if oauth_version == 1:
             # User Authentication is through OAuth 1
-            if self.app_key is not None and self.app_secret is not None and \
-               self.oauth_token is None and self.oauth_token_secret is None:
-                auth = OAuth1(self.app_key, self.app_secret)
-
-            if self.app_key is not None and self.app_secret is not None and \
-               self.oauth_token is not None and self.oauth_token_secret is \
-               not None:
+            if self.app_key is not None and self.app_secret is not None:
                 auth = OAuth1(self.app_key, self.app_secret,
-                              self.oauth_token, self.oauth_token_secret)
+                                self.oauth_token, self.oauth_token_secret)
+
         elif oauth_version == 2 and self.access_token:
             # Application Authentication is through OAuth 2
             token = {'token_type': token_type,
