@@ -14,7 +14,12 @@ This map is organized the order functions are documented at:
 https://dev.twitter.com/docs/api/1.1
 """
 
+import os
 import warnings
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 from .advisory import TwythonDeprecationWarning
 
@@ -138,6 +143,62 @@ class EndpointsMixin(object):
         https://dev.twitter.com/rest/reference/post/media/upload
         """
         return self.post('https://upload.twitter.com/1.1/media/upload.json', params=params)
+
+    def upload_video(self, media, media_type, size=None):
+        """Uploads video file to Twitter servers in chunks. The file will be available to be attached
+        to a status for 60 minutes. To attach to a update, pass a list of returned media ids
+        to the 'update_status' method using the 'media_ids' param.
+
+        Upload happens in 3 stages:
+        - INIT call with size of media to be uploaded(in bytes). If this is more than 15mb, twitter will return error.
+        - APPEND calls each with media chunk. This returns a 204(No Content) if chunk is received.
+        - FINALIZE call to complete media upload. This returns media_id to be used with status update.
+
+        Twitter media upload api expects each chunk to be not more than 5mb. We are sending chunk of 1mb each.
+
+        Docs:
+        https://dev.twitter.com/rest/public/uploading-media#chunkedupload
+        """
+        upload_url = 'https://upload.twitter.com/1.1/media/upload.json'
+        if not size:
+            media.seek(0, os.SEEK_END)
+            size = media.tell()
+            media.seek(0)
+
+        # Stage 1: INIT call
+        params = {
+            'command': 'INIT',
+            'media_type': media_type,
+            'total_bytes': size
+        }
+        response_init = self.post(upload_url, params=params)
+        media_id = response_init['media_id']
+
+        # Stage 2: APPEND calls with 1mb chunks
+        segment_index = 0
+        while True:
+            data = media.read(1*1024*1024)
+            if not data:
+                break
+            media_chunk = StringIO()
+            media_chunk.write(data)
+            media_chunk.seek(0)
+
+            params = {
+                'command': 'APPEND',
+                'media_id': media_id,
+                'segment_index': segment_index,
+                'media': media_chunk,
+            }
+            self.post(upload_url, params=params)
+            segment_index += 1
+
+        # Stage 3: FINALIZE call to complete upload
+        params = {
+            'command': 'FINALIZE',
+            'media_id': media_id
+        }
+        return self.post(upload_url, params=params)
 
     def get_oembed_tweet(self, **params):
         """Returns information allowing the creation of an embedded
@@ -546,7 +607,7 @@ class EndpointsMixin(object):
     list_mute_ids.iter_key = 'ids'
 
     def create_mute(self, **params):
-        """Mutes the specified user, preventing their tweets appearing 
+        """Mutes the specified user, preventing their tweets appearing
         in the authenticating user's timeline.
 
         Docs: https://dev.twitter.com/docs/api/1.1/post/mutes/users/create
@@ -555,7 +616,7 @@ class EndpointsMixin(object):
         return self.post('mutes/users/create', params=params)
 
     def destroy_mute(self, **params):
-        """Un-mutes the user specified in the user or ID parameter for 
+        """Un-mutes the user specified in the user or ID parameter for
         the authenticating user.
 
         Docs: https://dev.twitter.com/docs/api/1.1/post/mutes/users/destroy
