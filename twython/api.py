@@ -194,7 +194,10 @@ class Twython(EndpointsMixin, object):
                 retry_after=response.headers.get('X-Rate-Limit-Reset'))
 
         try:
-            content = response.json()
+            if response.status_code == 204:
+                content = response.content
+            else:
+                content = response.json()
         except ValueError:
             raise TwythonError('Response was not valid JSON. \
                                Unable to decode.')

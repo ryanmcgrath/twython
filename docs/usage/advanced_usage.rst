@@ -35,6 +35,22 @@ Documentation:
 * https://dev.twitter.com/rest/reference/post/statuses/update
 * https://dev.twitter.com/rest/reference/post/media/upload
 
+Updating Status with Video
+--------------------------
+
+This uploads a video as a media object and associates it with a status update.
+
+.. code-block:: python
+
+    video = open('/path/to/file/video.mp4', 'rb')
+    response = twitter.upload_video(media=video, media_type='video/mp4')
+    twitter.update_status(status='Checkout this cool video!', media_ids=[response['media_id']])
+
+Documentation:
+
+* https://dev.twitter.com/rest/reference/post/statuses/update
+* https://dev.twitter.com/rest/reference/post/media/upload
+
 Posting a Status with an Editing Image
 --------------------------------------
 
