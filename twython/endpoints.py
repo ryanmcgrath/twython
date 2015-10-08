@@ -144,6 +144,10 @@ class EndpointsMixin(object):
         """
         return self.post('https://upload.twitter.com/1.1/media/upload.json', params=params)
 
+    def upload_media_with_file(self, filename):
+        with open(filename, 'rb') as f:
+            return self.upload_media(media=f)
+
     def upload_video(self, media, media_type, size=None):
         """Uploads video file to Twitter servers in chunks. The file will be available to be attached
         to a status for 60 minutes. To attach to a update, pass a list of returned media ids
