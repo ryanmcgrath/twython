@@ -597,7 +597,7 @@ class Twython(EndpointsMixin, object):
                     text = text.replace(tweet['text'][start:end],
                                         url_html % (entity['url'], shown_url))
 
-        if expand_quoted_status and tweet['is_quote_status']:
+        if expand_quoted_status and tweet.get('is_quote_status'):
             quoted_status = tweet['quoted_status']
             text += '<blockquote class="twython-quote">%(quote)s<cite><a href="%(quote_tweet_link)s">' \
                     '<span class="twython-quote-user-name">%(quote_user_name)s</span>' \
