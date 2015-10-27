@@ -32,6 +32,10 @@ class EndpointsAdsMixin(object):
         response = self.get('accounts/%s' % account_id, params=params)
         return response['data']
 
+    def get_account_features(self, account_id, **params):
+        response = self.get('accounts/%s/features' % account_id, params=params)
+        return response['data']
+
     def get_funding_instruments(self, account_id, **params):
         response = self.get('accounts/%s/funding_instruments' % account_id, params=params)
         return response['data']
@@ -40,10 +44,28 @@ class EndpointsAdsMixin(object):
         response = self.get('accounts/%s/funding_instruments/%s' % (account_id, funding_instrument_id), params=params)
         return response['data']
 
+    def get_iab_categories(self, **params):
+        response = self.get('iab_categories', params=params)
+        return response['data']
+
     def get_campaigns(self, account_id, **params):
-        response = self.get('accounts/%s/campaigns' % account_id, params)
+        response = self.get('accounts/%s/campaigns' % account_id, params=params)
+        return response['data']
+
+    def get_campaign(self, account_id, campaign_id, **params):
+        response = self.get('accounts/%s/campaigns/%s' % (account_id, campaign_id), params=params)
         return response['data']
 
     def create_campaign(self, account_id, **params):
-        response = self.post('accounts/%s/campaigns' % account_id, params)
+        response = self.post('accounts/%s/campaigns' % account_id, params=params)
+        return response['data']
+
+    def delete_campaign(self, account_id, campaign_id):
+        response = self.delete('accounts/%s/campaigns/%s' % (account_id, campaign_id))
+        return response['data']['deleted']
+
+    def create_line_item(self, account_id, campaign_id, **params):
+        params_extended = params.copy()
+        params_extended['campaign_id'] = campaign_id
+        response = self.post('accounts/%s/line_items' % account_id, params=params_extended)
         return response['data']

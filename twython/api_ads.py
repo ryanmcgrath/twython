@@ -267,6 +267,10 @@ class TwythonAds(EndpointsAdsMixin, object):
         """Shortcut for POST requests via :class:`request`"""
         return self.request(endpoint, 'POST', params=params, version=version)
 
+    def delete(self, endpoint, params=None, version='0'):
+        """Shortcut for DELETE requests via :class:`request`"""
+        return self.request(endpoint, 'DELETE', params=params, version=version)
+
     def get_lastfunction_header(self, header, default_return_value=None):
         """Returns a specific header from the last API call
         This will return None if the header is not present
