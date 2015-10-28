@@ -15,8 +15,6 @@ The API functions that are implemented in this module are documented at:
 https://dev.twitter.com/ads/overview
 """
 
-import os
-import warnings
 try:
     from StringIO import StringIO
 except ImportError:
@@ -74,9 +72,21 @@ class EndpointsAdsMixin(object):
         response = self.post('accounts/%s/line_items' % account_id, params=params_extended)
         return response['data']
 
+    def get_website_cards(self, account_id, **params):
+        response = self.get('accounts/%s/cards/website' % account_id, params=params)
+        return response['data']
+
+    def get_website_card(self, account_id, card_id, **params):
+        response = self.get('account/%s/cards/website/%s' % (account_id, card_id), params=params)
+        return response['data']
+
     def create_website_card(self, account_id, **params):
         # TODO: handle the case where name, website_title, website_url are too long!
         response = self.post('accounts/%s/cards/website' % account_id, params=params)
+        return response['data']
+
+    def delete_website_card(self, account_id, card_id, **params):
+        response = self.delete('accounts/%s/cards/website/%s' % (account_id, card_id), params=params)
         return response['data']
 
     def upload_image(self, **params):
