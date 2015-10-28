@@ -48,6 +48,10 @@ class EndpointsAdsMixin(object):
         response = self.get('iab_categories', params=params)
         return response['data']
 
+    def get_available_platforms(self, **params):
+        response = self.get('targeting_criteria/platforms')
+        return response['data']
+
     def get_campaigns(self, account_id, **params):
         response = self.get('accounts/%s/campaigns' % account_id, params=params)
         return response['data']
@@ -69,3 +73,12 @@ class EndpointsAdsMixin(object):
         params_extended['campaign_id'] = campaign_id
         response = self.post('accounts/%s/line_items' % account_id, params=params_extended)
         return response['data']
+
+    def create_website_card(self, account_id, **params):
+        # TODO: handle the case where name, website_title, website_url are too long!
+        response = self.post('accounts/%s/cards/website' % account_id, params=params)
+        return response['data']
+
+    def upload_image(self, **params):
+        response = self.post('https://upload.twitter.com/1.1/media/upload.json', params=params)
+        return response
