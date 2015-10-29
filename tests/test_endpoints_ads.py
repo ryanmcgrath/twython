@@ -82,6 +82,14 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         available_platforms = self.api.get_available_platforms()
         self.assertTrue(len(available_platforms) >= 0)
 
+    def test_get_available_locations(self):
+        params = {
+            'location_type': 'CITY',
+            'country_code': 'US'
+        }
+        available_locations = self.api.get_available_locations(**params)
+        self.assertTrue(len(available_locations) > 0)
+
     def test_get_campaigns(self):
         campaigns = self.api.get_campaigns(test_account_id)
         self.assertTrue(len(campaigns) >= 0)
@@ -103,9 +111,10 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         is_deleted = self.api.delete_campaign(test_account_id, campaign_id)
         self.assertTrue(is_deleted)
 
-    def test_create_line_item(self):
+    def test_create_and_delete_line_item(self):
         campaign_id = self._create_test_campaign()
-        self._create_test_line_item(campaign_id)
+        line_item_id = self._create_test_line_item(campaign_id)
+        self._delete_test_line_item(line_item_id)
         self._delete_test_campaign(campaign_id)
 
     def _create_test_line_item(self, campaign_id):
@@ -115,6 +124,10 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         self.assertEqual(response['campaign_id'], campaign_id)
         self.assertIsNotNone(line_item_id)
         return line_item_id
+
+    def _delete_test_line_item(self, line_item_id):
+        is_deleted = self.api.delete_line_item(test_account_id, line_item_id)
+        self.assertTrue(is_deleted)
 
     def test_upload_image(self):
         response = self._upload_test_image()
@@ -194,3 +207,28 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         self.assertEqual(result_unpromotion['id'], promotion_id)
         self._delete_test_campaign(campaign_id)
         self._delete_test_website_card(card_id)
+
+    def test_add_targeting_criteria(self):
+        campaign_id = self._create_test_campaign()
+        line_item_id = self._create_test_line_item(campaign_id)
+        criteria_ios_id = self._create_test_targeting_criteria(line_item_id, 'PLATFORM', '0')
+        criteria_android_id = self._create_test_targeting_criteria(line_item_id, 'PLATFORM', '1')
+        criteria_desktop_id = self._create_test_targeting_criteria(line_item_id, 'PLATFORM', '4')
+        criteria_new_york_id= self._create_test_targeting_criteria(line_item_id, 'LOCATION', 'b6c2e04f1673337f')
+        # since all the targeting criteria share the same id, we only have to do the removal once.
+        self.api.remove_targeting_criteria(test_account_id, criteria_ios_id)
+        self.api.remove_targeting_criteria(test_account_id, criteria_android_id)
+        self.api.remove_targeting_criteria(test_account_id, criteria_desktop_id)
+        self.api.remove_targeting_criteria(test_account_id, criteria_new_york_id)
+        self._delete_test_line_item(line_item_id)
+        self._delete_test_campaign(campaign_id)
+
+    def _create_test_targeting_criteria(self, line_item_id, targeting_type, targeting_value):
+        test_targeting_criteria_ios = {
+            'targeting_type': targeting_type,
+            'targeting_value': targeting_value
+        }
+        response_add = self.api.add_targeting_criteria(test_account_id, line_item_id, **test_targeting_criteria_ios)
+        self.assertEqual(response_add['account_id'], test_account_id)
+        self.assertEquals(response_add['line_item_id'], line_item_id)
+        return response_add['id']

@@ -47,7 +47,11 @@ class EndpointsAdsMixin(object):
         return response['data']
 
     def get_available_platforms(self, **params):
-        response = self.get('targeting_criteria/platforms')
+        response = self.get('targeting_criteria/platforms', params=params)
+        return response['data']
+
+    def get_available_locations(self, **params):
+        response = self.get('targeting_criteria/locations', params=params)
         return response['data']
 
     def get_campaigns(self, account_id, **params):
@@ -71,6 +75,10 @@ class EndpointsAdsMixin(object):
         params_extended['campaign_id'] = campaign_id
         response = self.post('accounts/%s/line_items' % account_id, params=params_extended)
         return response['data']
+
+    def delete_line_item(self, account_id, line_item_id):
+        response = self.delete('accounts/%s/line_items/%s' % (account_id, line_item_id))
+        return response['data']['deleted']
 
     def get_website_cards(self, account_id, **params):
         response = self.get('accounts/%s/cards/website' % account_id, params=params)
@@ -103,4 +111,14 @@ class EndpointsAdsMixin(object):
 
     def unpromote_tweet(self, account_id, promotion_id):
         response = self.delete('accounts/%s/promoted_tweets/%s' % (account_id, promotion_id))
+        return response['data']
+
+    def add_targeting_criteria(self, account_id, line_item_id, **params):
+        params_extended = params.copy()
+        params_extended['line_item_id'] = line_item_id
+        response = self.post('accounts/%s/targeting_criteria' % account_id, params=params_extended)
+        return response['data']
+
+    def remove_targeting_criteria(self, account_id, criteria_id):
+        response = self.delete('accounts/%s/targeting_criteria/%s' % (account_id, criteria_id))
         return response['data']
