@@ -77,7 +77,7 @@ class EndpointsAdsMixin(object):
         return response['data']
 
     def get_website_card(self, account_id, card_id, **params):
-        response = self.get('account/%s/cards/website/%s' % (account_id, card_id), params=params)
+        response = self.get('accounts/%s/cards/website/%s' % (account_id, card_id), params=params)
         return response['data']
 
     def create_website_card(self, account_id, **params):
@@ -92,3 +92,15 @@ class EndpointsAdsMixin(object):
     def upload_image(self, **params):
         response = self.post('https://upload.twitter.com/1.1/media/upload.json', params=params)
         return response
+
+    def create_promoted_only_tweet(self, account_id, **params):
+        response = self.post('accounts/%s/tweet' % account_id, params=params)
+        return response['data']
+
+    def promote_tweet(self, account_id, **params):
+        response = self.post('accounts/%s/promoted_tweets' % account_id, params=params)
+        return response['data']
+
+    def unpromote_tweet(self, account_id, promotion_id):
+        response = self.delete('accounts/%s/promoted_tweets/%s' % (account_id, promotion_id))
+        return response['data']

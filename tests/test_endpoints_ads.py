@@ -105,10 +105,16 @@ class TwythonEndpointsTestCase(unittest.TestCase):
 
     def test_create_line_item(self):
         campaign_id = self._create_test_campaign()
+        self._create_test_line_item(campaign_id)
+        self._delete_test_campaign(campaign_id)
+
+    def _create_test_line_item(self, campaign_id):
         response = self.api.create_line_item(test_account_id, campaign_id, **self.TEST_WEBSITE_CLICKS_LINE_ITEM)
+        line_item_id = response['id']
         self.assertEqual(response['account_id'], test_account_id)
         self.assertEqual(response['campaign_id'], campaign_id)
-        self._delete_test_campaign(campaign_id)
+        self.assertIsNotNone(line_item_id)
+        return line_item_id
 
     def test_upload_image(self):
         response = self._upload_test_image()
@@ -130,6 +136,12 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         self.assertTrue(len(response) >= 0)
 
     def test_create_and_delete_website_card(self):
+        card_id = self._create_test_website_card()
+        card = self.api.get_website_card(test_account_id, card_id)
+        self.assertEqual(card['id'], card_id)
+        self._delete_test_website_card(card_id)
+
+    def _create_test_website_card(self):
         uploaded_image = self._upload_test_image()
         test_website_card = {
             'name': 'Zemanta Partnered with AdsNative for Programmatic Native Supply',
@@ -142,6 +154,43 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         card_id = response_create['id']
         self.assertEqual(response_create['account_id'], test_account_id)
         self.assertIsNotNone(card_id)
+        return card_id
+
+    def _delete_test_website_card(self, card_id):
         response_delete = self.api.delete_website_card(test_account_id, card_id)
         self.assertEqual(response_delete['id'], card_id)
 
+    def test_create_promoted_only_tweet(self):
+        card_id, tweet_id = self._create_test_promoted_only_tweet()
+        self._delete_test_website_card(card_id)
+
+    def _create_test_promoted_only_tweet(self):
+        card_id = self._create_test_website_card()
+        card = self.api.get_website_card(test_account_id, card_id)
+        test_promoted_only_tweet = {
+            'status': 'This is test tweet for website card: %s' % card['preview_url'],
+            # 'as_user_id': '',
+        }
+        response = self.api.create_promoted_only_tweet(test_account_id, **test_promoted_only_tweet)
+        tweet_id = response['id']
+        self.assertIsNotNone(tweet_id)
+        return card_id, tweet_id
+
+    def test_promote_and_unpromote_tweet(self):
+        campaign_id = self._create_test_campaign()
+        line_item_id = self._create_test_line_item(campaign_id)
+        card_id, tweet_id = self._create_test_promoted_only_tweet()
+        test_tweet_promotion = {
+            'line_item_id': line_item_id,
+            'tweet_ids': [tweet_id]
+        }
+        result_promote = self.api.promote_tweet(test_account_id, **test_tweet_promotion)
+        self.assertTrue(len(result_promote) > 0)
+        self.assertEqual(int(result_promote[0]['tweet_id']), tweet_id)
+        promotion_id = result_promote[0]['id']
+        self.assertIsNotNone(promotion_id)
+        result_unpromotion = self.api.unpromote_tweet(test_account_id, promotion_id)
+        self.assertTrue(result_unpromotion['deleted'])
+        self.assertEqual(result_unpromotion['id'], promotion_id)
+        self._delete_test_campaign(campaign_id)
+        self._delete_test_website_card(card_id)
