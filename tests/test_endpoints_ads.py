@@ -5,7 +5,7 @@ import urllib
 from twython import Twython, TwythonError
 from .config import (
     app_key, app_secret, oauth_token, oauth_token_secret,
-    access_token, test_account_id, test_funding_instrument_id, unittest
+    access_token, test_account_id, test_funding_instrument_id, test_campaign_id, unittest
 )
 from twython.api_ads import TwythonAds
 
@@ -114,6 +114,8 @@ class TwythonEndpointsTestCase(unittest.TestCase):
     def test_create_and_delete_line_item(self):
         campaign_id = self._create_test_campaign()
         line_item_id = self._create_test_line_item(campaign_id)
+        line_items = self.api.get_line_items(test_account_id, campaign_id)
+        self.assertTrue(len(line_items) > 0)
         self._delete_test_line_item(line_item_id)
         self._delete_test_campaign(campaign_id)
 
@@ -202,6 +204,8 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         self.assertEqual(int(result_promote[0]['tweet_id']), tweet_id)
         promotion_id = result_promote[0]['id']
         self.assertIsNotNone(promotion_id)
+        promoted_tweets = self.api.get_promoted_tweets(test_account_id, line_item_id)
+        self.assertTrue(len(promoted_tweets) == 1)
         result_unpromotion = self.api.unpromote_tweet(test_account_id, promotion_id)
         self.assertTrue(result_unpromotion['deleted'])
         self.assertEqual(result_unpromotion['id'], promotion_id)
@@ -214,7 +218,7 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         criteria_ios_id = self._create_test_targeting_criteria(line_item_id, 'PLATFORM', '0')
         criteria_android_id = self._create_test_targeting_criteria(line_item_id, 'PLATFORM', '1')
         criteria_desktop_id = self._create_test_targeting_criteria(line_item_id, 'PLATFORM', '4')
-        criteria_new_york_id= self._create_test_targeting_criteria(line_item_id, 'LOCATION', 'b6c2e04f1673337f')
+        criteria_new_york_id = self._create_test_targeting_criteria(line_item_id, 'LOCATION', 'b6c2e04f1673337f')
         # since all the targeting criteria share the same id, we only have to do the removal once.
         self.api.remove_targeting_criteria(test_account_id, criteria_ios_id)
         self.api.remove_targeting_criteria(test_account_id, criteria_android_id)
@@ -232,3 +236,15 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         self.assertEqual(response_add['account_id'], test_account_id)
         self.assertEquals(response_add['line_item_id'], line_item_id)
         return response_add['id']
+
+    def test_get_stats_promoted_tweets(self):
+        line_items = self.api.get_line_items(test_account_id, test_campaign_id)
+        promoted_tweets = self.api.get_promoted_tweets(test_account_id, line_items[0]['id'])
+        promoted_ids = [tweet['id'] for tweet in promoted_tweets]
+        stats_query = {
+            'start_time': '2015-10-29T00:00:00Z',
+            'end_time': '2015-10-29T23:59:59Z',
+            'granularity': 'TOTAL'
+        }
+        stats = self.api.get_stats_promoted_tweets(test_account_id, promoted_ids, **stats_query)
+        self.assertTrue(len(stats) >= 0)

@@ -31,3 +31,4 @@ test_tweet_html = '<a href="http://t.co/FCmXyI6VHd" class="twython-url">google.c
 
 test_account_id = os.environ.get('TEST_ACCOUNT_ID')
 test_funding_instrument_id = os.environ.get('TEST_FUNDING_INSTRUMENT_ID')
+test_campaign_id = os.environ.get('TEST_CAMPAIGN_ID')

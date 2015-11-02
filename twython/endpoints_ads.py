@@ -80,6 +80,13 @@ class EndpointsAdsMixin(object):
         response = self.delete('accounts/%s/line_items/%s' % (account_id, line_item_id))
         return response['data']['deleted']
 
+    def get_line_items(self, account_id, campaign_id=None, **params):
+        params_extended = params.copy()
+        if campaign_id is not None:
+            params_extended['campaign_ids'] = campaign_id
+        response = self.get('accounts/%s/line_items' % account_id, params=params_extended)
+        return response['data']
+
     def get_website_cards(self, account_id, **params):
         response = self.get('accounts/%s/cards/website' % account_id, params=params)
         return response['data']
@@ -113,6 +120,13 @@ class EndpointsAdsMixin(object):
         response = self.delete('accounts/%s/promoted_tweets/%s' % (account_id, promotion_id))
         return response['data']
 
+    def get_promoted_tweets(self, account_id, line_item_id=None, **params):
+        params_extended = params.copy()
+        if line_item_id is not None:
+            params_extended['line_item_id'] = line_item_id
+        response = self.get('accounts/%s/promoted_tweets' % account_id, params=params_extended)
+        return response['data']
+
     def add_targeting_criteria(self, account_id, line_item_id, **params):
         params_extended = params.copy()
         params_extended['line_item_id'] = line_item_id
@@ -122,3 +136,16 @@ class EndpointsAdsMixin(object):
     def remove_targeting_criteria(self, account_id, criteria_id):
         response = self.delete('accounts/%s/targeting_criteria/%s' % (account_id, criteria_id))
         return response['data']
+
+    def get_stats_promoted_tweets(self, account_id, promoted_tweet_ids, **params):
+        # the promoted_tweet_ids contains a list of up to 20 identifiers:
+        # https://dev.twitter.com/ads/reference/get/stats/accounts/%3Aaccount_id/promoted_tweets
+        stats = []
+        max_chunk_size = 20
+        for i in range(0, len(promoted_tweet_ids), max_chunk_size):
+            chunk = promoted_tweet_ids[i:i + max_chunk_size]
+            params_extended = params.copy()
+            params_extended['promoted_tweet_ids'] = ",".join(chunk)
+            response = self.get('stats/accounts/%s/promoted_tweets' % account_id, params=params_extended)
+            stats.extend(response['data'])
+        return stats
