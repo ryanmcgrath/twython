@@ -5,8 +5,8 @@ twython.api
 ~~~~~~~~~~~
 
 This module contains functionality for access to core Twitter API calls,
-Twitter Authentication, and miscellaneous methods that are useful when
-dealing with the Twitter API
+Twitter Ads API calls, Twitter Authentication, and miscellaneous methods
+that are useful when dealing with the Twitter API
 """
 
 import warnings
@@ -20,17 +20,19 @@ from . import __version__
 from .advisory import TwythonDeprecationWarning
 from .compat import json, urlencode, parse_qsl, quote_plus, str, is_py2
 from .endpoints import EndpointsMixin
+from .endpoints_ads import EndpointsAdsMixin
 from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
 from .helpers import _transparent_params
+from .api_type import API_TYPE_TWITTER, API_TYPE_TWITTER_ADS
 
 warnings.simplefilter('always', TwythonDeprecationWarning)  # For Python 2.7 >
 
 
-class Twython(EndpointsMixin, object):
+class Twython(EndpointsMixin, EndpointsAdsMixin, object):
     def __init__(self, app_key=None, app_secret=None, oauth_token=None,
                  oauth_token_secret=None, access_token=None,
                  token_type='bearer', oauth_version=1, api_version='1.1',
-                 client_args=None, auth_endpoint='authenticate'):
+                 api_ads_version='0', client_args=None, auth_endpoint='authenticate'):
         """Instantiates an instance of Twython. Takes optional parameters for
         authentication and such (see below).
 
@@ -48,6 +50,8 @@ class Twython(EndpointsMixin, object):
         Default: 1
         :param api_version: (optional) Choose which Twitter API version to
         use. Default: 1.1
+        :param api_ads_version: (optional) Choose which Twitter Ads API version to
+        use. Default: 0
 
         :param client_args: (optional) Accepts some requests Session parameters
         and some requests Request parameters.
@@ -64,7 +68,9 @@ class Twython(EndpointsMixin, object):
         # API urls, OAuth urls and API version; needed for hitting that there
         # API.
         self.api_version = api_version
+        self.api_ads_version = api_ads_version
         self.api_url = 'https://api.twitter.com/%s'
+        self.api_ads_url = 'https://ads-api.twitter.com/%s'
 
         self.app_key = app_key
         self.app_secret = app_secret
@@ -224,7 +230,7 @@ class Twython(EndpointsMixin, object):
 
         return error_message
 
-    def request(self, endpoint, method='GET', params=None, version='1.1'):
+    def request(self, endpoint, api_type=API_TYPE_TWITTER, method='GET', params=None, version='1.1'):
         """Return dict of response received from Twitter's API
 
         :param endpoint: (required) Full url or Twitter API endpoint
@@ -251,6 +257,8 @@ class Twython(EndpointsMixin, object):
         # i.e. https://api.twitter.com/1.1/search/tweets.json
         if endpoint.startswith('https://'):
             url = endpoint
+        elif api_type == API_TYPE_TWITTER_ADS:
+            url = '%s/%s' % (self.api_ads_url % version, endpoint)
         else:
             url = '%s/%s.json' % (self.api_url % version, endpoint)
 
@@ -259,13 +267,17 @@ class Twython(EndpointsMixin, object):
 
         return content
 
-    def get(self, endpoint, params=None, version='1.1'):
+    def get(self, endpoint, api_type=API_TYPE_TWITTER, params=None, version='1.1'):
         """Shortcut for GET requests via :class:`request`"""
-        return self.request(endpoint, params=params, version=version)
+        return self.request(endpoint, api_type=api_type, params=params, version=version)
 
-    def post(self, endpoint, params=None, version='1.1'):
+    def post(self, endpoint, api_type=API_TYPE_TWITTER, params=None, version='1.1'):
         """Shortcut for POST requests via :class:`request`"""
-        return self.request(endpoint, 'POST', params=params, version=version)
+        return self.request(endpoint, api_type=api_type, method='POST', params=params, version=version)
+
+    def delete(self, endpoint, api_type=API_TYPE_TWITTER, params=None, version='1.1'):
+        """Shortcut for DELETE requests via :class:`request`"""
+        return self.request(endpoint, api_type=api_type, method='DELETE', params=params, version=version)
 
     def get_lastfunction_header(self, header, default_return_value=None):
         """Returns a specific header from the last API call

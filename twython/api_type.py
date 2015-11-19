@@ -1,0 +1,2 @@
+API_TYPE_TWITTER='api'
+API_TYPE_TWITTER_ADS='api_ads'
