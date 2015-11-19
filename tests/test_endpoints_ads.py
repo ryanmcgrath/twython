@@ -47,29 +47,29 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         self.oauth2_api = Twython(app_key, access_token=access_token,
                                   client_args=oauth2_client_args)
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_get_accounts(self):
         accounts = self.api.get_accounts()
         self.assertTrue(len(accounts) >= 0)
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_get_account(self):
         account = self.api.get_account(test_account_id)
         self.assertEqual(account['id'], test_account_id)
         with self.assertRaises(TwythonError):
             self.api.get_account('1234')
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_get_account_features(self):
         account_features = self.api.get_account_features(test_account_id)
         self.assertTrue(len(account_features) >= 0)
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_get_funding_instruments(self):
         funding_instruments = self.api.get_funding_instruments(test_account_id)
         self.assertTrue(len(funding_instruments) >= 0)
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_get_funding_instrument(self):
         funding_instrument = self.api.get_funding_instrument(test_account_id, test_funding_instrument_id)
         self.assertEqual(funding_instrument['id'], test_funding_instrument_id)
@@ -77,17 +77,17 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         with self.assertRaises(TwythonError):
             self.api.get_funding_instrument('1234', '1234')
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_get_iab_categories(self):
         iab_categories = self.api.get_iab_categories()
         self.assertTrue(len(iab_categories) >= 0)
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_get_available_platforms(self):
         available_platforms = self.api.get_available_platforms()
         self.assertTrue(len(available_platforms) >= 0)
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_get_available_locations(self):
         params = {
             'location_type': 'CITY',
@@ -96,12 +96,12 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         available_locations = self.api.get_available_locations(**params)
         self.assertTrue(len(available_locations) > 0)
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_get_campaigns(self):
         campaigns = self.api.get_campaigns(test_account_id)
         self.assertTrue(len(campaigns) >= 0)
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_create_and_delete_campaign(self):
         campaign_id = self._create_test_campaign()
         campaign_check = self.api.get_campaign(test_account_id, campaign_id)
@@ -119,7 +119,7 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         is_deleted = self.api.delete_campaign(test_account_id, campaign_id)
         self.assertTrue(is_deleted)
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_create_and_delete_line_item(self):
         campaign_id = self._create_test_campaign()
         line_item_id = self._create_test_line_item(campaign_id)
@@ -140,7 +140,7 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         is_deleted = self.api.delete_line_item(test_account_id, line_item_id)
         self.assertTrue(is_deleted)
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_upload_image(self):
         response = self._upload_test_image()
         self.assertIsNotNone(response['media_id'])
@@ -156,12 +156,12 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         response = self.api.upload_image(**upload_data)
         return response
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_get_website_cards(self):
         response = self.api.get_website_cards(test_account_id)
         self.assertTrue(len(response) >= 0)
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_create_and_delete_website_card(self):
         card_id = self._create_test_website_card()
         card = self.api.get_website_card(test_account_id, card_id)
@@ -187,7 +187,7 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         response_delete = self.api.delete_website_card(test_account_id, card_id)
         self.assertEqual(response_delete['id'], card_id)
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_create_promoted_only_tweet(self):
         card_id, tweet_id = self._create_test_promoted_only_tweet()
         self._delete_test_website_card(card_id)
@@ -204,7 +204,7 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         self.assertIsNotNone(tweet_id)
         return card_id, tweet_id
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_promote_and_unpromote_tweet(self):
         campaign_id = self._create_test_campaign()
         line_item_id = self._create_test_line_item(campaign_id)
@@ -226,7 +226,7 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         self._delete_test_campaign(campaign_id)
         self._delete_test_website_card(card_id)
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_add_targeting_criteria(self):
         campaign_id = self._create_test_campaign()
         line_item_id = self._create_test_line_item(campaign_id)
@@ -252,7 +252,7 @@ class TwythonEndpointsTestCase(unittest.TestCase):
         self.assertEquals(response_add['line_item_id'], line_item_id)
         return response_add['id']
 
-    # @unittest.skip('skipping non-updated test')
+    @unittest.skip('skipping non-updated test')
     def test_get_stats_promoted_tweets(self):
         line_items = self.api.get_line_items(test_account_id, test_campaign_id)
         promoted_tweets = self.api.get_promoted_tweets(test_account_id, line_items[0]['id'])
