@@ -19,8 +19,7 @@ from requests_oauthlib import OAuth1, OAuth2
 from . import __version__
 from .advisory import TwythonDeprecationWarning
 from .compat import json, urlencode, parse_qsl, quote_plus, str, is_py2
-from .endpoints import EndpointsMixin
-from .endpoints_ads import EndpointsAdsMixin
+from .endpoints import EndpointsMixin, EndpointsAdsMixin
 from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
 from .helpers import _transparent_params
 from .api_type import API_TYPE_TWITTER, API_TYPE_TWITTER_ADS
