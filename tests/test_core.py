@@ -317,3 +317,10 @@ class TwythonAPITestCase(unittest.TestCase):
         # Make sure HTML doesn't contain the display OR expanded url
         self.assertTrue('http://google.com' not in tweet_text)
         self.assertTrue('google.com' not in tweet_text)
+
+    def test_html_for_tweet_no_entities(self):
+        """Test HTML for tweet returns tweet text if it has no entities"""
+        tweet = test_tweet_object
+        del(tweet['entities'])
+        tweet_text = self.api.html_for_tweet(tweet)
+        self.assertEqual(tweet['text'], tweet_text)
