@@ -72,11 +72,11 @@ The above code takes all the tweets from a specific users timeline, loops over t
 
 So:
 
-    http://t.co/FCmXyI6VHd is a #cool site, lol! @mikehelmick shd #checkitout. Love, @__twython__ https://t.co/67pwRvY6z9 http://t.co/N6InAO4B71
+    http://t.co/FCmXyI6VHd is #cool, lol! @mikehelmick shd #checkitout. Love, @__twython__ $IBM https://t.co/67pwRvY6z9 http://t.co/N6InAO4B71
 
 will be replaced with:
 
-    <a href="http://t.co/FCmXyI6VHd" class="twython-url">google.com</a> is a <a href="https://twitter.com/search?q=%23cool" class="twython-hashtag">#cool</a> site, lol! <a href="https://twitter.com/mikehelmick" class="twython-mention">@mikehelmick</a> shd <a href="https://twitter.com/search?q=%23checkitout" class="twython-hashtag">#checkitout</a>. Love, <a href="https://twitter.com/__twython__" class="twython-mention">@__twython__</a> <a href="https://t.co/67pwRvY6z9" class="twython-url">github.com</a> <a href="http://t.co/N6InAO4B71" class="twython-media">pic.twitter.com/N6InAO4B71</a>
+    <a href="http://t.co/FCmXyI6VHd" class="twython-url">google.com</a> is <a href="https://twitter.com/search?q=%23cool" class="twython-hashtag">#cool</a>, lol! <a href="https://twitter.com/mikehelmick" class="twython-mention">@mikehelmick</a> shd <a href="https://twitter.com/search?q=%23checkitout" class="twython-hashtag">#checkitout</a>. Love, <a href="https://twitter.com/__twython__" class="twython-mention">@__twython__</a> <a href="https://twitter.com/?q=%24IBM" class="twython-symbol">$IBM</a> <a href="https://t.co/67pwRvY6z9" class="twython-url">github.com</a> <a href="http://t.co/N6InAO4B71" class="twython-media">pic.twitter.com/N6InAO4B71</a>
 
 .. note:: When converting the string to HTML we add a class to each HTML tag so that you can maninpulate the DOM later on.
 
@@ -84,6 +84,7 @@ will be replaced with:
 - For media urls that are replaced we add ``class="twython-media"`` to the anchor tag
 - For user mentions that are replaced we add ``class="twython-mention"`` to the anchor tag
 - For hashtags that are replaced we add ``class="twython-hashtag"`` to the anchor tag
+- For symbols that are replaced we add ``class="twython-symbol"`` to the anchor tag
 
 This function accepts two parameters: ``use_display_url`` and ``use_expanded_url``
 By default, ``use_display_url`` is ``True``. Meaning the link displayed in the tweet text will appear as (ex. google.com, github.com)

@@ -528,7 +528,7 @@ class Twython(EndpointsMixin, object):
 
     @staticmethod
     def html_for_tweet(tweet, use_display_url=True, use_expanded_url=False, expand_quoted_status=False):
-        """Return HTML for a tweet (urls, mentions, hashtags replaced with links)
+        """Return HTML for a tweet (urls, mentions, hashtags, symbols replaced with links)
 
         :param tweet: Tweet object from received from Twitter API
         :param use_display_url: Use display URL to represent link
@@ -567,6 +567,15 @@ class Twython(EndpointsMixin, object):
                 text = re.sub(r'(?<!>)' + tweet['text'][start:end] + '(?!</a>)',
                               hashtag_html % {'hashtag': entity['text']}, text)
 
+            # Symbols
+            for entity in sorted(entities['symbols'],
+                                 key=lambda symbol: len(symbol['text']), reverse=True):
+                start, end = entity['indices'][0], entity['indices'][1]
+
+                symbol_html = '<a href="https://twitter.com/search?q=%%24%(symbol)s" class="twython-symbol">$%(symbol)s</a>'
+                text = re.sub(r'(?<!>)' + re.escape(tweet['text'][start:end]) + '(?!</a>)',
+                              symbol_html % {'symbol': entity['text']}, text)
+
             # Urls
             for entity in entities['urls']:
                 start, end = entity['indices'][0], entity['indices'][1]
@@ -598,7 +607,7 @@ class Twython(EndpointsMixin, object):
                     text = text.replace(tweet['text'][start:end],
                                         url_html % (entity['url'], shown_url))
 
-        if expand_quoted_status and tweet.get('is_quote_status'):
+        if expand_quoted_status and tweet.get('is_quote_status') and tweet.get('quoted_status'):
             quoted_status = tweet['quoted_status']
             text += '<blockquote class="twython-quote">%(quote)s<cite><a href="%(quote_tweet_link)s">' \
                     '<span class="twython-quote-user-name">%(quote_user_name)s</span>' \

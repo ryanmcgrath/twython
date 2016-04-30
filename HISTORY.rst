@@ -3,6 +3,12 @@
 History
 -------
 
+3.4.0 (2016-30-04)
+++++++++++++++++++
+- Added `upload_video` endpoint
+- Fix quoted status checks in `html_for_tweet`
+- Fix `html_for_tweet` method response when hashtag/mention is a substring of another
+
 3.3.0 (2015-18-07)
 ++++++++++++++++++
 - Added support for muting users

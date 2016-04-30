@@ -3,16 +3,16 @@ Twython
 
 
 .. image:: https://img.shields.io/pypi/v/twython.svg?style=flat-square
-  :target: https://pypi.python.org/pypi/twython 
+  :target: https://pypi.python.org/pypi/twython
 
 .. image:: https://img.shields.io/pypi/dw/twython.svg?style=flat-square
-  :target: https://pypi.python.org/pypi/twython 
- 
+  :target: https://pypi.python.org/pypi/twython
+
 .. image:: https://img.shields.io/travis/ryanmcgrath/twython.svg?style=flat-square
-  :target: https://travis-ci.org/ryanmcgrath/twython 
+  :target: https://travis-ci.org/ryanmcgrath/twython
 
 .. image:: https://img.shields.io/coveralls/ryanmcgrath/twython/master.svg?style=flat-square
-  :target: https://coveralls.io/r/ryanmcgrath/twython?branch=master 
+  :target: https://coveralls.io/r/ryanmcgrath/twython?branch=master
 
 ``Twython`` is the premier Python library providing an easy (and up-to-date) way to access Twitter data. Actively maintained and featuring support for Python 2.6+ and Python 3. It's been battle tested by companies, educational institutions and individuals alike. Try it today!
 
@@ -62,7 +62,7 @@ Or, if you want the code that is currently on GitHub
 Documentation
 -------------
 
-Documentation is available at https://twython.readthedocs.org/en/latest/
+Documentation is available at https://twython.readthedocs.io/en/latest/
 
 Starting Out
 ------------
@@ -142,7 +142,7 @@ Once you have the final user tokens, store them in a database for later use::
     OAUTH_TOKEN = final_step['oauth_token']
     OAUTH_TOKEN_SECRET = final_step['oauth_token_secret']
 
-For OAuth 2 (Application Only, read-only) authentication, see `our documentation <https://twython.readthedocs.org/en/latest/usage/starting_out.html#oauth-2-application-authentication>`_
+For OAuth 2 (Application Only, read-only) authentication, see `our documentation <https://twython.readthedocs.io/en/latest/usage/starting_out.html#oauth-2-application-authentication>`_
 
 Dynamic Function Arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -174,7 +174,7 @@ Documentation: https://dev.twitter.com/docs/api/1.1/get/statuses/home_timeline
 Updating Status
 ~~~~~~~~~~~~~~~
 
-This method makes use of dynamic arguments, `read more about them <https://twython.readthedocs.org/en/latest/usage/starting_out.html#dynamic-function-arguments>`_
+This method makes use of dynamic arguments, `read more about them <https://twython.readthedocs.io/en/latest/usage/starting_out.html#dynamic-function-arguments>`_
 
 Documentation: https://dev.twitter.com/docs/api/1/post/statuses/update
 
@@ -195,8 +195,8 @@ Searching
 Advanced Usage
 --------------
 
-- `Advanced Twython Usage <https://twython.readthedocs.org/en/latest/usage/advanced_usage.html>`_
-- `Streaming with Twython <https://twython.readthedocs.org/en/latest/usage/streaming_api.html>`_
+- `Advanced Twython Usage <https://twython.readthedocs.io/en/latest/usage/advanced_usage.html>`_
+- `Streaming with Twython <https://twython.readthedocs.io/en/latest/usage/streaming_api.html>`_
 
 
 Notes
