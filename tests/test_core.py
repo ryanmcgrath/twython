@@ -1,7 +1,7 @@
 from twython import Twython, TwythonError, TwythonAuthError, TwythonRateLimitError
 
 from .config import (
-    test_tweet_object, test_tweet_html, unittest
+    test_tweet_object, test_tweet_html, test_tweet_symbols_object, unittest
 )
 
 import responses
@@ -317,3 +317,10 @@ class TwythonAPITestCase(unittest.TestCase):
         # Make sure HTML doesn't contain the display OR expanded url
         self.assertTrue('http://google.com' not in tweet_text)
         self.assertTrue('google.com' not in tweet_text)
+
+    def test_html_for_tweet_symbols(self):
+        tweet_text = self.api.html_for_tweet(test_tweet_symbols_object)
+        # Should only link symbols listed in entities:
+        self.assertTrue('<a href="https://twitter.com/search?q=%24AAPL" class="twython-symbol">$AAPL</a>' in tweet_text)
+        self.assertTrue('<a href="https://twitter.com/search?q=%24ANOTHER" class="twython-symbol">$ANOTHER</a>' not in tweet_text)
+
