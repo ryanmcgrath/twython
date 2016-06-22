@@ -142,6 +142,10 @@ class EndpointsMixin(object):
         Docs:
         https://dev.twitter.com/rest/reference/post/media/upload
         """
+        # https://dev.twitter.com/rest/reference/get/media/upload-status
+        if params and params.get('command', '') == 'STATUS':
+            return self.get('https://upload.twitter.com/1.1/media/upload.json', params=params)
+
         return self.post('https://upload.twitter.com/1.1/media/upload.json', params=params)
 
     def upload_video(self, media, media_type, size=None):
