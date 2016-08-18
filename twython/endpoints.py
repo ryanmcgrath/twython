@@ -16,10 +16,11 @@ https://dev.twitter.com/docs/api/1.1
 
 import os
 import warnings
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+from io import BytesIO
+#try:
+    #from StringIO import StringIO
+#except ImportError:
+    #from io import StringIO
 
 from .advisory import TwythonDeprecationWarning
 
@@ -180,7 +181,7 @@ class EndpointsMixin(object):
             data = media.read(1*1024*1024)
             if not data:
                 break
-            media_chunk = StringIO()
+            media_chunk = BytesIO()
             media_chunk.write(data)
             media_chunk.seek(0)
 
