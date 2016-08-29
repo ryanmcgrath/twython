@@ -324,3 +324,10 @@ class TwythonAPITestCase(unittest.TestCase):
         self.assertTrue('<a href="https://twitter.com/search?q=%24AAPL" class="twython-symbol">$AAPL</a>' in tweet_text)
         self.assertTrue('<a href="https://twitter.com/search?q=%24ANOTHER" class="twython-symbol">$ANOTHER</a>' not in tweet_text)
 
+    def test_html_for_tweet_no_entities(self):
+        """Test HTML for tweet returns tweet text if it has no entities"""
+        tweet = test_tweet_object
+        del(tweet['entities'])
+        tweet_text = self.api.html_for_tweet(tweet)
+        self.assertEqual(tweet['text'], tweet_text)
+

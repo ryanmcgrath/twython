@@ -544,8 +544,9 @@ class Twython(EndpointsMixin, object):
         if 'retweeted_status' in tweet:
             tweet = tweet['retweeted_status']
 
+        text = tweet['text']
+
         if 'entities' in tweet:
-            text = tweet['text']
             entities = tweet['entities']
 
             # Mentions
