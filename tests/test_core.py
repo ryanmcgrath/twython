@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
 from twython import Twython, TwythonError, TwythonAuthError, TwythonRateLimitError
 
 from .config import (
-    test_tweet_object, test_tweet_html, test_tweet_symbols_object, unittest
+    test_tweet_object, test_tweet_html, test_tweet_symbols_object,
+    test_tweet_compat_object, test_tweet_extended_object, test_tweet_extended_html,
+    unittest
 )
 
 import responses
@@ -324,3 +327,13 @@ class TwythonAPITestCase(unittest.TestCase):
         self.assertTrue('<a href="https://twitter.com/search?q=%24AAPL" class="twython-symbol">$AAPL</a>' in tweet_text)
         self.assertTrue('<a href="https://twitter.com/search?q=%24ANOTHER" class="twython-symbol">$ANOTHER</a>' not in tweet_text)
 
+    def test_html_for_tweet_compatmode(self):
+        tweet_text = self.api.html_for_tweet(test_tweet_compat_object)
+        # link to compat web status link
+        self.assertTrue(
+            u'<a href="https://t.co/SRmsuks2ru" class="twython-url">twitter.com/i/web/status/7…</a>' in tweet_text)
+
+    def test_html_for_tweet_extendedmode(self):
+        tweet_text = self.api.html_for_tweet(test_tweet_extended_object)
+        # full tweet rendered with suffix
+        self.assertEqual(test_tweet_extended_html, tweet_text)

@@ -544,8 +544,18 @@ class Twython(EndpointsMixin, object):
         if 'retweeted_status' in tweet:
             tweet = tweet['retweeted_status']
 
+        if 'extended_tweet' in tweet:
+            tweet = tweet['extended_tweet']
+
+        orig_tweet_text = tweet.get('full_text') or tweet['text']
+
+        display_text_range = tweet.get('display_text_range') or [0, len(orig_tweet_text)]
+        display_text_start, display_text_end = display_text_range[0], display_text_range[1]
+        display_text = orig_tweet_text[display_text_start:display_text_end]
+        prefix_text = orig_tweet_text[0:display_text_start]
+        suffix_text = orig_tweet_text[display_text_end:len(orig_tweet_text)]
+
         if 'entities' in tweet:
-            text = tweet['text']
             entities = tweet['entities']
 
             # Mentions
@@ -553,9 +563,13 @@ class Twython(EndpointsMixin, object):
                                  key=lambda mention: len(mention['screen_name']), reverse=True):
                 start, end = entity['indices'][0], entity['indices'][1]
 
-                mention_html = '<a href="https://twitter.com/%(screen_name)s" class="twython-mention">@%(screen_name)s</a>'
-                text = re.sub(r'(?<!>)' + tweet['text'][start:end] + '(?!</a>)',
-                              mention_html % {'screen_name': entity['screen_name']}, text)
+                mention_html = '<a href="https://twitter.com/%(screen_name)s" ' \
+                               'class="twython-mention">@%(screen_name)s</a>' % {'screen_name': entity['screen_name']}
+                sub_expr = r'(?<!>)' + orig_tweet_text[start:end] + '(?!</a>)'
+                if display_text_start <= start <= display_text_end:
+                    display_text = re.sub(sub_expr, mention_html, display_text)
+                else:
+                    prefix_text = re.sub(sub_expr, mention_html, prefix_text)
 
             # Hashtags
             for entity in sorted(entities['hashtags'],
@@ -563,8 +577,8 @@ class Twython(EndpointsMixin, object):
                 start, end = entity['indices'][0], entity['indices'][1]
 
                 hashtag_html = '<a href="https://twitter.com/search?q=%%23%(hashtag)s" class="twython-hashtag">#%(hashtag)s</a>'
-                text = re.sub(r'(?<!>)' + tweet['text'][start:end] + '(?!</a>)',
-                              hashtag_html % {'hashtag': entity['text']}, text)
+                display_text = re.sub(r'(?<!>)' + orig_tweet_text[start:end] + '(?!</a>)',
+                                      hashtag_html % {'hashtag': entity['text']}, display_text)
 
             # Symbols
             for entity in sorted(entities['symbols'],
@@ -572,8 +586,8 @@ class Twython(EndpointsMixin, object):
                 start, end = entity['indices'][0], entity['indices'][1]
 
                 symbol_html = '<a href="https://twitter.com/search?q=%%24%(symbol)s" class="twython-symbol">$%(symbol)s</a>'
-                text = re.sub(r'(?<!>)' + re.escape(tweet['text'][start:end]) + '(?!</a>)',
-                              symbol_html % {'symbol': entity['text']}, text)
+                display_text = re.sub(r'(?<!>)' + re.escape(orig_tweet_text[start:end]) + r'\b(?!</a>)',
+                                      symbol_html % {'symbol': entity['text']}, display_text)
 
             # Urls
             for entity in entities['urls']:
@@ -586,9 +600,11 @@ class Twython(EndpointsMixin, object):
                 else:
                     shown_url = entity['url']
 
-                url_html = '<a href="%s" class="twython-url">%s</a>'
-                text = text.replace(tweet['text'][start:end],
-                                    url_html % (entity['url'], shown_url))
+                url_html = '<a href="%s" class="twython-url">%s</a>' % (entity['url'], shown_url)
+                if display_text_start <= start <= display_text_end:
+                    display_text = display_text.replace(orig_tweet_text[start:end], url_html)
+                else:
+                    suffix_text = suffix_text.replace(orig_tweet_text[start:end], url_html)
 
              # Media
             if 'media' in entities:
@@ -602,13 +618,17 @@ class Twython(EndpointsMixin, object):
                     else:
                         shown_url = entity['url']
 
-                    url_html = '<a href="%s" class="twython-media">%s</a>'
-                    text = text.replace(tweet['text'][start:end],
-                                        url_html % (entity['url'], shown_url))
+                    url_html = '<a href="%s" class="twython-media">%s</a>' % (entity['url'], shown_url)
+                    if display_text_start <= start <= display_text_end:
+                        # for compatibility with pre-extended tweets
+                        display_text = display_text.replace(orig_tweet_text[start:end], url_html)
+                    else:
+                        suffix_text = suffix_text.replace(orig_tweet_text[start:end], url_html)
 
+        quote_text = ''
         if expand_quoted_status and tweet.get('is_quote_status') and tweet.get('quoted_status'):
             quoted_status = tweet['quoted_status']
-            text += '<blockquote class="twython-quote">%(quote)s<cite><a href="%(quote_tweet_link)s">' \
+            quote_text += '<blockquote class="twython-quote">%(quote)s<cite><a href="%(quote_tweet_link)s">' \
                     '<span class="twython-quote-user-name">%(quote_user_name)s</span>' \
                     '<span class="twython-quote-user-screenname">@%(quote_user_screen_name)s</span></a>' \
                     '</cite></blockquote>' % \
@@ -618,4 +638,9 @@ class Twython(EndpointsMixin, object):
                      'quote_user_name': quoted_status['user']['name'],
                      'quote_user_screen_name': quoted_status['user']['screen_name']}
 
-        return text
+        return '%(prefix)s%(display)s%(suffix)s%(quote)s' % {
+            'prefix': '<span class="twython-tweet-prefix">%s</span>' % prefix_text if prefix_text else '',
+            'display': display_text,
+            'suffix': '<span class="twython-tweet-suffix">%s</span>' % suffix_text if suffix_text else '',
+            'quote': quote_text
+        }
