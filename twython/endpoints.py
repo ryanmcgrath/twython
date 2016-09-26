@@ -17,6 +17,7 @@ https://dev.twitter.com/docs/api/1.1
 import os
 import warnings
 from io import BytesIO
+from time import sleep
 #try:
     #from StringIO import StringIO
 #except ImportError:
@@ -145,7 +146,7 @@ class EndpointsMixin(object):
         """
         return self.post('https://upload.twitter.com/1.1/media/upload.json', params=params)
 
-    def upload_video(self, media, media_type, size=None, check_progress=False):
+    def upload_video(self, media, media_type, media_category=None, size=None, check_progress=False):
         """Uploads video file to Twitter servers in chunks. The file will be available to be attached
         to a status for 60 minutes. To attach to a update, pass a list of returned media ids
         to the 'update_status' method using the 'media_ids' param.
@@ -170,7 +171,8 @@ class EndpointsMixin(object):
         params = {
             'command': 'INIT',
             'media_type': media_type,
-            'total_bytes': size
+            'total_bytes': size,
+            'media_category': media_category
         }
         response_init = self.post(upload_url, params=params)
         media_id = response_init['media_id']
@@ -211,19 +213,24 @@ class EndpointsMixin(object):
                 'command': 'STATUS',
                 'media_id': media_id
             }
-            
-            processing_state = response['processing_info'].get('state')
 
-            if processing_state is not None:
+            # added code to handle if media_category is NOT set and check_progress=True
+            # the API will return a NoneType object in this case
+            try:
+                processing_state = response.get('processing_info').get('state')
+            except AttributeError:
+                return response
+
+            if processing_state:
                 while (processing_state == 'pending' or processing_state == 'in_progress') :
                     # get the secs to wait
-                    check_after_secs = response['processing_info'].get('check_after_secs')
+                    check_after_secs = response.get('processing_info').get('check_after_secs')
 
-                    if check_after_secs is not None:
-                        time.sleep(check_after_secs)
+                    if check_after_secs:
+                        sleep(check_after_secs)
                         response = self.get(upload_url, params=params)
                         # get new state after waiting
-                        processing_state = response['processing_info'].get('state')
+                        processing_state = response.get('processing_info').get('state')
 
         return response
 
