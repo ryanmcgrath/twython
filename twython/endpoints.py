@@ -145,7 +145,7 @@ class EndpointsMixin(object):
         """
         return self.post('https://upload.twitter.com/1.1/media/upload.json', params=params)
 
-    def upload_video(self, media, media_type, size=None):
+    def upload_video(self, media, media_type, size=None, check_progress=False):
         """Uploads video file to Twitter servers in chunks. The file will be available to be attached
         to a status for 60 minutes. To attach to a update, pass a list of returned media ids
         to the 'update_status' method using the 'media_ids' param.
@@ -199,28 +199,33 @@ class EndpointsMixin(object):
             'command': 'FINALIZE',
             'media_id': media_id
         }
-        response_finalize = self.post(upload_url, params=params)
 
-        # Stage 4: STATUS call if still processing
-        params = {
-            'command': 'STATUS',
-            'media_id': media_id
-        }
-        
-        processing_state = response_finalize['processing_info'].get('state', None)
+        # Only get the status if explicity asked to 
+        # Default to False
+        if check_progress == True:
 
-        if processing_state is not None:
-            while (processing_state == "pending" or processing_state == "in_progress") :
-                # get the secs to wait
-                check_after_secs = response_finalize['processing_info'].get('check_after_secs', None)
+            response_finalize = self.post(upload_url, params=params)
 
-                if check_after_secs is not None:
-                    time.sleep(check_after_secs)
-                    response_finalize = self.get(upload_url, params=params)
-                    # get new state after waiting
-                    processing_state = response_finalize['processing_info'].get('state')
+            # Stage 4: STATUS call if still processing
+            params = {
+                'command': 'STATUS',
+                'media_id': media_id
+            }
+            
+            processing_state = response_finalize['processing_info'].get('state')
 
-        return response_finalize
+            if processing_state is not None:
+                while (processing_state == 'pending' or processing_state == 'in_progress') :
+                    # get the secs to wait
+                    check_after_secs = response_finalize['processing_info'].get('check_after_secs', None)
+
+                    if check_after_secs is not None:
+                        time.sleep(check_after_secs)
+                        response_finalize = self.get(upload_url, params=params)
+                        # get new state after waiting
+                        processing_state = response_finalize['processing_info'].get('state')
+
+        return self.post(upload_url, param=params)
 
     def get_oembed_tweet(self, **params):
         """Returns information allowing the creation of an embedded
