@@ -200,11 +200,11 @@ class EndpointsMixin(object):
             'media_id': media_id
         }
 
+        response = self.post(upload_url, params=params)
+
         # Only get the status if explicity asked to 
         # Default to False
-        if check_progress == True:
-
-            response_finalize = self.post(upload_url, params=params)
+        if check_progress:
 
             # Stage 4: STATUS call if still processing
             params = {
@@ -212,20 +212,20 @@ class EndpointsMixin(object):
                 'media_id': media_id
             }
             
-            processing_state = response_finalize['processing_info'].get('state')
+            processing_state = response['processing_info'].get('state')
 
             if processing_state is not None:
                 while (processing_state == 'pending' or processing_state == 'in_progress') :
                     # get the secs to wait
-                    check_after_secs = response_finalize['processing_info'].get('check_after_secs', None)
+                    check_after_secs = response['processing_info'].get('check_after_secs')
 
                     if check_after_secs is not None:
                         time.sleep(check_after_secs)
-                        response_finalize = self.get(upload_url, params=params)
+                        response = self.get(upload_url, params=params)
                         # get new state after waiting
-                        processing_state = response_finalize['processing_info'].get('state')
+                        processing_state = response['processing_info'].get('state')
 
-        return self.post(upload_url, param=params)
+        return response
 
     def get_oembed_tweet(self, **params):
         """Returns information allowing the creation of an embedded
