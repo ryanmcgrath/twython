@@ -202,6 +202,7 @@ class Twython(EndpointsMixin, object):
             raise TwythonError('Response was not valid JSON. \
                                Unable to decode.')
 
+        content['headers']=dict(response.headers)
         return content
 
     def _get_error_message(self, response):
