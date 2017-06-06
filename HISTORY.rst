@@ -3,6 +3,12 @@
 History
 -------
 
+3.5.0 (2017-06-06)
+++++++++++++++++++
+- Added support for "symbols" in `Twython.html_for_tweet()`
+- Added support for extended tweets in `Twython.html_for_tweet()`
+- You can now check progress of video uploads to Twitter when using `Twython.upload_video()`
+
 3.4.0 (2016-30-04)
 ++++++++++++++++++
 - Added `upload_video` endpoint
