@@ -581,13 +581,14 @@ class Twython(EndpointsMixin, object):
                                       hashtag_html % {'hashtag': entity['text']}, display_text)
 
             # Symbols
-            for entity in sorted(entities['symbols'],
-                                 key=lambda symbol: len(symbol['text']), reverse=True):
-                start, end = entity['indices'][0], entity['indices'][1]
+            if 'symbols' in entities:
+                for entity in sorted(entities['symbols'],
+                                     key=lambda symbol: len(symbol['text']), reverse=True):
+                    start, end = entity['indices'][0], entity['indices'][1]
 
-                symbol_html = '<a href="https://twitter.com/search?q=%%24%(symbol)s" class="twython-symbol">$%(symbol)s</a>'
-                display_text = re.sub(r'(?<!>)' + re.escape(orig_tweet_text[start:end]) + r'\b(?!</a>)',
-                                      symbol_html % {'symbol': entity['text']}, display_text)
+                    symbol_html = '<a href="https://twitter.com/search?q=%%24%(symbol)s" class="twython-symbol">$%(symbol)s</a>'
+                    display_text = re.sub(r'(?<!>)' + re.escape(orig_tweet_text[start:end]) + r'\b(?!</a>)',
+                                          symbol_html % {'symbol': entity['text']}, display_text)
 
             # Urls
             for entity in entities['urls']:
