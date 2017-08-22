@@ -4,6 +4,7 @@ from twython import Twython, TwythonError, TwythonAuthError, TwythonRateLimitErr
 from .config import (
     test_tweet_object, test_tweet_html, test_tweet_symbols_object,
     test_tweet_compat_object, test_tweet_extended_object, test_tweet_extended_html,
+    test_tweet_identical_urls,
     unittest
 )
 
@@ -320,6 +321,12 @@ class TwythonAPITestCase(unittest.TestCase):
         # Make sure HTML doesn't contain the display OR expanded url
         self.assertTrue('http://google.com' not in tweet_text)
         self.assertTrue('google.com' not in tweet_text)
+
+    def test_html_for_tweet_identical_urls(self):
+        """If the 'url's for different url entities are identical, they should link correctly."""
+        tweet_text = self.api.html_for_tweet(test_tweet_identical_urls)
+        self.assertEqual(tweet_text,
+                u'Use Cases, Trials and Making 5G a Reality <a href="https://t.co/W0uArTMk9N" class="twython-url">buff.ly/2sEhrgO</a> #5G #innovation via @5GWorldSeries <a href="https://t.co/W0uArTMk9N" class="twython-url">buff.ly/2sEhrgO</a>')
 
     def test_html_for_tweet_symbols(self):
         tweet_text = self.api.html_for_tweet(test_tweet_symbols_object)
