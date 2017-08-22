@@ -327,6 +327,19 @@ class TwythonAPITestCase(unittest.TestCase):
         self.assertTrue('<a href="https://twitter.com/search?q=%24AAPL" class="twython-symbol">$AAPL</a>' in tweet_text)
         self.assertTrue('<a href="https://twitter.com/search?q=%24ANOTHER" class="twython-symbol">$ANOTHER</a>' not in tweet_text)
 
+    def test_html_for_tweet_no_symbols(self):
+        """Should still work if tweet object has no symbols list"""
+        tweet = test_tweet_symbols_object
+        # Save a copy:
+        symbols = tweet['entities']['symbols']
+        del tweet['entities']['symbols']
+        tweet_text = self.api.html_for_tweet(tweet)
+        self.assertTrue('symbols: $AAPL and' in tweet_text)
+        self.assertTrue('and $ANOTHER and $A.' in tweet_text)
+        # Put the symbols back:
+        test_tweet_symbols_object['entities']['symbols'] = symbols
+
+
     def test_html_for_tweet_compatmode(self):
         tweet_text = self.api.html_for_tweet(test_tweet_compat_object)
         # link to compat web status link
