@@ -2,7 +2,8 @@ language: python
 python:
   - 2.6
   - 2.7
-  - 3.3
+  - 3.5
+  - 3.6
 env:
   global:
   - secure: USjLDneiXlVvEjkUVqTt+LBi0XJ4QhkRcJzqVXA9gEau1NTjAkNTPmHjUbOygp0dkfoV0uWrZKCw6fL1g+HJgWl0vHeHzcNl4mUkA+OwkGFHgaeIhvUfnyyJA8P3Zm21XHC+ehzMpEFN5fVNNhREjnRj+CXMc0FgA6knwBRobu4=
@@ -17,7 +18,7 @@ env:
   - TEST_LIST_SLUG=team
   - TEST_LIST_OWNER_SCREEN_NAME=twitterapi
   - ACCESS_TOKEN_B64=U2FsdGVkX18QdBhvMNshM4PGy04tU3HLwKP+nNSoNZHKsvGLjELcWEXN2LIu/T+yngX1vGONf9lo14ElnfS4k7sfhiru8phR4+rZuBVP3bDvC2A6fXJuhuLqNhBrWqg32WQewvxLWDWBoKmnvRHg5b74GHh+IN/12tU0cBF2HK8=
-install: 
+install:
   - pip install -r requirements.txt
   - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install unittest2; fi
 script: nosetests -v -w tests/ --logging-filter="twython" --with-cov --cov twython --cov-config .coveragerc --cov-report term-missing

@@ -9,7 +9,7 @@ except ImportError:
     from distutils.core import setup
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '3.5.0'
+__version__ = '3.6.0'
 
 packages = [
     'twython',
@@ -45,8 +45,7 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ]
 )

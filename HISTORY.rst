@@ -3,6 +3,11 @@
 History
 -------
 
+3.6.0 (2017-23-08)
+++++++++++++++++++
+- Improve replacing of entities with links in `html_for_tweet()`
+- Update classifiers for PyPI
+
 3.5.0 (2017-06-06)
 ++++++++++++++++++
 - Added support for "symbols" in `Twython.html_for_tweet()`
