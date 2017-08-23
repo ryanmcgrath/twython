@@ -556,62 +556,78 @@ class Twython(EndpointsMixin, object):
         suffix_text = orig_tweet_text[display_text_end:len(orig_tweet_text)]
 
         if 'entities' in tweet:
-            entities = tweet['entities']
+            # We'll put all the bits of replacement HTML and their starts/ends
+            # in this list:
+            entities = []
 
             # Mentions
-            for entity in sorted(entities['user_mentions'],
-                                 key=lambda mention: len(mention['screen_name']), reverse=True):
-                start, end = entity['indices'][0], entity['indices'][1]
+            if 'user_mentions' in tweet['entities']:
+                for entity in tweet['entities']['user_mentions']:
+                    temp = {}
+                    temp['start'] = entity['indices'][0]
+                    temp['end'] = entity['indices'][1]
 
-                mention_html = '<a href="https://twitter.com/%(screen_name)s" ' \
-                               'class="twython-mention">@%(screen_name)s</a>' % {'screen_name': entity['screen_name']}
-                sub_expr = r'(?<!>)' + orig_tweet_text[start:end] + '(?!</a>)'
-                if display_text_start <= start <= display_text_end:
-                    display_text = re.sub(sub_expr, mention_html, display_text)
-                else:
-                    prefix_text = re.sub(sub_expr, mention_html, prefix_text)
+                    mention_html = '<a href="https://twitter.com/%(screen_name)s" class="twython-mention">@%(screen_name)s</a>' % {'screen_name': entity['screen_name']}
+
+                    if display_text_start <= temp['start'] <= display_text_end:
+                        temp['replacement'] = mention_html
+                        entities.append(temp)
+                    else:
+                        prefix_text = re.sub(sub_expr, mention_html, prefix_text)
 
             # Hashtags
-            for entity in sorted(entities['hashtags'],
-                                 key=lambda hashtag: len(hashtag['text']), reverse=True):
-                start, end = entity['indices'][0], entity['indices'][1]
+            if 'hashtags' in tweet['entities']:
+                for entity in tweet['entities']['hashtags']:
+                    temp = {}
+                    temp['start'] = entity['indices'][0]
+                    temp['end'] = entity['indices'][1]
 
-                hashtag_html = '<a href="https://twitter.com/search?q=%%23%(hashtag)s" class="twython-hashtag">#%(hashtag)s</a>'
-                display_text = re.sub(r'(?<!>)' + orig_tweet_text[start:end] + '(?!</a>)',
-                                      hashtag_html % {'hashtag': entity['text']}, display_text)
+                    url_html = '<a href="https://twitter.com/search?q=%%23%(hashtag)s" class="twython-hashtag">#%(hashtag)s</a>' % {'hashtag': entity['text']}
+
+                    temp['replacement'] = url_html
+                    entities.append(temp)
 
             # Symbols
-            for entity in sorted(entities['symbols'],
-                                 key=lambda symbol: len(symbol['text']), reverse=True):
-                start, end = entity['indices'][0], entity['indices'][1]
+            if 'symbols' in tweet['entities']:
+                for entity in tweet['entities']['symbols']:
+                    temp = {}
+                    temp['start'] = entity['indices'][0]
+                    temp['end'] = entity['indices'][1]
 
-                symbol_html = '<a href="https://twitter.com/search?q=%%24%(symbol)s" class="twython-symbol">$%(symbol)s</a>'
-                display_text = re.sub(r'(?<!>)' + re.escape(orig_tweet_text[start:end]) + r'\b(?!</a>)',
-                                      symbol_html % {'symbol': entity['text']}, display_text)
+                    url_html = '<a href="https://twitter.com/search?q=%%24%(symbol)s" class="twython-symbol">$%(symbol)s</a>' % {'symbol': entity['text']}
 
-            # Urls
-            for entity in entities['urls']:
-                start, end = entity['indices'][0], entity['indices'][1]
-                if use_display_url and entity.get('display_url') \
-                   and not use_expanded_url:
-                    shown_url = entity['display_url']
-                elif use_expanded_url and entity.get('expanded_url'):
-                    shown_url = entity['expanded_url']
-                else:
-                    shown_url = entity['url']
+                    temp['replacement'] = url_html
+                    entities.append(temp)
 
-                url_html = '<a href="%s" class="twython-url">%s</a>' % (entity['url'], shown_url)
-                if display_text_start <= start <= display_text_end:
-                    display_text = display_text.replace(orig_tweet_text[start:end], url_html)
-                else:
-                    suffix_text = suffix_text.replace(orig_tweet_text[start:end], url_html)
+            # URLs
+            if 'urls' in tweet['entities']:
+                for entity in tweet['entities']['urls']:
+                    temp = {}
+                    temp['start'] = entity['indices'][0]
+                    temp['end'] = entity['indices'][1]
 
-             # Media
-            if 'media' in entities:
-                for entity in entities['media']:
-                    start, end = entity['indices'][0], entity['indices'][1]
-                    if use_display_url and entity.get('display_url') \
-                       and not use_expanded_url:
+                    if use_display_url and entity.get('display_url') and not use_expanded_url:
+                        shown_url = entity['display_url']
+                    elif use_expanded_url and entity.get('expanded_url'):
+                        shown_url = entity['expanded_url']
+                    else:
+                        shown_url = entity['url']
+
+                    url_html = '<a href="%s" class="twython-url">%s</a>' % (entity['url'], shown_url)
+
+                    if display_text_start <= temp['start'] <= display_text_end:
+                        temp['replacement'] = url_html
+                        entities.append(temp)
+                    else:
+                        suffix_text = suffix_text.replace(orig_tweet_text[temp['start']:temp['end']], url_html)
+
+            if 'media' in tweet['entities']:
+                for entity in tweet['entities']['media']:
+                    temp = {}
+                    temp['start'] = entity['indices'][0]
+                    temp['end'] = entity['indices'][1]
+
+                    if use_display_url and entity.get('display_url') and not use_expanded_url:
                         shown_url = entity['display_url']
                     elif use_expanded_url and entity.get('expanded_url'):
                         shown_url = entity['expanded_url']
@@ -619,11 +635,17 @@ class Twython(EndpointsMixin, object):
                         shown_url = entity['url']
 
                     url_html = '<a href="%s" class="twython-media">%s</a>' % (entity['url'], shown_url)
-                    if display_text_start <= start <= display_text_end:
-                        # for compatibility with pre-extended tweets
-                        display_text = display_text.replace(orig_tweet_text[start:end], url_html)
+
+                    if display_text_start <= temp['start'] <= display_text_end:
+                        temp['replacement'] = url_html
+                        entities.append(temp)
                     else:
-                        suffix_text = suffix_text.replace(orig_tweet_text[start:end], url_html)
+                        suffix_text = suffix_text.replace(orig_tweet_text[temp['start']:temp['end']], url_html)
+
+            # Now do all the replacements, starting from the end, so that the
+            # start/end indices still work:
+            for entity in sorted(entities, key=lambda e: e['start'], reverse=True):
+                display_text = display_text[0:entity['start']] + entity['replacement'] + display_text[entity['end']:]
 
         quote_text = ''
         if expand_quoted_status and tweet.get('is_quote_status') and tweet.get('quoted_status'):

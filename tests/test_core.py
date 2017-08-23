@@ -4,6 +4,7 @@ from twython import Twython, TwythonError, TwythonAuthError, TwythonRateLimitErr
 from .config import (
     test_tweet_object, test_tweet_html, test_tweet_symbols_object,
     test_tweet_compat_object, test_tweet_extended_object, test_tweet_extended_html,
+    test_tweet_identical_urls,
     unittest
 )
 
@@ -321,11 +322,29 @@ class TwythonAPITestCase(unittest.TestCase):
         self.assertTrue('http://google.com' not in tweet_text)
         self.assertTrue('google.com' not in tweet_text)
 
+    def test_html_for_tweet_identical_urls(self):
+        """If the 'url's for different url entities are identical, they should link correctly."""
+        tweet_text = self.api.html_for_tweet(test_tweet_identical_urls)
+        self.assertEqual(tweet_text,
+                u'Use Cases, Trials and Making 5G a Reality <a href="https://t.co/W0uArTMk9N" class="twython-url">buff.ly/2sEhrgO</a> #5G #innovation via @5GWorldSeries <a href="https://t.co/W0uArTMk9N" class="twython-url">buff.ly/2sEhrgO</a>')
+
     def test_html_for_tweet_symbols(self):
         tweet_text = self.api.html_for_tweet(test_tweet_symbols_object)
         # Should only link symbols listed in entities:
         self.assertTrue('<a href="https://twitter.com/search?q=%24AAPL" class="twython-symbol">$AAPL</a>' in tweet_text)
         self.assertTrue('<a href="https://twitter.com/search?q=%24ANOTHER" class="twython-symbol">$ANOTHER</a>' not in tweet_text)
+
+    def test_html_for_tweet_no_symbols(self):
+        """Should still work if tweet object has no symbols list"""
+        tweet = test_tweet_symbols_object
+        # Save a copy:
+        symbols = tweet['entities']['symbols']
+        del tweet['entities']['symbols']
+        tweet_text = self.api.html_for_tweet(tweet)
+        self.assertTrue('symbols: $AAPL and' in tweet_text)
+        self.assertTrue('and $ANOTHER and $A.' in tweet_text)
+        # Put the symbols back:
+        test_tweet_symbols_object['entities']['symbols'] = symbols
 
     def test_html_for_tweet_compatmode(self):
         tweet_text = self.api.html_for_tweet(test_tweet_compat_object)
