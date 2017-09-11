@@ -356,3 +356,15 @@ class TwythonAPITestCase(unittest.TestCase):
         tweet_text = self.api.html_for_tweet(test_tweet_extended_object)
         # full tweet rendered with suffix
         self.assertEqual(test_tweet_extended_html, tweet_text)
+
+    def test_cursor_requires_twython_function(self):
+        """Test that cursor() raises when called without a Twython function"""
+        def init_and_iterate_cursor(*args, **kwargs):
+            cursor = self.api.cursor(*args, **kwargs)
+            return next(cursor)
+
+        non_function = object()
+        non_twython_function = lambda x: x
+
+        self.assertRaises(TypeError, init_and_iterate_cursor, non_function)
+        self.assertRaises(TwythonError, init_and_iterate_cursor, non_twython_function)
