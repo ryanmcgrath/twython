@@ -470,6 +470,11 @@ class Twython(EndpointsMixin, object):
           >>>   print result
 
         """
+        if not callable(function):
+            raise TypeError('.cursor() takes a Twython function as its first \
+                            argument. Did you provide the result of a \
+                            function call?')
+
         if not hasattr(function, 'iter_mode'):
             raise TwythonError('Unable to create generator for Twython \
                                method "%s"' % function.__name__)
