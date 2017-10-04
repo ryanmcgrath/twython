@@ -3,8 +3,8 @@ from twython import Twython, TwythonError, TwythonAuthError, TwythonRateLimitErr
 
 from .config import (
     test_tweet_object, test_tweet_html, test_tweet_symbols_object,
-    test_tweet_compat_object, test_tweet_extended_object, test_tweet_extended_html,
-    test_tweet_identical_urls,
+    test_tweet_compat_object, test_tweet_extended_object,
+    test_tweet_extended_html, test_tweet_identical_urls, test_tweet_reply,
     unittest
 )
 
@@ -307,6 +307,12 @@ class TwythonAPITestCase(unittest.TestCase):
         """Test HTML for Tweet returns what we want"""
         tweet_text = self.api.html_for_tweet(test_tweet_object)
         self.assertEqual(test_tweet_html, tweet_text)
+
+    def test_html_for_tweet_reply(self):
+        """Test HTML for Tweet links the replied-to username."""
+        tweet_text = self.api.html_for_tweet(test_tweet_reply)
+        self.assertEqual(tweet_text,
+                u'<span class="twython-tweet-prefix"><a href="https://twitter.com/philgyford" class="twython-mention">@philgyford</a> </span>Here’s a test tweet that goes on as much as possible and includes an image. Hi to my fans in testland!<span class="twython-tweet-suffix"> https://t.co/tzhyk2QWSr</span>')
 
     def test_html_for_tweet_expanded_url(self):
         """Test using expanded url in HTML for Tweet displays full urls"""

@@ -578,6 +578,9 @@ class Twython(EndpointsMixin, object):
                         temp['replacement'] = mention_html
                         entities.append(temp)
                     else:
+                        # Make the '@username' at the start, before
+                        # display_text, into a link:
+                        sub_expr = r'(?<!>)' + orig_tweet_text[temp['start']:temp['end']] + '(?!</a>)'
                         prefix_text = re.sub(sub_expr, mention_html, prefix_text)
 
             # Hashtags
