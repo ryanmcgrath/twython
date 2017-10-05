@@ -140,8 +140,11 @@ class Twython(EndpointsMixin, object):
         params = params or {}
 
         func = getattr(self.client, method)
-        params, files = _transparent_params(params)
-
+        if type(params) is dict:
+            params, files = _transparent_params(params)
+        else:
+            params = params
+            files = list()
         requests_args = {}
         for k, v in self.client_args.items():
             # Maybe this should be set as a class variable and only done once?
@@ -199,8 +202,10 @@ class Twython(EndpointsMixin, object):
             else:
                 content = response.json()
         except ValueError:
-            raise TwythonError('Response was not valid JSON. \
-                               Unable to decode.')
+            # Send the response as is for working with /media/metadata/create.json.
+            content = response.content
+            #raise TwythonError('Response was not valid JSON. \
+                               #Unable to decode.')
 
         return content
 

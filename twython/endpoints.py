@@ -22,7 +22,7 @@ from time import sleep
     #from StringIO import StringIO
 #except ImportError:
     #from io import StringIO
-
+import json
 from .advisory import TwythonDeprecationWarning
 
 
@@ -237,6 +237,14 @@ class EndpointsMixin(object):
                         processing_state = response.get('processing_info').get('state')
 
         return response
+
+    def set_description(self, **params):
+        """ Adds a description to an image.
+        Docs: there is no official documentation
+        """
+        # This method only accepts strings, no dictionaries.
+        params = json.dumps(params)
+        return self.post("media/metadata/create", params=params)
 
     def get_oembed_tweet(self, **params):
         """Returns information allowing the creation of an embedded
