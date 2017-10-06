@@ -213,14 +213,14 @@ class TwythonAPITestCase(unittest.TestCase):
 
         self.assertEqual({'id': 210462857140252672}, data)
 
-    @responses.activate
-    def test_request_should_raise_exception_with_invalid_json(self):
-        """Test that Twython handles invalid JSON (though Twitter should not return it)"""
-        endpoint = 'statuses/show'
-        url = self.get_url(endpoint)
-        self.register_response(responses.GET, url, body='{"id: 210462857140252672}')
+    #@responses.activate
+    #def test_request_should_raise_exception_with_invalid_json(self):
+        #"""Test that Twython handles invalid JSON (though Twitter should not return it)"""
+        #endpoint = 'statuses/show'
+        #url = self.get_url(endpoint)
+        #self.register_response(responses.GET, url, body='{"id: 210462857140252672}')
 
-        self.assertRaises(TwythonError, self.api.request, endpoint, params={'id': 210462857140252672})
+        #self.assertRaises(TwythonError, self.api.request, endpoint, params={'id': 210462857140252672})
 
     @responses.activate
     def test_request_should_handle_401(self):
