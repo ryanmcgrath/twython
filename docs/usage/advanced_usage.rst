@@ -62,7 +62,12 @@ with a status update.
     # Assume you are working with a JPEG
 
     from PIL import Image
-    from StringIO import StringIO
+    try:
+        # Python 3
+        from io import StringIO
+    except ImportError:
+        # Python 2
+        from StringIO import StringIO
 
     photo = Image.open('/path/to/file/image.jpg')
 
