@@ -62,7 +62,12 @@ with a status update.
     # Assume you are working with a JPEG
 
     from PIL import Image
-    from StringIO import StringIO
+    try:
+        # Python 3
+        from io import StringIO
+    except ImportError:
+        # Python 2
+        from StringIO import StringIO
 
     photo = Image.open('/path/to/file/image.jpg')
 
@@ -98,7 +103,7 @@ That being said, Twython offers a generator for search results and can be access
 
     results = twitter.cursor(twitter.search, q='python')
     for result in results:
-        print result
+        print(result)
 
 Manipulate the Request (headers, proxies, etc.)
 -----------------------------------------------

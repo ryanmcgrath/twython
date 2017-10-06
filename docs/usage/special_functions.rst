@@ -25,7 +25,7 @@ The Old Way
     results = twitter.search(q='twitter')
     if results.get('statuses'):
         for result in results['statuses']:
-            print result['id_str']
+            print(result['id_str'])
 
 The New Way
 ^^^^^^^^^^^
@@ -39,7 +39,7 @@ The New Way
 
     results = twitter.cursor(twitter.search, q='twitter')
     for result in results:
-        print result['id_str']
+        print(result['id_str'])
 
 Another example:
 
@@ -47,7 +47,7 @@ Another example:
 
     results = twitter.cursor(t.get_mentions_timeline)
     for result in results:
-        print result['id_str']
+        print(result['id_str'])
 
 
 HTML for Tweet
@@ -66,7 +66,7 @@ This function takes a tweet object received from the Twitter API and returns an 
                                             include_rts=True)
     for tweet in user_tweets:
         tweet['text'] = Twython.html_for_tweet(tweet)
-        print tweet['text']
+        print(tweet['text'])
 
 The above code takes all the tweets from a specific users timeline, loops over them and replaces the value of ``tweet['text']`` with HTML.
 
