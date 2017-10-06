@@ -98,7 +98,7 @@ That being said, Twython offers a generator for search results and can be access
 
     results = twitter.cursor(twitter.search, q='python')
     for result in results:
-        print result
+        print(result)
 
 Manipulate the Request (headers, proxies, etc.)
 -----------------------------------------------
