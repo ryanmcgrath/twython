@@ -16,7 +16,7 @@ Features
    - Twitter lists
    - Timelines
    - Direct Messages
-   - and anything found in `the Twitter API docs <https://dev.twitter.com/docs/api/1.1>`_.
+   - and anything found in `the Twitter API docs <https://developer.twitter.com/en/docs>`_.
 - Image Uploading:
    - Update user status with an image
    - Change user avatar
