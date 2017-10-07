@@ -5,6 +5,7 @@ from .config import (
     test_tweet_object, test_tweet_html, test_tweet_symbols_object,
     test_tweet_compat_object, test_tweet_extended_object,
     test_tweet_extended_html, test_tweet_identical_urls, test_tweet_reply,
+    test_tweet_media,
     unittest
 )
 
@@ -72,3 +73,11 @@ class TestHtmlForTweetTestCase(unittest.TestCase):
         tweet_text = self.api.html_for_tweet(test_tweet_extended_object)
         # full tweet rendered with suffix
         self.assertEqual(test_tweet_extended_html, tweet_text)
+
+    def test_media(self):
+        tweet_text = self.api.html_for_tweet(test_tweet_media)
+
+        self.assertEqual(
+            """I made some D3.js charts showing the years covered by books in a series compared to their publishing dates <a href="https://t.co/2yUmmn3TOc" class="twython-url">gyford.com/phil/writing/2…</a> <a href="https://t.co/OwNc6uJklg" class="twython-media">pic.twitter.com/OwNc6uJklg</a>""",
+            tweet_text)
+
