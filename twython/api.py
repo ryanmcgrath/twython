@@ -140,7 +140,11 @@ class Twython(EndpointsMixin, object):
         params = params or {}
 
         func = getattr(self.client, method)
-        params, files = _transparent_params(params)
+        if type(params) is dict:
+            params, files = _transparent_params(params)
+        else:
+            params = params
+            files = list()
 
         requests_args = {}
         for k, v in self.client_args.items():
@@ -192,15 +196,16 @@ class Twython(EndpointsMixin, object):
                 error_message,
                 error_code=response.status_code,
                 retry_after=response.headers.get('X-Rate-Limit-Reset'))
-
+        content=""
         try:
             if response.status_code == 204:
                 content = response.content
             else:
                 content = response.json()
         except ValueError:
-            raise TwythonError('Response was not valid JSON. \
-                               Unable to decode.')
+            if response.content!="":
+                raise TwythonError('Response was not valid JSON. \
+                                   Unable to decode.')
 
         return content
 
