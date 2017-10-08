@@ -10,7 +10,7 @@ This section is going to help you understand creating a Twitter Application, aut
 Beginning
 ---------
 
-First, you'll want to head over to https://dev.twitter.com/apps and register an application!
+First, you'll want to head over to https://apps.twitter.com/ and register an application!
 
 After you register, grab your applications ``Consumer Key`` and ``Consumer Secret`` from the application details tab.
 

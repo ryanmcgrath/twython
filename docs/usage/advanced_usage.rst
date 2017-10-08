@@ -29,11 +29,11 @@ This uploads an image as a media object and associates it with a status update.
     photo = open('/path/to/file/image.jpg', 'rb')
     response = twitter.upload_media(media=photo)
     twitter.update_status(status='Checkout this cool image!', media_ids=[response['media_id']])
-    
+
 Documentation:
 
-* https://dev.twitter.com/rest/reference/post/statuses/update
-* https://dev.twitter.com/rest/reference/post/media/upload
+* https://developer.twitter.com/en/docs/api-reference-index
+* https://developer.twitter.com/en/docs/media/upload-media/overview
 
 Updating Status with Video
 --------------------------
@@ -48,8 +48,8 @@ This uploads a video as a media object and associates it with a status update.
 
 Documentation:
 
-* https://dev.twitter.com/rest/reference/post/statuses/update
-* https://dev.twitter.com/rest/reference/post/media/upload
+* https://developer.twitter.com/en/docs/api-reference-index
+* https://developer.twitter.com/en/docs/media/upload-media/overview
 
 Posting a Status with an Editing Image
 --------------------------------------

@@ -5,7 +5,7 @@ Streaming API
 
 This section will cover how to use Twython and interact with the Twitter Streaming API.
 
-Streaming Documentation: https://dev.twitter.com/docs/streaming-apis
+Streaming Documentation: https://developer.twitter.com/en/docs/tweets/filter-realtime/guides/streaming-message-types
 
 .. important:: The Streaming API requires that you have OAuth 1 authentication credentials. If you don't have credentials, head over to the :ref:`authentication section <oauth1>` and find out how!
 
