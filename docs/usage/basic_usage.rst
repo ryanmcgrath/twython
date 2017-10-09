@@ -28,7 +28,7 @@ Create a Twython instance with your application keys and the users OAuth tokens
 User Information
 ^^^^^^^^^^^^^^^^
 
-Documentation: https://dev.twitter.com/docs/api/1.1/get/account/verify_credentials
+Documentation: https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/get-account-verify_credentials
 
 .. code-block:: python
 
@@ -37,7 +37,7 @@ Documentation: https://dev.twitter.com/docs/api/1.1/get/account/verify_credentia
 Authenticated Users Home Timeline
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Documentation: https://dev.twitter.com/docs/api/1.1/get/statuses/home_timeline
+Documentation: https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-home_timeline
 
 .. code-block:: python
 
@@ -48,7 +48,7 @@ Updating Status
 
 This method makes use of dynamic arguments, :ref:`read more about them <dynamicargexplaination>`
 
-Documentation: https://dev.twitter.com/docs/api/1.1/post/statuses/update
+Documentation: https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-update
 
 .. code-block:: python
 
@@ -72,7 +72,7 @@ Searching
 
 .. note:: Searching can be done whether you're authenticated via OAuth 1 or OAuth 2
 
-Documentation: https://dev.twitter.com/docs/api/1.1/get/search/tweets
+Documentation: https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets
 
 .. code-block:: python
 
