@@ -5,7 +5,7 @@ from .config import (
     test_tweet_object, test_tweet_html, test_tweet_symbols_object,
     test_tweet_compat_object, test_tweet_extended_object,
     test_tweet_extended_html, test_tweet_identical_urls, test_tweet_reply,
-    test_tweet_media,
+    test_tweet_media, test_tweet_quoted,
     unittest
 )
 
@@ -80,4 +80,13 @@ class TestHtmlForTweetTestCase(unittest.TestCase):
         self.assertEqual(
             """I made some D3.js charts showing the years covered by books in a series compared to their publishing dates <a href="https://t.co/2yUmmn3TOc" class="twython-url">gyford.com/phil/writing/2…</a> <a href="https://t.co/OwNc6uJklg" class="twython-media">pic.twitter.com/OwNc6uJklg</a>""",
             tweet_text)
+
+    def test_quoted(self):
+        "With expand_quoted_status=True it should include a quoted tweet."
+        tweet_text = self.api.html_for_tweet(test_tweet_quoted,
+                                             expand_quoted_status=True)
+
+        self.assertEqual(
+                u"""Here\u2019s a quoted tweet. <a href="https://t.co/3neKzof0gT" class="twython-url">twitter.com/philgyford/sta\u2026</a><blockquote class="twython-quote">The quoted tweet text.<cite><a href="https://twitter.com/philgyford/status/917699069916729344"><span class="twython-quote-user-name">Phil Gyford</span><span class="twython-quote-user-screenname">@philgyford</span></a></cite></blockquote>""",
+                tweet_text)
 
