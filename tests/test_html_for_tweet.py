@@ -5,7 +5,7 @@ from .config import (
     test_tweet_object, test_tweet_html, test_tweet_symbols_object,
     test_tweet_compat_object, test_tweet_extended_object,
     test_tweet_extended_html, test_tweet_identical_urls, test_tweet_reply,
-    test_tweet_media, test_tweet_quoted,
+    test_tweet_media, test_tweet_quoted, test_tweet_retweet,
     unittest
 )
 
@@ -88,5 +88,13 @@ class TestHtmlForTweetTestCase(unittest.TestCase):
 
         self.assertEqual(
                 u"""Here\u2019s a quoted tweet. <a href="https://t.co/3neKzof0gT" class="twython-url">twitter.com/philgyford/sta\u2026</a><blockquote class="twython-quote">The quoted tweet text.<cite><a href="https://twitter.com/philgyford/status/917699069916729344"><span class="twython-quote-user-name">Phil Gyford</span><span class="twython-quote-user-screenname">@philgyford</span></a></cite></blockquote>""",
+                tweet_text)
+
+    def test_retweet(self):
+        "With expand_quoted_status=True it should include a quoted tweet."
+        tweet_text = self.api.html_for_tweet(test_tweet_retweet)
+
+        self.assertEqual(
+                u"""My aunt and uncle in a very ill humour one with another, but I made shift with much ado to keep them from scolding.""",
                 tweet_text)
 
