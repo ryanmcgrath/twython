@@ -1,0 +1,94 @@
+{  
+  "contributors":null,
+  "truncated":false,
+  "text":"Here\u2019s a quoted tweet. https://t.co/3neKzof0gT",
+  "is_quote_status":true,
+  "in_reply_to_status_id":null,
+  "id":917706313785905157,
+  "favorite_count":0,
+  "source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+  "quoted_status_id":917699069916729344,
+  "retweeted":false,
+  "coordinates":null,
+  "quoted_status":{  
+    "contributors":null,
+    "truncated":false,
+    "text":"The quoted tweet text.",
+    "is_quote_status":false,
+    "in_reply_to_status_id":null,
+    "id":917699069916729344,
+    "favorite_count":1,
+    "source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+    "retweeted":false,
+    "coordinates":null,
+    "entities":{  
+      "symbols":[  
+
+      ],
+      "user_mentions":[  
+
+      ],
+      "hashtags":[  
+
+      ],
+      "urls":[  
+
+      ]
+    },
+    "in_reply_to_screen_name":null,
+    "in_reply_to_user_id":null,
+    "retweet_count":0,
+    "id_str":"917699069916729344",
+    "favorited":false,
+    "user":{  
+      "screen_name":"philgyford",
+      "name":"Phil Gyford"
+    },
+    "geo":null,
+    "in_reply_to_user_id_str":null,
+    "lang":"ht",
+    "created_at":"Tue Oct 10 10:31:22 +0000 2017",
+    "in_reply_to_status_id_str":null,
+    "place":null
+  },
+  "entities":{  
+    "symbols":[  
+
+    ],
+    "user_mentions":[  
+
+    ],
+    "hashtags":[  
+
+    ],
+    "urls":[  
+      {  
+        "url":"https://t.co/3neKzof0gT",
+        "indices":[  
+          23,
+          46
+        ],
+        "expanded_url":"https://twitter.com/philgyford/status/917699069916729344",
+        "display_url":"twitter.com/philgyford/sta\u2026"
+      }
+    ]
+  },
+  "in_reply_to_screen_name":null,
+  "in_reply_to_user_id":null,
+  "retweet_count":0,
+  "id_str":"917706313785905157",
+  "favorited":false,
+  "user":{  
+    "screen_name":"philgyfordtest",
+    "name":"Phil Gyford Test"
+  },
+  "geo":null,
+  "in_reply_to_user_id_str":null,
+  "possibly_sensitive":false,
+  "possibly_sensitive_appealable":false,
+  "lang":"en",
+  "created_at":"Tue Oct 10 11:00:10 +0000 2017",
+  "quoted_status_id_str":"917699069916729344",
+  "in_reply_to_status_id_str":null,
+  "place":null
+}

@@ -1,0 +1,61 @@
+{
+  "text":"Some symbols: $AAPL and $PEP and $ANOTHER and $A.",
+  "contributors":null,
+  "geo":null,
+  "favorited":true,
+  "in_reply_to_user_id_str":null,
+  "user":{
+    "screen_name":"philgyfordtest",
+    "name":"Phil Gyford Test"
+  },
+  "in_reply_to_user_id":null,
+  "retweeted":false,
+  "coordinates":null,
+  "place":null,
+  "in_reply_to_status_id":null,
+  "lang":"en",
+  "in_reply_to_status_id_str":null,
+  "truncated":false,
+  "retweet_count":0,
+  "is_quote_status":false,
+  "id":662694880657989632,
+  "id_str":"662694880657989632",
+  "in_reply_to_screen_name":null,
+  "favorite_count":1,
+  "entities":{
+    "hashtags":[
+
+    ],
+    "user_mentions":[
+
+    ],
+    "symbols":[
+      {
+        "indices":[
+          14,
+          19
+        ],
+        "text":"AAPL"
+      },
+      {
+        "indices":[
+          24,
+          28
+        ],
+        "text":"PEP"
+      },
+      {
+        "indices":[
+          46,
+          48
+        ],
+        "text":"A"
+      }
+    ],
+    "urls":[
+
+    ]
+  },
+  "created_at":"Fri Nov 06 18:15:46 +0000 2015",
+  "source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>"
+}
