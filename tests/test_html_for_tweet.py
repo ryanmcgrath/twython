@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import os
 
 from twython import Twython, TwythonError
 
@@ -11,7 +12,11 @@ class TestHtmlForTweetTestCase(unittest.TestCase):
         self.api = Twython('', '', '', '')
 
     def load_tweet(self, name):
-        f = open('tests/tweets/%s.json' % name)
+        f = open(os.path.join(
+                os.path.dirname(__file__),
+                'tweets',
+                '%s.json' % name
+            ))
         tweet = json.load(f)
         f.close()
         return tweet
