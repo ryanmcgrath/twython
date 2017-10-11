@@ -24,7 +24,7 @@ Features
     - Twitter lists
     - Timelines
     - Direct Messages
-    - and anything found in `the docs <https://dev.twitter.com/docs/api/1.1>`_
+    - and anything found in `the docs <https://developer.twitter.com/en/docs>`_
 - Image Uploading:
     - Update user status with an image
     - Change user avatar
@@ -67,7 +67,7 @@ Documentation is available at https://twython.readthedocs.io/en/latest/
 Starting Out
 ------------
 
-First, you'll want to head over to https://dev.twitter.com/apps and register an application!
+First, you'll want to head over to https://apps.twitter.com and register an application!
 
 After you register, grab your applications ``Consumer Key`` and ``Consumer Secret`` from the application details tab.
 
@@ -165,7 +165,7 @@ Create a Twython instance with your application keys and the users OAuth tokens
 Authenticated Users Home Timeline
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Documentation: https://dev.twitter.com/docs/api/1.1/get/statuses/home_timeline
+Documentation: https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-home_timeline
 
 .. code-block:: python
 
@@ -176,7 +176,7 @@ Updating Status
 
 This method makes use of dynamic arguments, `read more about them <https://twython.readthedocs.io/en/latest/usage/starting_out.html#dynamic-function-arguments>`_
 
-Documentation: https://dev.twitter.com/docs/api/1/post/statuses/update
+Documentation: https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-update
 
 .. code-block:: python
 
@@ -185,7 +185,7 @@ Documentation: https://dev.twitter.com/docs/api/1/post/statuses/update
 Searching
 ~~~~~~~~~
 
-    https://dev.twitter.com/docs/api/1.1/get/search/tweets says it takes "q" and "result_type" amongst other arguments
+    https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets says it takes "q" and "result_type" amongst other arguments
 
 .. code-block:: python
 
