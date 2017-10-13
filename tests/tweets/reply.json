@@ -1,0 +1,62 @@
+{
+  "display_text_range":[
+    12,
+    114
+  ],
+  "in_reply_to_status_id_str":"742374355531923456",
+  "source":"<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>",
+  "geo":null,
+  "full_text":"@philgyford Here\u2019s a test tweet that goes on as much as possible and includes an image. Hi to my fans in testland! https://t.co/tzhyk2QWSr",
+  "extended_entities":{
+    "media":[
+
+    ]
+  },
+  "id_str":"300",
+  "in_reply_to_status_id":742374355531923456,
+  "id":300,
+  "in_reply_to_screen_name":"philgyford",
+  "retweet_count":0,
+  "user":{
+
+  },
+  "created_at":"Mon Jun 13 15:48:06 +0000 2016",
+  "lang":"en",
+  "favorite_count":0,
+  "coordinates":null,
+  "place":null,
+  "contributors":null,
+  "in_reply_to_user_id":12552,
+  "in_reply_to_user_id_str":"12552",
+  "retweeted":false,
+  "favorited":false,
+  "truncated":false,
+  "entities":{
+    "user_mentions":[
+      {
+        "id_str":"12552",
+        "id":12552,
+        "screen_name":"philgyford",
+        "name":"Phil Gyford",
+        "indices":[
+          0,
+          11
+        ]
+      }
+    ],
+    "media":[
+
+    ],
+    "hashtags":[
+
+    ],
+    "symbols":[
+
+    ],
+    "urls":[
+
+    ]
+  },
+  "is_quote_status":false,
+  "possibly_sensitive":false
+}

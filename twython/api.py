@@ -634,26 +634,30 @@ class Twython(EndpointsMixin, object):
                     else:
                         suffix_text = suffix_text.replace(orig_tweet_text[temp['start']:temp['end']], url_html)
 
-            if 'media' in tweet['entities']:
-                for entity in tweet['entities']['media']:
-                    temp = {}
-                    temp['start'] = entity['indices'][0]
-                    temp['end'] = entity['indices'][1]
+            if 'media' in tweet['entities'] and len(tweet['entities']['media']) > 0:
+                # We just link to the overall URL for the tweet's media,
+                # rather than to each individual item.
+                # So, we get the URL from the first media item:
+                entity = tweet['entities']['media'][0]
 
-                    if use_display_url and entity.get('display_url') and not use_expanded_url:
-                        shown_url = entity['display_url']
-                    elif use_expanded_url and entity.get('expanded_url'):
-                        shown_url = entity['expanded_url']
-                    else:
-                        shown_url = entity['url']
+                temp = {}
+                temp['start'] = entity['indices'][0]
+                temp['end'] = entity['indices'][1]
 
-                    url_html = '<a href="%s" class="twython-media">%s</a>' % (entity['url'], shown_url)
+                if use_display_url and entity.get('display_url') and not use_expanded_url:
+                    shown_url = entity['display_url']
+                elif use_expanded_url and entity.get('expanded_url'):
+                    shown_url = entity['expanded_url']
+                else:
+                    shown_url = entity['url']
 
-                    if display_text_start <= temp['start'] <= display_text_end:
-                        temp['replacement'] = url_html
-                        entities.append(temp)
-                    else:
-                        suffix_text = suffix_text.replace(orig_tweet_text[temp['start']:temp['end']], url_html)
+                url_html = '<a href="%s" class="twython-media">%s</a>' % (entity['url'], shown_url)
+
+                if display_text_start <= temp['start'] <= display_text_end:
+                    temp['replacement'] = url_html
+                    entities.append(temp)
+                else:
+                    suffix_text = suffix_text.replace(orig_tweet_text[temp['start']:temp['end']], url_html)
 
             # Now do all the replacements, starting from the end, so that the
             # start/end indices still work:

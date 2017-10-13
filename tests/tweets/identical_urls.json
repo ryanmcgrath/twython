@@ -1,0 +1,34 @@
+{
+  "entities":{
+    "hashtags":[
+
+    ],
+    "user_mentions":[
+
+    ],
+    "symbols":[
+
+    ],
+    "urls":[
+      {
+        "display_url":"buff.ly/2sEhrgO",
+        "expanded_url":"http://buff.ly/2sEhrgO",
+        "indices":[
+          42,
+          65
+        ],
+        "url":"https://t.co/W0uArTMk9N"
+      },
+      {
+        "display_url":"buff.ly/2sEhrgO",
+        "expanded_url":"http://buff.ly/2sEhrgO",
+        "indices":[
+          101,
+          124
+        ],
+        "url":"https://t.co/W0uArTMk9N"
+      }
+    ]
+  },
+  "full_text":"Use Cases, Trials and Making 5G a Reality https://t.co/W0uArTMk9N #5G #innovation via @5GWorldSeries https://t.co/W0uArTMk9N"
+}
