@@ -59,7 +59,7 @@ class TwythonStreamerTypesStatuses(object):
         :param \*\*params: Parameters to send with your stream request
 
         Accepted params found at:
-        https://dev.twitter.com/docs/api/1.1/post/statuses/filter
+        https://developer.twitter.com/en/docs/tweets/filter-realtime/api-reference/post-statuses-filter
         """
         url = 'https://stream.twitter.com/%s/statuses/filter.json' \
               % self.streamer.api_version
@@ -71,7 +71,7 @@ class TwythonStreamerTypesStatuses(object):
         :param \*\*params: Parameters to send with your stream request
 
         Accepted params found at:
-        https://dev.twitter.com/docs/api/1.1/get/statuses/sample
+        https://developer.twitter.com/en/docs/tweets/sample-realtime/api-reference/get-statuses-sample
         """
         url = 'https://stream.twitter.com/%s/statuses/sample.json' \
               % self.streamer.api_version
@@ -95,7 +95,7 @@ class TwythonStreamerTypesStatuses(object):
         :param \*\*params: Parameters to send with your stream request
 
         Accepted params found at:
-        https://dev.twitter.com/docs/api/1.1/post/statuses/filter
+        https://developer.twitter.com/en/docs/tweets/filter-realtime/api-reference/post-statuses-filter
         """
         self.params = params
 
@@ -104,4 +104,4 @@ class TwythonStreamerTypesStatuses(object):
 
         url = 'https://stream.twitter.com/%s/statuses/filter.json' \
               % self.streamer.api_version
-        self.streamer._request(url, 'POST', params=self.params)	
+        self.streamer._request(url, 'POST', params=self.params)

@@ -169,9 +169,9 @@ class TwythonStreamer(object):
         Returns True if other handlers for this message should be invoked.
 
         Feel free to override this to handle your streaming data how you
-        want it handled.
-        See https://dev.twitter.com/docs/streaming-apis/messages for messages
-        sent along in stream responses.
+        want it handled. See
+        https://developer.twitter.com/en/docs/tweets/filter-realtime/guides/streaming-message-types
+        for messages sent along in stream responses.
 
         :param data: data recieved from the stream
         :type data: dict
