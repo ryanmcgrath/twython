@@ -45,7 +45,7 @@ Another example:
 
 .. code-block:: python
 
-    results = twitter.cursor(t.get_mentions_timeline)
+    results = twitter.cursor(twitter.get_mentions_timeline)
     for result in results:
         print(result['id_str'])
 
