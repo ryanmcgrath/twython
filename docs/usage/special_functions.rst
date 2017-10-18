@@ -49,6 +49,19 @@ Another example:
     for result in results:
         print(result['id_str'])
 
+Items vs Pages
+^^^^^^^^^^^^^^
+
+By default, the cursor yields one item at a time. If instead you prefer to work with entire pages of results, specify ``return_pages=True`` as a keyword argument.
+
+.. code-block:: python
+
+    results = twitter.cursor(twitter.get_mentions_timeline, return_pages=True)
+    # page is a list
+    for page in results:
+        for result in page:
+            print(result['id_str'])
+
 
 HTML for Tweet
 --------------
