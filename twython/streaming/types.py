@@ -44,9 +44,10 @@ class TwythonStreamerTypes(object):
 class TwythonStreamerTypesStatuses(object):
     """Class for different statuses endpoints
 
-    Available so TwythonStreamer.statuses.filter() is available.
-    Just a bit cleaner than TwythonStreamer.statuses_filter(),
-    statuses_sample(), etc. all being single methods in TwythonStreamer
+    Available so :meth:`TwythonStreamer.statuses.filter()` is available.
+    Just a bit cleaner than :meth:`TwythonStreamer.statuses_filter()`,
+    :meth:`statuses_sample()`, etc. all being single methods in 
+    :class:`TwythonStreamer`.
 
     """
     def __init__(self, streamer):

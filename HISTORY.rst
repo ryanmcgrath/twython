@@ -3,6 +3,7 @@
 History
 -------
 
+
 3.6.0 (2017-23-08)
 ++++++++++++++++++
 - Improve replacing of entities with links in `html_for_tweet()`
