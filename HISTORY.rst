@@ -3,9 +3,6 @@
 History
 -------
 
-Unreleased
-++++++++++++++++++
-- Cleaned up some docstrings with Sphinx markup and param names.
 
 3.6.0 (2017-23-08)
 ++++++++++++++++++
