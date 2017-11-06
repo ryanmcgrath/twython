@@ -42,7 +42,7 @@ class EndpointsMixin(object):
 
     def get_user_timeline(self, **params):
         """Returns a collection of the most recent Tweets posted by the user
-        indicated by the screen_name or user_id parameters.
+        indicated by the ``screen_name`` or ``user_id`` parameters.
 
         Docs:
         https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-user_timeline
@@ -85,7 +85,7 @@ class EndpointsMixin(object):
                         params=params)
 
     def show_status(self, **params):
-        """Returns a single Tweet, specified by the id parameter
+        """Returns a single Tweet, specified by the ``id`` parameter
 
         Docs:
         https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-show-id
@@ -95,7 +95,7 @@ class EndpointsMixin(object):
 
     def lookup_status(self, **params):
         """Returns fully-hydrated tweet objects for up to 100 tweets per
-        request, as specified by comma-separated values passed to the id
+        request, as specified by comma-separated values passed to the ``id``
         parameter.
 
         Docs:
@@ -105,7 +105,7 @@ class EndpointsMixin(object):
         return self.post('statuses/lookup', params=params)
 
     def destroy_status(self, **params):
-        """Destroys the status specified by the required ID parameter
+        """Destroys the status specified by the required ``id`` parameter
 
         Docs:
         https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-destroy-id
@@ -123,7 +123,7 @@ class EndpointsMixin(object):
         return self.post('statuses/update', params=params)
 
     def retweet(self, **params):
-        """Retweets a tweet specified by the id parameter
+        """Retweets a tweet specified by the ``id`` parameter
 
         Docs:
         https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-retweet-id
@@ -149,7 +149,7 @@ class EndpointsMixin(object):
     def upload_media(self, **params):
         """Uploads media file to Twitter servers. The file will be available to be attached
         to a status for 60 minutes. To attach to a update, pass a list of returned media ids
-        to the 'update_status' method using the 'media_ids' param.
+        to the :meth:`update_status` method using the ``media_ids`` param.
 
         Docs:
         https://developer.twitter.com/en/docs/media/upload-media/api-reference/post-media-upload
@@ -174,7 +174,7 @@ class EndpointsMixin(object):
     def upload_video(self, media, media_type, media_category=None, size=None, check_progress=False):
         """Uploads video file to Twitter servers in chunks. The file will be available to be attached
         to a status for 60 minutes. To attach to a update, pass a list of returned media ids
-        to the 'update_status' method using the 'media_ids' param.
+        to the :meth:`update_status` method using the ``media_ids`` param.
 
         Upload happens in 3 stages:
         - INIT call with size of media to be uploaded(in bytes). If this is more than 15mb, twitter will return error.
@@ -272,7 +272,7 @@ class EndpointsMixin(object):
 
     def get_retweeters_ids(self, **params):
         """Returns a collection of up to 100 user IDs belonging to users who
-        have retweeted the tweet specified by the id parameter.
+        have retweeted the tweet specified by the ``id`` parameter.
 
         Docs:
         https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-retweeters-ids
@@ -317,7 +317,7 @@ class EndpointsMixin(object):
     get_sent_messages.iter_mode = 'id'
 
     def get_direct_message(self, **params):
-        """Returns a single direct message, specified by an id parameter.
+        """Returns a single direct message, specified by an ``id`` parameter.
 
         Docs:
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-message
@@ -326,7 +326,7 @@ class EndpointsMixin(object):
         return self.get('direct_messages/show', params=params)
 
     def destroy_direct_message(self, **params):
-        """Destroys the direct message specified in the required id parameter
+        """Destroys the direct message specified in the required ``id`` parameter
 
         Docs:
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/delete-message
@@ -381,7 +381,7 @@ class EndpointsMixin(object):
 
     def lookup_friendships(self, **params):
         """Returns the relationships of the authenticating user to the
-        comma-separated list of up to 100 screen_names or user_ids provided.
+        comma-separated list of up to 100 ``screen_names`` or ``user_ids`` provided.
 
         Docs:
         https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-friendships-lookup
@@ -415,7 +415,7 @@ class EndpointsMixin(object):
 
     def create_friendship(self, **params):
         """Allows the authenticating users to follow the user specified
-        in the ID parameter.
+        in the ``id`` parameter.
 
         Docs:
         https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/post-friendships-create
@@ -425,7 +425,7 @@ class EndpointsMixin(object):
 
     def destroy_friendship(self, **params):
         """Allows the authenticating user to unfollow the user specified
-        in the ID parameter.
+        in the ``id`` parameter.
 
         Docs:
         https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/post-friendships-destroy
@@ -540,8 +540,8 @@ class EndpointsMixin(object):
         """Sets one or more hex values that control the color scheme of the
         authenticating user's profile page on twitter.com.
 
-        This method is deprecated, replaced by the profile_link_color
-        parameter to update_profile.
+        This method is deprecated, replaced by the ``profile_link_color``
+        parameter to :meth:`update_profile`.
 
         Docs:
         https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/api-reference/post-account-update_profile
@@ -597,7 +597,7 @@ class EndpointsMixin(object):
         return self.post('blocks/create', params=params)
 
     def destroy_block(self, **params):
-        """Un-blocks the user specified in the ID parameter for the
+        """Un-blocks the user specified in the ``id`` parameter for the
         authenticating user.
 
         Docs:
@@ -608,8 +608,8 @@ class EndpointsMixin(object):
 
     def lookup_user(self, **params):
         """Returns fully-hydrated user objects for up to 100 users per request,
-        as specified by comma-separated values passed to the user_id and/or
-        screen_name parameters.
+        as specified by comma-separated values passed to the ``user_id`` and/or
+        ``screen_name`` parameters.
 
         Docs:
         https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-lookup
@@ -619,7 +619,7 @@ class EndpointsMixin(object):
 
     def show_user(self, **params):
         """Returns a variety of information about the user specified by the
-        required user_id or screen_name parameter.
+        required ``user_id`` or ``screen_name`` parameter.
 
         Docs:
         https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-show
@@ -718,7 +718,7 @@ class EndpointsMixin(object):
         return self.post('mutes/users/create', params=params)
 
     def destroy_mute(self, **params):
-        """Un-mutes the user specified in the user or ID parameter for
+        """Un-mutes the user specified in the user or ``id`` parameter for
         the authenticating user.
 
         Docs:
@@ -772,7 +772,7 @@ class EndpointsMixin(object):
     get_favorites.iter_mode = 'id'
 
     def destroy_favorite(self, **params):
-        """Un-favorites the status specified in the ID parameter as the
+        """Un-favorites the status specified in the ``id`` parameter as the
         authenticating user.
 
         Docs:
@@ -782,7 +782,7 @@ class EndpointsMixin(object):
         return self.post('favorites/destroy', params=params)
 
     def create_favorite(self, **params):
-        """Favorites the status specified in the ID parameter as the
+        """Favorites the status specified in the ``id`` parameter as the
         authenticating user.
 
         Docs:
@@ -988,7 +988,7 @@ class EndpointsMixin(object):
         return self.get('saved_searches/list', params=params)
 
     def show_saved_search(self, **params):
-        """Retrieve the information for the saved search represented by the given id.
+        """Retrieve the information for the saved search represented by the given ``id``.
 
         Docs:
         https://developer.twitter.com/en/docs/tweets/search/api-reference/get-saved_searches-show-id
