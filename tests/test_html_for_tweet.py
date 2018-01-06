@@ -96,11 +96,11 @@ class TestHtmlForTweetTestCase(unittest.TestCase):
         But its length is still counted in the indices of any subsequent
         mentions, urls, hashtags, etc.
         """
-        self.maxDiff = 2000
+        self.maxDiff = 2200
         tweet_object = self.load_tweet('entities_with_prefix')
         tweet_text = self.api.html_for_tweet(tweet_object)
         self.assertEqual(tweet_text,
-            '<span class="twython-tweet-prefix"><a href="https://twitter.com/philgyford" class="twython-mention">@philgyford</a> </span>This is a test for <a href="https://twitter.com/visionphil" class="twython-mention">@visionphil</a> that includes a link <a href="https://t.co/sKw4J3A8SZ" class="twython-url">example.org</a> and <a href="https://twitter.com/search?q=%23hashtag" class="twython-hashtag">#hashtag</a> and 😃 for good measure AND that is longer than 140 characters. <a href="https://t.co/jnQdy7Zg7u" class="twython-url">example.com</a>')
+            u'<span class="twython-tweet-prefix"><a href="https://twitter.com/philgyford" class="twython-mention">@philgyford</a> </span>This is a test for <a href="https://twitter.com/visionphil" class="twython-mention">@visionphil</a> that includes a link <a href="https://t.co/sKw4J3A8SZ" class="twython-url">example.org</a> and <a href="https://twitter.com/search?q=%23hashtag" class="twython-hashtag">#hashtag</a> and X for good measure AND that is longer than 140 characters. <a href="https://t.co/jnQdy7Zg7u" class="twython-url">example.com</a>')
 
     def test_media(self):
         tweet_object = self.load_tweet('media')
