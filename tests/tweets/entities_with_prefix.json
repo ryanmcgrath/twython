@@ -1,0 +1,68 @@
+{  
+  "created_at":"Sat Jan 06 18:56:35 +0000 2018",
+  "id":949716340755091458,
+  "id_str":"949716340755091458",
+  "full_text":"@philgyford This is a test for @visionphil that includes a link https://t.co/sKw4J3A8SZ and #hashtag and X for good measure AND that is longer than 140 characters. https://t.co/jnQdy7Zg7u",
+  "truncated":false,
+  "display_text_range":[ 12, 187 ],
+  "entities":{  
+    "hashtags":[  
+      {  
+        "text":"hashtag",
+        "indices":[ 92, 100 ]
+      }
+    ],
+    "symbols":[  ],
+    "user_mentions":[  
+      {  
+        "screen_name":"philgyford",
+        "name":"Phil Gyford",
+        "id":12552,
+        "id_str":"12552",
+        "indices":[ 0, 11 ]
+      },
+      {  
+        "screen_name":"visionphil",
+        "name":"Vision Phil",
+        "id":104456050,
+        "id_str":"104456050",
+        "indices":[ 31, 42 ]
+      }
+    ],
+    "urls":[  
+      {  
+        "url":"https://t.co/sKw4J3A8SZ",
+        "expanded_url":"http://example.org",
+        "display_url":"example.org",
+        "indices":[ 64, 87 ]
+      },
+      {  
+        "url":"https://t.co/jnQdy7Zg7u",
+        "expanded_url":"http://example.com",
+        "display_url":"example.com",
+        "indices":[ 164, 187 ]
+      }
+    ]
+  },
+  "source":"<a href=\"http://tapbots.com/software/tweetbot/mac\" rel=\"nofollow\">Tweetbot for Mac</a>",
+  "in_reply_to_status_id":948561036889722880,
+  "in_reply_to_status_id_str":"948561036889722880",
+  "in_reply_to_user_id":12552,
+  "in_reply_to_user_id_str":"12552",
+  "in_reply_to_screen_name":"philgyford",
+  "user":{  
+    "id":2030131,
+    "id_str":"2030131"
+  },
+  "geo":null,
+  "coordinates":null,
+  "place":null,
+  "contributors":null,
+  "is_quote_status":false,
+  "retweet_count":0,
+  "favorite_count":0,
+  "favorited":false,
+  "retweeted":false,
+  "possibly_sensitive":false,
+  "lang":"en"
+}

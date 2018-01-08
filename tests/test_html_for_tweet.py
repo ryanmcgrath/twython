@@ -89,6 +89,19 @@ class TestHtmlForTweetTestCase(unittest.TestCase):
         self.assertEqual(tweet_text,
             'Say more about what\'s happening! Rolling out now: photos, videos, GIFs, polls, and Quote Tweets no longer count toward your 140 characters.<span class="twython-tweet-suffix"> <a href="https://t.co/I9pUC0NdZC" class="twython-media">pic.twitter.com/I9pUC0NdZC</a></span>')
 
+    def test_entities_with_prefix(self):
+        """
+        If there is a username mention at the start of a tweet it's in the
+        "prefix" and so isn't part of the main tweet display text.
+        But its length is still counted in the indices of any subsequent
+        mentions, urls, hashtags, etc.
+        """
+        self.maxDiff = 2200
+        tweet_object = self.load_tweet('entities_with_prefix')
+        tweet_text = self.api.html_for_tweet(tweet_object)
+        self.assertEqual(tweet_text,
+            u'<span class="twython-tweet-prefix"><a href="https://twitter.com/philgyford" class="twython-mention">@philgyford</a> </span>This is a test for <a href="https://twitter.com/visionphil" class="twython-mention">@visionphil</a> that includes a link <a href="https://t.co/sKw4J3A8SZ" class="twython-url">example.org</a> and <a href="https://twitter.com/search?q=%23hashtag" class="twython-hashtag">#hashtag</a> and X for good measure AND that is longer than 140 characters. <a href="https://t.co/jnQdy7Zg7u" class="twython-url">example.com</a>')
+
     def test_media(self):
         tweet_object = self.load_tweet('media')
         tweet_text = self.api.html_for_tweet(tweet_object)

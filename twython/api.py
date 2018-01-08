@@ -581,6 +581,8 @@ class Twython(EndpointsMixin, object):
 
                     if display_text_start <= temp['start'] <= display_text_end:
                         temp['replacement'] = mention_html
+                        temp['start'] -= display_text_start
+                        temp['end'] -= display_text_start
                         entities.append(temp)
                     else:
                         # Make the '@username' at the start, before
@@ -592,8 +594,8 @@ class Twython(EndpointsMixin, object):
             if 'hashtags' in tweet['entities']:
                 for entity in tweet['entities']['hashtags']:
                     temp = {}
-                    temp['start'] = entity['indices'][0]
-                    temp['end'] = entity['indices'][1]
+                    temp['start'] = entity['indices'][0] - display_text_start
+                    temp['end'] = entity['indices'][1] - display_text_start
 
                     url_html = '<a href="https://twitter.com/search?q=%%23%(hashtag)s" class="twython-hashtag">#%(hashtag)s</a>' % {'hashtag': entity['text']}
 
@@ -604,8 +606,8 @@ class Twython(EndpointsMixin, object):
             if 'symbols' in tweet['entities']:
                 for entity in tweet['entities']['symbols']:
                     temp = {}
-                    temp['start'] = entity['indices'][0]
-                    temp['end'] = entity['indices'][1]
+                    temp['start'] = entity['indices'][0] - display_text_start
+                    temp['end'] = entity['indices'][1] - display_text_start
 
                     url_html = '<a href="https://twitter.com/search?q=%%24%(symbol)s" class="twython-symbol">$%(symbol)s</a>' % {'symbol': entity['text']}
 
@@ -616,8 +618,8 @@ class Twython(EndpointsMixin, object):
             if 'urls' in tweet['entities']:
                 for entity in tweet['entities']['urls']:
                     temp = {}
-                    temp['start'] = entity['indices'][0]
-                    temp['end'] = entity['indices'][1]
+                    temp['start'] = entity['indices'][0] - display_text_start
+                    temp['end'] = entity['indices'][1] - display_text_start
 
                     if use_display_url and entity.get('display_url') and not use_expanded_url:
                         shown_url = entity['display_url']
