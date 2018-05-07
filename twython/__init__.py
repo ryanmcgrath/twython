@@ -19,7 +19,7 @@ Questions, comments? ryan@venodesigns.net
 """
 
 __author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '3.6.0'
+__version__ = '3.7.0'
 
 from .api import Twython
 from .streaming import TwythonStreamer

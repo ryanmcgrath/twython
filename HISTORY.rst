@@ -3,6 +3,15 @@
 History
 -------
 
+3.7.0 (2018-07-05)
+++++++++++++++++++
+- Fixes for cursoring API endpoints
+- Improve `html_for_tweet()` parsing
+- Documentation cleanup
+- Documentation for cursor's `return_pages` keyword argument
+- Update links to Twitter API in documentation
+- Added `create_metadata` endpoint
+- Raise error for when cursor is not provided a callable
 
 3.6.0 (2017-23-08)
 ++++++++++++++++++
