@@ -19,6 +19,7 @@ from requests_oauthlib import OAuth1, OAuth2
 from . import __version__
 from .advisory import TwythonDeprecationWarning
 from .compat import json, urlencode, parse_qsl, quote_plus, str, is_py2
+from .compat import urlsplit
 from .endpoints import EndpointsMixin
 from .exceptions import TwythonError, TwythonAuthError, TwythonRateLimitError
 from .helpers import _transparent_params
@@ -507,19 +508,27 @@ class Twython(EndpointsMixin, object):
 
             try:
                 if function.iter_mode == 'id':
-                    if 'max_id' not in params:
-                        # Add 1 to the id because since_id and
-                        # max_id are inclusive
-                        if hasattr(function, 'iter_metadata'):
-                            since_id = content[function.iter_metadata].get('since_id_str')
+                    # Set max_id in params to one less than lowest tweet id
+                    if hasattr(function, 'iter_metadata'):
+                        # Get supplied next max_id
+                        metadata = content.get(function.iter_metadata)
+                        if 'next_results' in metadata:
+                            next_results = urlsplit(metadata['next_results'])
+                            params = dict(parse_qsl(next_results.query))
                         else:
-                            since_id = content[0]['id_str']
-                        params['since_id'] = (int(since_id) - 1)
+                            # No more results
+                            raise StopIteration
+                    else:
+                        # Twitter gives tweets in reverse chronological order:
+                        params['max_id'] = str(int(content[-1]['id_str']) - 1)
                 elif function.iter_mode == 'cursor':
                     params['cursor'] = content['next_cursor_str']
             except (TypeError, ValueError):  # pragma: no cover
                 raise TwythonError('Unable to generate next page of search \
                                    results, `page` is not a number.')
+            except (KeyError, AttributeError):  #pragma no cover
+                raise TwythonError('Unable to generate next page of search \
+                                   results, content has unexpected structure.')
 
     @staticmethod
     def unicode2utf8(text):
