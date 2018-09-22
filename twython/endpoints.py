@@ -300,10 +300,10 @@ class EndpointsMixin(object):
         """Returns the 20 most recent direct messages sent to the authenticating user.
 
         Docs:
-        https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-messages
+        https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/list-events
 
         """
-        return self.get('direct_messages', params=params)
+        return self.get('direct_messages/events/list', params=params)
     get_direct_messages.iter_mode = 'id'
 
     def get_sent_messages(self, **params):
@@ -320,10 +320,10 @@ class EndpointsMixin(object):
         """Returns a single direct message, specified by an ``id`` parameter.
 
         Docs:
-        https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-message
+        https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-event
 
         """
-        return self.get('direct_messages/show', params=params)
+        return self.get('direct_messages/events/show', params=params)
 
     def destroy_direct_message(self, **params):
         """Destroys the direct message specified in the required ``id`` parameter
@@ -339,10 +339,10 @@ class EndpointsMixin(object):
         authenticating user.
 
         Docs:
-        https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-message
+        https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-event
 
         """
-        return self.post('direct_messages/new', params=params)
+        return self.post('direct_messages/events/new', params=params, json_encoded=True)
 
     # Friends & Followers
     def get_user_ids_of_blocked_retweets(self, **params):
