@@ -303,7 +303,7 @@ class EndpointsMixin(object):
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-messages
 
         """
-        return self.get('direct_messages', params=params)
+        return self.get('direct_messages/events/list', params=params)
     get_direct_messages.iter_mode = 'id'
 
     def get_sent_messages(self, **params):
@@ -313,7 +313,7 @@ class EndpointsMixin(object):
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-sent-message
 
         """
-        return self.get('direct_messages/sent', params=params)
+        return self.get('direct_messages/events/list', params=params)
     get_sent_messages.iter_mode = 'id'
 
     def get_direct_message(self, **params):
@@ -323,7 +323,7 @@ class EndpointsMixin(object):
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-message
 
         """
-        return self.get('direct_messages/show', params=params)
+        return self.get('direct_messages/events/show', params=params)
 
     def destroy_direct_message(self, **params):
         """Destroys the direct message specified in the required ``id`` parameter
@@ -332,7 +332,7 @@ class EndpointsMixin(object):
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/delete-message
 
         """
-        return self.post('direct_messages/destroy', params=params)
+        return self.delete('direct_messages/events/destroy', params=params)
 
     def send_direct_message(self, **params):
         """Sends a new direct message to the specified user from the
@@ -342,7 +342,7 @@ class EndpointsMixin(object):
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-message
 
         """
-        return self.post('direct_messages/new', params=params)
+        return self.post('direct_messages/events/new', params=params)
 
     # Friends & Followers
     def get_user_ids_of_blocked_retweets(self, **params):
