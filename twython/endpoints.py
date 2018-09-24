@@ -19,7 +19,7 @@ import os
 import warnings
 from io import BytesIO
 from time import sleep
-from utils import old_format_direct_messages
+from .utils import old_format_direct_messages
 #try:
     #from StringIO import StringIO
 #except ImportError:
