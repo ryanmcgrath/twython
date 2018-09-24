@@ -199,8 +199,7 @@ class EndpointsMixin(object):
             'command': 'INIT',
             'media_type': media_type,
             'total_bytes': size,
-            'media_category': media_category,
-            'json': 'true'
+            'media_category': media_category
         }
         response_init = self.post(upload_url, params=params)
         media_id = response_init['media_id']
@@ -305,7 +304,9 @@ class EndpointsMixin(object):
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-messages
 
         """
-        new_style_direct_messages = self.get('direct_messages/events/list', params=params)['events']
+        _params = params
+        _params['json'] = 'true'
+        new_style_direct_messages = self.get('direct_messages/events/list', params=_params)['events']
         old_style_direct_messages = old_format_direct_messages(new_style_direct_messages)
         return old_style_direct_messages
     get_direct_messages.iter_mode = 'id'
@@ -317,7 +318,9 @@ class EndpointsMixin(object):
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-sent-message
 
         """
-        return self.get('direct_messages/events/list', params=params)['events']
+        _params = params
+        _params['json'] = 'true'
+        return self.get('direct_messages/events/list', params=_params)['events']
     get_sent_messages.iter_mode = 'id'
 
     def get_direct_message(self, **params):
@@ -327,7 +330,9 @@ class EndpointsMixin(object):
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-message
 
         """
-        return self.get('direct_messages/events/show', params=params)['events']
+        _params = params
+        _params['json'] = 'true'
+        return self.get('direct_messages/events/show', params=_params)['events']
 
     def destroy_direct_message(self, **params):
         """Destroys the direct message specified in the required ``id`` parameter
@@ -336,7 +341,9 @@ class EndpointsMixin(object):
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/delete-message
 
         """
-        return self.delete('direct_messages/events/destroy', params=params)
+        _params = params
+        _params['json'] = 'true'
+        return self.delete('direct_messages/events/destroy', params=_params)
 
     def send_direct_message(self, **params):
         """Sends a new direct message to the specified user from the
@@ -346,7 +353,9 @@ class EndpointsMixin(object):
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-message
 
         """
-        return self.post('direct_messages/events/new', params=params)
+        _params = params
+        _params['json'] = 'true'
+        return self.post('direct_messages/events/new', params=_params)
 
     # Friends & Followers
     def get_user_ids_of_blocked_retweets(self, **params):
