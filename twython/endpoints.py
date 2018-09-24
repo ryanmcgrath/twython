@@ -19,6 +19,7 @@ import os
 import warnings
 from io import BytesIO
 from time import sleep
+from utils import old_format_direct_messages
 #try:
     #from StringIO import StringIO
 #except ImportError:
@@ -198,7 +199,8 @@ class EndpointsMixin(object):
             'command': 'INIT',
             'media_type': media_type,
             'total_bytes': size,
-            'media_category': media_category
+            'media_category': media_category,
+            'json': 'true'
         }
         response_init = self.post(upload_url, params=params)
         media_id = response_init['media_id']
@@ -303,7 +305,9 @@ class EndpointsMixin(object):
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-messages
 
         """
-        return self.get('direct_messages/events/list', params=params)
+        new_style_direct_messages = self.get('direct_messages/events/list', params=params)['events']
+        old_style_direct_messages = old_format_direct_messages(new_style_direct_messages)
+        return old_style_direct_messages
     get_direct_messages.iter_mode = 'id'
 
     def get_sent_messages(self, **params):
@@ -313,7 +317,7 @@ class EndpointsMixin(object):
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-sent-message
 
         """
-        return self.get('direct_messages/events/list', params=params)
+        return self.get('direct_messages/events/list', params=params)['events']
     get_sent_messages.iter_mode = 'id'
 
     def get_direct_message(self, **params):
@@ -323,7 +327,7 @@ class EndpointsMixin(object):
         https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-message
 
         """
-        return self.get('direct_messages/events/show', params=params)
+        return self.get('direct_messages/events/show', params=params)['events']
 
     def destroy_direct_message(self, **params):
         """Destroys the direct message specified in the required ``id`` parameter
