@@ -307,7 +307,7 @@ class EndpointsMixin(object):
         _params = params
         _params['json'] = 'true'
         new_style_direct_messages = self.get('direct_messages/events/list', params=_params)['events']
-        old_style_direct_messages = old_format_direct_messages(new_style_direct_messages)
+        old_style_direct_messages = old_format_direct_messages(new_style_direct_messages, self.show_user)
         return old_style_direct_messages
     get_direct_messages.iter_mode = 'id'
 
