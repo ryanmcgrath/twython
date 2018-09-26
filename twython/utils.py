@@ -7,7 +7,7 @@ def load_users():
 		with open('users.json', 'r') as f:
 			users = json.load(f)
 			return users
-	except ValueError as e:
+	except (ValueError, IOError) as e:
 		print(e)
 		return {}
 
