@@ -268,7 +268,7 @@ class EndpointsMixin(object):
         https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/get-statuses-oembed
 
         """
-        return self.get('statuses/oembed', params=params)
+        return self.get('oembed', params=params)
 
     def get_retweeters_ids(self, **params):
         """Returns a collection of up to 100 user IDs belonging to users who
