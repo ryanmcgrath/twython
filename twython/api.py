@@ -153,7 +153,7 @@ class Twython(EndpointsMixin, object):
             if k in ('timeout', 'allow_redirects', 'stream', 'verify'):
                 requests_args[k] = v
 
-        if method == 'get':
+        if method == 'get' or method == 'delete':
             requests_args['params'] = params
         else:
             # Check for json_encoded so we will sent params as "data" or "json"
@@ -242,7 +242,7 @@ class Twython(EndpointsMixin, object):
                          (e.g. search/tweets)
         :type endpoint: string
         :param method: (optional) Method of accessing data, either
-                       GET or POST. (default GET)
+                       GET, POST or DELETE. (default GET)
         :type method: string
         :param params: (optional) Dict of parameters (if any) accepted
                        the by Twitter API endpoint you are trying to
@@ -280,6 +280,10 @@ class Twython(EndpointsMixin, object):
     def post(self, endpoint, params=None, version='1.1', json_encoded=False):
         """Shortcut for POST requests via :class:`request`"""
         return self.request(endpoint, 'POST', params=params, version=version, json_encoded=json_encoded)
+
+    def delete(self, endpoint, params=None, version='1.1', json_encoded=False):
+        """Shortcut for delete requests via :class:`request`"""
+        return self.request(endpoint, 'DELETE', params=params, version=version, json_encoded=json_encoded)
 
     def get_lastfunction_header(self, header, default_return_value=None):
         """Returns a specific header from the last API call
