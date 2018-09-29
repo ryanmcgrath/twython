@@ -329,10 +329,10 @@ class EndpointsMixin(object):
         """Destroys the direct message specified in the required ``id`` parameter
 
         Docs:
-        https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/delete-message
+        https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/delete-message-event
 
         """
-        return self.post('direct_messages/destroy', params=params)
+        return self.delete('direct_messages/events/destroy', params=params)
 
     def send_direct_message(self, **params):
         """Sends a new direct message to the specified user from the
