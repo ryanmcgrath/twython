@@ -141,7 +141,7 @@ class Twython(EndpointsMixin, object):
         params = params or {}
 
         func = getattr(self.client, method)
-        if isinstance(params, dict) and json_encoded == False:
+        if isinstance(params, dict) and json_encoded is False:
             params, files = _transparent_params(params)
         else:
             params = params
@@ -158,9 +158,9 @@ class Twython(EndpointsMixin, object):
         else:
             # Check for json_encoded so we will sent params as "data" or "json"
             if json_encoded:
-                data_key = "json"
+                data_key = 'json'
             else:
-               data_key = "data"
+               data_key = 'data'
             requests_args.update({
                 data_key: params,
                 'files': files,
