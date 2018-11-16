@@ -160,7 +160,7 @@ class Twython(EndpointsMixin, object):
             if json_encoded:
                 data_key = 'json'
             else:
-               data_key = 'data'
+                data_key = 'data'
             requests_args.update({
                 data_key: params,
                 'files': files,
