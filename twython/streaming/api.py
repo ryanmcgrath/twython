@@ -125,7 +125,7 @@ class TwythonStreamer(object):
                     self.on_timeout()
                 else:
                     if response.status_code != 200:
-                        self.on_error(response.status_code, response.content)
+                        self.on_error(response.status_code, response.content, response.headers)
 
                     if self.retry_count and \
                        (self.retry_count - retry_counter) > 0:
@@ -178,7 +178,7 @@ class TwythonStreamer(object):
         """
         return True
 
-    def on_error(self, status_code, data):  # pragma: no cover
+    def on_error(self, status_code, data, headers=None):  # pragma: no cover
         """Called when stream returns non-200 status code
 
         Feel free to override this to handle your streaming data how you
@@ -189,6 +189,9 @@ class TwythonStreamer(object):
 
         :param data: Error message sent from stream
         :type data: dict
+
+        :param headers: Response headers sent from the stream (i.e. Retry-After)
+        :type headers: dict
         """
         return
 
