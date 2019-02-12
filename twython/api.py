@@ -514,7 +514,7 @@ class Twython(EndpointsMixin, object):
                         metadata = content.get(function.iter_metadata)
                         if 'next_results' in metadata:
                             next_results = urlsplit(metadata['next_results'])
-                            params = dict(parse_qsl(next_results.query))
+                            params.update(dict(parse_qsl(next_results.query)))
                         else:
                             # No more results
                             raise StopIteration
