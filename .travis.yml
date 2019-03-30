@@ -4,6 +4,12 @@ python:
   - 2.7
   - 3.5
   - 3.6
+# Enable 3.7 without globally enabling sudo and dist: xenial for other build jobs
+matrix:
+  include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
 env:
   global:
   - secure: USjLDneiXlVvEjkUVqTt+LBi0XJ4QhkRcJzqVXA9gEau1NTjAkNTPmHjUbOygp0dkfoV0uWrZKCw6fL1g+HJgWl0vHeHzcNl4mUkA+OwkGFHgaeIhvUfnyyJA8P3Zm21XHC+ehzMpEFN5fVNNhREjnRj+CXMc0FgA6knwBRobu4=
@@ -24,9 +30,6 @@ install:
 script: nosetests -v -w tests/ --logging-filter="twython" --with-cov --cov twython --cov-config .coveragerc --cov-report term-missing
 notifications:
   email: false
-branches:
-  only:
-    - master
 after_success:
   - coveralls
 before_script:
