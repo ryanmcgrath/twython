@@ -135,13 +135,13 @@ class Twython(EndpointsMixin, object):
     def __repr__(self):
         return '<Twython: %s>' % (self.app_key)
 
-    def _request(self, url, method='GET', params=None, api_call=None):
+    def _request(self, url, method='GET', params=None, api_call=None, json_encoded=False):
         """Internal request method"""
         method = method.lower()
         params = params or {}
 
         func = getattr(self.client, method)
-        if isinstance(params, dict):
+        if isinstance(params, dict) and json_encoded is False:
             params, files = _transparent_params(params)
         else:
             params = params
@@ -153,11 +153,16 @@ class Twython(EndpointsMixin, object):
             if k in ('timeout', 'allow_redirects', 'stream', 'verify'):
                 requests_args[k] = v
 
-        if method == 'get':
+        if method == 'get' or method == 'delete':
             requests_args['params'] = params
         else:
+            # Check for json_encoded so we will sent params as "data" or "json"
+            if json_encoded:
+                data_key = 'json'
+            else:
+                data_key = 'data'
             requests_args.update({
-                'data': params,
+                data_key: params,
                 'files': files,
             })
         try:
@@ -230,14 +235,14 @@ class Twython(EndpointsMixin, object):
 
         return error_message
 
-    def request(self, endpoint, method='GET', params=None, version='1.1'):
+    def request(self, endpoint, method='GET', params=None, version='1.1', json_encoded=False):
         """Return dict of response received from Twitter's API
 
         :param endpoint: (required) Full url or Twitter API endpoint
                          (e.g. search/tweets)
         :type endpoint: string
         :param method: (optional) Method of accessing data, either
-                       GET or POST. (default GET)
+                       GET, POST or DELETE. (default GET)
         :type method: string
         :param params: (optional) Dict of parameters (if any) accepted
                        the by Twitter API endpoint you are trying to
@@ -246,6 +251,9 @@ class Twython(EndpointsMixin, object):
         :param version: (optional) Twitter API version to access
                         (default 1.1)
         :type version: string
+        :param json_encoded: (optional) Flag to indicate if this method should send data encoded as json
+                        (default False)
+        :type json_encoded: bool
 
         :rtype: dict
         """
@@ -261,7 +269,7 @@ class Twython(EndpointsMixin, object):
             url = '%s/%s.json' % (self.api_url % version, endpoint)
 
         content = self._request(url, method=method, params=params,
-                                api_call=url)
+                                api_call=url, json_encoded=json_encoded)
 
         return content
 
@@ -269,9 +277,13 @@ class Twython(EndpointsMixin, object):
         """Shortcut for GET requests via :class:`request`"""
         return self.request(endpoint, params=params, version=version)
 
-    def post(self, endpoint, params=None, version='1.1'):
+    def post(self, endpoint, params=None, version='1.1', json_encoded=False):
         """Shortcut for POST requests via :class:`request`"""
-        return self.request(endpoint, 'POST', params=params, version=version)
+        return self.request(endpoint, 'POST', params=params, version=version, json_encoded=json_encoded)
+
+    def delete(self, endpoint, params=None, version='1.1', json_encoded=False):
+        """Shortcut for delete requests via :class:`request`"""
+        return self.request(endpoint, 'DELETE', params=params, version=version, json_encoded=json_encoded)
 
     def get_lastfunction_header(self, header, default_return_value=None):
         """Returns a specific header from the last API call
