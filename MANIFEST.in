@@ -1,1 +1,9 @@
 include README.rst HISTORY.rst LICENSE requirements.txt
+
+recursive-include docs *
+prune docs/_build
+
+recursive-include examples *.py
+
+recursive-include tests *.py
+recursive-include tests/tweets *.json
