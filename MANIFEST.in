@@ -1,4 +1,4 @@
-include README.rst HISTORY.rst LICENSE requirements.txt
+include README.md HISTORY.md LICENSE requirements.txt
 
 recursive-include docs *
 prune docs/_build
