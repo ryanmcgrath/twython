@@ -8,8 +8,8 @@ try:
 except ImportError:
     from distutils.core import setup
 
-__author__ = 'Ryan McGrath <ryan@venodesigns.net>'
-__version__ = '3.7.0'
+__author__ = 'Ryan McGrath <ryan@rymc.io>'
+__version__ = '3.8.0'
 
 packages = [
     'twython',
@@ -26,13 +26,11 @@ setup(
     install_requires=['requests>=2.1.0', 'requests_oauthlib>=0.4.0'],
     author='Ryan McGrath',
     author_email='ryan@venodesigns.net',
-    license=open('LICENSE').read(),
+    license='MIT',
     url='https://github.com/ryanmcgrath/twython/tree/master',
     keywords='twitter search api tweet twython stream',
-    description='Actively maintained, pure Python wrapper for the \
-    Twitter API. Supports both normal and streaming Twitter APIs',
-    long_description=open('README.md').read() + '\n\n' +
-        open('HISTORY.md').read(),
+    description='Actively maintained, pure Python wrapper for the Twitter API. Supports both normal and streaming Twitter APIs',
+    long_description=open('README.md', encoding='utf-8').read() + '\n\n' +open('HISTORY.md', encoding='utf-8').read(),
     long_description_content_type='text/markdown',
     include_package_data=True,
     packages=packages,
