@@ -1,10 +1,10 @@
-.. :changelog:
+# History
 
-History
--------
+## 3.8.0 (2020-04-02)
+- Bump release with latest patches from GitHub.
+- Fix Direct Messages with patches from @manuelcortez.
 
-3.7.0 (2018-07-05)
-++++++++++++++++++
+## 3.7.0 (2018-07-05)
 - Fixes for cursoring API endpoints
 - Improve `html_for_tweet()` parsing
 - Documentation cleanup
@@ -13,32 +13,27 @@ History
 - Added `create_metadata` endpoint
 - Raise error for when cursor is not provided a callable
 
-3.6.0 (2017-23-08)
-++++++++++++++++++
+## 3.6.0 (2017-23-08)
 - Improve replacing of entities with links in `html_for_tweet()`
 - Update classifiers for PyPI
 
-3.5.0 (2017-06-06)
-++++++++++++++++++
+## 3.5.0 (2017-06-06)
 - Added support for "symbols" in `Twython.html_for_tweet()`
 - Added support for extended tweets in `Twython.html_for_tweet()`
 - You can now check progress of video uploads to Twitter when using `Twython.upload_video()`
 
-3.4.0 (2016-30-04)
-++++++++++++++++++
+## 3.4.0 (2016-30-04)
 - Added `upload_video` endpoint
 - Fix quoted status checks in `html_for_tweet`
 - Fix `html_for_tweet` method response when hashtag/mention is a substring of another
 
-3.3.0 (2015-18-07)
-++++++++++++++++++
+## 3.3.0 (2015-18-07)
 - Added support for muting users
 - Fix typos in documentation
 - Updated documentation examples
 - Added dynamic filtering to streamer
 
-3.2.0 (2014-10-30)
-++++++++++++++++++
+## 3.2.0 (2014-10-30)
 - PEP8'd some code
 - Added `lookup_status` function to `endpoints.py`
 - Added keyword argument to `cursor` to return full pages rather than individual results
@@ -51,23 +46,16 @@ History
 - Deprecating `update_with_media` per Twitter API 1.1 (https://dev.twitter.com/rest/reference/post/statuses/update_with_media)
 - Unpin `requests` and `requests-oauthlib` in `requirements.txt`
 
-
-3.1.2 (2013-12-05)
-++++++++++++++++++
-
+## 3.1.2 (2013-12-05)
 - Fixed Changelog (HISTORY.rst)
 
-3.1.1 (2013-12-05)
-++++++++++++++++++
-
+## 3.1.1 (2013-12-05)
 - Update `requests` version to 2.1.0.
 - Fixed: Streaming issue where `Exceptions` in handlers or `on_success` which subclass `ValueError` would previously be caught and reported as a JSON decoding problem, and `on_error()` would be called (with status_code=200)
 - Fixed issue where XML was returned when bad tokens were passed to `get_authorized_tokens`
 - Fixed import for `setup` causing installation to fail on some devices (eg. Nokia N9/MeeGo)
 
-3.1.0 (2013-09-25)
-++++++++++++++++++
-
+## 3.1.0 (2013-09-25)
 - Added ``html_for_tweet`` static method. This method accepts a tweet object returned from a Twitter API call and will return a string with urls, mentions and hashtags in the tweet replaced with HTML.
 - Pass ``client_args`` to the streaming ``__init__``, much like in core Twython (you can pass headers, timeout, hooks, proxies, etc.).
 - Streamer has new parameter ``handlers`` which accepts a list of strings related to functions that are apart of the Streaming class and start with "on\_". i.e. ['delete'] is passed, when 'delete' is received from a stream response; ``on_delete`` will be called.
@@ -79,9 +67,7 @@ History
 - Fixed streaming issue where results wouldn't be returned for streams that weren't so active (See https://github.com/ryanmcgrath/twython/issues/202#issuecomment-19915708)
 - Streaming API now uses ``_transparent_params`` so when passed ``True`` or ``False`` or an array, etc. Twython formats it to meet Twitter parameter standards (i.e. ['ryanmcgrath', 'mikehelmick', 'twitterapi'] would convert to string 'ryanmcgrath,mikehelmick,twitterapi')
 
-3.0.0 (2013-06-18)
-++++++++++++++++++
-
+## 3.0.0 (2013-06-18)
 - Changed ``twython/twython.py`` to ``twython/api.py`` in attempt to make structure look a little neater
 - Removed all camelCase function access (anything like ``getHomeTimeline`` is now ``get_home_timeline``)
 - Removed ``shorten_url``. With the ``requests`` library, shortening a URL on your own is simple enough
@@ -100,9 +86,7 @@ History
 - Added ``invalidate_token`` API method which allows registed apps to revoke an access token presenting its client credentials
 - ``get_lastfunction_header`` now accepts a ``default_return_value`` parameter. This means that if you pass a second value (ex. ``Twython.get_lastfunction_header('x-rate-limit-remaining', 0)``) and the value is not found, it returns your default value
 
-2.10.1 (2013-05-29)
-++++++++++++++++++
-
+## 2.10.1 (2013-05-29)
 - More test coverage!
 - Fix ``search_gen``
 - Fixed ``get_lastfunction_header`` to actually do what its docstring says, returns ``None`` if header is not found
@@ -112,9 +96,7 @@ History
 - No longer raise ``TwythonStreamError`` when stream line can't be decoded. Instead, sends signal to ``TwythonStreamer.on_error``
 - Allow for (int, long, float) params to be passed to Twython Twitter API functions in Python 2, and (int, float) in Python 3
 
-2.10.0 (2013-05-21)
-++++++++++++++++++
-
+## 2.10.0 (2013-05-21)
 - Added ``get_retweeters_ids`` method
 - Fixed ``TwythonDeprecationWarning`` on camelCase functions if the camelCase was the same as the PEP8 function (i.e. ``Twython.retweet`` did not change)
 - Fixed error message bubbling when error message returned from Twitter was not an array (i.e. if you try to retweet something twice, the error is not found at index 0)
@@ -125,20 +107,14 @@ History
 - Cleaned up ``Twython.construct_api_url``, uses "transparent" parameters (see 4th bullet in this version for explaination)
 - Update ``requests`` and ``requests-oauthlib`` requirements, fixing posting files AND post data together, making authenticated requests in general in Python 3.3
 
-2.9.1 (2013-05-04)
-++++++++++++++++++
-
+## 2.9.1 (2013-05-04)
 - "PEP8" all the functions. Switch functions from camelCase() to underscore_funcs(). (i.e. ``updateStatus()`` is now ``update_status()``)
 
-2.9.0 (2013-05-04)
-++++++++++++++++++
-
+## 2.9.0 (2013-05-04)
 - Fixed streaming issue #144, added ``TwythonStreamer`` to aid users in a friendly streaming experience (streaming examples in ``examples`` and README's have been updated as well)
 - ``Twython`` now requires ``requests-oauthlib`` 0.3.1, fixes #154 (unable to upload media when sending POST data with the file)
 
-2.8.0 (2013-04-29)
-++++++++++++++++++
-
+## 2.8.0 (2013-04-29)
 - Added a ``HISTORY.rst`` to start tracking history of changes
 - Updated ``twitter_endpoints.py`` to ``endpoints.py`` for cleanliness
 - Removed twython3k directory, no longer needed
@@ -161,36 +137,24 @@ History
 - Twython now takes ``ssl_verify`` parameter, defaults True. Set False if you're having development server issues
 - Removed internal ``_media_update`` function, we could have always just used ``self.post``
 
-2.7.3 (2013-04-12)
-++++++++++++++++++
-
+## 2.7.3 (2013-04-12)
 - Fixed issue where Twython Exceptions were not being logged correctly
 
-2.7.2 (2013-04-08)
-++++++++++++++++++
-
+## 2.7.2 (2013-04-08)
 - Fixed ``AttributeError`` when trying to decode the JSON response via ``Response.json()``
 
-2.7.1 (2013-04-08)
-++++++++++++++++++
-
+## 2.7.1 (2013-04-08)
 - Removed ``simplejson`` dependency
 - Fixed ``destroyDirectMessage``, ``createBlock``, ``destroyBlock`` endpoints in ``twitter_endpoints.py``
 - Added ``getProfileBannerSizes`` method to ``twitter_endpoints.py``
 - Made oauth_verifier argument required in ``get_authorized_tokens``
 - Update ``updateProfileBannerImage`` to use v1.1 endpoint
 
-2.7.0 (2013-04-04)
-++++++++++++++++++
-
+## 2.7.0 (2013-04-04)
 - New ``showOwnedLists`` method
 
-2.7.0 (2013-03-31)
-++++++++++++++++++
-
+## 2.7.0 (2013-03-31)
 - Added missing slash to ``getMentionsTimeline`` in ``twitter_endpoints.py``
 
-2.6.0 (2013-03-29)
-++++++++++++++++++
-
+## 2.6.0 (2013-03-29)
 - Updated ``twitter_endpoints.py`` to better reflect order of API endpoints on the Twitter API v1.1 docs site

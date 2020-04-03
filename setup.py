@@ -31,8 +31,9 @@ setup(
     keywords='twitter search api tweet twython stream',
     description='Actively maintained, pure Python wrapper for the \
     Twitter API. Supports both normal and streaming Twitter APIs',
-    long_description=open('README.rst').read() + '\n\n' +
-        open('HISTORY.rst').read(),
+    long_description=open('README.md').read() + '\n\n' +
+        open('HISTORY.md').read(),
+    long_description_content_type='text/markdown',
     include_package_data=True,
     packages=packages,
     classifiers=[

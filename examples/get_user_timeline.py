@@ -7,4 +7,4 @@ try:
 except TwythonError as e:
     print e
 
-print user_timeline
+print(user_timeline)
