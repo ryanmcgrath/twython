@@ -20,26 +20,6 @@ class TwythonStreamerTypes(object):
         self.streamer = streamer
         self.statuses = TwythonStreamerTypesStatuses(streamer)
 
-    def user(self, **params):
-        """Stream user
-
-        Accepted params found at:
-        https://dev.twitter.com/docs/api/1.1/get/user
-        """
-        url = 'https://userstream.twitter.com/%s/user.json' \
-              % self.streamer.api_version
-        self.streamer._request(url, params=params)
-
-    def site(self, **params):
-        """Stream site
-
-        Accepted params found at:
-        https://dev.twitter.com/docs/api/1.1/get/site
-        """
-        url = 'https://sitestream.twitter.com/%s/site.json' \
-              % self.streamer.api_version
-        self.streamer._request(url, params=params)
-
 
 class TwythonStreamerTypesStatuses(object):
     """Class for different statuses endpoints
