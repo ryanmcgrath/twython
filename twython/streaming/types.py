@@ -35,7 +35,7 @@ class TwythonStreamerTypesStatuses(object):
         self.params = None
 
     def filter(self, **params):
-        """Stream statuses/filter
+        r"""Stream statuses/filter
 
         :param \*\*params: Parameters to send with your stream request
 
@@ -47,7 +47,7 @@ class TwythonStreamerTypesStatuses(object):
         self.streamer._request(url, 'POST', params=params)
 
     def sample(self, **params):
-        """Stream statuses/sample
+        r"""Stream statuses/sample
 
         :param \*\*params: Parameters to send with your stream request
 
@@ -59,7 +59,7 @@ class TwythonStreamerTypesStatuses(object):
         self.streamer._request(url, params=params)
 
     def firehose(self, **params):
-        """Stream statuses/firehose
+        r"""Stream statuses/firehose
 
         :param \*\*params: Parameters to send with your stream request
 
@@ -71,7 +71,7 @@ class TwythonStreamerTypesStatuses(object):
         self.streamer._request(url, params=params)
 
     def set_dynamic_filter(self, **params):
-        """Set/update statuses/filter
+        r"""Set/update statuses/filter
 
         :param \*\*params: Parameters to send with your stream request
 
