@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import io
 import os
 import sys
 
@@ -30,7 +31,7 @@ setup(
     url='https://github.com/ryanmcgrath/twython/tree/master',
     keywords='twitter search api tweet twython stream',
     description='Actively maintained, pure Python wrapper for the Twitter API. Supports both normal and streaming Twitter APIs',
-    long_description=open('README.md', encoding='utf-8').read() + '\n\n' +open('HISTORY.md', encoding='utf-8').read(),
+    long_description=io.open('README.md', encoding='utf-8').read() + '\n\n' +io.open('HISTORY.md', encoding='utf-8').read(),
     long_description_content_type='text/markdown',
     include_package_data=True,
     packages=packages,
