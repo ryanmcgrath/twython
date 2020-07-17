@@ -59,15 +59,10 @@ with a status update.
 
 .. code-block:: python
 
-    # Assume you are working with a JPEG
+    # Assuming that you are working with a JPEG
 
     from PIL import Image
-    try:
-        # Python 3
-        from io import StringIO
-    except ImportError:
-        # Python 2
-        from StringIO import StringIO
+    from io import BytesIO
 
     photo = Image.open('/path/to/file/image.jpg')
 
@@ -76,13 +71,12 @@ with a status update.
     height = int((float(photo.size[1]) * float(wpercent)))
     photo = photo.resize((basewidth, height), Image.ANTIALIAS)
 
-    image_io = StringIO.StringIO()
+    image_io = BytesIO()
     photo.save(image_io, format='JPEG')
 
     # If you do not seek(0), the image will be at the end of the file and
     # unable to be read
     image_io.seek(0)
-
 
     response = twitter.upload_media(media=image_io)
     twitter.update_status(status='Checkout this cool image!', media_ids=[response['media_id']])
