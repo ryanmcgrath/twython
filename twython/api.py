@@ -9,6 +9,7 @@ Twitter Authentication, and miscellaneous methods that are useful when
 dealing with the Twitter API
 """
 
+from __future__ import generator_stop
 import warnings
 import re
 
