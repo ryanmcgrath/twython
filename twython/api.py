@@ -431,7 +431,7 @@ class Twython(EndpointsMixin, object):
 
     @staticmethod
     def construct_api_url(api_url, **params):
-        """Construct a Twitter API url, encoded, with parameters
+        r"""Construct a Twitter API url, encoded, with parameters
 
         :param api_url: URL of the Twitter API endpoint you are attempting
         to construct
@@ -470,7 +470,7 @@ class Twython(EndpointsMixin, object):
         return self.cursor(self.search, q=search_query, **params)
 
     def cursor(self, function, return_pages=False, **params):
-        """Returns a generator for results that match a specified query.
+        r"""Returns a generator for results that match a specified query.
 
         :param function: Instance of a Twython function
         (Twython.get_home_timeline, Twython.search)
