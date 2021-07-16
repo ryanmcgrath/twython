@@ -32,7 +32,13 @@ Install Twython via pip:
 $ pip install twython
 ```
 
-Or, if you want the code that is currently on GitHub
+If you're on a legacy project that needs Python 2.7 support, you can install the last version of Twython that supported 2.7:
+
+```
+pip install twython==3.7.0`
+```
+
+Or, if you want the code that is currently on GitHub:
 
 ```bash
 git clone git://github.com/ryanmcgrath/twython.git
