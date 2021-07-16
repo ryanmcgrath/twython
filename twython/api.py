@@ -9,6 +9,7 @@ Twitter Authentication, and miscellaneous methods that are useful when
 dealing with the Twitter API
 """
 
+from __future__ import generator_stop
 import warnings
 import re
 
@@ -501,7 +502,7 @@ class Twython(EndpointsMixin, object):
             content = function(**params)
 
             if not content:
-                raise StopIteration
+                return
 
             if hasattr(function, 'iter_key'):
                 results = content.get(function.iter_key)
@@ -516,7 +517,7 @@ class Twython(EndpointsMixin, object):
 
             if function.iter_mode == 'cursor' and \
                content['next_cursor_str'] == '0':
-                raise StopIteration
+                return
 
             try:
                 if function.iter_mode == 'id':
@@ -529,7 +530,7 @@ class Twython(EndpointsMixin, object):
                             params = dict(parse_qsl(next_results.query))
                         else:
                             # No more results
-                            raise StopIteration
+                            return
                     else:
                         # Twitter gives tweets in reverse chronological order:
                         params['max_id'] = str(int(content[-1]['id_str']) - 1)
