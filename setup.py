@@ -9,7 +9,7 @@ except ImportError:
     from distutils.core import setup
 
 __author__ = 'Ryan McGrath <ryan@rymc.io>'
-__version__ = '3.8.2'
+__version__ = '3.9.0'
 
 packages = [
     'twython',
@@ -25,7 +25,7 @@ setup(
     version=__version__,
     install_requires=['requests>=2.1.0', 'requests_oauthlib>=0.4.0'],
     author='Ryan McGrath',
-    author_email='ryan@venodesigns.net',
+    author_email='ryan@rymc.io',
     license='MIT',
     url='https://github.com/ryanmcgrath/twython/tree/master',
     keywords='twitter search api tweet twython stream',
