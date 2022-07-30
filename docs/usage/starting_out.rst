@@ -74,7 +74,7 @@ Handling the Callback
 
 .. note:: If your application is a Desktop or Mobile Application *oauth_verifier* will be the PIN code
 
-After they authorize your application to access some of their account details, they'll be redirected to the callback url you specified in ``get_autentication_tokens``
+After they authorize your application to access some of their account details, they'll be redirected to the callback url you specified in ``get_authentication_tokens``
 
 You'll want to extract the ``oauth_verifier`` from the url.
 

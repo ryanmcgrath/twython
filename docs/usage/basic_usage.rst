@@ -80,7 +80,7 @@ Documentation: https://developer.twitter.com/en/docs/tweets/search/api-reference
 
 .. _dynamicargexplaination:
 
-.. important:: To help explain :ref:`dynamic function arguments <dynamicfunctionarguments>` a little more, you can see that the previous call used the keyword argument ``q``, that is because Twitter specifies in their `search documentation <https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets>`_ that the search call accepts the parameter "q". You can pass mutiple keyword arguments. The search documentation also specifies that the call accepts the parameter "result_type"
+.. important:: To help explain :ref:`dynamic function arguments <dynamicfunctionarguments>` a little more, you can see that the previous call used the keyword argument ``q``, that is because Twitter specifies in their `search documentation <https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets>`_ that the search call accepts the parameter "q". You can pass multiple keyword arguments. The search documentation also specifies that the call accepts the parameter "result_type"
 
 .. code-block:: python
 

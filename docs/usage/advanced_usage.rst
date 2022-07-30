@@ -104,7 +104,7 @@ Manipulate the Request (headers, proxies, etc.)
 
 There are times when you may want to turn SSL verification off, send custom headers, or add proxies for the request to go through.
 
-Twython uses the `requests <http://python-requests.org>`_ library to make API calls to Twitter. ``requests`` accepts a few parameters to allow developers to manipulate the acutal HTTP request.
+Twython uses the `requests <http://python-requests.org>`_ library to make API calls to Twitter. ``requests`` accepts a few parameters to allow developers to manipulate the actual HTTP request.
 
 Here is an example of sending custom headers to a Twitter API request:
 
