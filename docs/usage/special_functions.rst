@@ -10,7 +10,7 @@ This section covers methods to are part of Twython but not necessarily connected
 Cursor
 ------
 
-This function returns a generator for Twitter API endpoints that are able to be pagintated in some way (either by cursor or since_id parameter)
+This function returns a generator for Twitter API endpoints that are able to be paginated in some way (either by cursor or since_id parameter)
 
 The Old Way
 ^^^^^^^^^^^
@@ -91,7 +91,7 @@ will be replaced with:
 
     <a href="http://t.co/FCmXyI6VHd" class="twython-url">google.com</a> is <a href="https://twitter.com/search?q=%23cool" class="twython-hashtag">#cool</a>, lol! <a href="https://twitter.com/mikehelmick" class="twython-mention">@mikehelmick</a> shd <a href="https://twitter.com/search?q=%23checkitout" class="twython-hashtag">#checkitout</a>. Love, <a href="https://twitter.com/__twython__" class="twython-mention">@__twython__</a> <a href="https://twitter.com/?q=%24IBM" class="twython-symbol">$IBM</a> <a href="https://t.co/67pwRvY6z9" class="twython-url">github.com</a> <a href="http://t.co/N6InAO4B71" class="twython-media">pic.twitter.com/N6InAO4B71</a>
 
-.. note:: When converting the string to HTML we add a class to each HTML tag so that you can maninpulate the DOM later on.
+.. note:: When converting the string to HTML we add a class to each HTML tag so that you can manipulate the DOM later on.
 
 - For urls that are replaced we add ``class="twython-url"`` to the anchor tag
 - For media urls that are replaced we add ``class="twython-media"`` to the anchor tag

@@ -171,7 +171,7 @@ class TwythonStreamer(object):
         https://developer.twitter.com/en/docs/tweets/filter-realtime/guides/streaming-message-types
         for messages sent along in stream responses.
 
-        :param data: data recieved from the stream
+        :param data: data received from the stream
         :type data: dict
         """
         return True

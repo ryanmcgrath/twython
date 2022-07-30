@@ -119,7 +119,7 @@ class TwythonEndpointsTestCase(unittest.TestCase):
 
     @unittest.skip('skipping non-updated test')
     def test_send_get_and_destroy_direct_message(self):
-        """Test sending, getting, then destory a direct message succeeds"""
+        """Test sending, getting, then destroy a direct message succeeds"""
         message = self.api.send_direct_message(screen_name=protected_twitter_1,
                                                text='Hey d00d! %s\
                                                ' % int(time.time()))
@@ -395,7 +395,7 @@ class TwythonEndpointsTestCase(unittest.TestCase):
 
     @unittest.skip('skipping non-updated test')
     def test_get_list_memberships(self):
-        """Test list of memberhips the authenticated user succeeds"""
+        """Test list of membership the authenticated user succeeds"""
         self.api.get_list_memberships()
 
     @unittest.skip('skipping non-updated test')

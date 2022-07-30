@@ -230,7 +230,7 @@ class EndpointsMixin(object):
 
         response = self.post(upload_url, params=params)
 
-        # Only get the status if explicity asked to
+        # Only get the status if explicitly asked to
         # Default to False
         if check_progress:
 
